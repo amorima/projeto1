@@ -17,7 +17,7 @@ const createFlight = () => {
     flights.push(flight)
 }
 const readFlight = () => {
-
+    return flights; //comming soon
 }
 const updateFlight = (object,newObject) => {
 
