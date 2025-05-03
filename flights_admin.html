@@ -51,7 +51,7 @@
                 </tr>
             </thead>
             <!-- Table Content -->
-            <tbody class="table-row-group">
+            <tbody id="tableContent" class="table-row-group">
                 <tr class="table-row h-[42px]">
                     <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-bold font-['IBM_Plex_Sans']">TRD783</td>
                     <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">OPO</td>
@@ -60,8 +60,8 @@
                     <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">25/05/2025 10:25</td>
                     <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">S</td>
                     <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
-                        <span class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6">edit_square</span>
-                        <span class="material-symbols-outlined text-red-600 cursor-pointer">delete</span>
+                        <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6">edit_square</button>
+                        <button class="material-symbols-outlined text-red-600 cursor-pointer">delete</button>
                     </td>
                 </tr>
                 <tr class="table-row h-[42px]">
@@ -148,7 +148,7 @@
             <!-- Header -->
             <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">Adicionar voo manual</h2>
             <!-- Formulario -->
-            <form class="space-y-4">
+            <form class="space-y-4" id="add_flight_form">
                 <div>
                     <label for="flight_name" class="block text-base font-light text-Text-Subtitles">Número do Voo</label>
                     <input id="flight_name" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
@@ -185,7 +185,7 @@
   
             <!-- Acções -->
             <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
-                <button class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
+                <button onclick="createFlight()" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
                     <div class="inline-flex justify-start items-center gap-2.5">
                         <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                         <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
