@@ -3,10 +3,12 @@ tailwind.config = {
     extend: {
       colors: {
         "Main-Primary": "#1B9AAA", // cor primária
+        "Main-Secondary": "#126B76",
         "brand-secondary": "#126B76", // cor secundária
         "Button-Main": "#126B76", // cor secundária
         "Background-Card-Bg-Gami": "#F7F7F7",
         "Text-Subtitles": "#808080",
+        "Components-Limit-Color":"",//Gradiente
       },
       fontFamily: {
         sans: [
