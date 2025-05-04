@@ -22,6 +22,7 @@ const createFlight = () => {
     }
     flights.push(flight)
 
+    closeModal('modal-adicionar');
     //Atualizar Tabela
     currentPage = 1
     updateTable()
@@ -48,24 +49,74 @@ const openModal = (id) => {
   }
 const closeModal = (id) => {
     document.getElementById(id).classList.add("hidden")
+    resetModalToAddMode();
 }
-function editFlight(name) {
+const editFlight = (name) => {
     const flight = flights.find(f => f.flight_name == name);
     if (!flight) return;
 
     // Editar Titulo
-    document.getElementById('modal-title').innerText = 'Editar Voo';
+    document.querySelector('#modal-adicionar h2').innerText = 'Editar voo'
 
+    document.getElementById('original_flight_name').value = flight.flight_name;
     // Preencher Campos
     document.getElementById('flight_name').value = flight.flight_name;
     document.getElementById('flight_from').value = flight.flight_from;
     document.getElementById('flight_to').value = flight.flight_to;
     document.getElementById('flight_company').value = flight.flight_company;
     document.getElementById('flight_leaves').value = flight.flight_leaves;
-    document.getElementById('flight_direct').checked = flight.flight_direct;
+    document.getElementById('flight_direct').value = flight.flight_direct;
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector('#modal-adicionar button[onclick="createFlight()"]');
+    addButton.innerHTML = `
+        <div class="inline-flex justify-start items-center gap-2.5">
+            <span class="material-symbols-outlined text-white cursor-pointer">edit_square</span>
+            <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Salvar</div>
+        </div>
+    `;
+    addButton.onclick = saveEditedFlight;
 
     openModal(`modal-adicionar`);
 }
+const saveEditedFlight = () => {
+    const originalName = document.getElementById('original_flight_name').value;
+
+    const updatedFlight = {
+        flight_name: document.getElementById('flight_name').value,
+        flight_from: document.getElementById('flight_from').value,
+        flight_to: document.getElementById('flight_to').value,
+        flight_company: document.getElementById('flight_company').value,
+        flight_leaves: document.getElementById('flight_leaves').value,
+        flight_direct: document.getElementById('flight_direct').value
+    };
+
+    const index = flights.findIndex(f => f.flight_name === originalName);
+    if (index !== -1) {
+        flights[index] = updatedFlight;
+    }
+
+    resetModalToAddMode();
+    closeModal('modal-adicionar');
+    updateTable();
+}
+const resetModalToAddMode = () => {
+    document.querySelector('#modal-adicionar h2').innerText = 'Adicionar voo manual';
+
+    const addButton = document.querySelector('#modal-adicionar button');
+    addButton.innerHTML = `
+        <div class="inline-flex justify-start items-center gap-2.5">
+            <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
+            <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
+        </div>
+    `;
+    addButton.onclick = createFlight;
+
+    // Optionally clear the form
+    document.getElementById('add_flight_form').reset()
+    document.getElementById('original_flight_name').value = ""
+}
+
 //Tabela Voos
 //Paginação
 const updatePaginationControls = () => {
@@ -165,8 +216,8 @@ const updateTable = () => {
             <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_leaves}</td>
             <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_direct}</td>
             <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
-                <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6" onclick="editFlight(${flight.flight_name})">edit_square</button>
-                <button class="material-symbols-outlined text-red-600  cursor-pointer mr-6" onclick="deleteFlight(${flight.flight_name})">delete</button>
+                <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6" onclick="editFlight('${flight.flight_name}')">edit_square</button>
+                <button class="material-symbols-outlined text-red-600  cursor-pointer mr-6" onclick="deleteFlight('${flight.flight_name}')">delete</button>
             </td>
         `
         tableBody.appendChild(row)
