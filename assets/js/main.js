@@ -3,6 +3,9 @@ const flights = []
 //Defenição da Paginação da Tabela
 let currentPage = 1 //Inicia a Pagina Sempre a 1
 const rowsPerPage = 13 //Define Linhas a Mostrar
+//Ordenação da Tabela
+let sortColumn = null;
+let sortDirection = 'asc';
 
 //CRUD Flights
 const createFlight = () => {
@@ -126,7 +129,6 @@ const updatePaginationControls = () => {
         }
     }, currentPage === totalPages))
 }
-
 //Carregar Tabela
 const updateTable = () => {
     const tableBody = document.getElementById("tableContent")
@@ -155,6 +157,38 @@ const updateTable = () => {
     })
 
     updatePaginationControls()
+}
+//Ordenar Tabela
+const sortTableBy = (column) =>{
+    if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+    }
+
+    flights.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+
+        // Convert date strings to timestamps for proper comparison
+        if (column === 'flight_leaves') {
+            valA = new Date(valA).getTime();
+            valB = new Date(valB).getTime();
+        }
+
+        if (typeof valA === 'string') {
+            valA = valA.toLowerCase();
+            valB = valB.toLowerCase();
+        }
+
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    currentPage = 1; // reset to first page after sorting
+    updateTable();
 }
 
 //On Page Load
