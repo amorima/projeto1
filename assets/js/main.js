@@ -11,7 +11,8 @@ let sortDirection = 'asc';
 const createFlight = () => {
     const form = document.getElementById("add_flight_form")
     const flight = {}
-    //Note: Adicionar Validação de Dados
+
+
     for (let element of form.elements) {
         // Id/Nome do elemento como Key (key:value)
         const key = element.name || element.id
@@ -20,27 +21,47 @@ const createFlight = () => {
             flight[key] = element.value
         }
     }
+    //Validação Dados Preenchimento Antes de Adicionar ao Array de Objetos
+    if (!flight.flight_name || !flight.flight_from || !flight.flight_to || !flight.flight_leaves) {
+        //Comentado: Mensagem de Eroo
+        //alert("Preenchimento de Campo Obrigatório");
+        return;
+    }
+    //Validação Id (flight_name) Único
+    if (flights.some(f => f.flight_name === flight.flight_name)) {
+        //Comentado: Nome Duplicado
+        //alert("NºVoo deve ser unico");
+        return;
+    }
+
     flights.push(flight)
 
     closeModal('modal-adicionar');
-    //Atualizar Tabela
     currentPage = 1
     updateTable()
 }
-const readFlight = () => {
-    return flights //comming soon
+const readFlight = (filterFn = null) => { //filtro byDefault nenhum
+    return filterFn ? flights.filter(filterFn) : flights;
 }
 const updateFlight = (object,newObject) => {
-    
-    //Atualizar Tabela
-    currentPage = 1
-    updateTable()
+    const index = flights.findIndex(f => f.flight_name === originalName);
+    if (index !== -1) {
+        flights[index] = updatedFlight;
+        return true;
+    }
+    return false;
 }
-const deleteFlight = (object) => {
-    //Atualizar Tabela
-    currentPage = 1
-    updateTable()
-}
+const deleteFlight = (object_name) => {
+    //Comentado: Confirm Delete
+    //if (!confirm(`Are you sure you want to delete flight "${object_name}"?`)) return;
+
+    const index = flights.findIndex(f => f.flight_name === object_name);
+    if (index !== -1) {
+        flights.splice(index, 1);
+        currentPage = 1;
+        updateTable();
+    }
+};    
 
 //Interações c/Interface
 //Modal
@@ -49,10 +70,9 @@ const openModal = (id) => {
   }
 const closeModal = (id) => {
     document.getElementById(id).classList.add("hidden")
-    resetModalToAddMode();
 }
 const editFlight = (name) => {
-    const flight = flights.find(f => f.flight_name == name);
+    const flight = readFlight(f => f.flight_name === name)[0];
     if (!flight) return;
 
     // Editar Titulo
@@ -91,9 +111,8 @@ const saveEditedFlight = () => {
         flight_direct: document.getElementById('flight_direct').value
     };
 
-    const index = flights.findIndex(f => f.flight_name === originalName);
-    if (index !== -1) {
-        flights[index] = updatedFlight;
+    if (!updateFlight(originalName, updatedFlight)) {
+        alert("Falha ao editar o voo. Nome original não encontrado.");
     }
 
     resetModalToAddMode();
