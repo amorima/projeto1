@@ -79,9 +79,6 @@ const updateFlight = (originalFlight, updatedFlight) => {
     return false;
 }
 const deleteFlight = (flight_name) => {
-    //Comentado: Confirm Delete
-    //if (!confirm(`Are you sure you want to delete flight "${object_name}"?`)) return;
-
     const index = flights.findIndex(f => f.flight_name === flight_name);
     if (index !== -1) {
         flights.splice(index, 1);
@@ -141,7 +138,6 @@ const updateActivitie = (originalActivitie, updatedActivitie) => {
 const deleteActivitie = (activitie_name) => {
 
 }
-
 //CRUD User
 const createUser = () => {
 
@@ -181,6 +177,7 @@ const updateAcess = (originalAcess, updatedAcess) => {
 const deleteAcess = (acess_name) => {
 
 }
+
 // === Interface ===
 // Interações Modal 
 const openModal = (id) => {
