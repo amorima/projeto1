@@ -16,53 +16,56 @@
     <script src="assets/js/ui.js" defer></script>
 
 </head>
-<body class="font-sans"> <header id="header-placeholder"></header>
+<body class="font-sans"><header id="header-placeholder"></header>
 
-    <nav id="menu-placeholder"></nav>
+  <nav id="menu-placeholder"></nav>
 
-    <section class="m-10">
-        <div data-property-1="Full" class="mt-10 w-64 h-14 px-16 py-2 bg-Button-Main rounded-[67.50px] inline-flex flex-col justify-center items-center gap-3.5">
-          <div class="w-20 h-7 inline-flex justify-start items-center gap-2">
-              <div class="w-20 h-7 p-3.5 flex justify-center items-center gap-3.5">
-                  <div class="justify-start"><span class="text-white text-xl font-bold font-['Space_Mono']">Plan</span><span class="text-white text-xl font-normal font-['Space_Mono']">It</span></div>
-              </div>
-          </div>
+  <section class="relative h-80 bg-Main-Primary w-full mt-[96px] px-[120px]">
+    <p class="justify-start text-white text-2xl font-bold font-['Space_Mono'] px-8 py-4">Não complique,</p>
+    <form class="grid grid-cols-3 gap-4 px-8">
+      <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
+        <span class="material-symbols-outlined text-Main-Primary cursor-pointer">trip_origin</span>
+        <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Porto</p>
       </div>
-
-      <div class="w-96 h-20 relative bg-Main-Primary rounded-lg overflow-hidden mt-10">
-        <div class="left-[19px] top-[28.41px] absolute inline-flex justify-start items-end">
-            <div class="w-8 h-8 relative">
-              <span class="material-symbols-outlined text-white">bed</span>
-            </div>
-            <div class="w-28 h-8 relative">
-                <div class="w-20 h-8 left-[18.82px] top-[0.30px] absolute justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Hotéis</div>
-            </div>
+      <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
+        <span class="material-symbols-outlined text-Main-Primary cursor-pointer">location_on</span>
+        <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Londres</p>
+      </div>
+      <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5 divide-x-2 divide-solid divide-Main-Primary">
+        <div class="w-1/2 inline-flex">
+          <span class="material-symbols-outlined text-Main-Primary cursor-pointer">calendar_month</span>
+          <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">06 Mai - 13 Mai</p>
         </div>
-    </div>
-
-    <div class="w-96 h-20 relative bg-Main-Primary rounded-lg overflow-hidden mt-10">
-      <div class="left-[19px] top-[28.41px] absolute inline-flex justify-start items-end">
-          <div class="w-8 h-8 relative">
-            <span class="material-symbols-outlined text-white">directions_car</span>
-          </div>
-          <div class="w-28 h-8 relative">
-              <div class="w-44 h-8 left-[18.82px] top-[0.30px] absolute justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Aluguer de carros</div>
-          </div>
+        <div class="w-1/2">
+          <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">1 Viajante</p>
+        </div>
       </div>
-  </div>
+      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white overflow-hidden flex-row items-center px-[11px] gap-1.5">
+        <div class="inline-flex gap-3 py-2 items-center">
+          <span class="material-symbols-outlined text-white cursor-pointer">travel_luggage_and_bags</span>
+          <p class="justify-start text-neutral-950 text-white text-base font-normal font-['IBM_Plex_Sans']">Tipo Turimo</p>
+        </div>
+        <p class="justify-start px-9 text-neutral-950 text-white text-xl font-semibold font-['IBM_Plex_Sans']">Turimo Urbano</p>
+      </div>
+      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white overflow-hidden flex-row items-center px-[11px] gap-1.5">
+        <div class="inline-flex gap-3 py-2 items-center">
+          <span class="material-symbols-outlined text-white cursor-pointer">travel_luggage_and_bags</span>
+          <p class="justify-start text-neutral-950 text-white text-base font-normal font-['IBM_Plex_Sans']">Tipo Turimo</p>
+        </div class=>
+        <p class="justify-start px-9 text-neutral-950 text-white text-xl font-semibold font-['IBM_Plex_Sans']">Turimo Urbano</p>
+      </div>
+      <div class="absolute -bottom-7 h-14 px-16 py-3 bg-Button-Main rounded-[4rem] flex-col">
+        <p class="justify-center text-center"><span class="text-white text-xl font-bold font-['Space_Mono']">Plan</span><span class="text-white text-xl font-normal font-['Space_Mono']">It</span></p>
+      </div>
+    </form>
+  </section>
 
-  <button class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex flex-col justify-start items-start gap-1.5">
-    <div class="inline-flex justify-start items-center gap-2.5">
-      <span class="material-symbols-outlined text-white">add_circle</span>
-        <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
-    </div>
-  </button>
+  <section>
 
-  <svg class="fill-red-500" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#1f1f1f"><path d="M480-140q-11 0-22-4t-19-12l-53-49Q262-320 171-424.5T80-643q0-90 60.5-150.5T290-854q51 0 101 24.5t89 80.5q44-56 91-80.5t99-24.5q89 0 149.5 60.5T880-643q0 114-91 218.5T574-205l-53 49q-8 8-19 12t-22 4Z"/></svg>
+  </section>
 
-</section>
 
-    <footer id="footer-placeholder"></footer>
+  <footer id="footer-placeholder"></footer>
 
-    <script src="assets/js/components.js"></script> <script src="assets/js/storage.js"></script>  <script src="assets/js/main.js" defer></script>    </body>
+  <script src="assets/js/components.js"></script> <script src="assets/js/storage.js"></script>  <script src="assets/js/main.js" defer></script></body>
 </html>
