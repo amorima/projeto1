@@ -43,7 +43,7 @@ const createFlight = () => {
 const readFlight = (filterFn = null) => { //filtro byDefault nenhum
     return filterFn ? flights.filter(filterFn) : flights;
 }
-const updateFlight = (object,newObject) => {
+const updateFlight = (originalName, updatedFlight) => {
     const index = flights.findIndex(f => f.flight_name === originalName);
     if (index !== -1) {
         flights[index] = updatedFlight;
