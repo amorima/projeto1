@@ -7,36 +7,62 @@ const rowsPerPage = 13 //Define Linhas a Mostrar
 let sortColumn = null;
 let sortDirection = 'asc';
 
+// === Funções Uteis ===
+const getFormData = (formId) => {
+    const form = document.getElementById(formId);
+    const data = {};
+    for (let element of form.elements) {
+        const key = element.name || element.id;
+        if (key){
+            data[key] = element.value;
+        } 
+    }
+    return data;
+}
+const showToast = (message, type = 'success') => {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50 
+        ${type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`;
+    toast.innerText = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+//Local Storage
+const saveToLocalStorage = (key, data) => {
+    localStorage.setItem(key, JSON.stringify(data));
+};
+const loadFromLocalStorage = (key, targetArray) => {
+    const saved = localStorage.getItem(key);
+    if (saved) {
+        const content = JSON.parse(saved);
+        if (Array.isArray(content)) {
+            targetArray.splice(0, targetArray.length, ...content);
+        }
+    }
+};
+
 // === CRUD PlanIt ===
 //CRUD Flights
 const createFlight = () => {
-    const form = document.getElementById("add_flight_form")
-    const flight = {}
+    const flight = getFormData("add_flight_form");
 
-
-    for (let element of form.elements) {
-        // Id/Nome do elemento como Key (key:value)
-        const key = element.name || element.id
-        // Filtrar keys vazias
-        if (key) {
-            flight[key] = element.value
-        }
-    }
     //Validação Dados Preenchimento Antes de Adicionar ao Array de Objetos
-    if (!flight.flight_name || !flight.flight_from || !flight.flight_to || !flight.flight_leaves) {
-        //Comentado: Mensagem de Eroo
-        //alert("Preenchimento de Campo Obrigatório");
+    const required = ['flight_name', 'flight_from', 'flight_to', 'flight_leaves'];
+    const missing = required.filter(key => !flight[key]);
+    if (missing.length > 0) {
+        showToast("Preencha todos os campos obrigatórios.", 'error');
         return;
     }
-    //Validação Id (flight_name) Único
+
     if (flights.some(f => f.flight_name === flight.flight_name)) {
-        //Comentado: Nome Duplicado
-        //alert("NºVoo deve ser unico");
+        showToast("Nº do voo deve ser único.", 'error');
         return;
     }
 
     flights.push(flight)
+    saveToLocalStorage('flights', flights);
 
+    showToast("Voo adicionado com sucesso!");
     closeModal('modal-adicionar');
     currentPage = 1
     updateTable()
@@ -59,6 +85,7 @@ const deleteFlight = (object_name) => {
     const index = flights.findIndex(f => f.flight_name === object_name);
     if (index !== -1) {
         flights.splice(index, 1);
+        saveToLocalStorage('flights', flights);
         currentPage = 1;
         updateTable();
     }
@@ -102,24 +129,27 @@ const editFlight = (name) => {
 }
 const saveEditedFlight = () => {
     const originalName = document.getElementById('original_flight_name').value;
+    const updatedFlight = getFormData("add_flight_form");
 
-    const updatedFlight = {
-        flight_name: document.getElementById('flight_name').value,
-        flight_from: document.getElementById('flight_from').value,
-        flight_to: document.getElementById('flight_to').value,
-        flight_company: document.getElementById('flight_company').value,
-        flight_leaves: document.getElementById('flight_leaves').value,
-        flight_direct: document.getElementById('flight_direct').value
-    };
-
-    if (!updateFlight(originalName, updatedFlight)) {
-        alert("Falha ao editar o voo. Nome original não encontrado.");
+    const required = ['flight_name', 'flight_from', 'flight_to', 'flight_leaves'];
+    const missing = required.filter(key => !updatedFlight[key]);
+    if (missing.length > 0) {
+        showToast("Preencha todos os campos obrigatórios.", 'error');
+        return;
     }
 
+    const success = updateFlight(originalName, updatedFlight);
+    if (!success) {
+        showToast("Erro ao editar voo.", 'error');
+        return;
+    }
+
+    saveToLocalStorage('flights', flights);;
+    showToast("Voo editado com sucesso!");
     resetModalToAddMode();
     closeModal('modal-adicionar');
     updateTable();
-}
+};
 const resetModalToAddMode = () => {
     document.querySelector('#modal-adicionar h2').innerText = 'Adicionar voo manual';
 
@@ -260,7 +290,7 @@ const updateSortIcons = (activeColumn) => { //Se não for para usar esta funçã
         }
     });
 }
-const sortTableBy = (column) =>{
+const sortTableBy = (column) =>{//WARNING: Não contempla tabulação
     if (sortColumn === column) {
         sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -295,5 +325,6 @@ const sortTableBy = (column) =>{
 
 // === On Page Load ===
 document.addEventListener("DOMContentLoaded", () => {
+    loadFromLocalStorage('flights', flights);
     updateTable()
 })
