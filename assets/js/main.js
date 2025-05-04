@@ -159,6 +159,20 @@ const updateTable = () => {
     updatePaginationControls()
 }
 //Ordenar Tabela
+const updateSortIcons = (activeColumn) => { //Se não for para usar esta função na versão final REMINDER:limpar chamada no sortTableBy()
+    const columns = ['flight_name', 'flight_from', 'flight_to', 'flight_company', 'flight_leaves', 'flight_direct'];
+
+    columns.forEach(col => {
+        const iconEl = document.getElementById(`sort-icon-${col}`);
+        if (!iconEl) return;
+
+        if (col === activeColumn) {
+            iconEl.innerHTML = sortDirection === 'asc' ? '▲' : '▼';
+        } else {
+            iconEl.innerHTML = ''; // Limpar Outros
+        }
+    });
+}
 const sortTableBy = (column) =>{
     if (sortColumn === column) {
         sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
@@ -171,7 +185,7 @@ const sortTableBy = (column) =>{
         let valA = a[column];
         let valB = b[column];
 
-        // Convert date strings to timestamps for proper comparison
+        // Converção Data
         if (column === 'flight_leaves') {
             valA = new Date(valA).getTime();
             valB = new Date(valB).getTime();
@@ -187,8 +201,9 @@ const sortTableBy = (column) =>{
         return 0;
     });
 
-    currentPage = 1; // reset to first page after sorting
-    updateTable();
+    updateSortIcons(column)
+    currentPage = 1
+    updateTable()
 }
 
 //On Page Load
