@@ -70,27 +70,117 @@ const createFlight = () => {
 const readFlight = (filterFn = null) => { //filtro byDefault nenhum
     return filterFn ? flights.filter(filterFn) : flights;
 }
-const updateFlight = (originalName, updatedFlight) => {
-    const index = flights.findIndex(f => f.flight_name === originalName);
+const updateFlight = (originalFlight, updatedFlight) => {
+    const index = flights.findIndex(f => f.flight_name === originalFlight);
     if (index !== -1) {
         flights[index] = updatedFlight;
         return true;
     }
     return false;
 }
-const deleteFlight = (object_name) => {
+const deleteFlight = (flight_name) => {
     //Comentado: Confirm Delete
     //if (!confirm(`Are you sure you want to delete flight "${object_name}"?`)) return;
 
-    const index = flights.findIndex(f => f.flight_name === object_name);
+    const index = flights.findIndex(f => f.flight_name === flight_name);
     if (index !== -1) {
         flights.splice(index, 1);
         saveToLocalStorage('flights', flights);
         currentPage = 1;
         updateTable();
     }
-};    
+};
+//CRUD Destino
+const createDestination = () => {
 
+}
+const readDestination = (filterFn = null) => {
+
+}
+const updateDestination = (originalDestination, updatedDestination) => {
+
+}
+const deleteDestination = (destination_name) => {
+}
+//CRUD Hotel
+const createHotel = () => {
+
+}
+const readHotel = (filterFn = null) => {
+
+}
+const updateHotel = (originalHotel, updatedHotel) => {
+
+}
+const deleteHotel = (hotel_name) => {
+
+}
+//CRUD Carros
+const createCar = () => {
+
+}
+const readCar = (filterFn = null) => {
+
+}
+const updateCar = (originalCar, updatedCar) => {
+
+}
+const deleteCar = (car_name) => {
+
+}
+//CRUD Atividades
+const createActivitie = () => {
+
+}
+const readActivitie = (filterFn = null) => {
+
+}
+const updateActivitie = (originalActivitie, updatedActivitie) => {
+
+}
+const deleteActivitie = (activitie_name) => {
+
+}
+
+//CRUD User
+const createUser = () => {
+
+}
+const readUser = (filterFn = null) => {
+
+}
+const updateUser = (originalUser, updatedUser) => {
+
+}
+const deleteUser = (user_name) => {
+
+}
+//CRUD Tipologias de Turismo
+const createTurism = () => {
+
+}
+const readTurism = (filterFn = null) => {
+
+}
+const updateTurism = (originalTurism, updatedTurism) => {
+
+}
+const deleteTurism = (turism_name) => {
+
+}
+//CRUD Opções de Acessibilidade
+const createAcess = () => {
+
+}
+const readAcess = (filterFn = null) => {
+
+}
+const updateAcess = (originalAcess, updatedAcess) => {
+
+}
+const deleteAcess = (acess_name) => {
+
+}
 // === Interface ===
 // Interações Modal 
 const openModal = (id) => {
@@ -128,7 +218,7 @@ const editFlight = (name) => {
     openModal(`modal-adicionar`);
 }
 const saveEditedFlight = () => {
-    const originalName = document.getElementById('original_flight_name').value;
+    const originalFlight = document.getElementById('original_flight_name').value;
     const updatedFlight = getFormData("add_flight_form");
 
     const required = ['flight_name', 'flight_from', 'flight_to', 'flight_leaves'];
@@ -138,7 +228,7 @@ const saveEditedFlight = () => {
         return;
     }
 
-    const success = updateFlight(originalName, updatedFlight);
+    const success = updateFlight(originalFlight, updatedFlight);
     if (!success) {
         showToast("Erro ao editar voo.", 'error');
         return;
