@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/ui.js" defer></script>
+
+</head>
+<body class="font-sans"><header id="header-placeholder"></header>
+     
+    <nav id="menu-placeholder"></nav>
+
+    <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mt-[126px] w-full h-24 p-8 bg-Background-Card-Bg-Gami rounded-lg overflow-hidden inline-flex justify-between">
+            <h2 class="w-full sm:w-[592px] justify-center text-Button-Main text-4xl font-bold font-['Space_Mono'] justify-start">Gestão de utilizadores</h2>
+            <div>
+                <button class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5">
+                    <span class="material-symbols-outlined text-white cursor-pointer">search</span>
+                </button>
+                <button onclick="openModal(`modal-adicionar`)" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
+                    <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
+                    <p class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script src="assets/js/components.js"></script> 
+    <script src="assets/js/storage.js"></script>
+    <script src="assets/js/main.js" defer></script>
+</body>
+</html>
