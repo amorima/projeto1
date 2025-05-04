@@ -1,4 +1,4 @@
-
+// === Variaveis Gerais ===
 const flights = []
 //Defenição da Paginação da Tabela
 let currentPage = 1 //Inicia a Pagina Sempre a 1
@@ -7,6 +7,7 @@ const rowsPerPage = 13 //Define Linhas a Mostrar
 let sortColumn = null;
 let sortDirection = 'asc';
 
+// === CRUD PlanIt ===
 //CRUD Flights
 const createFlight = () => {
     const form = document.getElementById("add_flight_form")
@@ -63,8 +64,8 @@ const deleteFlight = (object_name) => {
     }
 };    
 
-//Interações c/Interface
-//Modal
+// === Interface ===
+// Interações Modal 
 const openModal = (id) => {
     document.getElementById(id).classList.remove("hidden")
   }
@@ -136,8 +137,8 @@ const resetModalToAddMode = () => {
     document.getElementById('original_flight_name').value = ""
 }
 
-//Tabela Voos
-//Paginação
+// Tabela Voos
+// Paginação
 const updatePaginationControls = () => {
     const container = document.getElementById("pagination-controls")
     container.innerHTML = ""
@@ -292,7 +293,7 @@ const sortTableBy = (column) =>{
     updateTable()
 }
 
-//On Page Load
+// === On Page Load ===
 document.addEventListener("DOMContentLoaded", () => {
     updateTable()
 })
