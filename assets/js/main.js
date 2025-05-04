@@ -30,6 +30,7 @@ const readFlight = () => {
     return flights //comming soon
 }
 const updateFlight = (object,newObject) => {
+    
     //Atualizar Tabela
     currentPage = 1
     updateTable()
@@ -41,7 +42,6 @@ const deleteFlight = (object) => {
 }
 
 //Interações c/Interface
-
 //Modal
 const openModal = (id) => {
     document.getElementById(id).classList.remove("hidden")
@@ -49,7 +49,23 @@ const openModal = (id) => {
 const closeModal = (id) => {
     document.getElementById(id).classList.add("hidden")
 }
+function editFlight(name) {
+    const flight = flights.find(f => f.flight_name == name);
+    if (!flight) return;
 
+    // Editar Titulo
+    document.getElementById('modal-title').innerText = 'Editar Voo';
+
+    // Preencher Campos
+    document.getElementById('flight_name').value = flight.flight_name;
+    document.getElementById('flight_from').value = flight.flight_from;
+    document.getElementById('flight_to').value = flight.flight_to;
+    document.getElementById('flight_company').value = flight.flight_company;
+    document.getElementById('flight_leaves').value = flight.flight_leaves;
+    document.getElementById('flight_direct').checked = flight.flight_direct;
+
+    openModal(`modal-adicionar`);
+}
 //Tabela Voos
 //Paginação
 const updatePaginationControls = () => {
@@ -149,8 +165,8 @@ const updateTable = () => {
             <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_leaves}</td>
             <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_direct}</td>
             <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
-                <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6" onclick="editFlight(${index})">edit_square</button>
-                <button class="material-symbols-outlined text-red-600  cursor-pointer mr-6" onclick="deleteFlight(${index})">delete</button>
+                <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6" onclick="editFlight(${flight.flight_name})">edit_square</button>
+                <button class="material-symbols-outlined text-red-600  cursor-pointer mr-6" onclick="deleteFlight(${flight.flight_name})">delete</button>
             </td>
         `
         tableBody.appendChild(row)
@@ -167,7 +183,7 @@ const updateSortIcons = (activeColumn) => { //Se não for para usar esta funçã
         if (!iconEl) return;
 
         if (col === activeColumn) {
-            iconEl.innerHTML = sortDirection === 'asc' ? '▲' : '▼';
+            iconEl.innerHTML = sortDirection === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down';
         } else {
             iconEl.innerHTML = ''; // Limpar Outros
         }
