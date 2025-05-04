@@ -20,13 +20,13 @@
 
   <nav id="menu-placeholder"></nav>
 
-  <section class="relative h-auto bg-Main-Primary w-full mt-[96px] px-[120px] pb-12">
+  <section class="h-auto bg-Main-Primary w-full mt-[96px] px-[120px]">
     <p class="justify-start text-white text-2xl font-bold font-['Space_Mono'] px-8 py-4">Não complique,</p>
-    <form class="grid grid-cols-1 sm:grid-cols-3  gap-4 px-8">
-      <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
+    <form class="grid grid-cols-1 sm:grid-cols-3 gap-4 px-8">
+      <button onclick="openModal(`modal-from`)" class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
         <span class="material-symbols-outlined text-Main-Primary cursor-pointer">trip_origin</span>
         <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Porto</p>
-      </div>
+      </button>
       <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
         <span class="material-symbols-outlined text-Main-Primary cursor-pointer">location_on</span>
         <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Londres</p>
@@ -54,18 +54,51 @@
         </div class=>
         <p class="justify-start px-9 text-neutral-950 text-white text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
       </div>
-      <div class="absolute -bottom-7 h-14 px-16 py-3 bg-Button-Main rounded-[4rem] flex-col">
+      <div class="px-16 py-3 bg-Button-Main rounded-[4rem] col-start-2">
         <p class="justify-center text-center"><span class="text-white text-xl font-bold font-['Space_Mono']">Plan</span><span class="text-white text-xl font-normal font-['Space_Mono']">It</span></p>
       </div>
     </form>
   </section>
 
-  <section>
-
+  <section class="h-auto w-full px-[120px] pt-12">
+    <div class="px-8 grid grid-cols-3 gap-4">
+      <div class="inline-flex bg-Main-Primary rounded-lg h-20 w-96 justify-start items-center px-8 gap-6">
+        <span class="material-symbols-outlined text-white cursor-pointer">explore</span>
+        <p class="justify-start text-neutral-950 text-white text-xl font-bold font-['IBM_Plex_Sans']">Explorar</p>
+      </div>
+      <div class="inline-flex bg-Main-Primary rounded-lg h-20 w-96 justify-start items-center px-8 gap-6">
+        <span class="material-symbols-outlined text-white cursor-pointer">king_bed</span>
+        <p class="justify-start text-neutral-950 text-white text-xl font-bold font-['IBM_Plex_Sans']">Hotéis</p>
+      </div>
+      <div class="inline-flex bg-Main-Primary rounded-lg h-20 w-96 justify-start items-center px-8 gap-6">
+        <span class="material-symbols-outlined text-white cursor-pointer">directions_car</span>
+        <p class="justify-start text-neutral-950 text-white text-xl font-bold font-['IBM_Plex_Sans']">Aluguer de carros</p>
+      </div>
+    </div>
   </section>
 
 
   <footer id="footer-placeholder"></footer>
+
+  <div id="modal-from" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+    <!-- Conteudo -->
+        <div class="bg-white w-full max-w-2xl mx-auto rounded-xl shadow-lg p-8">
+            <!-- Header -->
+            <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">De</h2>
+            <!-- Procura -->
+
+            <!-- Opções -->
+  
+            <!-- Acções -->
+            <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
+                <button onclick="closeModal(`modal-from`)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                    <div class="flex justify-start items-center gap-2.5">
+                        <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
 
   <script src="assets/js/components.js"></script> <script src="assets/js/storage.js"></script>  <script src="assets/js/main.js" defer></script></body>
 </html>

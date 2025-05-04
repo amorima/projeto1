@@ -1,5 +1,8 @@
 
 const flights = []
+//Defenição da Paginação da Tabela
+let currentPage = 1 //Inicia a Pagina Sempre a 1
+const rowsPerPage = 13 //Define Linhas a Mostrar
 
 //CRUD Flights
 const createFlight = () => {
@@ -8,42 +11,134 @@ const createFlight = () => {
     //Note: Adicionar Validação de Dados
     for (let element of form.elements) {
         // Id/Nome do elemento como Key (key:value)
-        const key = element.name || element.id;
+        const key = element.name || element.id
         // Filtrar keys vazias
         if (key) {
-            flight[key] = element.value;
+            flight[key] = element.value
         }
     }
     flights.push(flight)
+
+    //Atualizar Tabela
+    currentPage = 1
+    updateTable()
 }
 const readFlight = () => {
-    return flights; //comming soon
+    return flights //comming soon
 }
 const updateFlight = (object,newObject) => {
-
+    //Atualizar Tabela
+    currentPage = 1
+    updateTable()
 }
 const deleteFlight = (object) => {
-
+    //Atualizar Tabela
+    currentPage = 1
+    updateTable()
 }
 
 //Interações c/Interface
 
-//Modal Gestão de Voos
-const openModal = () => {
-    document.getElementById("modal-adicionar").classList.remove("hidden");
+//Modal
+const openModal = (id) => {
+    document.getElementById(id).classList.remove("hidden")
   }
-const closeModal = () => {
-    document.getElementById("modal-adicionar").classList.add("hidden");
+const closeModal = (id) => {
+    document.getElementById(id).classList.add("hidden")
 }
 
 //Tabela Voos
-const updateTable = () => {
-    const tableBody = document.getElementById("tableContent");
-    tableBody.innerHTML = ""; // reset
+//Paginação
+const updatePaginationControls = () => {
+    const container = document.getElementById("pagination-controls")
+    container.innerHTML = ""
+    const totalPages = Math.ceil(flights.length / rowsPerPage)
 
-    flights.forEach((flight, index) => {
-        const row = document.createElement("tr");
-        row.classList.add("table-row", "h-[42px]");
+    const createPageButton = (label, page, isActive = false, isEllipsis = false) => {
+        const btn = document.createElement("button")
+        btn.className = `w-8 h-8 px-2.5 py-2 rounded-lg inline-flex flex-col justify-center items-center gap-2.5 ${
+            isActive ? "bg-Main-Primary" : "outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color"
+        }`
+        if (isEllipsis) {
+            const p = document.createElement("p")
+            p.textContent = "..."
+            p.className = "justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']"
+            btn.appendChild(p)
+        } else {
+            const p = document.createElement("p")
+            p.textContent = label
+            p.className = `justify-start ${isActive ? "text-white" : "text-black"} text-lg font-normal font-['IBM_Plex_Sans']`
+            btn.appendChild(p)
+            btn.onclick = () => {
+                currentPage = page
+                updateTable()
+            }
+        }
+        return btn
+    }
+    const createIconButton = (icon, onClick, disabled = false) => {
+        const btn = document.createElement("button")
+        btn.className = `w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5
+                        ${disabled ? "opacity-50 pointer-events-none" : ""}`
+
+        const span = document.createElement("span")
+        span.className = "material-symbols-outlined text-zinc-900 cursor-pointer"
+        span.textContent = icon
+        btn.appendChild(span)
+
+        if (!disabled) btn.onclick = onClick
+
+        return btn
+    }
+
+    // Left Arrow
+    container.appendChild(createIconButton("chevron_left", () => {
+        if (currentPage > 1) {
+            currentPage--
+            updateTable()
+        }
+    }, currentPage === 1))
+
+    // First Page
+    container.appendChild(createPageButton(1, 1, currentPage === 1))
+
+    // Before current page
+    if (currentPage > 3) container.appendChild(createPageButton("...", null, false, true))
+    if (currentPage > 2) container.appendChild(createPageButton(currentPage - 1, currentPage - 1))
+
+    // Current Page
+    if (currentPage !== 1 && currentPage !== totalPages)
+        container.appendChild(createPageButton(currentPage, currentPage, true))
+
+    // After current page
+    if (currentPage < totalPages - 1) container.appendChild(createPageButton(currentPage + 1, currentPage + 1))
+    if (currentPage < totalPages - 2) container.appendChild(createPageButton("...", null, false, true))
+
+    // Last Page
+    if (totalPages > 1)
+        container.appendChild(createPageButton(totalPages, totalPages, currentPage === totalPages))
+
+    // Right Arrow
+    container.appendChild(createIconButton("chevron_right", () => {
+        if (currentPage < totalPages) {
+            currentPage++
+            updateTable()
+        }
+    }, currentPage === totalPages))
+}
+
+//Carregar Tabela
+const updateTable = () => {
+    const tableBody = document.getElementById("tableContent")
+    tableBody.innerHTML = "" // reset
+
+    const startIndex = (currentPage - 1) * rowsPerPage
+    const endIndex = startIndex + rowsPerPage
+    const currentFlights = flights.slice(startIndex, endIndex)
+
+    currentFlights.forEach((flight, index) => {
+        const row = document.createElement("tr")
+        row.classList.add("table-row", "h-[42px]")
         row.innerHTML = `
             <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-bold font-['IBM_Plex_Sans']">${flight.flight_name}</td>
             <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_from}</td>
@@ -55,7 +150,14 @@ const updateTable = () => {
                 <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6" onclick="editFlight(${index})">edit_square</button>
                 <button class="material-symbols-outlined text-red-600  cursor-pointer mr-6" onclick="deleteFlight(${index})">delete</button>
             </td>
-        `;
-        tableBody.appendChild(row);
-    });
-};
+        `
+        tableBody.appendChild(row)
+    })
+
+    updatePaginationControls()
+}
+
+//On Page Load
+document.addEventListener("DOMContentLoaded", () => {
+    updateTable()
+})
