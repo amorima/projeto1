@@ -254,7 +254,7 @@ const deleteHotel = (id) => {
 const createCar = () => {//work on id
     const car = getFormData('add_car_form')
 
-    const required = ['marca', 'modelo', 'destinoId']
+    const required = ['cars_destinoId', 'cars_brand', 'cars_model', "cars_seats", "cars_price", "cars_available" ,"cars_adapted"]
     const missing = required.filter(key => !car[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
@@ -293,14 +293,14 @@ const deleteCar = (id) => {
 const createAero = () => {
     const airport = getFormData('add_airport_form')
 
-    const required = ['code', 'pais', 'cidade']
+    const required = ['aero_code', 'aero_country', 'aero_city']
     const missing = required.filter(key => !airport[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
         return
     }
 
-    if (airports.some(a => a.code === airport.code)) {
+    if (airports.some(a => a.aero_code === airport.aero_code)) {
         showToast('Código do aeroporto deve ser único.', 'error')
         return
     }
@@ -334,10 +334,10 @@ const deleteAero = (code) => {
 const createActivitie = () => { //id
     const activity = getFormData('add_activitie_form')
 
-    activity.tipo_de_turismo = activity.tipo_de_turismo?.split(',').map(t => t.trim())
-    activity.acessibilidade = activity.acessibilidade?.split(',').map(a => a.trim())
+    activity.act_turism = activity.act_turism?.split(',').map(t => t.trim())
+    activity.act_acess = activity.act_acess?.split(',').map(a => a.trim())
 
-    const required = ['nome', 'destinoId']
+    const required = ['act_name', 'act_destinoId']
     const missing = required.filter(key => !activity[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
@@ -349,7 +349,7 @@ const createActivitie = () => { //id
     saveToLocalStorage('activities', activities)
     showToast('Atividade adicionada com sucesso!')
     closeModal('modal-adicionar')
-    updateTable(activitieTableConfig)
+    updateTable(activitiesTableConfig)
 }
 const readActivitie = (filterFn = null) => {
     return filterFn ? activities.filter(filterFn) : activities
@@ -764,9 +764,9 @@ const hotelTableConfig = {
 const airportTableConfig = {
     data: airports,
     columns: [ 
-        {key:`air_code`, label:`Codigo Aeroporto`, sortable: true},
-        {key:`air_country`, label:`Pais`, sortable: true},
-        {key:`air_city`, label:`Cidade`, sortable: true},
+        {key:`aero_code`, label:`Codigo Aeroporto`, sortable: true},
+        {key:`aero_country`, label:`Pais`, sortable: true},
+        {key:`aero_city`, label:`Cidade`, sortable: true},
     ],
     actions: [
         { icon: `edit_square`, class: `text-Main-Primary`, handler: editAero },
@@ -799,7 +799,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTable(destinationTableConfig)
     } else if (path.includes('users_admin.html')) { 
 
-    } else if (path.includes('turism_admin.html')) {
-
+    } else if (path.includes('airport_admin.html')) {
+        loadFromLocalStorage(`airports`, airports)
+        updateTable(airportTableConfig)
+    } else if (path.includes('cars_admin.html')) {
+        loadFromLocalStorage(`cars`, cars)
+        updateTable(carTableConfig)
+    }else if (path.includes('activitie_admin.html')) {
+        loadFromLocalStorage(`activities`, activities)
+        updateTable(activitiesTableConfig)
     }
 })
