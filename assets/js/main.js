@@ -1,5 +1,6 @@
 // === Variaveis Gerais ===
 const flights = []
+const destinations = [];
 //Defenição da Paginação da Tabela
 let currentPage = 1 //Inicia a Pagina Sempre a 1
 const rowsPerPage = 13 //Define Linhas a Mostrar
@@ -84,20 +85,62 @@ const deleteFlight = (flight_name) => {
         saveToLocalStorage('flights', flights);
         currentPage = 1;
         updateTable(flightTableConfig);
+        showToast("Viagem removida com sucesso.");
     }
 };
 //CRUD Destino
-const createDestination = () => {
+const createDestination = () => { //Work in Progress
+    const destination = getFormData("add_destination_form");
 
-}
+    // Tipos de Turismo e Acessibilidade => Array
+    destination.destination_type = destination.destination_type.split(',').map(t => t.trim());
+    destination.destination_acess = destination.destination_acess.split(',').map(a => a.trim());
+
+    // Validação
+    const required = ['destination_city', 'destination_country', 'destination_aero'];
+    const missing = required.filter(key => !destination[key]);
+    if (missing.length > 0) {
+        showToast("Preencha todos os campos obrigatórios.", 'error');
+        return;
+    }
+
+    // Chack Aeroporto Unico
+    if (destinations.some(d => d.destination_aero === destination.destination_aero)) {
+        showToast("Destino com este aeroporto já existe.", 'error');
+        return;
+    }
+
+    destination.id = 1 //Gerar Id Unico
+    destinations.push(destination);
+    saveToLocalStorage('destinations', destinations);
+    showToast("Destino adicionado com sucesso!");
+    closeModal('modal-adicionar');
+    currentPage = 1;
+    updateTable(destinationTableConfig);
+};
 const readDestination = (filterFn = null) => {
-
-}
-const updateDestination = (originalDestination, updatedDestination) => {
-
-}
-const deleteDestination = (destination_name) => {
-}
+    return filterFn ? destinations.filter(filterFn) : destinations;
+};
+const updateDestination = (originalId, updatedDestination) => {
+    const index = destinations.findIndex(d => d.id == originalId);
+    if (index !== -1) {
+        updatedDestination.id = originalId; // Manter ID
+        //Tipos de Turismo e Acessebilidade => Array
+        updatedDestination.tiposTurismo = updatedDestination.tiposTurismo.split(',').map(t => t.trim());
+        updatedDestination.acessibilidade = updatedDestination.acessibilidade.split(',').map(a => a.trim());
+        destinations[index] = updatedDestination;
+    }
+};
+const deleteDestination = (id) => {
+    const index = destinations.findIndex(d => d.id == id);
+    if (index !== -1) {
+        destinations.splice(index, 1);
+        saveToLocalStorage('destinations', destinations);
+        currentPage = 1;
+        updateTable(destinationTableConfig);
+        showToast("Destino removido com sucesso.");
+    }
+};
 //CRUD Hotel
 const createHotel = () => {
 
@@ -251,6 +294,8 @@ const resetModalToAddMode = () => {
     document.getElementById('add_flight_form').reset()
     document.getElementById('original_flight_name').value = ""
 }
+const editDestination = () => {//Modal Edição destinos
+}
 // Tabela Voos
 // Paginação
 const updatePaginationControls = (config) => {
@@ -346,7 +391,9 @@ const updateTable = (config) => {
         columns.forEach(col => {
             const td = document.createElement("td");
             td.className = "table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-['IBM_Plex_Sans']";
-            td.textContent = row[col.key];
+            //Table Data Contempla Arrays
+            const cellValue = row[col.key];
+            td.textContent = Array.isArray(cellValue) ? cellValue.join(', ') : cellValue;
             tr.appendChild(td);
         });
 
@@ -371,8 +418,8 @@ const updateTable = (config) => {
     updatePaginationControls(config)
 }
 //Ordenar Tabela
-const updateSortIcons = (activeColumn) => { //Se não for para usar esta função na versão final REMINDER:limpar chamada no sortTableBy()
-    const columns = ['flight_name', 'flight_from', 'flight_to', 'flight_company', 'flight_leaves', 'flight_direct'];
+const updateSortIcons = (activeColumn, tableConfig) => {
+    const columns = tableConfig.columns.map(col => col.key);
 
     columns.forEach(col => {
         const iconEl = document.getElementById(`sort-icon-${col}`);
@@ -381,10 +428,10 @@ const updateSortIcons = (activeColumn) => { //Se não for para usar esta funçã
         if (col === activeColumn) {
             iconEl.innerHTML = sortDirection === 'asc' ? 'arrow_drop_up' : 'arrow_drop_down';
         } else {
-            iconEl.innerHTML = ''; // Limpar Outros
+            iconEl.innerHTML = '';
         }
     });
-}
+};
 const sortTableBy = (columnKey, config) => {
     const column = config.columns.find(col => col.key === columnKey);
     if (!column || !column.sortable) return;
@@ -418,7 +465,7 @@ const sortTableBy = (columnKey, config) => {
         return 0;
     });
 
-    updateSortIcons(columnKey);
+    updateSortIcons(columnKey, config);
     currentPage = 1;
     updateTable(config);
 };
@@ -438,8 +485,29 @@ const flightTableConfig = {
         { icon: 'delete', class: 'text-red-600', handler: deleteFlight }
     ]
 };
+const destinationTableConfig = {
+    data: destinations,
+    columns: [
+        { key: 'destination_country', label: 'País', sortable: true },
+        { key: 'destination_city', label: 'Cidade', sortable: true },
+        { key: 'destination_aero', label: 'Aeroporto', sortable: true },
+        { key: 'destination_type', label: 'Tipos de Turismo', sortable: true },
+        { key: 'destination_acess', label: 'Acessibilidade', sortable: true },
+    ],
+    actions: [
+        { icon: 'edit_square', class: 'text-Main-Primary', handler: editDestination },
+        { icon: 'delete', class: 'text-red-600', handler: deleteDestination }
+    ]
+};
 // === On Page Load ===
 document.addEventListener("DOMContentLoaded", () => {
-    loadFromLocalStorage('flights', flights);
-    updateTable(flightTableConfig)
-})
+    const path = window.location.pathname;
+
+    if (path.includes("flights_admin.html")) {
+        loadFromLocalStorage('flights', flights);
+        updateTable(flightTableConfig);
+    } else if (path.includes("places_admin.html")) {
+        loadFromLocalStorage('destinations', destinations);
+        updateTable(destinationTableConfig);
+    }
+});
