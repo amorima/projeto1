@@ -1,12 +1,75 @@
 // === Variaveis Gerais ===
-const flights = []
-const destinations = []
-const cars = []
-const hotels = []
-const airports = []
-const activities = []
-const turismTypes = []
-const accessibilityOptions = []
+const flights = [
+/*     voo = {
+        id: int,
+        nºvoo: str,
+        from: str,
+        to: str,
+        company: str,
+        leaves: data,
+        arrives: data,
+        direct: "boll",
+        price: int
+    } */
+]
+const destinations = [
+/*     destino = {
+        id: int,
+        cidade: str,
+        pais: str,
+        aeroporto: str,
+        tipo_de_turismo : array,
+        acessibilidade: array,
+    } */
+]
+const cars = [
+/*     car = {
+        id: int,
+        destinoId: int,
+        marca: str,
+        modelo: str,
+        lugares: int,
+        preço/Dia: int,
+        foto: str(url),
+        desponibilidade: bool,
+        adaptado: bool,
+    } */
+]
+const hotels = [
+/*     hotel = {
+        id: int,
+        destinoId: int,
+        nome: str,
+        foto: str(url),
+        quartos: object,
+    } */
+]
+const airports = [
+/*     aeroporto {
+        code: str,
+        pais: str,
+        cidade: str,
+    } */
+]
+const activities = [
+/*     atividade = {
+        id: int,
+        destinoId: int,
+        tipo_de_turismo: str?array,
+        nome: str,
+        foto: str(url),
+        descrição: str,
+        acessibilidade: array,
+    } */
+]
+const turismTypes = [/* str
+    "Turismo religioso", "Turismo cultural", "Ecoturismo", "Turismo rural",
+    "Turismo gastronómico", "Turismo de Sol e Praia", "Turismo de negócios" */
+]
+const accessibilityOptions = [/* str
+    "Acesso Sem Degraus", "Elevadores Disponíveis", "Casas de Banho Adaptadas",
+    "Quartos Adaptados", "Transporte Acessível", "Informação em Braille/Áudio", */
+]
 //Defenição da Paginação da Tabela
 let currentPage = 1 //Inicia a Pagina Sempre a 1
 const rowsPerPage = 13 //Define Linhas a Mostrar
@@ -313,19 +376,19 @@ const resetModalToAddMode = () => {
     document.getElementById(`add_flight_form`).reset()
     document.getElementById(`original_flight_name`).value = ''
 }
-const editDestination = () => {//Modal Edição destinos
+const editDestination = (id) => {//Modal Edição destinos
 
 }
-const editCar = () => {//Modal Edição Carros
+const editCar = (id) => {//Modal Edição Carros
 
 }
-const editHotel = () => {//Modal Edição Hotel
+const editHotel = (id) => {//Modal Edição Hotel
 
 }
-const editAero = () => {//Modal Edição Aeroportos
+const editAero = (id) => {//Modal Edição Aeroportos
 
 }
-const editActivitie = () => {//Modal Edição de Atividades
+const editActivitie = (id) => {//Modal Edição de Atividades
 
 }
 // Tabela Voos 
@@ -596,10 +659,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`destinations`, destinations)
         updateTable(destinationTableConfig)
     } else if (path.includes('users_admin.html')) { 
-        loadFromLocalStorage(`destinations`, destinations)
-        updateTable(destinationTableConfig)
+
     } else if (path.includes('turism_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        updateTable(destinationTableConfig)
+
     }
 })
