@@ -70,6 +70,7 @@ const accessibilityOptions = [/* str
     "Acesso Sem Degraus", "Elevadores Disponíveis", "Casas de Banho Adaptadas",
     "Quartos Adaptados", "Transporte Acessível", "Informação em Braille/Áudio", */
 ]
+const users = []
 //Defenição da Paginação da Tabela
 let currentPage = 1 //Inicia a Pagina Sempre a 1
 const rowsPerPage = 13 //Define Linhas a Mostrar
@@ -112,7 +113,7 @@ const loadFromLocalStorage = (key, targetArray) => {
 
 // === CRUD PlanIt ===
 //CRUD Flights
-const createFlight = () => {
+const createFlight = () => { //outdated?maybe
     const flight = getFormData('add_flight_form')
 
     //Validação Dados Preenchimento Antes de Adicionar ao Array de Objetos
@@ -158,7 +159,7 @@ const deleteFlight = (flight_name) => {
     }
 }
 //CRUD Destino
-const createDestination = () => {
+const createDestination = () => {//work on id
     const destination = getFormData('add_destination_form')
 
     // Tipos de Turismo e Acessibilidade => Array
@@ -211,56 +212,166 @@ const deleteDestination = (id) => {
     }
 }
 //CRUD Hotel
-const createHotel = () => {
+const createHotel = () => {//work on id
+    const hotel = getFormData('add_hotel_form')
 
+    const required = ['nome', 'destinoId']
+    const missing = required.filter(key => !hotel[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', 'error')
+        return
+    }
+
+    hotel.id = 1 //Need id method
+    hotels.push(hotel)
+    saveToLocalStorage('hotels', hotels)
+    showToast('Hotel adicionado com sucesso!')
+    closeModal('modal-adicionar')
+    currentPage = 1
+    updateTable(hotelTableConfig)
 }
 const readHotel = (filterFn = null) => {
-
+    return filterFn ? hotels.filter(filterFn) : hotels
 }
-const updateHotel = (originalHotel, updatedHotel) => {
-
+const updateHotel = (originalId, updatedHotel) => {
+    const index = hotels.findIndex(h => h.id == originalId)
+    if (index !== -1) {
+        updatedHotel.id = originalId
+        hotels[index] = updatedHotel
+        saveToLocalStorage('hotels', hotels)
+    }
 }
-const deleteHotel = (hotel_name) => {
-
+const deleteHotel = (id) => {
+    const index = hotels.findIndex(h => h.id == id)
+    if (index !== -1) {
+        hotels.splice(index, 1)
+        saveToLocalStorage('hotels', hotels)
+        updateTable(hotelTableConfig)
+        showToast('Hotel removido com sucesso.','error')
+    }
 }
 //CRUD Carros
-const createCar = () => {
+const createCar = () => {//work on id
+    const car = getFormData('add_car_form')
 
+    const required = ['marca', 'modelo', 'destinoId']
+    const missing = required.filter(key => !car[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', 'error')
+        return
+    }
+
+    car.id = 1 //Needs Id method
+    cars.push(car)
+    saveToLocalStorage('cars', cars)
+    showToast('Carro adicionado com sucesso!')
+    closeModal('modal-adicionar')
+    currentPage = 1
+    updateTable(carTableConfig)
 }
 const readCar = (filterFn = null) => {
-
+    return filterFn ? cars.filter(filterFn) : cars
 }
-const updateCar = (originalCar, updatedCar) => {
-
+const updateCar = (originalId, updatedCar) => {
+    const index = cars.findIndex(c => c.id == originalId)
+    if (index !== -1) {
+        updatedCar.id = originalId
+        cars[index] = updatedCar
+        saveToLocalStorage('cars', cars)
+    }
 }
-const deleteCar = (car_name) => {
-
+const deleteCar = (id) => {
+    const index = cars.findIndex(c => c.id == id)
+    if (index !== -1) {
+        cars.splice(index, 1)
+        saveToLocalStorage('cars', cars)
+        updateTable(carTableConfig)
+        showToast('Carro removido com sucesso.','error')
+    }
 }
 //CRUD Aeroporto
 const createAero = () => {
+    const airport = getFormData('add_airport_form')
 
+    const required = ['code', 'pais', 'cidade']
+    const missing = required.filter(key => !airport[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', 'error')
+        return
+    }
+
+    if (airports.some(a => a.code === airport.code)) {
+        showToast('Código do aeroporto deve ser único.', 'error')
+        return
+    }
+
+    airports.push(airport)
+    saveToLocalStorage('airports', airports)
+    showToast('Aeroporto adicionado com sucesso!')
+    closeModal('modal-adicionar')
+    updateTable(airportTableConfig)
 }
 const readAero = (filterFn = null) => {
-
+    return filterFn ? airports.filter(filterFn) : airports
 }
-const updateAero = (originalAir, updatedAir) => {
-
+const updateAero = (originalCode, updatedAero) => {
+    const index = airports.findIndex(a => a.code === originalCode)
+    if (index !== -1) {
+        airports[index] = updatedAero
+        saveToLocalStorage('airports', airports)
+    }
 }
-const deleteAero = (air_name) => {
-
+const deleteAero = (code) => {
+    const index = airports.findIndex(a => a.code === code)
+    if (index !== -1) {
+        airports.splice(index, 1)
+        saveToLocalStorage('airports', airports)
+        updateTable(airportTableConfig)
+        showToast('Aeroporto removido com sucesso.')
+    }
 }
 //CRUD Atividades
-const createActivitie = () => {
+const createActivitie = () => { //id
+    const activity = getFormData('add_activitie_form')
 
+    activity.tipo_de_turismo = activity.tipo_de_turismo?.split(',').map(t => t.trim())
+    activity.acessibilidade = activity.acessibilidade?.split(',').map(a => a.trim())
+
+    const required = ['nome', 'destinoId']
+    const missing = required.filter(key => !activity[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', 'error')
+        return
+    }
+
+    activity.id = 1 //need id mecanicsa
+    activities.push(activity)
+    saveToLocalStorage('activities', activities)
+    showToast('Atividade adicionada com sucesso!')
+    closeModal('modal-adicionar')
+    updateTable(activitieTableConfig)
 }
 const readActivitie = (filterFn = null) => {
-
+    return filterFn ? activities.filter(filterFn) : activities
 }
-const updateActivitie = (originalActivitie, updatedActivitie) => {
-
+const updateActivitie = (originalId, updatedActivity) => {
+    const index = activities.findIndex(a => a.id == originalId)
+    if (index !== -1) {
+        updatedActivity.id = originalId
+        updatedActivity.tipo_de_turismo = updatedActivity.tipo_de_turismo?.split(',').map(t => t.trim())
+        updatedActivity.acessibilidade = updatedActivity.acessibilidade?.split(',').map(a => a.trim())
+        activities[index] = updatedActivity
+        saveToLocalStorage('activities', activities)
+    }
 }
-const deleteActivitie = (activitie_name) => {
-
+const deleteActivitie = (id) => {
+    const index = activities.findIndex(a => a.id == id)
+    if (index !== -1) {
+        activities.splice(index, 1)
+        saveToLocalStorage('activities', activities)
+        updateTable(activitiesTableConfig)
+        showToast('Atividade removida com sucesso.')
+    }
 }
 //CRUD User
 const createUser = () => {
@@ -276,30 +387,58 @@ const deleteUser = (user_name) => {
 
 }
 //CRUD Tipologias de Turismo
-const createTurism = () => {
-
+const createTurism = (type) => {
+    if (!type || turismTypes.includes(type)) {
+        showToast('Tipo já existe ou está vazio.', 'error')
+        return
+    }
+    turismTypes.push(type)
+    saveToLocalStorage('turismTypes', turismTypes)
+    showToast('Tipo de turismo adicionado com sucesso!')
 }
-const readTurism = (filterFn = null) => {
-
+//const readTurism = () => turismTypes
+const updateTurism = (original, updated) => {
+    const index = turismTypes.findIndex(t => t === original)
+    if (index !== -1) {
+        turismTypes[index] = updated
+        saveToLocalStorage('turismTypes', turismTypes)
+    }
 }
-const updateTurism = (originalTurism, updatedTurism) => {
-
-}
-const deleteTurism = (turism_name) => {
-
+const deleteTurism = (type) => {
+    const index = turismTypes.findIndex(t => t === type)
+    if (index !== -1) {
+        turismTypes.splice(index, 1)
+        saveToLocalStorage('turismTypes', turismTypes)
+        showToast('Tipo de turismo removido.','error')
+    }
 }
 //CRUD Opções de Acessibilidade
-const createAcess = () => {
-
+const createAcess = (acess) => {
+    if (!acess || accessibilityOptions.includes(acess)) {
+        showToast('Opção de Acessibilidade inválida ou já existe.', 'error')
+        return
+    }
+    accessibilityOptions.push(option)
+    saveToLocalStorage('accessibilityOptions', accessibilityOptions)
+    showToast('Opção de Acessibilidade adicionada!')
 }
-const readAcess = (filterFn = null) => {
-
+//const readAcess = () => accessibilityOptions
+const updateAcess = (original, updated) => {
+    const index = accessibilityOptions.findIndex(a => a === original)
+    if (index !== -1) {
+        accessibilityOptions[index] = updated
+        saveToLocalStorage('accessibilityOptions', accessibilityOptions)
+        return true
+    }
+    return false
 }
-const updateAcess = (originalAcess, updatedAcess) => {
-
-}
-const deleteAcess = (acess_name) => {
-
+const deleteAcess = (option) => {
+    const index = accessibilityOptions.findIndex(a => a === option)
+    if (index !== -1) {
+        accessibilityOptions.splice(index, 1)
+        saveToLocalStorage('accessibilityOptions', accessibilityOptions)
+        showToast('Opção de acessibilidade removida.')
+    }
 }
 // === Interface ===
 // Interações Modal 
