@@ -399,24 +399,24 @@ const sortTableBy = (columnKey, config) => {
     config.data.sort((a, b) => {
         let valA = a[columnKey];
         let valB = b[columnKey];
-    
+
+        //Tipo de Sort Data=>Number=>String
         if (column.type === 'date') {
             valA = new Date(valA).getTime();
             valB = new Date(valB).getTime();
-        } else if (typeof valA === 'string' && typeof valB === 'string') {
-            valA = valA.toLowerCase();
-            valB = valB.toLowerCase();
-    
-            if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-            if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-            return 0;
-        } else {
+        } else if (!isNaN(valA) && !isNaN(valB)) {
             valA = parseFloat(valA);
             valB = parseFloat(valB);
+        } else {
+            valA = String(valA).toLowerCase();
+            valB = String(valB).toLowerCase();
         }
-    
-        return sortDirection === 'asc' ? valA - valB : valB - valA;
-    });    
+        
+        //Sort Info
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
 
     updateSortIcons(columnKey);
     currentPage = 1;
