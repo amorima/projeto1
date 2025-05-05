@@ -6,7 +6,6 @@ const rowsPerPage = 13 //Define Linhas a Mostrar
 //Ordenação da Tabela
 let sortColumn = null;
 let sortDirection = 'asc';
-
 // === Funções Uteis ===
 const getFormData = (formId) => {
     const form = document.getElementById(formId);
@@ -65,7 +64,7 @@ const createFlight = () => {
     showToast("Voo adicionado com sucesso!");
     closeModal('modal-adicionar');
     currentPage = 1
-    updateTable()
+    updateTable(flightTableConfig)
 }
 const readFlight = (filterFn = null) => { //filtro byDefault nenhum
     return filterFn ? flights.filter(filterFn) : flights;
@@ -84,7 +83,7 @@ const deleteFlight = (flight_name) => {
         flights.splice(index, 1);
         saveToLocalStorage('flights', flights);
         currentPage = 1;
-        updateTable();
+        updateTable(flightTableConfig);
     }
 };
 //CRUD Destino
@@ -177,7 +176,6 @@ const updateAcess = (originalAcess, updatedAcess) => {
 const deleteAcess = (acess_name) => {
 
 }
-
 // === Interface ===
 // Interações Modal 
 const openModal = (id) => {
@@ -235,7 +233,7 @@ const saveEditedFlight = () => {
     showToast("Voo editado com sucesso!");
     resetModalToAddMode();
     closeModal('modal-adicionar');
-    updateTable();
+    updateTable(flightTableConfig);
 };
 const resetModalToAddMode = () => {
     document.querySelector('#modal-adicionar h2').innerText = 'Adicionar voo manual';
@@ -249,17 +247,16 @@ const resetModalToAddMode = () => {
     `;
     addButton.onclick = createFlight;
 
-    // Optionally clear the form
+
     document.getElementById('add_flight_form').reset()
     document.getElementById('original_flight_name').value = ""
 }
-
 // Tabela Voos
 // Paginação
-const updatePaginationControls = () => {
-    const container = document.getElementById("pagination-controls")
-    container.innerHTML = ""
-    const totalPages = Math.ceil(flights.length / rowsPerPage)
+const updatePaginationControls = (config) => {
+    const container = document.getElementById("pagination-controls");
+    container.innerHTML = "";
+    const totalPages = Math.ceil(config.data.length / rowsPerPage);
 
     const createPageButton = (label, page, isActive = false, isEllipsis = false) => {
         const btn = document.createElement("button")
@@ -278,7 +275,7 @@ const updatePaginationControls = () => {
             btn.appendChild(p)
             btn.onclick = () => {
                 currentPage = page
-                updateTable()
+                updateTable(flightTableConfig)
             }
         }
         return btn
@@ -302,7 +299,7 @@ const updatePaginationControls = () => {
     container.appendChild(createIconButton("chevron_left", () => {
         if (currentPage > 1) {
             currentPage--
-            updateTable()
+            updateTable(flightTableConfig)
         }
     }, currentPage === 1))
 
@@ -329,38 +326,49 @@ const updatePaginationControls = () => {
     container.appendChild(createIconButton("chevron_right", () => {
         if (currentPage < totalPages) {
             currentPage++
-            updateTable()
+            updateTable(flightTableConfig)
         }
     }, currentPage === totalPages))
 }
 //Carregar Tabela
-const updateTable = () => {
-    const tableBody = document.getElementById("tableContent")
-    tableBody.innerHTML = "" // reset
+const updateTable = (config) => {
+    const { data, columns, actions } = config;
+    const tableBody = document.getElementById("tableContent");
+    tableBody.innerHTML = "";
 
-    const startIndex = (currentPage - 1) * rowsPerPage
-    const endIndex = startIndex + rowsPerPage
-    const currentFlights = flights.slice(startIndex, endIndex)
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const currentData = data.slice(startIndex, startIndex + rowsPerPage);
 
-    currentFlights.forEach((flight, index) => {
-        const row = document.createElement("tr")
-        row.classList.add("table-row", "h-[42px]")
-        row.innerHTML = `
-            <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-bold font-['IBM_Plex_Sans']">${flight.flight_name}</td>
-            <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_from}</td>
-            <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_to}</td>
-            <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_company}</td>
-            <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_leaves}</td>
-            <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">${flight.flight_direct}</td>
-            <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
-                <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6" onclick="editFlight('${flight.flight_name}')">edit_square</button>
-                <button class="material-symbols-outlined text-red-600  cursor-pointer mr-6" onclick="deleteFlight('${flight.flight_name}')">delete</button>
-            </td>
-        `
-        tableBody.appendChild(row)
-    })
+    currentData.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.className = "table-row h-[42px]";
 
-    updatePaginationControls()
+        columns.forEach(col => {
+            const td = document.createElement("td");
+            td.className = "table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-['IBM_Plex_Sans']";
+            td.textContent = row[col.key];
+            tr.appendChild(td);
+        });
+
+        if (actions?.length) {
+            const actionTd = document.createElement("td");
+            actionTd.className = "table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center";
+
+            actions.forEach(({ icon, class: iconClass, handler }) => {
+                const btn = document.createElement("button");
+                btn.className = `material-symbols-outlined cursor-pointer mr-6 ${iconClass}`;
+                btn.textContent = icon;
+                btn.onclick = () => handler(row[columns[0].key]);
+                actionTd.appendChild(btn);
+            });
+
+            tr.appendChild(actionTd);
+        }
+
+        tableBody.appendChild(tr);
+    });
+
+    updatePaginationControls(config)
 }
 //Ordenar Tabela
 const updateSortIcons = (activeColumn) => { //Se não for para usar esta função na versão final REMINDER:limpar chamada no sortTableBy()
@@ -377,41 +385,61 @@ const updateSortIcons = (activeColumn) => { //Se não for para usar esta funçã
         }
     });
 }
-const sortTableBy = (column) =>{//WARNING: Não contempla tabulação
-    if (sortColumn === column) {
+const sortTableBy = (columnKey, config) => {
+    const column = config.columns.find(col => col.key === columnKey);
+    if (!column || !column.sortable) return;
+
+    if (sortColumn === columnKey) {
         sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
-        sortColumn = column;
+        sortColumn = columnKey;
         sortDirection = 'asc';
     }
 
-    flights.sort((a, b) => {
-        let valA = a[column];
-        let valB = b[column];
-
-        // Converção Data
-        if (column === 'flight_leaves') {
+    config.data.sort((a, b) => {
+        let valA = a[columnKey];
+        let valB = b[columnKey];
+    
+        if (column.type === 'date') {
             valA = new Date(valA).getTime();
             valB = new Date(valB).getTime();
-        }
-
-        if (typeof valA === 'string') {
+        } else if (typeof valA === 'string' && typeof valB === 'string') {
             valA = valA.toLowerCase();
             valB = valB.toLowerCase();
+    
+            if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        } else {
+            valA = parseFloat(valA);
+            valB = parseFloat(valB);
         }
+    
+        return sortDirection === 'asc' ? valA - valB : valB - valA;
+    });    
 
-        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
-        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    updateSortIcons(column)
-    currentPage = 1
-    updateTable()
-}
-
+    updateSortIcons(columnKey);
+    currentPage = 1;
+    updateTable(config);
+};
+// === Constantes de Configuração de Tabelas ===
+const flightTableConfig = {
+    data: flights,
+    columns: [
+        { key: 'flight_name', label: 'Name', sortable: true },
+        { key: 'flight_from', label: 'From', sortable: true },
+        { key: 'flight_to', label: 'To', sortable: true },
+        { key: 'flight_company', label: 'Company', sortable: true },
+        { key: 'flight_leaves', label: 'Leaves', sortable: true, type: 'date' },
+        { key: 'flight_direct', label: 'Direct', sortable: true },
+    ],
+    actions: [
+        { icon: 'edit_square', class: 'text-Main-Primary', handler: editFlight },
+        { icon: 'delete', class: 'text-red-600', handler: deleteFlight }
+    ]
+};
 // === On Page Load ===
 document.addEventListener("DOMContentLoaded", () => {
     loadFromLocalStorage('flights', flights);
-    updateTable()
+    updateTable(flightTableConfig)
 })
