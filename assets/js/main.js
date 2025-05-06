@@ -418,7 +418,7 @@ const createAcess = (acess) => {
         showToast('Opção de Acessibilidade inválida ou já existe.', 'error')
         return
     }
-    accessibilityOptions.push(option)
+    accessibilityOptions.push(acess)
     saveToLocalStorage('accessibilityOptions', accessibilityOptions)
     showToast('Opção de Acessibilidade adicionada!')
 }
