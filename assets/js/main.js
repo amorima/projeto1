@@ -1018,5 +1018,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }else if (path.includes('activitie_admin.html')) {
         loadFromLocalStorage(`activities`, activities)
         updateTable(activitiesTableConfig)
+    }else if (path.includes('dashboard_admin.html')) {
+
     }
 })
