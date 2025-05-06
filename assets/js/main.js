@@ -141,6 +141,7 @@ const createFlight = () => {
         return
     }
 
+    flight.id = generateId(flights)
     flights.push(flight)
     saveToLocalStorage(`flights`, flights)
 
@@ -490,14 +491,14 @@ const resetModalToAddMode = (form, header, handler) => {
     document.getElementById(form).reset()
     document.getElementById(`id`).value = ''
 }
-const editFlight = (name) => { // Quando Adiconar id aos Objetos Atualizar esta Funçao name => id
-    const flight = readFlight(f => f.flight_name === name)[0]
+const editFlight = (id) => { // Quando Adiconar id aos Objetos Atualizar esta Funçao name => id
+    const flight = readFlight(f => f.id === id)[0]
     if (!flight) return
 
     // Editar Titulo
     document.querySelector(`#modal-adicionar h2`).innerText = `Editar voo`
 
-    document.getElementById(`original_flight_name`).value = flight.flight_name
+    document.getElementById(`id`).value = flight.flight_name
     // Preencher Campos
     document.getElementById(`flight_name`).value = flight.flight_name
     document.getElementById(`flight_from`).value = flight.flight_from
@@ -519,7 +520,7 @@ const editFlight = (name) => { // Quando Adiconar id aos Objetos Atualizar esta 
     openModal(`modal-adicionar`)
 }
 const saveEditedFlight = () => {
-    const originalFlight = document.getElementById(`original_flight_name`).value
+    const originalFlight = document.getElementById(`id`).value
     const updatedFlight = getFormData('add_flight_form')
 
     const required = [`flight_name`, `flight_from`, `flight_to`, `flight_leaves`]
