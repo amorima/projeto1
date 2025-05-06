@@ -273,7 +273,7 @@ const createCar = () => {
     cars.push(car)
     saveToLocalStorage('cars', cars)
     showToast('Carro adicionado com sucesso!')
-    closeModal('modal-adicionar')
+    closeModal(`modal-adicionar`,'add_car_form','Adicionar caroo manual',createCar)
     currentPage = 1
     updateTable(carTableConfig)
 }
@@ -286,7 +286,9 @@ const updateCar = (originalId, updatedCar) => {
         updatedCar.id = originalId
         cars[index] = updatedCar
         saveToLocalStorage('cars', cars)
+        return true
     }
+    return false
 }
 const deleteCar = (id) => {
     const index = cars.findIndex(c => c.id == id)
@@ -577,7 +579,55 @@ const saveEditedDestination = () => {
     updateTable(destinationTableConfig)
 }
 const editCar = (id) => {//Modal Edição Carros
+    const car = readCar(c => c.id == id)[0]
+    if (!car) return
 
+    // Editar Titulo
+    document.querySelector(`#modal-adicionar h2`).innerText = `Editar carro`
+
+    document.getElementById(`id`).value = car.id
+    // Preencher Campos
+    document.getElementById(`cars_destinoId`).value = car.cars_destinoId
+    document.getElementById(`cars_brand`).value = car.cars_brand
+    document.getElementById(`cars_model`).value = car.cars_model
+    document.getElementById(`cars_seats`).value = car.cars_seats
+    document.getElementById(`cars_price`).value = car.cars_price
+    document.getElementById(`cars_available`).value = car.cars_available
+    document.getElementById(`cars_adapted`).value = car.cars_adapted
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector(`#modal-adicionar button[onclick='createCar()']`)
+    addButton.innerHTML = `
+        <div class='inline-flex justify-start items-center gap-2.5'>
+            <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Salvar</div>
+        </div>
+    `
+    addButton.onclick = saveEditedCar
+
+    openModal(`modal-adicionar`)
+}
+const saveEditedCar = () => {
+    const originalCar = document.getElementById(`id`).value
+    const updatedCar = getFormData('add_car_form')
+
+    const required = [`cars_destinoId`, `cars_brand`, `cars_model`, 'cars_seats', 'cars_price', 'cars_available', 'cars_adapted']
+    const missing = required.filter(key => !updatedCar[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', `error`)
+        return
+    }
+
+    const success = updateCar(originalCar, updatedCar)
+    if (!success) {
+        showToast('Erro ao editar carro.', `error`)
+        return
+    }
+
+    saveToLocalStorage(`cars`, cars)
+    showToast('Destino editado com sucesso!')
+    closeModal(`modal-adicionar`,'add_car_form','Adicionar caroo manual',createCar)
+    updateTable(carTableConfig)
 }
 const editHotel = (id) => {//Modal Edição Hotel
 
