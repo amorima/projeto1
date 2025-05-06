@@ -362,7 +362,7 @@ const createActivitie = () => {
     activities.push(activity)
     saveToLocalStorage('activities', activities)
     showToast('Atividade adicionada com sucesso!')
-    closeModal('modal-adicionar')
+    closeModal(`modal-adicionar`,'add_activitie_form','Adicionar atividade manual',createActivitie)
     updateTable(activitiesTableConfig)
 }
 const readActivitie = (filterFn = null) => {
@@ -376,7 +376,9 @@ const updateActivitie = (originalId, updatedActivity) => {
         updatedActivity.acessibilidade = updatedActivity.acessibilidade?.split(',').map(a => a.trim())
         activities[index] = updatedActivity
         saveToLocalStorage('activities', activities)
+        return true
     }
+    return false
 }
 const deleteActivitie = (id) => {
     const index = activities.findIndex(a => a.id == id)
@@ -629,6 +631,7 @@ const saveEditedCar = () => {
     closeModal(`modal-adicionar`,'add_car_form','Adicionar caroo manual',createCar)
     updateTable(carTableConfig)
 }
+// Not finished
 const editHotel = (id) => {//Modal Edição Hotel
 
 }
@@ -680,7 +683,53 @@ const saveEditedAero = () => {
     updateTable(airportTableConfig)
 }
 const editActivitie = (id) => {//Modal Edição de Atividades
+    const activity = readActivitie(a => a.id == id)[0]
+    if (!activity) return
 
+    // Editar Titulo
+    document.querySelector(`#modal-adicionar h2`).innerText = `Editar atividade`
+
+    document.getElementById(`id`).value = activity.id
+    // Preencher Campos
+    document.getElementById(`act_destinoId`).value = activity.act_destinoId
+    document.getElementById(`act_turism`).value = activity.act_turism
+    document.getElementById(`act_name`).value = activity.act_name
+    document.getElementById(`act_description`).value = activity.act_description
+    document.getElementById(`act_acess`).value = activity.act_acess
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector(`#modal-adicionar button[onclick='createActivitie()']`)
+    addButton.innerHTML = `
+        <div class='inline-flex justify-start items-center gap-2.5'>
+            <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Salvar</div>
+        </div>
+    `
+    addButton.onclick = saveEditedActivitie
+
+    openModal(`modal-adicionar`)
+}
+const saveEditedActivitie = () => {
+    const originalId = document.getElementById(`id`).value
+    const updatedAct = getFormData('add_activitie_form')
+
+    const required = [`act_destinoId`, `act_turism`, `act_name`,'act_description']
+    const missing = required.filter(key => !updatedAct[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', `error`)
+        return
+    }
+
+    const success = updateActivitie(originalId, updatedAct)
+    if (!success) {
+        showToast('Erro ao editar atividade.', `error`)
+        return
+    }
+
+    saveToLocalStorage(`activities`, activities)
+    showToast('Atividade editada com sucesso!')
+    closeModal(`modal-adicionar`,'add_activitie_form','Adicionar atividade manual',createActivitie)
+    updateTable(activitiesTableConfig)
 }
 // Tabela Voos 
 // Paginação
