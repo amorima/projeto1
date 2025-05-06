@@ -137,7 +137,7 @@ const createFlight = () => {
     saveToLocalStorage(`flights`, flights)
 
     showToast('Voo adicionado com sucesso!')
-    closeModal(`modal-adicionar`)
+    closeModal(`modal-adicionar`,'add_flight_form','Adicionar voo manual',createFlight)
     currentPage = 1
     updateTable(flightTableConfig)
 }
@@ -188,7 +188,7 @@ const createDestination = () => {
     destinations.push(destination)
     saveToLocalStorage(`destinations`, destinations)
     showToast('Destino adicionado com sucesso!')
-    closeModal(`modal-adicionar`)
+    closeModal(`modal-adicionar`,'add_destination_form','Adicionar destino manual',createDestination)
     currentPage = 1
     updateTable(destinationTableConfig)
 }
@@ -196,7 +196,6 @@ const readDestination = (filterFn = null) => {
     return filterFn ? destinations.filter(filterFn) : destinations
 }
 const updateDestination = (originalId, updatedDestination) => {
-    console.log(updatedDestination,originalId)
     const index = destinations.findIndex(d => d.id == originalId)
     if (index !== -1) {
         updatedDestination.id = originalId // Manter ID
@@ -218,7 +217,8 @@ const deleteDestination = (id) => {
         showToast('Destino removido com sucesso.')
     }
 }
-//CRUD Hotel
+//CRUD Hotel 
+//Warning: IMG
 const createHotel = () => {
     const hotel = getFormData('add_hotel_form')
 
@@ -258,6 +258,7 @@ const deleteHotel = (id) => {
     }
 }
 //CRUD Carros
+//Warning: IMG
 const createCar = () => {
     const car = getFormData('add_car_form')
 
@@ -312,21 +313,25 @@ const createAero = () => {
         return
     }
 
+    airport.id = generateId(airports)
     airports.push(airport)
     saveToLocalStorage('airports', airports)
     showToast('Aeroporto adicionado com sucesso!')
-    closeModal('modal-adicionar')
+    closeModal(`modal-adicionar`,'add_airport_form','Adicionar aeroporto manual',createAero)
     updateTable(airportTableConfig)
 }
 const readAero = (filterFn = null) => {
     return filterFn ? airports.filter(filterFn) : airports
 }
-const updateAero = (originalCode, updatedAero) => {
-    const index = airports.findIndex(a => a.code === originalCode)
+const updateAero = (originalId, updatedAero) => {
+    const index = airports.findIndex(a => a.id == originalId)
     if (index !== -1) {
+        updatedAero.id = originalId // Manter ID
         airports[index] = updatedAero
         saveToLocalStorage('airports', airports)
+        return true
     }
+    return false
 }
 const deleteAero = (code) => {
     const index = airports.findIndex(a => a.code === code)
@@ -519,8 +524,7 @@ const saveEditedFlight = () => {
 
     saveToLocalStorage(`flights`, flights)
     showToast('Voo editado com sucesso!')
-    resetModalToAddMode(add_flight_form,'Adicionar voo manual', createFlight)
-    closeModal(`modal-adicionar`)
+    closeModal(`modal-adicionar`,'add_flight_form','Adicionar voo manual', createFlight)
     updateTable(flightTableConfig)
 }
 const editDestination = (id) => {//Modal Edição destinos
@@ -569,8 +573,7 @@ const saveEditedDestination = () => {
 
     saveToLocalStorage(`destinations`, destinations)
     showToast('Destino editado com sucesso!')
-    resetModalToAddMode('add_destination_form','Adicionar destino manual',createDestination)
-    closeModal(`modal-adicionar`)
+    closeModal(`modal-adicionar`,'add_destination_form','Adicionar destino manual',createDestination)
     updateTable(destinationTableConfig)
 }
 const editCar = (id) => {//Modal Edição Carros
@@ -580,7 +583,51 @@ const editHotel = (id) => {//Modal Edição Hotel
 
 }
 const editAero = (id) => {//Modal Edição Aeroportos
+    const airport = readAero(a => a.id == id)[0]
+    if (!airport) return
 
+    // Editar Titulo
+    document.querySelector(`#modal-adicionar h2`).innerText = `Editar aeroporto`
+
+    document.getElementById(`id`).value = airport.id
+    // Preencher Campos
+    document.getElementById(`aero_code`).value = airport.aero_code
+    document.getElementById(`aero_country`).value = airport.aero_country
+    document.getElementById(`aero_city`).value = airport.aero_city
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector(`#modal-adicionar button[onclick='createAero()']`)
+    addButton.innerHTML = `
+        <div class='inline-flex justify-start items-center gap-2.5'>
+            <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Salvar</div>
+        </div>
+    `
+    addButton.onclick = saveEditedAero
+
+    openModal(`modal-adicionar`)
+}
+const saveEditedAero = () => {
+    const originalId = document.getElementById(`id`).value
+    const updatedAero = getFormData('add_airport_form')
+
+    const required = [`aero_code`, `aero_country`, `aero_city`]
+    const missing = required.filter(key => !updatedAero[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', `error`)
+        return
+    }
+
+    const success = updateAero(originalId, updatedAero)
+    if (!success) {
+        showToast('Erro ao editar aeroporto.', `error`)
+        return
+    }
+
+    saveToLocalStorage(`airports`, airports)
+    showToast('Aeroporto editado com sucesso!')
+    closeModal(`modal-adicionar`,'add_airport_form','Adicionar aeroporto manual',createAero)
+    updateTable(airportTableConfig)
 }
 const editActivitie = (id) => {//Modal Edição de Atividades
 

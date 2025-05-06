@@ -104,7 +104,7 @@
             <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">Adicionar aeroporto manual</h2>
             <!-- Formulario -->
             <form class="space-y-4" id="add_airport_form">
-                <input type="hidden" id="original_destination_id">
+                <input type="hidden" id="id">
                 <div>
                     <label for="aero_code" class="block text-base font-light text-Text-Subtitles">Codigo Aeroporto</label>
                     <input id="aero_code" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
@@ -129,7 +129,7 @@
                         <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
                     </div>
                 </button>
-                <button onclick="closeModal(`modal-adicionar`)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                <button onclick="closeModal(`modal-adicionar`,'add_airport_form','Adicionar aeroporto manual',createAero)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
                     <div class="flex justify-start items-center gap-2.5">
                         <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
                     </div>
