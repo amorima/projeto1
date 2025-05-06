@@ -97,6 +97,9 @@ const showToast = (message, type = `success`) => {
     document.body.appendChild(toast)
     setTimeout(() => toast.remove(), 3000)
 }
+function generateId(array) {
+    return array.length ? array[array.length - 1].id + 1 : 1;
+  }
 //Local Storage
 const saveToLocalStorage = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data))
@@ -113,8 +116,9 @@ const loadFromLocalStorage = (key, targetArray) => {
 
 // === CRUD PlanIt ===
 //CRUD Flights
-const createFlight = () => { //outdated?maybe
+const createFlight = () => {
     const flight = getFormData('add_flight_form')
+    flight.id = generateId(flights)
 
     //Validação Dados Preenchimento Antes de Adicionar ao Array de Objetos
     const required = [`flight_name`, `flight_from`, `flight_to`, `flight_leaves`]
@@ -137,7 +141,7 @@ const createFlight = () => { //outdated?maybe
     currentPage = 1
     updateTable(flightTableConfig)
 }
-const readFlight = (filterFn = null) => { //filtro byDefault nenhum
+const readFlight = (filterFn = null) => {
     return filterFn ? flights.filter(filterFn) : flights
 }
 const updateFlight = (originalFlight, updatedFlight) => {
@@ -159,7 +163,7 @@ const deleteFlight = (flight_name) => {
     }
 }
 //CRUD Destino
-const createDestination = () => {//work on id
+const createDestination = () => {
     const destination = getFormData('add_destination_form')
 
     // Tipos de Turismo e Acessibilidade => Array
@@ -180,7 +184,7 @@ const createDestination = () => {//work on id
         return
     }
 
-    destination.id = 1 //Gerar Id Unico
+    destination.id = generateId(destinations)
     destinations.push(destination)
     saveToLocalStorage(`destinations`, destinations)
     showToast('Destino adicionado com sucesso!')
@@ -212,7 +216,7 @@ const deleteDestination = (id) => {
     }
 }
 //CRUD Hotel
-const createHotel = () => {//work on id
+const createHotel = () => {
     const hotel = getFormData('add_hotel_form')
 
     const required = ['nome', 'destinoId']
@@ -222,7 +226,7 @@ const createHotel = () => {//work on id
         return
     }
 
-    hotel.id = 1 //Need id method
+    hotel.id = generateId(hotels)
     hotels.push(hotel)
     saveToLocalStorage('hotels', hotels)
     showToast('Hotel adicionado com sucesso!')
@@ -251,7 +255,7 @@ const deleteHotel = (id) => {
     }
 }
 //CRUD Carros
-const createCar = () => {//work on id
+const createCar = () => {
     const car = getFormData('add_car_form')
 
     const required = ['cars_destinoId', 'cars_brand', 'cars_model', "cars_seats", "cars_price", "cars_available" ,"cars_adapted"]
@@ -261,7 +265,7 @@ const createCar = () => {//work on id
         return
     }
 
-    car.id = 1 //Needs Id method
+    car.id = generateId(cars)
     cars.push(car)
     saveToLocalStorage('cars', cars)
     showToast('Carro adicionado com sucesso!')
@@ -331,7 +335,7 @@ const deleteAero = (code) => {
     }
 }
 //CRUD Atividades
-const createActivitie = () => { //id
+const createActivitie = () => {
     const activity = getFormData('add_activitie_form')
 
     activity.act_turism = activity.act_turism?.split(',').map(t => t.trim())
@@ -344,7 +348,7 @@ const createActivitie = () => { //id
         return
     }
 
-    activity.id = 1 //need id mecanicsa
+    activity.id = generateId(activities)
     activities.push(activity)
     saveToLocalStorage('activities', activities)
     showToast('Atividade adicionada com sucesso!')
