@@ -71,22 +71,28 @@
                     <!-- Header -->
                     <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">Turismo e acessibilidade</h2>
                     <!-- Formulario -->
-                    <form class="space-y-4" id="add_activitie_form">
-
+                    <form class="space-y-4" id="add_turism_acess">
+                        <div>
+                            <label for="type" class="block text-base font-light text-Text-Subtitles">Opção</label>
+                            <input id="type" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                        </div>
+                        <div>
+                            <label for="category" class="block text-base font-light text-Text-Subtitles">Tipo (Turismo/Acessibilidade)</label>
+                            <select id="category" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                                <option value="acessibilidade">Acessibilidade</option>
+                                <option value="turismo">Turismo</option>
+                            </select>
+                        </div>
                     </form>
-                    <!-- Carregar Opção -->
-                    <div class="hidden grid grid-cols-3">
-
-                    </div>
                     <!-- Acções -->
                     <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
-                        <button onclick="createActivitie()" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
+                        <button onclick="createTurismAcess('add_turism_acess')" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
                             <div class="inline-flex justify-start items-center gap-2.5">
                                 <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                                 <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
                             </div>
                         </button>
-                        <button onclick="closeModal(`modal-adicionar`)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                        <button onclick="closeModal(`modal-adicionar`,'add_turism_acess','Turismo e acessibilidade',createTurismAcess)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
                             <div class="flex justify-start items-center gap-2.5">
                                 <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
                             </div>

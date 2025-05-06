@@ -99,7 +99,7 @@ const showToast = (message, type = `success`) => {
 }
 function generateId(array) {
     return array.length ? array[array.length - 1].id + 1 : 1;
-  }
+}
 //Local Storage
 const saveToLocalStorage = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data))
@@ -115,6 +115,14 @@ const loadFromLocalStorage = (key, targetArray) => {
 }
 
 // === CRUD PlanIt ===
+const createTurismAcess = (formId) => {
+    const form = getFormData(formId)
+    if(form.category == 'acessibilidade'){
+        createAcess(form.type)
+    } else {
+        createTurism(form.type)
+    }
+}
 //CRUD Flights
 const createFlight = () => {
     const flight = getFormData('add_flight_form')
