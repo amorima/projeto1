@@ -196,14 +196,17 @@ const readDestination = (filterFn = null) => {
     return filterFn ? destinations.filter(filterFn) : destinations
 }
 const updateDestination = (originalId, updatedDestination) => {
+    console.log(updatedDestination,originalId)
     const index = destinations.findIndex(d => d.id == originalId)
     if (index !== -1) {
         updatedDestination.id = originalId // Manter ID
         //Tipos de Turismo e Acessebilidade => Array
-        updatedDestination.tiposTurismo = updatedDestination.tiposTurismo.split(`,`).map(t => t.trim())
-        updatedDestination.acessibilidade = updatedDestination.acessibilidade.split(`,`).map(a => a.trim())
+        updatedDestination.tiposTurismo = (updatedDestination.tiposTurismo || "").split(`,`).map(t => t.trim())
+        updatedDestination.acessibilidade = (updatedDestination.acessibilidade || "").split(`,`).map(a => a.trim())        
         destinations[index] = updatedDestination
+        return true
     }
+    return false
 }
 const deleteDestination = (id) => {
     const index = destinations.findIndex(d => d.id == id)
@@ -449,8 +452,25 @@ const deleteAcess = (option) => {
 const openModal = (id) => {
     document.getElementById(id).classList.remove('hidden')
   }
-const closeModal = (id) => {
-    document.getElementById(id).classList.add('hidden')
+const closeModal = (id,form,header,handler) => {
+    modal = document.getElementById(id)
+    modal.classList.add('hidden')
+    resetModalToAddMode(form ,header,handler)
+}
+const resetModalToAddMode = (form, header, handler) => {
+    document.querySelector(`#modal-adicionar h2`).innerText = header
+
+    const addButton = document.querySelector(`#modal-adicionar button`)
+    addButton.innerHTML = `
+        <div class='inline-flex justify-start items-center gap-2.5'>
+            <span class='material-symbols-outlined text-white cursor-pointer'>add_circle</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Adicionar</div>
+        </div>
+    `
+    addButton.onclick = handler
+
+    document.getElementById(form).reset()
+    document.getElementById(`id`).value = ''
 }
 const editFlight = (name) => { // Quando Adiconar id aos Objetos Atualizar esta Funçao name => id
     const flight = readFlight(f => f.flight_name === name)[0]
@@ -499,28 +519,59 @@ const saveEditedFlight = () => {
 
     saveToLocalStorage(`flights`, flights)
     showToast('Voo editado com sucesso!')
-    resetModalToAddMode()
+    resetModalToAddMode(add_flight_form,'Adicionar voo manual', createFlight)
     closeModal(`modal-adicionar`)
     updateTable(flightTableConfig)
 }
-const resetModalToAddMode = () => {
-    document.querySelector(`#modal-adicionar h2`).innerText = `Adicionar voo manual`
+const editDestination = (id) => {//Modal Edição destinos
+    const destination = readDestination(d => d.id == id)[0]
+    if (!destination) return
 
-    const addButton = document.querySelector(`#modal-adicionar button`)
+    // Editar Titulo
+    document.querySelector(`#modal-adicionar h2`).innerText = `Editar destino`
+
+    document.getElementById(`id`).value = destination.id
+    // Preencher Campos
+    document.getElementById(`destination_country`).value = destination.destination_country
+    document.getElementById(`destination_city`).value = destination.destination_city
+    document.getElementById(`destination_aero`).value = destination.destination_aero
+    document.getElementById(`destination_type`).value = destination.destination_type
+    document.getElementById(`destination_acess`).value = destination.destination_acess
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector(`#modal-adicionar button[onclick='createDestination()']`)
     addButton.innerHTML = `
         <div class='inline-flex justify-start items-center gap-2.5'>
-            <span class='material-symbols-outlined text-white cursor-pointer'>add_circle</span>
-            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Adicionar</div>
+            <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Salvar</div>
         </div>
     `
-    addButton.onclick = createFlight
+    addButton.onclick = saveEditedDestination
 
-
-    document.getElementById(`add_flight_form`).reset()
-    document.getElementById(`original_flight_name`).value = ''
+    openModal(`modal-adicionar`)
 }
-const editDestination = (id) => {//Modal Edição destinos
+const saveEditedDestination = () => {
+    const originalDestination = document.getElementById(`id`).value
+    const updatedDestination = getFormData('add_destination_form')
 
+    const required = [`destination_country`, `destination_city`, `destination_aero`]
+    const missing = required.filter(key => !updatedDestination[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', `error`)
+        return
+    }
+
+    const success = updateDestination(originalDestination, updatedDestination)
+    if (!success) {
+        showToast('Erro ao editar destino.', `error`)
+        return
+    }
+
+    saveToLocalStorage(`destinations`, destinations)
+    showToast('Destino editado com sucesso!')
+    resetModalToAddMode('add_destination_form','Adicionar destino manual',createDestination)
+    closeModal(`modal-adicionar`)
+    updateTable(destinationTableConfig)
 }
 const editCar = (id) => {//Modal Edição Carros
 
@@ -643,7 +694,7 @@ const updateTable = (config) => {
                 const btn = document.createElement('button')
                 btn.className = `material-symbols-outlined cursor-pointer mr-6 ${iconClass}`
                 btn.textContent = icon
-                btn.onclick = () => handler(row[columns[0].key]) // Quando Adicionar id aos objetos alterar esta linha para row[data.id]
+                btn.onclick = () => handler(row.id ?? row[columns[0].key]) // Medida de seguraça para objetos sem id
                 actionTd.appendChild(btn)
             })
 
