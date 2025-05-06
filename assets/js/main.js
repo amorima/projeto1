@@ -704,15 +704,15 @@ const sortTableBy = (columnKey, config) => {
     updateTable(config)
 }
 // === Constantes de Configuração de Tabelas ===
-const flightTableConfig = {
+const flightTableConfig = { //labels não tem função atualmente mas caso haja tempo a função da tabela será melhorada para gerar os header automaticamente com base nos labels
     data: flights,
     columns: [
-        { key: `flight_name`, label: `Name`, sortable: true },
-        { key: `flight_from`, label: `From`, sortable: true },
-        { key: `flight_to`, label: `To`, sortable: true },
-        { key: `flight_company`, label: `Company`, sortable: true },
-        { key: `flight_leaves`, label: `Leaves`, sortable: true, type: `date` },
-        { key: `flight_direct`, label: `Direct`, sortable: true },
+        { key: `flight_name`, label: `NºVoo`, sortable: true },
+        { key: `flight_from`, label: `Origem`, sortable: true },
+        { key: `flight_to`, label: `Destino`, sortable: true },
+        { key: `flight_company`, label: `Companhia Aeria`, sortable: true },
+        { key: `flight_leaves`, label: `Horario de Partida`, sortable: true, type: `date` },
+        { key: `flight_direct`, label: `Direto`, sortable: true },
     ],
     actions: [
         { icon: `edit_square`, class: `text-Main-Primary`, handler: editFlight },
