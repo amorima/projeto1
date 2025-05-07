@@ -746,24 +746,82 @@ const saveEditedActivitie = () => {
     closeModal(`modal-adicionar`,'add_activitie_form','Adicionar atividade manual',createActivitie)
     updateTable(activitiesTableConfig)
 }
-const loadTurismAcess = (category) => {
+const loadTurismAcess = (category) => { // Add Edit and Delete
     const container = document.getElementById('load-options')
     container.innerHTML=''
     if (category == 'acessibilidade'){
         accessibilityOptions.forEach(element => {
             const div = document.createElement('div')
-            div.className = 'p-4 bg-Background-Card-Bg-Gami text-center'
+            const action = document.createElement('div')
+            div.className = 'p-4 bg-Background-Card-Bg-Gami flex justify-between items-center rounded mb-2'
             div.textContent = element
-            container.appendChild(div)
+            const editBtn = document.createElement('button')
+            editBtn.innerHTML = '<span class="material-symbols-outlined text-blue-600">edit</span>'
+            editBtn.onclick = () => {
+                editTurismAcess(category, element)
+            }
+            const deleteBtn = document.createElement('button')
+            deleteBtn.innerHTML = '<span class="material-symbols-outlined text-red-600">delete</span>'
+            deleteBtn.onclick = () => {
+                deleteAcess(element)
+                loadTurismAcess(category)
+            }
+            action.appendChild(editBtn)
+            action.appendChild(deleteBtn)
+            div.appendChild(action)
+            container.appendChild(div)            
         })
     } else {
         turismTypes.forEach(element => {
             const div = document.createElement('div')
-            div.className = 'p-4 bg-Background-Card-Bg-Gami text-center'
+            const action = document.createElement('div')
+            div.className = 'p-4 bg-Background-Card-Bg-Gami text-start'
             div.textContent = element
-            container.appendChild(div)
+            const editBtn = document.createElement('button')
+            editBtn.innerHTML = '<span class="material-symbols-outlined text-blue-600">edit</span>'
+            editBtn.onclick = () => {
+                editTurismAcess(category, element)
+            }
+            const deleteBtn = document.createElement('button')
+            deleteBtn.innerHTML = '<span class="material-symbols-outlined text-red-600">delete</span>'
+            deleteBtn.onclick = () => {
+                deleteTurism(element)
+                loadTurismAcess(category)
+            }
+            action.appendChild(editBtn)
+            action.appendChild(deleteBtn)
+            div.appendChild(action)
+            container.appendChild(div)    
         })
     }
+}
+const editTurismAcess = (category,oldOption) => {
+    const actionsButton = document.getElementById('action')
+    const editBtn = document.createElement('button')
+    editBtn.className = 'w-40 h-11 px-5 py-2 bg-green-600 rounded-[5px] inline-flex items-center gap-2.5';
+    editBtn.innerHTML = `
+        <span class="material-symbols-outlined text-white">edit</span>
+        <div class="text-white text-xl font-bold font-['IBM_Plex_Sans']">Guardar</div>
+    `;
+
+    document.getElementById('type').value = oldOption
+    //edit
+    if (category == 'acessibilidade'){
+        editBtn.onclick = () => {
+            newOption = document.getElementById('type').value
+            updateAcess(oldOption,newOption)
+            actionsButton.removeChild(editBtn)
+            loadTurismAcess(category)
+        }
+    }else {
+        editBtn.onclick = () => {
+            newOption = document.getElementById('type').value
+            updateTurism(oldOption,newOption)
+            actionsButton.removeChild(editBtn)
+            loadTurismAcess(category)
+        }
+    }
+    actionsButton.appendChild(editBtn)
 }
 // Tabela Voos 
 // Paginação
