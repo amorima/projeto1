@@ -8,7 +8,7 @@ const flights = [
         company: str,
         leaves: data,
         arrives: data,
-        direct: "boll",
+        direct: 'boll',
         price: int
     } */
 ]
@@ -63,12 +63,12 @@ const activities = [
     } */
 ]
 const turismTypes = [/* str
-    "Turismo religioso", "Turismo cultural", "Ecoturismo", "Turismo rural",
-    "Turismo gastronómico", "Turismo de Sol e Praia", "Turismo de negócios" */
+    'Turismo religioso', 'Turismo cultural', 'Ecoturismo', 'Turismo rural',
+    'Turismo gastronómico', 'Turismo de Sol e Praia', 'Turismo de negócios' */
 ]
 const accessibilityOptions = [/* str
-    "Acesso Sem Degraus", "Elevadores Disponíveis", "Casas de Banho Adaptadas",
-    "Quartos Adaptados", "Transporte Acessível", "Informação em Braille/Áudio", */
+    'Acesso Sem Degraus', 'Elevadores Disponíveis', 'Casas de Banho Adaptadas',
+    'Quartos Adaptados', 'Transporte Acessível', 'Informação em Braille/Áudio', */
 ]
 const users = []
 //Defenição da Paginação da Tabela
@@ -100,7 +100,7 @@ const showToast = (message, type = `success`) => {
     setTimeout(() => toast.remove(), 3000)
 }
 function generateId(array) {
-    return array.length ? array[array.length - 1].id + 1 : 1;
+    return array.length ? array[array.length - 1].id + 1 : 1
 }
 //Local Storage
 const saveToLocalStorage = (key, data) => {
@@ -121,8 +121,10 @@ const createTurismAcess = () => {
     const form = getFormData('add_turism_acess')
     if(form.category == 'acessibilidade'){
         createAcess(form.type)
+        loadTurismAcess(form.category)
     } else {
         createTurism(form.type)
+        loadTurismAcess(form.category)
     }
 }
 //CRUD Flights
@@ -211,8 +213,8 @@ const updateDestination = (originalId, updatedDestination) => {
     if (index !== -1) {
         updatedDestination.id = originalId // Manter ID
         //Tipos de Turismo e Acessebilidade => Array
-        updatedDestination.tiposTurismo = (updatedDestination.tiposTurismo || "").split(`,`).map(t => t.trim())
-        updatedDestination.acessibilidade = (updatedDestination.acessibilidade || "").split(`,`).map(a => a.trim())        
+        updatedDestination.tiposTurismo = (updatedDestination.tiposTurismo || '').split(`,`).map(t => t.trim())
+        updatedDestination.acessibilidade = (updatedDestination.acessibilidade || '').split(`,`).map(a => a.trim())        
         destinations[index] = updatedDestination
         return true
     }
@@ -273,7 +275,7 @@ const deleteHotel = (id) => {
 const createCar = () => {
     const car = getFormData('add_car_form')
 
-    const required = ['cars_destinoId', 'cars_brand', 'cars_model', "cars_seats", "cars_price", "cars_available" ,"cars_adapted"]
+    const required = ['cars_destinoId', 'cars_brand', 'cars_model', 'cars_seats', 'cars_price', 'cars_available' ,'cars_adapted']
     const missing = required.filter(key => !car[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
@@ -746,20 +748,21 @@ const saveEditedActivitie = () => {
 }
 const loadTurismAcess = (category) => {
     const container = document.getElementById('load-options')
+    container.innerHTML=''
     if (category == 'acessibilidade'){
         accessibilityOptions.forEach(element => {
             const div = document.createElement('div')
-            div.className = 'p-4 bg-Background-Card-Bg-Gami'
-            div.innerHTML = element
+            div.className = 'p-4 bg-Background-Card-Bg-Gami text-center'
+            div.textContent = element
             container.appendChild(div)
-        });
+        })
     } else {
         turismTypes.forEach(element => {
             const div = document.createElement('div')
-            div.className = 'p-4 bg-Background-Card-Bg-Gami'
-            div.innerHTML = element
+            div.className = 'p-4 bg-Background-Card-Bg-Gami text-center'
+            div.textContent = element
             container.appendChild(div)
-        });
+        })
     }
 }
 // Tabela Voos 
@@ -1041,9 +1044,10 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`activities`, activities)
         updateTable(activitiesTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
-        element = document.getElementById('category')
-        category = element.value
-        document.addEventListener(onchange,loadTurismAcess(category))
-        loadTurismAcess(category)
+        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
+        loadFromLocalStorage(`turismTypes`, turismTypes)
+        const element = document.getElementById('category')
+        element.addEventListener('change', () => loadTurismAcess(element.value))
+        loadTurismAcess(element.value)
     }
 })
