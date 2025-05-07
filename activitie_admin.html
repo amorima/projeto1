@@ -23,8 +23,11 @@
     <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8">
         <div class="mt-[126px] w-full h-24 p-8 bg-Background-Card-Bg-Gami rounded-lg overflow-hidden inline-flex justify-between">
             <h2 class="w-full sm:w-[592px] justify-center text-Button-Main text-4xl font-bold font-['Space_Mono'] justify-start">Gestão atividades</h2>
-            <div>
-                <button class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5">
+            <div class="inline-flex">
+                <div class="w-80 h-11">
+                    <input type="text" id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm">
+                </div>
+                <button onclick="handleSearch('searchInput',activitiesTableConfig)" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
                     <span class="material-symbols-outlined text-white cursor-pointer">search</span>
                 </button>
                 <button onclick="openModal('modal-adicionar')" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5">

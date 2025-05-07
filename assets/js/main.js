@@ -1006,7 +1006,12 @@ const handleSearch = (inputId, config) => {
     const filtered = originalTableData.filter(row =>
         config.columns.some(col => {
             const value = row[col.key];
-            return value && value.toLowerCase().includes(filtro);
+            //Array => String
+            const text = Array.isArray(value)
+                ? value.join(', ')
+                : (value !== undefined && value !== null ? value.toString() : '');
+
+            return text.toLowerCase().includes(filtro);
         })
     );
 
