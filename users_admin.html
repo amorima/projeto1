@@ -23,8 +23,11 @@
     <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8">
         <div class="mt-[126px] w-full h-24 p-8 bg-Background-Card-Bg-Gami rounded-lg overflow-hidden inline-flex justify-between">
             <h2 class="w-full sm:w-[592px] justify-center text-Button-Main text-4xl font-bold font-['Space_Mono'] justify-start">Gestão de utilizadores</h2>
-            <div>
-                <button class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5">
+            <div class="inline-flex">
+                <div class="w-80 h-11">
+                    <input type="text" id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm">
+                </div>
+                <button onclick="handleSearch('searchInput',usersTableConfig)" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
                     <span class="material-symbols-outlined text-white cursor-pointer">search</span>
                 </button>
                 <button onclick="openModal(`modal-adicionar`)" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
@@ -34,6 +37,58 @@
             </div>
         </div>
     </section>
+
+    <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-auto">
+        <!-- Table -->
+        <table class="table w-full rounded-t-[40px] overflow-hidden">
+            <!-- Table Header -->
+            <thead class="table-header-group bg-Background-Card-Bg-Gami">
+                <tr class="table-row rounded-tl-[40px] rounded-tr-[40px] overflow-hidden">
+                    <th onclick="sortTableBy('username', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans'] ">Nome de Utilizador
+                        <span id="sort-icon-username" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('email', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Email
+                        <span id="sort-icon-email" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('password', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Password
+                        <span id="sort-icon-password" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('points', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Pontos
+                        <span id="sort-icon-points" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('level', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nivel
+                        <span id="sort-icon-level" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('trips', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nº Viagens
+                        <span id="sort-icon-trips" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('plans', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nº Planos
+                        <span id="sort-icon-plans" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('role', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">User/Admin
+                        <span id="sort-icon-role" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']"></th>
+                </tr>
+            </thead>
+            <!-- Table Content -->
+            <tbody id="tableContent" class="table-row-group"><!-- Clean the table row when finished -->
+                <tr class="table-row h-[42px]">
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-bold font-['IBM_Plex_Sans']">TRD783</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">OPO</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">STD</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">Tap Air Portugal</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">25/05/2025 10:25</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">S</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">S</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">S</td>
+                    <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
+                        <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6">edit_square</button>
+                        <button class="material-symbols-outlined text-red-600 cursor-pointer">delete</button>
+                    </td>
+                </tr>
+            </tbody>            
+        </table>
 
     <script src="assets/js/components.js"></script> 
     <script src="assets/js/storage.js"></script>

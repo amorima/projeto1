@@ -1114,6 +1114,23 @@ const activitiesTableConfig = {
         { icon: `delete`, class: `text-red-600`, handler: deleteActivitie }
     ]
 }
+const userTableConfig = {
+    data: users,
+    columns:[
+        {key:'username', label:'Nome de Utilizador', sortable: true},
+        {key:'email', label:'Email', sortable: true},
+        {key:'password', label:'Password', sortable: true},
+        {key:'points', label:'Pontos', sortable: true},
+        {key:'level', label:'Nivel', sortable: true},
+        {key:'trips', label:'Nº de Viagens', sortable: true},
+        {key:'plans', label:'Nº de Planos', sortable: true},
+        {key:'role', label:'User/Admin', sortable: true},
+    ],
+    actions: [
+        { icon: `edit_square`, class: `text-Main-Primary`, handler: editActivitie },
+        { icon: `delete`, class: `text-red-600`, handler: deleteActivitie }
+    ]
+}
 // === On Page Load ===
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname
