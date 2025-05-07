@@ -938,11 +938,11 @@ const loadTurismAcess = (category) => { // Add Edit and Delete
 const editTurismAcess = (category,oldOption) => {
     const actionsButton = document.getElementById('action')
     const editBtn = document.createElement('button')
-    editBtn.className = 'w-40 h-11 px-5 py-2 bg-green-600 rounded-[5px] inline-flex items-center gap-2.5';
+    editBtn.className = 'w-40 h-11 px-5 py-2 bg-green-600 rounded-[5px] inline-flex items-center gap-2.5'
     editBtn.innerHTML = `
         <span class="material-symbols-outlined text-white">edit</span>
         <div class="text-white text-xl font-bold font-['IBM_Plex_Sans']">Guardar</div>
-    `;
+    `
 
     document.getElementById('type').value = oldOption
     //edit
@@ -1139,26 +1139,26 @@ const sortTableBy = (columnKey, config) => {
 //Filtrar Tabela
 const handleSearch = (inputId, config) => {
     if (!originalTableData.length) {
-        originalTableData = [...config.data]; // backup dos dados da tabela inicial
+        originalTableData = [...config.data] // backup dos dados da tabela inicial
     }
     let filtro = document.getElementById(inputId).value
 
     const filtered = originalTableData.filter(row =>
         config.columns.some(col => {
-            const value = row[col.key];
+            const value = row[col.key]
             //Array => String
             const text = Array.isArray(value)
                 ? value.join(', ')
-                : (value !== undefined && value !== null ? value.toString() : '');
+                : (value !== undefined && value !== null ? value.toString() : '')
 
-            return text.toLowerCase().includes(filtro);
+            return text.toLowerCase().includes(filtro)
         })
-    );
+    )
 
 
-    config.data = filtro ? filtered : [...originalTableData];
-    currentPage = 1;
-    updateTable(config);
+    config.data = filtro ? filtered : [...originalTableData]
+    currentPage = 1
+    updateTable(config)
 }
 // === Constantes de Configuração de Tabelas ===
 const flightTableConfig = { //labels não tem função atualmente mas caso haja tempo a função da tabela será melhorada para gerar os header automaticamente com base nos labels
