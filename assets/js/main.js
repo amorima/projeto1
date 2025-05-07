@@ -70,7 +70,17 @@ const accessibilityOptions = [/* str
     'Acesso Sem Degraus', 'Elevadores Disponíveis', 'Casas de Banho Adaptadas',
     'Quartos Adaptados', 'Transporte Acessível', 'Informação em Braille/Áudio', */
 ]
-const users = []
+const users = [
+/*     username: str,
+    email: str,
+    password: str,
+    points: int,
+    level: int,
+    private: bool,
+    admin: bool,
+    trips: array(objects),
+    plans: array(objects) */
+]
 //Defenição da Paginação da Tabela
 let currentPage = 1 //Inicia a Pagina Sempre a 1
 const rowsPerPage = 13 //Define Linhas a Mostrar
