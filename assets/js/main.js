@@ -79,7 +79,9 @@ let sortColumn = null
 let sortDirection = `asc`
 // === Funções Uteis ===
 const getFormData = (formId) => {
+    console.log(formId)
     const form = document.getElementById(formId)
+    console.log(form)
     const data = {}
     for (let element of form.elements) {
         const key = element.name || element.id
@@ -115,8 +117,8 @@ const loadFromLocalStorage = (key, targetArray) => {
 }
 
 // === CRUD PlanIt ===
-const createTurismAcess = (formId) => {
-    const form = getFormData(formId)
+const createTurismAcess = () => {
+    const form = getFormData('add_turism_acess')
     if(form.category == 'acessibilidade'){
         createAcess(form.type)
     } else {
@@ -489,9 +491,10 @@ const resetModalToAddMode = (form, header, handler) => {
     addButton.onclick = handler
 
     document.getElementById(form).reset()
-    document.getElementById(`id`).value = ''
+    idInput = document.getElementById('id')
+    if (idInput) idInput.value = ''
 }
-const editFlight = (id) => { // Quando Adiconar id aos Objetos Atualizar esta Funçao name => id
+const editFlight = (id) => {
     const flight = readFlight(f => f.id === id)[0]
     if (!flight) return
 
@@ -740,6 +743,24 @@ const saveEditedActivitie = () => {
     showToast('Atividade editada com sucesso!')
     closeModal(`modal-adicionar`,'add_activitie_form','Adicionar atividade manual',createActivitie)
     updateTable(activitiesTableConfig)
+}
+const loadTurismAcess = (category) => {
+    const container = document.getElementById('load-options')
+    if (category == 'acessibilidade'){
+        accessibilityOptions.forEach(element => {
+            const div = document.createElement('div')
+            div.className = 'p-4 bg-Background-Card-Bg-Gami'
+            div.innerHTML = element
+            container.appendChild(div)
+        });
+    } else {
+        turismTypes.forEach(element => {
+            const div = document.createElement('div')
+            div.className = 'p-4 bg-Background-Card-Bg-Gami'
+            div.innerHTML = element
+            container.appendChild(div)
+        });
+    }
 }
 // Tabela Voos 
 // Paginação
@@ -1020,6 +1041,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`activities`, activities)
         updateTable(activitiesTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
-
+        element = document.getElementById('category')
+        category = element.value
+        document.addEventListener(onchange,loadTurismAcess(category))
+        loadTurismAcess(category)
     }
 })
