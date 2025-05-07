@@ -245,7 +245,7 @@ const deleteDestination = (id) => {
 const createHotel = () => {
     const hotel = getFormData('add_hotel_form')
 
-    const required = ['nome', 'destinoId']
+    const required = ['name', 'destinoId']
     const missing = required.filter(key => !hotel[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
@@ -256,7 +256,7 @@ const createHotel = () => {
     hotels.push(hotel)
     saveToLocalStorage('hotels', hotels)
     showToast('Hotel adicionado com sucesso!')
-    closeModal('modal-adicionar')
+    closeModal(`modal-adicionar`,'add_hotel_form','Adicionar hotel manual',createHotel)
     currentPage = 1
     updateTable(hotelTableConfig)
 }
@@ -269,7 +269,9 @@ const updateHotel = (originalId, updatedHotel) => {
         updatedHotel.id = originalId
         hotels[index] = updatedHotel
         saveToLocalStorage('hotels', hotels)
+        return true
     }
+    return false
 }
 const deleteHotel = (id) => {
     const index = hotels.findIndex(h => h.id == id)
@@ -415,16 +417,50 @@ const deleteActivitie = (id) => {
 }
 //CRUD User
 const createUser = () => {
+    const user = getFormData('add_user_form')
 
+    const required = ['username', 'email', 'password']
+    const missing = required.filter(key => !user[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', 'error')
+        return
+    }
+
+    if (users.some(u => u.username === user.username)) {
+        showToast('Nome de utilizador já existe.', 'error')
+        return
+    }
+    if (users.some(u => u.email === user.email)) {
+        showToast('Email já existe.', 'error')
+        return
+    }
+
+    users.push(user)
+    saveToLocalStorage('users', users)
+    showToast('Utilizador adicionado com sucesso!')
+    closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
+    updateTable(userTableConfig)
 }
 const readUser = (filterFn = null) => {
-
+    return filterFn ? users.filter(filterFn) : users
 }
 const updateUser = (originalUser, updatedUser) => {
-
+    const index = users.findIndex(u => u.username === originalUser)
+    if (index !== -1) {
+        users[index] = updatedUser
+        saveToLocalStorage('users', users)
+        return true
+    }
+    return false
 }
-const deleteUser = (user_name) => {
-
+const deleteUser = (username) => {
+    const index = users.findIndex(u => u.username === username)
+    if (index !== -1) {
+        users.splice(index, 1)
+        saveToLocalStorage('users', users)
+        updateTable(userTableConfig)
+        showToast('Utilizador removido com sucesso.')
+    }
 }
 //CRUD Tipologias de Turismo
 const createTurism = (type) => {
@@ -658,7 +694,51 @@ const saveEditedCar = () => {
 }
 // Not finished
 const editHotel = (id) => {//Modal Edição Hotel
+    const hotel = readHotel(h => h.id == id)[0]
+    if (!hotel) return
 
+    // Editar Titulo
+    document.querySelector(`#modal-adicionar h2`).innerText = `Editar hotel`
+    document.getElementById(`id`).value = hotel.id
+
+    // Preencher Campos
+    document.getElementById(`destinoId`).value = hotel.destinoId
+    document.getElementById(`name`).value = hotel.name
+    document.getElementById(`quartos`).value = hotel.quartos
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector(`#modal-adicionar button[onclick='createHotel()']`)
+    addButton.innerHTML = `
+        <div class='inline-flex justify-start items-center gap-2.5'>
+            <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Salvar</div>
+        </div>
+    `
+    addButton.onclick = saveEditedHotel
+
+    openModal(`modal-adicionar`)
+}
+const saveEditedHotel = () => {
+    const originalId = document.getElementById(`id`).value
+    const updatedHotel = getFormData('add_hotel_form')
+
+    const required = [`destinoId`, `name`, `quartos`]
+    const missing = required.filter(key => !updatedHotel[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', `error`)
+        return
+    }
+
+    const success = updateHotel(originalId, updatedHotel)
+    if (!success) {
+        showToast('Erro ao editar hotel.', `error`)
+        return
+    }
+
+    saveToLocalStorage(`hotels`, hotels)
+    showToast('Hotel editado com sucesso!')
+    closeModal(`modal-adicionar`,'add_hotel_form','Adicionar hotel manual',createHotel)
+    updateTable(hotelTableConfig)
 }
 const editAero = (id) => {//Modal Edição Aeroportos
     const airport = readAero(a => a.id == id)[0]
@@ -755,6 +835,56 @@ const saveEditedActivitie = () => {
     showToast('Atividade editada com sucesso!')
     closeModal(`modal-adicionar`,'add_activitie_form','Adicionar atividade manual',createActivitie)
     updateTable(activitiesTableConfig)
+}
+const editUser = (username) => {//Modal Edição de Utilizadores
+    console.log(username)
+    const user = readUser(u => u.username == username)[0]
+    if (!user) return
+
+    // Editar Titulo
+    document.querySelector(`#modal-adicionar h2`).innerText = `Editar utilizador`
+
+    // Preencher Campos
+    document.getElementById(`username`).value = user.username
+    document.getElementById(`email`).value = user.email
+    document.getElementById(`password`).value = user.password
+    document.getElementById(`points`).value = user.points
+    document.getElementById(`private`).value = user.private
+    document.getElementById(`admin`).value = user.admin
+
+    //Adicionar => Salvar
+    const addButton = document.querySelector(`#modal-adicionar button[onclick='createUser()']`)
+    addButton.innerHTML = `
+        <div class='inline-flex justify-start items-center gap-2.5'>
+            <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
+            <div class='justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']'>Salvar</div>
+        </div>
+    `
+    addButton.onclick = saveEditedUser
+
+    openModal(`modal-adicionar`)
+}
+const saveEditedUser = () => {
+    const originalUser = document.getElementById(`username`).value
+    const updatedUser = getFormData('add_user_form')
+
+    const required = [`username`, `email`, `password`]
+    const missing = required.filter(key => !updatedUser[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', `error`)
+        return
+    }
+
+    const success = updateUser(originalUser, updatedUser)
+    if (!success) {
+        showToast('Erro ao editar utilizador.', `error`)
+        return
+    }
+
+    saveToLocalStorage(`users`, users)
+    showToast('Utilizador editado com sucesso!')
+    closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
+    updateTable(userTableConfig)
 }
 const loadTurismAcess = (category) => { // Add Edit and Delete
     const container = document.getElementById('load-options')
@@ -1079,9 +1209,9 @@ const carTableConfig = {
 const hotelTableConfig = {
     data: hotels,
     columns: [ // Pensar em como gerir Quartos na tabela de Edição
-        {key:`hotel_destinoId`, label:`Localização`, sortable: true},
-        {key:`hotel_name`, label:`Nome`, sortable: true},
-        {key:`hotel_quartos`, label:`Quartos`, sortable: true},
+        {key:`destinoId`, label:`Localização`, sortable: true},
+        {key:`name`, label:`Nome`, sortable: true},
+        {key:`quartos`, label:`Quartos`, sortable: true},
     ],
     actions: [
         { icon: `edit_square`, class: `text-Main-Primary`, handler: editHotel },
@@ -1122,13 +1252,12 @@ const userTableConfig = {
         {key:'password', label:'Password', sortable: true},
         {key:'points', label:'Pontos', sortable: true},
         {key:'level', label:'Nivel', sortable: true},
-        {key:'trips', label:'Nº de Viagens', sortable: true},
-        {key:'plans', label:'Nº de Planos', sortable: true},
-        {key:'role', label:'User/Admin', sortable: true},
+        {key:'private', label:'Privacidade', sortable: true},
+        {key:'admin', label:'User/Admin', sortable: true},
     ],
     actions: [
-        { icon: `edit_square`, class: `text-Main-Primary`, handler: editActivitie },
-        { icon: `delete`, class: `text-red-600`, handler: deleteActivitie }
+        { icon: `edit_square`, class: `text-Main-Primary`, handler: editUser },
+        { icon: `delete`, class: `text-red-600`, handler: deleteUser }
     ]
 }
 // === On Page Load ===
@@ -1143,7 +1272,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`destinations`, destinations)
         updateTable(destinationTableConfig)
     } else if (path.includes('users_admin.html')) { 
-
+        loadFromLocalStorage(`users`, users)
+        updateTable(userTableConfig)
     } else if (path.includes('airport_admin.html')) {
         loadFromLocalStorage(`airports`, airports)
         updateTable(airportTableConfig)
@@ -1153,6 +1283,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }else if (path.includes('activitie_admin.html')) {
         loadFromLocalStorage(`activities`, activities)
         updateTable(activitiesTableConfig)
+    }else if (path.includes('hotel_admin.html')) {
+        loadFromLocalStorage(`hotels`, hotels)
+        updateTable(hotelTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
         loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
         loadFromLocalStorage(`turismTypes`, turismTypes)
