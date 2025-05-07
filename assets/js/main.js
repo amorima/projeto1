@@ -823,7 +823,7 @@ const editTurismAcess = (category,oldOption) => {
     }
     actionsButton.appendChild(editBtn)
 }
-// Tabela Voos 
+// === Tabela === 
 // Paginação
 const updatePaginationControls = (config) => {
     const container = document.getElementById('pagination-controls')
@@ -996,6 +996,25 @@ const sortTableBy = (columnKey, config) => {
     currentPage = 1
     updateTable(config)
 }
+//Filtrar Tabela
+const handleSearch = (inputId, config) => {
+    if (!originalTableData.length) {
+        originalTableData = [...config.data]; // backup dos dados da tabela inicial
+    }
+    let filtro = document.getElementById(inputId).value
+
+    const filtered = originalTableData.filter(row =>
+        config.columns.some(col => {
+            const value = row[col.key];
+            return value && value.toLowerCase().includes(filtro);
+        })
+    );
+
+
+    config.data = filtro ? filtered : [...originalTableData];
+    currentPage = 1;
+    updateTable(config);
+}
 // === Constantes de Configuração de Tabelas ===
 const flightTableConfig = { //labels não tem função atualmente mas caso haja tempo a função da tabela será melhorada para gerar os header automaticamente com base nos labels
     data: flights,
@@ -1083,6 +1102,7 @@ const activitiesTableConfig = {
 // === On Page Load ===
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname
+    originalTableData = []
 
     if (path.includes('flights_admin.html')) {
         loadFromLocalStorage(`flights`, flights)
