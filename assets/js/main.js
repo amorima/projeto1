@@ -135,7 +135,7 @@ const passwordValidation = (password) => {
             hasUpper = true;
         } else if (/[0-9]/.test(letter)) {
             hasNumber = true;
-        } else if (/[^a-zA-Z0-9]/.test(letter)) {
+        } else if (/[^a-zA-Z0-9]/.test(letter) && letter !== ' ') {
             hasSpecial = true;
         }
     }
