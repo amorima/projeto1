@@ -287,7 +287,7 @@ const deleteDestination = (id) => {
     }
 }
 //CRUD Hotel 
-//Warning: IMG
+//Warning: IMG && Wuatos
 const createHotel = () => {
     const hotel = getFormData('add_hotel_form')
 
@@ -416,7 +416,7 @@ const deleteAero = (code) => {
     }
 }
 //CRUD Atividades
-//Warning: IMg
+//Warning: IMG
 const createActivitie = () => {
     const activity = getFormData('add_activitie_form')
 
