@@ -122,7 +122,9 @@
                 <input type="hidden" id="id">
                 <div>
                     <label for="cars_destinoId" class="block text-base font-light text-Text-Subtitles">Localização</label>
-                    <input id="cars_destinoId" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <select id="cars_destinoId" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+
+                    </select>
                 </div>
                 <div>
                     <label for="cars_brand" class="block text-base font-light text-Text-Subtitles">Marca</label>
@@ -134,19 +136,25 @@
                 </div>
                 <div>
                     <label for="cars_seats" class="block text-base font-light text-Text-Subtitles">Lugares</label>
-                    <input id="cars_seats" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <input id="cars_seats" type="number" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
                 <div>
                     <label for="cars_price" class="block text-base font-light text-Text-Subtitles">Preço</label>
-                    <input id="cars_price" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <input id="cars_price" type="number" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
                 <div>
                     <label for="cars_available" class="block text-base font-light text-Text-Subtitles">Disponivel</label>
-                    <input id="cars_available" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <select id="cars_available" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                    </select>
                 </div>
                 <div>
                     <label for="cars_adapted" class="block text-base font-light text-Text-Subtitles">Adaptado</label>
-                    <input id="cars_adapted" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <select id="cars_adapted" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                        <option value="Não">Não</option>
+                        <option value="Sim">Sim</option>
+                    </select>
                 </div>
                 <!-- Carregar imagem -->
             </form>

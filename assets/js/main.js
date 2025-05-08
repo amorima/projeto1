@@ -117,8 +117,8 @@ const selectOptions = (array, selectId) => {
     select.innerHTML = ''
     array.forEach(item => {
         const option = document.createElement('option')
-        option.value = item.aero_code
-        option.textContent = item.aero_code
+        option.value = item.aero_code || item.destination_city
+        option.textContent = item.aero_code || item.destination_city
         select.appendChild(option)
     })
 }
@@ -1296,12 +1296,15 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`airports`, airports)
         updateTable(airportTableConfig)
     } else if (path.includes('cars_admin.html')) {
+        loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`cars`, cars)
+        selectOptions(destinations, 'cars_destinoId')
         updateTable(carTableConfig)
     }else if (path.includes('activitie_admin.html')) {
         loadFromLocalStorage(`activities`, activities)
         updateTable(activitiesTableConfig)
     }else if (path.includes('hotel_admin.html')) {
+        loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`hotels`, hotels)
         updateTable(hotelTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
