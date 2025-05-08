@@ -117,8 +117,8 @@ const selectOptions = (array, selectId) => {
     select.innerHTML = ''
     array.forEach(item => {
         const option = document.createElement('option')
-        option.value = item.destination_aero
-        option.textContent = item.destination_aero
+        option.value = item.aero_code
+        option.textContent = item.aero_code
         select.appendChild(option)
     })
 }
@@ -1277,13 +1277,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (path.includes('flights_admin.html')) {
         loadFromLocalStorage(`flights`, flights)
-        loadFromLocalStorage(`destinations`, destinations)
+        loadFromLocalStorage(`airports`, airports)
         updateTable(flightTableConfig)
-        selectOptions(destinations, 'from')
-        selectOptions(destinations, 'to')
+        selectOptions(airports, 'from')
+        selectOptions(airports, 'to')
     } else if (path.includes('places_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
+        loadFromLocalStorage(`airports`, airports)
         updateTable(destinationTableConfig)
+        selectOptions(airports, 'destination_aero')
     } else if (path.includes('users_admin.html')) { 
         loadFromLocalStorage(`users`, users)
         updateTable(userTableConfig)
