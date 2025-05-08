@@ -109,8 +109,18 @@ const showToast = (message, type = `success`) => {
     document.body.appendChild(toast)
     setTimeout(() => toast.remove(), 3000)
 }
-function generateId(array) {
+const generateId = (array) => {
     return array.length ? array[array.length - 1].id + 1 : 1
+}
+const selectOptions = (array, selectId) => {
+    const select = document.getElementById(selectId)
+    select.innerHTML = ''
+    array.forEach(item => {
+        const option = document.createElement('option')
+        option.value = item.destination_aero
+        option.textContent = item.destination_aero
+        select.appendChild(option)
+    })
 }
 //Local Storage
 const saveToLocalStorage = (key, data) => {
@@ -1267,7 +1277,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (path.includes('flights_admin.html')) {
         loadFromLocalStorage(`flights`, flights)
+        loadFromLocalStorage(`destinations`, destinations)
         updateTable(flightTableConfig)
+        selectOptions(destinations, 'from')
+        selectOptions(destinations, 'to')
     } else if (path.includes('places_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
         updateTable(destinationTableConfig)
