@@ -1277,25 +1277,24 @@ const userTableConfig = {
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname
     originalTableData = []
-
     if (path.includes('flights_admin.html')) {
         loadFromLocalStorage(`flights`, flights)
         loadFromLocalStorage(`airports`, airports)
         updateTable(flightTableConfig)
         selectOptions(airports, 'from')
         selectOptions(airports, 'to')
-    } else if (path.includes('places_admin.html')) {
+    }else if (path.includes('places_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`airports`, airports)
         updateTable(destinationTableConfig)
         selectOptions(airports, 'destination_aero')
-    } else if (path.includes('users_admin.html')) { 
+    }else if (path.includes('users_admin.html')) { 
         loadFromLocalStorage(`users`, users)
         updateTable(userTableConfig)
-    } else if (path.includes('airport_admin.html')) {
+    }else if (path.includes('airport_admin.html')) {
         loadFromLocalStorage(`airports`, airports)
         updateTable(airportTableConfig)
-    } else if (path.includes('cars_admin.html')) {
+    }else if (path.includes('cars_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`cars`, cars)
         selectOptions(destinations, 'cars_destinoId')
