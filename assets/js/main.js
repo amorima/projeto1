@@ -122,6 +122,42 @@ const selectOptions = (array, selectId) => {
         select.appendChild(option)
     })
 }
+const passwordValidation = (password) => {
+    if (password.length < 8) {
+        showToast('A senha deve ter pelo menos 8 caracteres.', 'error')
+        return false
+    }
+    hasLowe = hasUpper = hasNumber = hasSpecial = false
+    for (let letter of password) { //beds wirkds
+        if(letter.toLowerCase() === letter){
+            hasLowe = true
+        }
+        if(letter.toUpperCase() === letter){
+            hasUpper = true
+        }
+        if(!isNaN(letter)){
+            hasNumber = true
+        }
+        if(/[^a-zA-Z0-9]/.test(letter)){ 
+            hasSpecial = true
+        }
+        if(hasLowe && hasUpper && hasNumber && hasSpecial){
+            return true
+        }
+    }
+    if(!hasLowe){
+        showToast('A senha deve conter pelo menos uma letra minúscula.', 'error')
+    }
+    if(!hasUpper){
+        showToast('A senha deve conter pelo menos uma letra maiúscula.', 'error')
+    }
+    if(!hasNumber){
+        showToast('A senha deve conter pelo menos um número.', 'error')
+    }
+    if(!hasSpecial){
+        showToast('A senha deve conter pelo menos um caractere especial.', 'error')
+    }
+}
 //Local Storage
 const saveToLocalStorage = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data))
@@ -447,7 +483,9 @@ const createUser = () => {
         showToast('Email já existe.', 'error')
         return
     }
-
+    if (!passwordValidation(user.password)) {
+        return
+    }
     users.push(user)
     saveToLocalStorage('users', users)
     showToast('Utilizador adicionado com sucesso!')
