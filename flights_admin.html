@@ -44,23 +44,23 @@
             <!-- Table Header -->
             <thead class="table-header-group bg-Background-Card-Bg-Gami">
                 <tr class="table-row rounded-tl-[40px] rounded-tr-[40px] overflow-hidden">
-                    <th onclick="sortTableBy('flight_name', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans'] ">Nº Voo
-                        <span id="sort-icon-flight_name" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    <th onclick="sortTableBy('name', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans'] ">Nº Voo
+                        <span id="sort-icon-name" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('flight_from', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Origem
-                        <span id="sort-icon-flight_from" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    <th onclick="sortTableBy('from', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Origem
+                        <span id="sort-icon-from" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('flight_to', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Destino
-                        <span id="sort-icon-flight_to" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    <th onclick="sortTableBy('to', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Destino
+                        <span id="sort-icon-to" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('flight_company', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Companhia Aérea
-                        <span id="sort-icon-flight_company" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    <th onclick="sortTableBy('company', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Companhia Aérea
+                        <span id="sort-icon-company" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('flight_leaves', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Horario Partida
-                        <span id="sort-icon-flight_leaves" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    <th onclick="sortTableBy('leaves', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Horario Partida
+                        <span id="sort-icon-leaves" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('flight_direct', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Voo Direto
-                        <span id="sort-icon-flight_direct" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    <th onclick="sortTableBy('direct', flightTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Voo Direto
+                        <span id="sort-icon-direct" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
                     <th class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']"></th>
                 </tr>
@@ -118,33 +118,33 @@
             <form class="space-y-4" id="add_flight_form">
                 <input type="hidden" id="id">
                 <div>
-                    <label for="flight_name" class="block text-base font-light text-Text-Subtitles">Número do Voo</label>
-                    <input id="flight_name" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <label for="name" class="block text-base font-light text-Text-Subtitles">Número do Voo</label>
+                    <input id="name" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
   
                 <div>
-                    <label for="flight_from" class="block text-base font-light text-Text-Subtitles">Origem</label>
-                    <input id="flight_from" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <label for="from" class="block text-base font-light text-Text-Subtitles">Origem</label>
+                    <input id="from" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
   
                 <div>
-                    <label for="flight_to" class="block text-base font-light text-Text-Subtitles">Destino</label>
-                    <input id="flight_to" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <label for="to" class="block text-base font-light text-Text-Subtitles">Destino</label>
+                    <input id="to" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
   
                 <div>
-                    <label for="flight_company" class="block text-base font-light text-Text-Subtitles">Companhia Aérea</label>
-                    <input id="flight_company" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <label for="company" class="block text-base font-light text-Text-Subtitles">Companhia Aérea</label>
+                    <input id="company" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
   
                 <div>
-                    <label for="flight_leaves" class="block text-base font-light text-Text-Subtitles">Partida</label>
-                    <input id="flight_leaves" type="datetime-local" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                    <label for="leaves" class="block text-base font-light text-Text-Subtitles">Partida</label>
+                    <input id="leaves" type="datetime-local" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
                 </div>
   
                 <div>
-                    <label for="flight_direct" class="block text-base font-light text-Text-Subtitles">Voo Direto (S/N)</label>
-                    <select id="flight_direct" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                    <label for="direct" class="block text-base font-light text-Text-Subtitles">Voo Direto (S/N)</label>
+                    <select id="direct" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
                         <option value="S">Sim</option>
                         <option value="N">Não</option>
                     </select>

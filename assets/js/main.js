@@ -143,17 +143,17 @@ const createFlight = () => {
     flight.id = generateId(flights)
 
     //Validação Dados Preenchimento Antes de Adicionar ao Array de Objetos
-    const required = [`flight_name`, `flight_from`, `flight_to`, `flight_leaves`]
+    const required = [`name`, `from`, `to`, `leaves`]
     const missing = required.filter(key => !flight[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', `error`)
         return
     }
-
-    if (flights.some(f => f.flight_name === flight.flight_name)) {
+    if (flights.some(f => f.name === flight.name)) {
         showToast('Nº do voo deve ser único.', `error`)
         return
     }
+/*     if (flight.) */
 
     flight.id = generateId(flights)
     flights.push(flight)
@@ -168,7 +168,7 @@ const readFlight = (filterFn = null) => {
     return filterFn ? flights.filter(filterFn) : flights
 }
 const updateFlight = (originalFlight, updatedFlight) => {
-    const index = flights.findIndex(f => f.flight_name === originalFlight)
+    const index = flights.findIndex(f => f.name === originalFlight)
     if (index !== -1) {
         flights[index] = updatedFlight
         return true
@@ -549,14 +549,14 @@ const editFlight = (id) => {
     // Editar Titulo
     document.querySelector(`#modal-adicionar h2`).innerText = `Editar voo`
 
-    document.getElementById(`id`).value = flight.flight_name
+    document.getElementById(`id`).value = flight.id
     // Preencher Campos
-    document.getElementById(`flight_name`).value = flight.flight_name
-    document.getElementById(`flight_from`).value = flight.flight_from
-    document.getElementById(`flight_to`).value = flight.flight_to
-    document.getElementById(`flight_company`).value = flight.flight_company
-    document.getElementById(`flight_leaves`).value = flight.flight_leaves
-    document.getElementById(`flight_direct`).value = flight.flight_direct
+    document.getElementById(`name`).value = flight.name
+    document.getElementById(`from`).value = flight.from
+    document.getElementById(`to`).value = flight.to
+    document.getElementById(`company`).value = flight.company
+    document.getElementById(`leaves`).value = flight.leaves
+    document.getElementById(`direct`).value = flight.direct
 
     //Adicionar => Salvar
     const addButton = document.querySelector(`#modal-adicionar button[onclick='createFlight()']`)
@@ -574,7 +574,7 @@ const saveEditedFlight = () => {
     const originalFlight = document.getElementById(`id`).value
     const updatedFlight = getFormData('add_flight_form')
 
-    const required = [`flight_name`, `flight_from`, `flight_to`, `flight_leaves`]
+    const required = [`name`, `from`, `to`, `leaves`]
     const missing = required.filter(key => !updatedFlight[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', `error`)
@@ -1164,12 +1164,12 @@ const handleSearch = (inputId, config) => {
 const flightTableConfig = { //labels não tem função atualmente mas caso haja tempo a função da tabela será melhorada para gerar os header automaticamente com base nos labels
     data: flights,
     columns: [
-        { key: `flight_name`, label: `NºVoo`, sortable: true },
-        { key: `flight_from`, label: `Origem`, sortable: true },
-        { key: `flight_to`, label: `Destino`, sortable: true },
-        { key: `flight_company`, label: `Companhia Aeria`, sortable: true },
-        { key: `flight_leaves`, label: `Horario de Partida`, sortable: true, type: `date` },
-        { key: `flight_direct`, label: `Direto`, sortable: true },
+        { key: `name`, label: `NºVoo`, sortable: true },
+        { key: `from`, label: `Origem`, sortable: true },
+        { key: `to`, label: `Destino`, sortable: true },
+        { key: `company`, label: `Companhia Aeria`, sortable: true },
+        { key: `leaves`, label: `Horario de Partida`, sortable: true, type: `date` },
+        { key: `direct`, label: `Direto`, sortable: true },
     ],
     actions: [
         { icon: `edit_square`, class: `text-Main-Primary`, handler: editFlight },
