@@ -1305,7 +1305,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTable(carTableConfig)
     }else if (path.includes('activitie_admin.html')) {
         loadFromLocalStorage(`activities`, activities)
+        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
+        loadFromLocalStorage(`turismTypes`, turismTypes)
+        loadFromLocalStorage(`destinations`, destinations)
         updateTable(activitiesTableConfig)
+        selectOptions(accessibilityOptions, 'act_acess')
+        selectOptions(turismTypes, 'act_turism')
+        selectOptions(destinations, 'act_destinoId')
     }else if (path.includes('hotel_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`hotels`, hotels)
