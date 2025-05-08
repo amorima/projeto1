@@ -127,25 +127,22 @@ const passwordValidation = (password) => {
         showToast('A senha deve ter pelo menos 8 caracteres.', 'error')
         return false
     }
-    hasLowe = hasUpper = hasNumber = hasSpecial = false
-    for (let letter of password) { //beds wirkds
-        if(letter.toLowerCase() === letter){
-            hasLowe = true
-        }
-        if(letter.toUpperCase() === letter){
-            hasUpper = true
-        }
-        if(!isNaN(letter)){
-            hasNumber = true
-        }
-        if(/[^a-zA-Z0-9]/.test(letter)){ 
-            hasSpecial = true
-        }
-        if(hasLowe && hasUpper && hasNumber && hasSpecial){
-            return true
+    let hasLower = hasUpper = hasNumber = hasSpecial = false
+    for (let letter of password) {
+        if (/[a-z]/.test(letter)) {
+            hasLower = true;
+        } else if (/[A-Z]/.test(letter)) {
+            hasUpper = true;
+        } else if (/[0-9]/.test(letter)) {
+            hasNumber = true;
+        } else if (/[^a-zA-Z0-9]/.test(letter)) {
+            hasSpecial = true;
         }
     }
-    if(!hasLowe){
+    if(hasLower && hasUpper && hasNumber && hasSpecial){
+        return true
+    }
+    if(!hasLower){
         showToast('A senha deve conter pelo menos uma letra minúscula.', 'error')
     }
     if(!hasUpper){
@@ -931,7 +928,9 @@ const saveEditedUser = () => {
         showToast('Erro ao editar utilizador.', `error`)
         return
     }
-
+    if (!passwordValidation(updatedUser.password)) {
+        return
+    }
     saveToLocalStorage(`users`, users)
     showToast('Utilizador editado com sucesso!')
     closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
