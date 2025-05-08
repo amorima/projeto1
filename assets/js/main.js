@@ -117,8 +117,8 @@ const selectOptions = (array, selectId) => {
     select.innerHTML = ''
     array.forEach(item => {
         const option = document.createElement('option')
-        option.value = item.aero_code || item.destination_city
-        option.textContent = item.aero_code || item.destination_city
+        option.value = item.aero_code || item.destination_city || item
+        option.textContent = item.aero_code || item.destination_city || item
         select.appendChild(option)
     })
 }
@@ -1286,7 +1286,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }else if (path.includes('places_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`airports`, airports)
+        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
+        loadFromLocalStorage(`turismTypes`, turismTypes)
         updateTable(destinationTableConfig)
+        selectOptions(accessibilityOptions, 'destination_acess')
+        selectOptions(turismTypes, 'destination_type')
         selectOptions(airports, 'destination_aero')
     }else if (path.includes('users_admin.html')) { 
         loadFromLocalStorage(`users`, users)
