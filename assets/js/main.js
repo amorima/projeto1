@@ -135,7 +135,6 @@ const loadFromLocalStorage = (key, targetArray) => {
         }
     }
 }
-
 // === CRUD PlanIt ===
 const createTurismAcess = () => {
     const form = getFormData('add_turism_acess')
@@ -204,7 +203,7 @@ const createDestination = () => {
     destination.destination_acess = destination.destination_acess.split(`,`).map(a => a.trim())
 
     // Validação
-    const required = [`destination_city`, `destination_country`, `destination_aero`]
+    const required = [`destination_aero`]
     const missing = required.filter(key => !destination[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', `error`)
@@ -217,6 +216,8 @@ const createDestination = () => {
         return
     }
 
+    destination.destination_city = airports.find(a => a.aero_code === destination.destination_aero)?.aero_city || destination.destination_city
+    destination.destination_country = airports.find(a => a.aero_code === destination.destination_aero)?.aero_country || destination.destination_country
     destination.id = generateId(destinations)
     destinations.push(destination)
     saveToLocalStorage(`destinations`, destinations)
@@ -232,6 +233,8 @@ const updateDestination = (originalId, updatedDestination) => {
     const index = destinations.findIndex(d => d.id == originalId)
     if (index !== -1) {
         updatedDestination.id = originalId // Manter ID
+        updatedDestination.destination_city = airports.find(a => a.aero_code === updatedDestination.destination_aero)?.aero_city || updatedDestination.destination_city
+        updatedDestination.destination_country = airports.find(a => a.aero_code === updatedDestination.destination_aero)?.aero_country || updatedDestination.destination_country
         //Tipos de Turismo e Acessebilidade => Array
         updatedDestination.tiposTurismo = (updatedDestination.tiposTurismo || '').split(`,`).map(t => t.trim())
         updatedDestination.acessibilidade = (updatedDestination.acessibilidade || '').split(`,`).map(a => a.trim())        
@@ -371,7 +374,7 @@ const updateAero = (originalId, updatedAero) => {
     return false
 }
 const deleteAero = (code) => {
-    const index = airports.findIndex(a => a.code === code)
+    const index = airports.findIndex(a => a.id === code)
     if (index !== -1) {
         airports.splice(index, 1)
         saveToLocalStorage('airports', airports)
@@ -611,8 +614,8 @@ const editDestination = (id) => {//Modal Edição destinos
 
     document.getElementById(`id`).value = destination.id
     // Preencher Campos
-    document.getElementById(`destination_country`).value = destination.destination_country
-    document.getElementById(`destination_city`).value = destination.destination_city
+/*  document.getElementById(`destination_country`).value = destination.destination_country
+    document.getElementById(`destination_city`).value = destination.destination_city */
     document.getElementById(`destination_aero`).value = destination.destination_aero
     document.getElementById(`destination_type`).value = destination.destination_type
     document.getElementById(`destination_acess`).value = destination.destination_acess
@@ -633,7 +636,7 @@ const saveEditedDestination = () => {
     const originalDestination = document.getElementById(`id`).value
     const updatedDestination = getFormData('add_destination_form')
 
-    const required = [`destination_country`, `destination_city`, `destination_aero`]
+    const required = [`destination_aero`]
     const missing = required.filter(key => !updatedDestination[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', `error`)
