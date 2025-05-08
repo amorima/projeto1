@@ -1174,7 +1174,7 @@ const handleSearch = (inputId, config) => {
     updateTable(config)
 }
 // === Constantes de Configuração de Tabelas ===
-const flightTableConfig = { //labels não tem função atualmente mas caso haja tempo a função da tabela será melhorada para gerar os header automaticamente com base nos labels
+const flightTableConfig = {
     data: flights,
     columns: [
         { key: `name`, label: `NºVoo`, sortable: true },
@@ -1308,13 +1308,14 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
         loadFromLocalStorage(`turismTypes`, turismTypes)
         loadFromLocalStorage(`destinations`, destinations)
-        updateTable(activitiesTableConfig)
         selectOptions(accessibilityOptions, 'act_acess')
         selectOptions(turismTypes, 'act_turism')
         selectOptions(destinations, 'act_destinoId')
+        updateTable(activitiesTableConfig)
     }else if (path.includes('hotel_admin.html')) {
         loadFromLocalStorage(`destinations`, destinations)
         loadFromLocalStorage(`hotels`, hotels)
+        selectOptions(destinations, 'destinoId')
         updateTable(hotelTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
         loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
