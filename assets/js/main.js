@@ -328,6 +328,42 @@ const deleteHotel = (id) => {
         showToast('Hotel removido com sucesso.','error')
     }
 }
+//CRUD Quartos
+//Warning: IMG
+const createRoom = () => {
+    const room = getFormData('add_room_form')
+    const required = ['room_hotel', 'room_type', 'room_price', 'room_capacity','room_bed']
+    const missing = required.filter(key => !room[key])
+    if (missing.length > 0) {
+        showToast('Preencha todos os campos obrigatórios.', 'error')
+        return
+    }
+    const hotel = hotels.find(h => h.name == room.room_hotel)
+    hotel.quartos.push(room)
+    saveToLocalStorage('hotels', hotels)
+}
+const readRoom = (filterFn = null) => {
+    return filterFn ? hotels.quartos.filter(filterFn) : hotels.quartos
+}
+const updateRoom = (originalId, updatedRoom) => {
+    const index = hotels.quartos.findIndex(r => r.id == originalId)
+    if (index !== -1) {
+        updatedRoom.id = originalId
+        hotels.quartos[index] = updatedRoom
+        saveToLocalStorage('hotels', hotels)
+        return true
+    }
+    return false
+}
+const deleteRoom = (id) => {
+    const index = hotels.quartos.findIndex(r => r.id == id)
+    if (index !== -1) {
+        hotels.quartos.splice(index, 1)
+        saveToLocalStorage('hotels', hotels)
+        updateTable(hotelTableConfig)
+        showToast('Quarto removido com sucesso.','error')
+    }
+}
 //CRUD Carros
 //Warning: IMG
 const createCar = () => {
@@ -740,7 +776,6 @@ const saveEditedCar = () => {
     closeModal(`modal-adicionar`,'add_car_form','Adicionar caroo manual',createCar)
     updateTable(carTableConfig)
 }
-// Not finished
 const editHotel = (id) => {//Modal Edição Hotel
     const hotel = readHotel(h => h.id == id)[0]
     if (!hotel) return
