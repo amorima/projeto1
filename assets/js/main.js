@@ -1037,6 +1037,7 @@ const editTurismAcess = (category,oldOption) => {
             updateAcess(oldOption,newOption)
             actionsButton.removeChild(editBtn)
             loadTurismAcess(category)
+            document.getElementById('type').value = ''
         }
     }else {
         editBtn.onclick = () => {
@@ -1044,6 +1045,7 @@ const editTurismAcess = (category,oldOption) => {
             updateTurism(oldOption,newOption)
             actionsButton.removeChild(editBtn)
             loadTurismAcess(category)
+            document.getElementById('type').value = ''
         }
     }
     actionsButton.appendChild(editBtn)
