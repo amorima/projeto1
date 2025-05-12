@@ -499,26 +499,27 @@ const deleteActivitie = (id) => {
 }
 //CRUD User
 const createUser = () => {
-    const user = getFormData('add_user_form')
+    const userData = getFormData('add_user_form')
 
     const required = ['username', 'email', 'password']
-    const missing = required.filter(key => !user[key])
+    const missing = required.filter(key => !userData[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
         return
     }
 
-    if (users.some(u => u.username === user.username)) {
+    if (users.some(u => u.username === userData.username)) {
         showToast('Nome de utilizador já existe.', 'error')
         return
     }
-    if (users.some(u => u.email === user.email)) {
+    if (users.some(u => u.email === userData.email)) {
         showToast('Email já existe.', 'error')
         return
     }
-    if (!passwordValidation(user.password)) {
+    if (!passwordValidation(userData.password)) {
         return
     }
+    const user = new User(userData.username, userData.email, userData.password)
     users.push(user)
     saveToLocalStorage('users', users)
     showToast('Utilizador adicionado com sucesso!')
@@ -1377,7 +1378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFromLocalStorage(`cars`, cars)
         selectOptions(destinations, 'cars_destinoId')
         updateTable(carTableConfig)
-    }else if (path.includes('activitie_admin.html')) {
+    }else if (path.includes('activity_admin.html')) {
         loadFromLocalStorage(`activities`, activities)
         loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
         loadFromLocalStorage(`turismTypes`, turismTypes)

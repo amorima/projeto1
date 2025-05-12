@@ -1,4 +1,4 @@
-class user {
+class User {
     username = ''
     email = ''
     password = ''
