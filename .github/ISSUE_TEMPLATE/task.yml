@@ -1,0 +1,38 @@
+name: 📋 Nova Tarefa
+description: “Abra uma nova tarefa, escolha prioridade e defina datas”
+title: "[Tarefa] "
+labels: ["tarefa"]
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: "Prioridade"
+      description: "Selecione a prioridade desta tarefa"
+      options:
+        - "Alta"
+        - "Média"
+        - "Baixa"
+    validations:
+      required: true
+
+  - type: date
+    id: start_date
+    attributes:
+      label: "Data de início"
+      description: "Data de início (hoje)"
+      default: "2025-05-12"
+
+  - type: date
+    id: due_date
+    attributes:
+      label: "Data de conclusão"
+      description: "Data de conclusão (15 dias após hoje)"
+      default: "2025-05-27"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Descrição"
+      description: "Descreva os detalhes desta tarefa"
+    validations:
+      required: true
