@@ -1,4 +1,4 @@
-import {User} from './user.js'
+import User from './user.js'
 // === Variaveis Gerais ===
 const flights = [
 /*     voo = {
@@ -1351,51 +1351,78 @@ const userTableConfig = {
 }
 // === On Page Load ===
 document.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage(`flights`, flights)
+    loadFromLocalStorage(`airports`, airports)
+    loadFromLocalStorage(`destinations`, destinations)
+    loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
+    loadFromLocalStorage(`turismTypes`, turismTypes)
+    loadFromLocalStorage(`users`, users)
+    loadFromLocalStorage(`cars`, cars)
+    loadFromLocalStorage(`activities`, activities)
+    loadFromLocalStorage(`hotels`, hotels)
     const path = window.location.pathname
     let originalTableData = []
     if (path.includes('flights_admin.html')) {
-        loadFromLocalStorage(`flights`, flights)
-        loadFromLocalStorage(`airports`, airports)
         updateTable(flightTableConfig)
         selectOptions(airports, 'from')
         selectOptions(airports, 'to')
-    }else if (path.includes('places_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        loadFromLocalStorage(`airports`, airports)
-        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
-        loadFromLocalStorage(`turismTypes`, turismTypes)
+    }else if (path.includes('places_admin.html')) {   
         updateTable(destinationTableConfig)
         selectOptions(accessibilityOptions, 'destination_acess')
         selectOptions(turismTypes, 'destination_type')
         selectOptions(airports, 'destination_aero')
-    }else if (path.includes('users_admin.html')) { 
-        loadFromLocalStorage(`users`, users)
+    }else if (path.includes('users_admin.html')) {
+        const openBtn = document.getElementById('openModal')
+        openBtn.onclick = () => {
+            openModal('modal-adicionar')
+        }
+        const searchBtn = document.getElementById('searchBar')
+        searchBtn.onclick = () => {
+            handleSearch('searchInput', userTableConfig)
+        }
+        const thUsername = document.getElementById('username')
+        thUsername.onclick = () => {
+            sortTableBy('username', userTableConfig)
+        }
+        const thEmail = document.getElementById('email')
+        thEmail.onclick = () => {
+            sortTableBy('email', userTableConfig)
+        }
+        const thPassword = document.getElementById('password')
+        thPassword.onclick = () => {
+            sortTableBy('password', userTableConfig)
+        }
+        const thPoints = document.getElementById('points')
+        thPoints.onclick = () => {
+            sortTableBy('points', userTableConfig)
+        }
+        const thLevel = document.getElementById('level')
+        thLevel.onclick = () => {
+            sortTableBy('level', userTableConfig)
+        }
+        const thPrivate = document.getElementById('private')
+        thPrivate.onclick = () => {
+            sortTableBy('private', userTableConfig)
+        }
+        const thAdmin = document.getElementById('admin')
+        thAdmin.onclick = () => {
+            sortTableBy('admin', userTableConfig)
+        }
         updateTable(userTableConfig)
     }else if (path.includes('airport_admin.html')) {
-        loadFromLocalStorage(`airports`, airports)
         updateTable(airportTableConfig)
     }else if (path.includes('cars_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        loadFromLocalStorage(`cars`, cars)
         selectOptions(destinations, 'cars_destinoId')
         updateTable(carTableConfig)
-    }else if (path.includes('activity_admin.html')) {
-        loadFromLocalStorage(`activities`, activities)
-        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
-        loadFromLocalStorage(`turismTypes`, turismTypes)
-        loadFromLocalStorage(`destinations`, destinations)
+    }else if (path.includes('activity_admin.html')) {  
         selectOptions(accessibilityOptions, 'act_acess')
         selectOptions(turismTypes, 'act_turism')
         selectOptions(destinations, 'act_destinoId')
         updateTable(activitiesTableConfig)
     }else if (path.includes('hotel_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        loadFromLocalStorage(`hotels`, hotels)
         selectOptions(destinations, 'destinoId')
         updateTable(hotelTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
-        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
-        loadFromLocalStorage(`turismTypes`, turismTypes)
         const element = document.getElementById('category')
         element.addEventListener('change', () => loadTurismAcess(element.value))
         loadTurismAcess(element.value)
