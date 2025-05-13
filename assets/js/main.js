@@ -88,6 +88,7 @@ const rowsPerPage = 13 //Define Linhas a Mostrar
 //Ordenação da Tabela
 let sortColumn = null
 let sortDirection = `asc`
+let originalTableData = []
 // === Funções Uteis ===
 const getFormData = (formId) => {
     console.log(formId)
@@ -1362,7 +1363,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage(`activities`, activities)
     loadFromLocalStorage(`hotels`, hotels)
     const path = window.location.pathname
-    let originalTableData = []
     if (path.includes('flights_admin.html')) {
         updateTable(flightTableConfig)
         selectOptions(airports, 'from')
