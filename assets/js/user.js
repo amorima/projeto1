@@ -8,7 +8,7 @@ export default class User {
     admin = false
     trips = []
     plans = []
-    constructor(username, email, password, points = 50, level = 1, profile_private = true, admin = false, trips = [], plans = []){
+    constructor(username, email, password, points = 50, level = 1, profile_private = 'S', admin = 'User', trips = [], plans = []){
         this.username = username
         this.email = email
         this.password = password

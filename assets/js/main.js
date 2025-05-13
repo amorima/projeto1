@@ -128,7 +128,7 @@ const passwordValidation = (password) => {
         showToast('A senha deve ter pelo menos 8 caracteres.', 'error')
         return false
     }
-    let hasLower = hasUpper = hasNumber = hasSpecial = false
+    let hasLower = false, hasUpper = false, hasNumber = false, hasSpecial = false
     for (let letter of password) {
         if (/[a-z]/.test(letter)) {
             hasLower = true;
@@ -523,9 +523,9 @@ const createUser = () => {
     const user = new User(userData.username, userData.email, userData.password)
     users.push(user)
     saveToLocalStorage('users', users)
+    updateTable(userTableConfig)
     showToast('Utilizador adicionado com sucesso!')
     closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
-    updateTable(userTableConfig)
 }
 const readUser = (filterFn = null) => {
     return filterFn ? users.filter(filterFn) : users
@@ -608,7 +608,7 @@ const openModal = (id) => {
     document.getElementById(id).classList.remove('hidden')
   }
 const closeModal = (id,form,header,handler) => {
-    modal = document.getElementById(id)
+    const modal = document.getElementById(id)
     modal.classList.add('hidden')
     resetModalToAddMode(form ,header,handler)
 }
@@ -1375,6 +1375,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const openBtn = document.getElementById('openModal')
         openBtn.onclick = () => {
             openModal('modal-adicionar')
+        }
+        const closeBtn = document.getElementById('cancel')
+        closeBtn.onclick = () => {
+            closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
+        }
+        const createBtn = document.getElementById('createUser')
+        createBtn.onclick = () => {
+            createUser()
         }
         const searchBtn = document.getElementById('searchBar')
         searchBtn.onclick = () => {
