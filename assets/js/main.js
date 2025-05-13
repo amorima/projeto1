@@ -1352,7 +1352,7 @@ const userTableConfig = {
 // === On Page Load ===
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname
-    originalTableData = []
+    let originalTableData = []
     if (path.includes('flights_admin.html')) {
         loadFromLocalStorage(`flights`, flights)
         loadFromLocalStorage(`airports`, airports)
@@ -1369,10 +1369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         selectOptions(turismTypes, 'destination_type')
         selectOptions(airports, 'destination_aero')
     }else if (path.includes('users_admin.html')) { 
-        const button = document.getElementById('add')
-        button.onclick = () => {
-            openModal('modal-adicionar')
-        }
         loadFromLocalStorage(`users`, users)
         updateTable(userTableConfig)
     }else if (path.includes('airport_admin.html')) {
