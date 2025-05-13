@@ -520,7 +520,7 @@ const createUser = () => {
     if (!passwordValidation(userData.password)) {
         return
     }
-    const user = new User(userData.username, userData.email, userData.password)
+    const user = new User(userData.username, userData.email, userData.password, userData.points, userData.level, userData.private, userData.admin)
     users.push(user)
     saveToLocalStorage('users', users)
     updateTable(userTableConfig)
@@ -922,23 +922,22 @@ const saveEditedActivitie = () => {
     updateTable(activitiesTableConfig)
 }
 const editUser = (username) => {//Modal Edição de Utilizadores
-    console.log(username)
     const user = readUser(u => u.username == username)[0]
     if (!user) return
-
+    
     // Editar Titulo
     document.querySelector(`#modal-adicionar h2`).innerText = `Editar utilizador`
 
     // Preencher Campos
-    document.getElementById(`username`).value = user.username
-    document.getElementById(`email`).value = user.email
-    document.getElementById(`password`).value = user.password
-    document.getElementById(`points`).value = user.points
-    document.getElementById(`private`).value = user.private
-    document.getElementById(`admin`).value = user.admin
+    document.querySelector(`#add_user_form #username`).value = user.username
+    document.querySelector(`#add_user_form #email`).value = user.email
+    document.querySelector(`#add_user_form #password`).value = user.password
+    document.querySelector(`#add_user_form #points`).value = user.points
+    document.querySelector(`#add_user_form #private`).value = user.profile_private
+    document.querySelector(`#add_user_form #admin`).value = user.admin
 
     //Adicionar => Salvar
-    const addButton = document.querySelector(`#modal-adicionar button[onclick='createUser()']`)
+    const addButton = document.querySelector(`#modal-adicionar #createUser`)
     addButton.innerHTML = `
         <div class='inline-flex justify-start items-center gap-2.5'>
             <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
@@ -950,16 +949,17 @@ const editUser = (username) => {//Modal Edição de Utilizadores
     openModal(`modal-adicionar`)
 }
 const saveEditedUser = () => {
-    const originalUser = document.getElementById(`username`).value
-    const updatedUser = getFormData('add_user_form')
+    const updatedUserData = getFormData('add_user_form')
+    const originalUser = document.querySelector(`#add_user_form #username`).value
+    
 
     const required = [`username`, `email`, `password`]
-    const missing = required.filter(key => !updatedUser[key])
+    const missing = required.filter(key => !updatedUserData[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', `error`)
         return
     }
-
+    const updatedUser = new User(updatedUserData.username, updatedUserData.email, updatedUserData.password, updatedUserData.points, updatedUserData.level, updatedUserData.private, updatedUserData.admin)
     const success = updateUser(originalUser, updatedUser)
     if (!success) {
         showToast('Erro ao editar utilizador.', `error`)
@@ -969,6 +969,7 @@ const saveEditedUser = () => {
         return
     }
     saveToLocalStorage(`users`, users)
+    updateTable(userTableConfig)
     showToast('Utilizador editado com sucesso!')
     closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
     updateTable(userTableConfig)
@@ -1341,7 +1342,7 @@ const userTableConfig = {
         {key:'password', label:'Password', sortable: true},
         {key:'points', label:'Pontos', sortable: true},
         {key:'level', label:'Nivel', sortable: true},
-        {key:'private', label:'Privacidade', sortable: true},
+        {key:'profile_private', label:'Privacidade', sortable: true},
         {key:'admin', label:'User/Admin', sortable: true},
     ],
     actions: [
