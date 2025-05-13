@@ -1,20 +1,20 @@
-class User {
+export class User {
     username = ''
     email = ''
     password = ''
     points = 0
     level = 0
-    private = false
+    profile_private = false
     admin = false
     trips = []
     plans = []
-    constructor(username, email, password, points = 50, level = 1,private = true, admin = false, trips = [], plans = []){
+    constructor(username, email, password, points = 50, level = 1, profile_private = true, admin = false, trips = [], plans = []){
         this.username = username
         this.email = email
         this.password = password
         this.points = points
         this.level = level
-        this.private = private
+        this.profile_private = profile_private
         this.admin = admin
         this.trips = trips
         this.plans = plans
@@ -34,8 +34,8 @@ class User {
     get level(){
         return this.level
     }
-    get private(){
-        return this.private
+    get profile_private(){
+        return this.profile_private
     }
     get admin(){
         return this.admin
@@ -123,10 +123,10 @@ class User {
         this.level = level
     }
     /**
-     * @param {boolean} private
+     * @param {boolean} profile_private
      */
-    set private(private){
-        this.private = private
+    set profile_private(profile_private){
+        this.profile_private = profile_private
     }
     /**
      * @param {boolean} admin

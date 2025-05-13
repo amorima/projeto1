@@ -1,3 +1,4 @@
+import {User} from './user.js'
 // === Variaveis Gerais ===
 const flights = [
 /*     voo = {
@@ -1368,6 +1369,10 @@ document.addEventListener('DOMContentLoaded', () => {
         selectOptions(turismTypes, 'destination_type')
         selectOptions(airports, 'destination_aero')
     }else if (path.includes('users_admin.html')) { 
+        const button = document.getElementById('add')
+        button.onclick = () => {
+            openModal('modal-adicionar')
+        }
         loadFromLocalStorage(`users`, users)
         updateTable(userTableConfig)
     }else if (path.includes('airport_admin.html')) {

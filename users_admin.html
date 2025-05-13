@@ -30,7 +30,7 @@
                 <button onclick="handleSearch('searchInput',userTableConfig)" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
                     <span class="material-symbols-outlined text-white cursor-pointer">search</span>
                 </button>
-                <button onclick="openModal(`modal-adicionar`)" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
+                <button id="add" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
                     <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                     <p class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</p>
                 </button>
@@ -171,9 +171,8 @@
             </div>
         </div>
 
-    <script src="assets/js/user.js"></script>
     <script src="assets/js/components.js"></script> 
     <script src="assets/js/storage.js"></script>
-    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/main.js" type="module" defer></script>
 </body>
 </html>
