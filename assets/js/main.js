@@ -1,4 +1,4 @@
-import User from './user.js'
+import User from './obj classes/user.js'
 // === Variaveis Gerais ===
 const flights = [
 /*     voo = {
@@ -523,8 +523,8 @@ const createUser = () => {
     }
     const user = new User(userData.username, userData.email, userData.password, userData.points, userData.level, userData.private, userData.admin)
     users.push(user)
-    saveToLocalStorage('users', users)
     updateTable(userTableConfig)
+    saveToLocalStorage('users', users)
     showToast('Utilizador adicionado com sucesso!')
     closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
 }
