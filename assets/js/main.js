@@ -1,4 +1,4 @@
-import User from './obj classes/user.js'
+import User from './models/UserModel.js'
 // === Variaveis Gerais ===
 const flights = [
 /*     voo = {
