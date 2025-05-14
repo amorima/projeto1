@@ -1078,7 +1078,7 @@ const updatePaginationControls = (config) => {
             btn.appendChild(p)
             btn.onclick = () => {
                 currentPage = page
-                updateTable(flightTableConfig)
+                updateTable(config)
             }
         }
         return btn
@@ -1102,7 +1102,7 @@ const updatePaginationControls = (config) => {
     container.appendChild(createIconButton('chevron_left', () => {
         if (currentPage > 1) {
             currentPage--
-            updateTable(flightTableConfig)
+            updateTable(config)
         }
     }, currentPage === 1))
 
@@ -1129,7 +1129,7 @@ const updatePaginationControls = (config) => {
     container.appendChild(createIconButton('chevron_right', () => {
         if (currentPage < totalPages) {
             currentPage++
-            updateTable(flightTableConfig)
+            updateTable(config)
         }
     }, currentPage === totalPages))
 }
