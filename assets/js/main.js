@@ -1,3 +1,4 @@
+import User from './obj classes/user.js'
 // === Variaveis Gerais ===
 const flights = [
 /*     voo = {
@@ -87,6 +88,7 @@ const rowsPerPage = 13 //Define Linhas a Mostrar
 //Ordenação da Tabela
 let sortColumn = null
 let sortDirection = `asc`
+let originalTableData = []
 // === Funções Uteis ===
 const getFormData = (formId) => {
     console.log(formId)
@@ -127,7 +129,7 @@ const passwordValidation = (password) => {
         showToast('A senha deve ter pelo menos 8 caracteres.', 'error')
         return false
     }
-    let hasLower = hasUpper = hasNumber = hasSpecial = false
+    let hasLower = false, hasUpper = false, hasNumber = false, hasSpecial = false
     for (let letter of password) {
         if (/[a-z]/.test(letter)) {
             hasLower = true;
@@ -499,31 +501,32 @@ const deleteActivitie = (id) => {
 }
 //CRUD User
 const createUser = () => {
-    const user = getFormData('add_user_form')
+    const userData = getFormData('add_user_form')
 
     const required = ['username', 'email', 'password']
-    const missing = required.filter(key => !user[key])
+    const missing = required.filter(key => !userData[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', 'error')
         return
     }
 
-    if (users.some(u => u.username === user.username)) {
+    if (users.some(u => u.username === userData.username)) {
         showToast('Nome de utilizador já existe.', 'error')
         return
     }
-    if (users.some(u => u.email === user.email)) {
+    if (users.some(u => u.email === userData.email)) {
         showToast('Email já existe.', 'error')
         return
     }
-    if (!passwordValidation(user.password)) {
+    if (!passwordValidation(userData.password)) {
         return
     }
+    const user = new User(userData.username, userData.email, userData.password, userData.points, userData.level, userData.private, userData.admin)
     users.push(user)
+    updateTable(userTableConfig)
     saveToLocalStorage('users', users)
     showToast('Utilizador adicionado com sucesso!')
     closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
-    updateTable(userTableConfig)
 }
 const readUser = (filterFn = null) => {
     return filterFn ? users.filter(filterFn) : users
@@ -606,7 +609,7 @@ const openModal = (id) => {
     document.getElementById(id).classList.remove('hidden')
   }
 const closeModal = (id,form,header,handler) => {
-    modal = document.getElementById(id)
+    const modal = document.getElementById(id)
     modal.classList.add('hidden')
     resetModalToAddMode(form ,header,handler)
 }
@@ -920,23 +923,22 @@ const saveEditedActivitie = () => {
     updateTable(activitiesTableConfig)
 }
 const editUser = (username) => {//Modal Edição de Utilizadores
-    console.log(username)
     const user = readUser(u => u.username == username)[0]
     if (!user) return
-
+    
     // Editar Titulo
     document.querySelector(`#modal-adicionar h2`).innerText = `Editar utilizador`
 
     // Preencher Campos
-    document.getElementById(`username`).value = user.username
-    document.getElementById(`email`).value = user.email
-    document.getElementById(`password`).value = user.password
-    document.getElementById(`points`).value = user.points
-    document.getElementById(`private`).value = user.private
-    document.getElementById(`admin`).value = user.admin
+    document.querySelector(`#add_user_form #username`).value = user.username
+    document.querySelector(`#add_user_form #email`).value = user.email
+    document.querySelector(`#add_user_form #password`).value = user.password
+    document.querySelector(`#add_user_form #points`).value = user.points
+    document.querySelector(`#add_user_form #private`).value = user.profile_private
+    document.querySelector(`#add_user_form #admin`).value = user.admin
 
     //Adicionar => Salvar
-    const addButton = document.querySelector(`#modal-adicionar button[onclick='createUser()']`)
+    const addButton = document.querySelector(`#modal-adicionar #createUser`)
     addButton.innerHTML = `
         <div class='inline-flex justify-start items-center gap-2.5'>
             <span class='material-symbols-outlined text-white cursor-pointer'>edit_square</span>
@@ -948,16 +950,17 @@ const editUser = (username) => {//Modal Edição de Utilizadores
     openModal(`modal-adicionar`)
 }
 const saveEditedUser = () => {
-    const originalUser = document.getElementById(`username`).value
-    const updatedUser = getFormData('add_user_form')
+    const updatedUserData = getFormData('add_user_form')
+    const originalUser = document.querySelector(`#add_user_form #username`).value
+    
 
     const required = [`username`, `email`, `password`]
-    const missing = required.filter(key => !updatedUser[key])
+    const missing = required.filter(key => !updatedUserData[key])
     if (missing.length > 0) {
         showToast('Preencha todos os campos obrigatórios.', `error`)
         return
     }
-
+    const updatedUser = new User(updatedUserData.username, updatedUserData.email, updatedUserData.password, updatedUserData.points, updatedUserData.level, updatedUserData.private, updatedUserData.admin)
     const success = updateUser(originalUser, updatedUser)
     if (!success) {
         showToast('Erro ao editar utilizador.', `error`)
@@ -967,6 +970,7 @@ const saveEditedUser = () => {
         return
     }
     saveToLocalStorage(`users`, users)
+    updateTable(userTableConfig)
     showToast('Utilizador editado com sucesso!')
     closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
     updateTable(userTableConfig)
@@ -1074,7 +1078,7 @@ const updatePaginationControls = (config) => {
             btn.appendChild(p)
             btn.onclick = () => {
                 currentPage = page
-                updateTable(flightTableConfig)
+                updateTable(config)
             }
         }
         return btn
@@ -1098,7 +1102,7 @@ const updatePaginationControls = (config) => {
     container.appendChild(createIconButton('chevron_left', () => {
         if (currentPage > 1) {
             currentPage--
-            updateTable(flightTableConfig)
+            updateTable(config)
         }
     }, currentPage === 1))
 
@@ -1125,7 +1129,7 @@ const updatePaginationControls = (config) => {
     container.appendChild(createIconButton('chevron_right', () => {
         if (currentPage < totalPages) {
             currentPage++
-            updateTable(flightTableConfig)
+            updateTable(config)
         }
     }, currentPage === totalPages))
 }
@@ -1339,7 +1343,7 @@ const userTableConfig = {
         {key:'password', label:'Password', sortable: true},
         {key:'points', label:'Pontos', sortable: true},
         {key:'level', label:'Nivel', sortable: true},
-        {key:'private', label:'Privacidade', sortable: true},
+        {key:'profile_private', label:'Privacidade', sortable: true},
         {key:'admin', label:'User/Admin', sortable: true},
     ],
     actions: [
@@ -1349,51 +1353,85 @@ const userTableConfig = {
 }
 // === On Page Load ===
 document.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage(`flights`, flights)
+    loadFromLocalStorage(`airports`, airports)
+    loadFromLocalStorage(`destinations`, destinations)
+    loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
+    loadFromLocalStorage(`turismTypes`, turismTypes)
+    loadFromLocalStorage(`users`, users)
+    loadFromLocalStorage(`cars`, cars)
+    loadFromLocalStorage(`activities`, activities)
+    loadFromLocalStorage(`hotels`, hotels)
     const path = window.location.pathname
-    originalTableData = []
     if (path.includes('flights_admin.html')) {
-        loadFromLocalStorage(`flights`, flights)
-        loadFromLocalStorage(`airports`, airports)
         updateTable(flightTableConfig)
         selectOptions(airports, 'from')
         selectOptions(airports, 'to')
-    }else if (path.includes('places_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        loadFromLocalStorage(`airports`, airports)
-        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
-        loadFromLocalStorage(`turismTypes`, turismTypes)
+    }else if (path.includes('places_admin.html')) {   
         updateTable(destinationTableConfig)
         selectOptions(accessibilityOptions, 'destination_acess')
         selectOptions(turismTypes, 'destination_type')
         selectOptions(airports, 'destination_aero')
-    }else if (path.includes('users_admin.html')) { 
-        loadFromLocalStorage(`users`, users)
+    }else if (path.includes('users_admin.html')) {
+        const openBtn = document.getElementById('openModal')
+        openBtn.onclick = () => {
+            openModal('modal-adicionar')
+        }
+        const closeBtn = document.getElementById('cancel')
+        closeBtn.onclick = () => {
+            closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)
+        }
+        const createBtn = document.getElementById('createUser')
+        createBtn.onclick = () => {
+            createUser()
+        }
+        const searchBtn = document.getElementById('searchBar')
+        searchBtn.onclick = () => {
+            handleSearch('searchInput', userTableConfig)
+        }
+        const thUsername = document.getElementById('username')
+        thUsername.onclick = () => {
+            sortTableBy('username', userTableConfig)
+        }
+        const thEmail = document.getElementById('email')
+        thEmail.onclick = () => {
+            sortTableBy('email', userTableConfig)
+        }
+        const thPassword = document.getElementById('password')
+        thPassword.onclick = () => {
+            sortTableBy('password', userTableConfig)
+        }
+        const thPoints = document.getElementById('points')
+        thPoints.onclick = () => {
+            sortTableBy('points', userTableConfig)
+        }
+        const thLevel = document.getElementById('level')
+        thLevel.onclick = () => {
+            sortTableBy('level', userTableConfig)
+        }
+        const thPrivate = document.getElementById('private')
+        thPrivate.onclick = () => {
+            sortTableBy('private', userTableConfig)
+        }
+        const thAdmin = document.getElementById('admin')
+        thAdmin.onclick = () => {
+            sortTableBy('admin', userTableConfig)
+        }
         updateTable(userTableConfig)
     }else if (path.includes('airport_admin.html')) {
-        loadFromLocalStorage(`airports`, airports)
         updateTable(airportTableConfig)
     }else if (path.includes('cars_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        loadFromLocalStorage(`cars`, cars)
         selectOptions(destinations, 'cars_destinoId')
         updateTable(carTableConfig)
-    }else if (path.includes('activitie_admin.html')) {
-        loadFromLocalStorage(`activities`, activities)
-        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
-        loadFromLocalStorage(`turismTypes`, turismTypes)
-        loadFromLocalStorage(`destinations`, destinations)
+    }else if (path.includes('activity_admin.html')) {  
         selectOptions(accessibilityOptions, 'act_acess')
         selectOptions(turismTypes, 'act_turism')
         selectOptions(destinations, 'act_destinoId')
         updateTable(activitiesTableConfig)
     }else if (path.includes('hotel_admin.html')) {
-        loadFromLocalStorage(`destinations`, destinations)
-        loadFromLocalStorage(`hotels`, hotels)
         selectOptions(destinations, 'destinoId')
         updateTable(hotelTableConfig)
     }else if (path.includes('dashboard_admin.html')) {
-        loadFromLocalStorage(`accessibilityOptions`, accessibilityOptions)
-        loadFromLocalStorage(`turismTypes`, turismTypes)
         const element = document.getElementById('category')
         element.addEventListener('change', () => loadTurismAcess(element.value))
         loadTurismAcess(element.value)

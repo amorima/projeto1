@@ -14,7 +14,6 @@
 
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/ui.js" defer></script>
-
 </head>
 <body class="font-sans"><header id="header-placeholder"></header>
      
@@ -25,12 +24,12 @@
             <h2 class="w-full sm:w-[592px] justify-center text-Button-Main text-4xl font-bold font-['Space_Mono'] justify-start">Gestão de utilizadores</h2>
             <div class="inline-flex">
                 <div class="w-80 h-11">
-                    <input type="text" id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm">
+                    <input id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm">
                 </div>
-                <button onclick="handleSearch('searchInput',userTableConfig)" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
+                <button id="searchBar" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
                     <span class="material-symbols-outlined text-white cursor-pointer">search</span>
                 </button>
-                <button onclick="openModal(`modal-adicionar`)" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
+                <button id="openModal" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
                     <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                     <p class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</p>
                 </button>
@@ -47,22 +46,22 @@
                     <th onclick="sortTableBy('username', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans'] ">Nome de Utilizador
                         <span id="sort-icon-username" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('email', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Email
+                    <th id="email" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Email
                         <span id="sort-icon-email" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('password', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Password
+                    <th id="password" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Password
                         <span id="sort-icon-password" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('points', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Pontos
+                    <th id="points" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Pontos
                         <span id="sort-icon-points" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('level', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nivel
+                    <th id="level" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nivel
                         <span id="sort-icon-level" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('private', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Privacidade
+                    <th id="private" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Privacidade
                         <span id="sort-icon-private" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th onclick="sortTableBy('admin', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">User/Admin
+                    <th id="admin" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">User/Admin
                         <span id="sort-icon-admin" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
                     <th class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']"></th>
@@ -156,13 +155,13 @@
       
                 <!-- Acções -->
                 <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
-                    <button onclick="createUser()" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
+                    <button id="createUser" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
                         <div class="inline-flex justify-start items-center gap-2.5">
                             <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                             <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
                         </div>
                     </button>
-                    <button onclick="closeModal(`modal-adicionar`,'add_user_form','Adicionar utilizador manual',createUser)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                    <button id="cancel" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
                         <div class="flex justify-start items-center gap-2.5">
                             <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
                         </div>
@@ -173,6 +172,6 @@
 
     <script src="assets/js/components.js"></script> 
     <script src="assets/js/storage.js"></script>
-    <script src="assets/js/main.js" defer></script>
+    <script type="module" src="assets/js/main.js" defer></script>
 </body>
 </html>
