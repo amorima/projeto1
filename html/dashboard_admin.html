@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/ui.js" defer></script>
+
+</head>
+<body class="font-sans"> <header id="header-placeholder"></header>
+
+    <nav id="menu-placeholder"></nav>
+
+    <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-6">
+
+        <div class="mt-[126px] w-full h-24 relative bg-Background-Card-Bg-Gami rounded-lg overflow-hidden col-span-3 flex-none">
+            <div class="w-full left-[38px] top-[31px] absolute justify-center"><span class="text-Button-Main text-4xl font-bold font-['Space_Mono']">Administrate</span><span class="text-Button-Main text-4xl font-normal font-['Space_Mono']">It</span></div>
+        </div>
+
+        <div class="w-96 h-96 p-5 bg-Background-Card-Bg-Gami rounded-lg"></div>
+        <div class="w-96 h-96 p-5 bg-Background-Card-Bg-Gami rounded-lg"></div>
+        <div class="w-96 h-96 p-5 bg-Background-Card-Bg-Gami rounded-lg"></div>
+
+    </section>
+
+    <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
+        <a href="flights_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <p class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir voos</p>
+        </a>
+        <a href="places_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir destinos</div>
+        </a>
+        <a href="users_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir utilizadores</div>
+        </a>
+        <a href="airport_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir aeroportos</div>
+        </a>
+        <a href="cars_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir carros</div>
+        </a>
+        <a href="hotel_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir hoteis</div>
+        </a>
+        <a href="room_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir quartos</div>
+        </a>
+        <a href="activity_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir atividades</div>
+        </a>
+        <a href="challenges_admin.html" class="w-96 px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir desafios</div>
+        </a>
+        <button onclick="openModal(`modal-adicionar`)" class="col-start-1 col-span-3 w-full px-8 py-8 bg-Background-Card-Bg-Gami hover:bg-gray-200 transition duration-150 ease-in-out rounded-lg flex justify-center items-center gap-2.5 overflow-hidden">
+            <div class="justify-center text-Text-Subtitles text-xl font-normal font-['IBM_Plex_Sans']">Gerir turismo e acessibilidade</div>
+        </button>
+    </section>
+
+    <footer id="footer-placeholder"></footer>
+
+        <!-- Modal Adicionar -->
+        <div id="modal-adicionar" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+            <!-- Conteudo -->
+                <div class="bg-white w-full max-w-2xl mx-auto rounded-xl shadow-lg p-8">
+                    <!-- Header -->
+                    <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">Turismo e acessibilidade</h2>
+                    <!-- Formulario -->
+                    <form class="space-y-4" id="add_turism_acess">
+                        <div>
+                            <label for="type" class="block text-base font-light text-Text-Subtitles">Opção</label>
+                            <input id="type" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                        </div>
+                        <div>
+                            <label for="category" class="block text-base font-light text-Text-Subtitles">Tipo (Turismo/Acessibilidade)</label>
+                            <select id="category" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                                <option value="acessibilidade">Acessibilidade</option>
+                                <option value="turismo">Turismo</option>
+                            </select>
+                        </div>
+                    </form>
+                    <div class="grid grid-cols-3 gap-2 pt-4" id="load-options">
+                    </div>
+                    <!-- Acções -->
+                    <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6" id="action">
+                        <button onclick="createTurismAcess('add_turism_acess')" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
+                            <div class="inline-flex justify-start items-center gap-2.5">
+                                <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
+                                <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
+                            </div>
+                        </button>
+                        <button onclick="closeModal(`modal-adicionar`,'add_turism_acess','Turismo e acessibilidade',createTurismAcess)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                            <div class="flex justify-start items-center gap-2.5">
+                                <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+      </script> <script src="assets/js/main.js" defer></script>        <script type="module" src="../js/init.js" defer></script>
+</body>
+</html>
