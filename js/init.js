@@ -11,7 +11,7 @@ import AirportView from './views/AirportView.js';
 
 
 window.addEventListener('DOMContentLoaded', async () => {
-  await StorageModel.loadInitialData();
+  await StorageModel.loadInitialData();  
   const path = window.location.pathname;
   if (path.includes('flights_admin.html')) FlightView.init();
   if (path.includes('places_admin.html')) DestinationView.init();

@@ -61,17 +61,20 @@ export function updateTable(config) {
   const slice = data.slice(start, start + rowsPerPage);
   slice.forEach(item => {
     const tr = document.createElement('tr');
+    tr.className = 'table-row h-[42px]'
     columns.forEach(col => {
       const td = document.createElement('td');
+      td.className = 'table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-[`IBM_Plex_Sans`]'
       td.textContent = item[col.key] ?? '';
       tr.appendChild(td);
     });
     if (actions) {
       const td = document.createElement('td');
+      td.className = 'table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center'
       actions.forEach(a => {
         const btn = document.createElement('button');
-        btn.textContent = a.label;
-        btn.className = a.class;
+        btn.textContent = a.icon;
+        btn.className = `material-symbols-outlined cursor-pointer mr-6 ${a.class}`
         btn.addEventListener('click', () => a.handler(item.id));
         td.appendChild(btn);
       });

@@ -11,11 +11,16 @@ export default class FlightView {
     const config = {
       data,
       columns: [
-        /* defina as colunas para flights: ex { key: 'campo1' }, { key: 'campo2' } */
+        { key: `name`, label: `NºVoo`, sortable: true },
+        { key: `from`, label: `Origem`, sortable: true },
+        { key: `to`, label: `Destino`, sortable: true },
+        { key: `company`, label: `Companhia Aeria`, sortable: true },
+        { key: `leaves`, label: `Horario de Partida`, sortable: true, type: `date` },
+        { key: `direct`, label: `Direto`, sortable: true },
       ],
       actions: [
-        { label: '✏️', class: 'btn-edit', handler: id => this.edit(id) },
-        { label: '❌', class: 'btn-del',  handler: id => this.delete(id) }
+        { icon: `edit_square`, class: `text-Main-Primary`, handler: FlightModel.update },
+        { icon: `delete`, class: `text-red-600`, handler: FlightModel.delete }
       ],
       rowsPerPage: 10,
       currentPage: 1,
