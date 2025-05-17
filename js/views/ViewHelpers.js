@@ -46,6 +46,41 @@ tailwind.config = {
   },
 };
 
+export function showCookieBanner() {
+  // Só mostra se ainda não foi aceite
+  if (localStorage.getItem('cookieAccepted') === 'true') return;
+
+  // Cria o banner
+  const banner = document.createElement('div');
+  banner.id = 'cookie-banner';
+  banner.className = `
+    fixed left-1/2 bottom-8 transform -translate-x-1/2 z-50
+    w-[95vw] max-w-xl md:max-w-3xl px-4 py-4
+    bg-background-background rounded-2xl shadow-lg flex flex-col md:flex-row items-center gap-4
+  `;
+
+  banner.innerHTML = `
+    <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white-800 bg-opacity-50 backdrop-filter backdrop-blur-sm">
+  <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow">
+    <img class="w-7 h-7" src="/img/cookie.svg" alt="cookie">
+  </div>
+  <div class="flex-1 text-text-body text-xs md:text-sm font-normal font-['IBM_Plex_Sans'] uppercase tracking-wide text-center md:text-left text-black">
+    Usamos cookies para personalizar a sua experiência, recomendações e medir o desempenho do site. Ao usar o nosso site, concorda com a nossa política de privacidade.
+  </div>
+  <button id="accept-cookies-btn"
+    class="px-6 py-2 bg-cyan-800 hover:bg-cyan-700 rounded-full text-white text-sm font-bold font-['IBM_Plex_Sans'] uppercase tracking-wider transition"
+  >Aceitar</button>
+</div>
+  `;
+
+  document.body.appendChild(banner);
+
+  document.getElementById('accept-cookies-btn').onclick = () => {
+    localStorage.setItem('cookieAccepted', 'true');
+    banner.remove();
+  };
+}
+
 export function getFormData(formId) {
   const form = document.getElementById(formId);
   const data = {};
