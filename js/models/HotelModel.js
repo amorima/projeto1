@@ -1,48 +1,53 @@
 import { loadFromLocalStorage, saveToLocalStorage } from './ModelHelpers.js';
 
-export default class HotelModel {
-  static storageKey = 'hotels';
-  static _items = [];
+// ARRAY HOTELS
+let hotels
 
-  static init() {
-    this._items = [];
-    loadFromLocalStorage(this.storageKey, this._items);
-  }
+// CARREGAR HOTEIS DA LOCAL STORAGE
+export function init() {
+  hotels = localStorage.hotels ? loadFromLocalStorage('hotels',hotels) : []
+}
 
-  static getAll(filterFn = null) {
-    return filterFn ? this._items.filter(filterFn) : this._items;
-  }
+// ADICIONAR HOTEL
+export function add(name){
 
-  static _getNextId() {
-    return this._items.length
-      ? Math.max(...this._items.map(i => i.id || 0)) + 1
-      : 1;
-  }
+}
 
-  static add(data) {
-    const item = { ...data, id: this._getNextId() };
-    this._items.push(item);
-    saveToLocalStorage(this.storageKey, this._items);
-    return item;
-  }
+// ALTERAR DADOS DE HOTEL
+export function update(name, newHotel) {
 
-  static update(id, data) {
-    const idx = this._items.findIndex(i => i.id == id);
-    if (idx !== -1) {
-      this._items[idx] = { ...data, id };
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
-  }
+}
 
-  static delete(id) {
-    const idx = this._items.findIndex(i => i.id == id);
-    if (idx !== -1) {
-      this._items.splice(idx, 1);
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
+// APAGAR HOTEL
+export function deleteHotel (name) {
+
+}
+
+// ADICIONAR QUARTO 
+export function addRoom (hotel, room) {
+
+}
+
+// REMOVER QUARTO
+export function removeRoom (room) {
+
+}
+
+/**
+ * CLASSE QUE MODELA UM HOTEL NA APLICAÇÃO
+ */
+class Hotel {
+  id = 0;
+  name = '';
+  location = '';
+  image = '';
+  quartos = [];
+
+  constructor(id,name,location,image,quartos){
+    this.id = id;
+    this.name = name;
+    this.location = location;
+    this.image = image;
+    this.quartos = quartos;
   }
 }
