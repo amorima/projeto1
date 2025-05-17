@@ -1,24 +1,1351 @@
-// init.js – ponto de entrada
-import StorageModel from './models/StorageModel.js';
-import FlightView from './views/FlightView.js';
-import DestinationView from './views/DestinationView.js';
-import CarView from './views/CarView.js';
-import ActivityView from './views/ActivityView.js';
-import HotelView from './views/HotelView.js';
-import UserView from './views/UserView.js';
-import RoomView from './views/RoomView.js';
-import AirportView from './views/AirportView.js';
+/* // init.js – ponto de entrada
+import StorageModel from "./models/StorageModel.js";
+import FlightView from "./views/FlightView.js";
+import DestinationView from "./views/DestinationView.js";
+import CarView from "./views/CarView.js";
+import ActivityView from "./views/ActivityView.js";
+import HotelView from "./views/HotelView.js";
+import UserView from "./views/UserView.js";
+import RoomView from "./views/RoomView.js";
+import AirportView from "./views/AirportView.js";
 
-
-window.addEventListener('DOMContentLoaded', async () => {
-  await StorageModel.loadInitialData();  
+window.addEventListener("DOMContentLoaded", async () => {
+  await StorageModel.loadInitialData();
   const path = window.location.pathname;
-  if (path.includes('flights_admin.html')) FlightView.init();
-  if (path.includes('places_admin.html')) DestinationView.init();
-  if (path.includes('cars_admin.html')) CarView.init();
-  if (path.includes('activity_admin.html')) ActivityView.init();
-  if (path.includes('hotel_admin.html')) HotelView.init();
-  if (path.includes('users_admin.html')) UserView.init();
-  if (path.includes('room_admin.html')) RoomView.init();
-  if (path.includes('airport_admin.html')) AirportView.init();
-});
+  if (path.includes("flights_admin.html")) FlightView.init();
+  if (path.includes("places_admin.html")) DestinationView.init();
+  if (path.includes("cars_admin.html")) CarView.init();
+  if (path.includes("activity_admin.html")) ActivityView.init();
+  if (path.includes("hotel_admin.html")) HotelView.init();
+  if (path.includes("users_admin.html")) UserView.init();
+  if (path.includes("room_admin.html")) RoomView.init();
+  if (path.includes("airport_admin.html")) AirportView.init();
+}); */
+
+console.log("init.js carregado");
+
+initdata();
+
+function initdata() {
+  // Aeroportos
+  if (!localStorage.aeroportos) {
+    const aeroportos = [
+      { codigo: "OPO", cidade: "Porto", pais: "Portugal" },
+      { codigo: "LIS", cidade: "Lisboa", pais: "Portugal" },
+      { codigo: "LHR", cidade: "Londres", pais: "Reino Unido" },
+      { codigo: "LGW", cidade: "Londres", pais: "Reino Unido" },
+      { codigo: "STN", cidade: "Londres", pais: "Reino Unido" },
+      { codigo: "LTN", cidade: "Londres", pais: "Reino Unido" },
+      { codigo: "LCY", cidade: "Londres", pais: "Reino Unido" },
+      { codigo: "CDG", cidade: "Paris", pais: "França" },
+      { codigo: "ORY", cidade: "Paris", pais: "França" },
+      { codigo: "BVA", cidade: "Paris", pais: "França" },
+      { codigo: "AMS", cidade: "Amesterdão", pais: "Países Baixos" },
+      { codigo: "MAD", cidade: "Madrid", pais: "Espanha" },
+      { codigo: "FCO", cidade: "Roma", pais: "Itália" },
+      { codigo: "CIA", cidade: "Roma", pais: "Itália" },
+    ];
+    localStorage.setItem("aeroportos", JSON.stringify(aeroportos));
+  }
+  // Destinos
+  if (!localStorage.destinos) {
+    const destinos = [
+      {
+        id: 1,
+        cidade: "Porto",
+        pais: "Portugal",
+        aeroporto: "OPO",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Gastronómico",
+          "Enoturismo",
+        ],
+        acessibilidade: [
+          "Acesso Sem Degraus (variável)",
+          "Transporte Acessível (Metro)",
+        ],
+      },
+      {
+        id: 2,
+        cidade: "Lisboa",
+        pais: "Portugal",
+        aeroporto: "LIS",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Urbano",
+          "Turismo Histórico",
+          "Turismo Gastronómico",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (Metro)",
+          "Elevadores Disponíveis",
+          "Acesso Sem Degraus (variável)",
+        ],
+      },
+      {
+        id: 3,
+        cidade: "Londres",
+        pais: "Reino Unido",
+        aeroporto: "LHR",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Urbano",
+          "Turismo de Negócios",
+          "Compras",
+        ],
+        acessibilidade: [
+          "Transporte Acessível",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+      },
+      {
+        id: 4,
+        cidade: "Londres",
+        pais: "Reino Unido",
+        aeroporto: "LGW",
+        tiposTurismo: ["Turismo Cultural", "Turismo Urbano"],
+        acessibilidade: ["Transporte Acessível", "Elevadores Disponíveis"],
+      },
+      {
+        id: 5,
+        cidade: "Londres",
+        pais: "Reino Unido",
+        aeroporto: "STN",
+        tiposTurismo: ["Turismo Cultural", "Turismo Urbano"],
+        acessibilidade: [
+          "Transporte Acessível (comboio)",
+          "Elevadores Disponíveis",
+        ],
+      },
+      {
+        id: 6,
+        cidade: "Londres",
+        pais: "Reino Unido",
+        aeroporto: "LTN",
+        tiposTurismo: ["Turismo Cultural", "Turismo Urbano"],
+        acessibilidade: [
+          "Transporte Acessível (comboio/bus)",
+          "Elevadores Disponíveis",
+        ],
+      },
+      {
+        id: 7,
+        cidade: "Londres",
+        pais: "Reino Unido",
+        aeroporto: "LCY",
+        tiposTurismo: ["Turismo de Negócios", "Turismo Urbano"],
+        acessibilidade: [
+          "Transporte Acessível (DLR)",
+          "Elevadores Disponíveis",
+          "Acesso Sem Degraus",
+        ],
+      },
+      {
+        id: 8,
+        cidade: "Paris",
+        pais: "França",
+        aeroporto: "CDG",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Gastronómico",
+          "Turismo Urbano",
+          "Moda",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (RER/Metro)",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+        ],
+      },
+      {
+        id: 9,
+        cidade: "Paris",
+        pais: "França",
+        aeroporto: "ORY",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Gastronómico",
+          "Turismo Urbano",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (Orlyval/Bus)",
+          "Elevadores Disponíveis",
+        ],
+      },
+      {
+        id: 10,
+        cidade: "Paris",
+        pais: "França",
+        aeroporto: "BVA",
+        tiposTurismo: ["Turismo Cultural", "Turismo Urbano"],
+        acessibilidade: ["Transporte Acessível (Bus para Paris)"],
+      },
+      {
+        id: 11,
+        cidade: "Amesterdão",
+        pais: "Países Baixos",
+        aeroporto: "AMS",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Urbano",
+          "Museus",
+          "Ciclismo",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (excelente)",
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+        ],
+      },
+      {
+        id: 12,
+        cidade: "Madrid",
+        pais: "Espanha",
+        aeroporto: "MAD",
+        tiposTurismo: [
+          "Turismo Cultural",
+          "Turismo Gastronómico",
+          "Vida Noturna",
+          "Turismo Urbano",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (Metro excelente)",
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+        ],
+      },
+      {
+        id: 13,
+        cidade: "Roma",
+        pais: "Itália",
+        aeroporto: "FCO",
+        tiposTurismo: [
+          "Turismo Histórico",
+          "Turismo Cultural",
+          "Turismo Religioso",
+          "Turismo Gastronómico",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (comboio/bus)",
+          "Acesso Sem Degraus (desafiador)",
+          "Elevadores Disponíveis (limitado)",
+        ],
+      },
+      {
+        id: 14,
+        cidade: "Roma",
+        pais: "Itália",
+        aeroporto: "CIA",
+        tiposTurismo: [
+          "Turismo Histórico",
+          "Turismo Cultural",
+          "Turismo Religioso",
+        ],
+        acessibilidade: [
+          "Transporte Acessível (Bus)",
+          "Acesso Sem Degraus (desafiador)",
+        ],
+      },
+    ];
+    localStorage.setItem("destinos", JSON.stringify(destinos));
+  }
+  // Hoteis
+  if (!localStorage.hoteis) {
+    const hoteis = [
+      {
+        id: 1,
+        destinoId: 1,
+        nome: "Hotel Infante Sagres",
+        foto: "https://placehold.co/600x400/E1C4A9/5C4033?text=Hotel+Porto+1",
+        quartos: [
+          {
+            tipo: "Deluxe",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 250,
+            foto: "https://placehold.co/300x200/F0E6DD/A0522D?text=Quarto+Deluxe",
+            acessibilidade: ["Elevadores Disponíveis"],
+          },
+        ],
+      },
+      {
+        id: 2,
+        destinoId: 1,
+        nome: "The Yeatman Hotel",
+        foto: "https://placehold.co/600x400/D4AF37/8B4513?text=Hotel+Porto+2",
+        quartos: [
+          {
+            tipo: "Suite Superior Vista Rio",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 450,
+            foto: "https://placehold.co/300x200/FFDAB9/800000?text=Suite+Rio",
+            acessibilidade: ["Acesso Sem Degraus", "Casas de Banho Adaptadas"],
+          },
+        ],
+      },
+      {
+        id: 3,
+        destinoId: 1,
+        nome: "Pestana Vintage Porto Hotel",
+        foto: "https://placehold.co/600x400/A0522D/F5F5DC?text=Hotel+Porto+3",
+        quartos: [
+          {
+            tipo: "Vintage Classic",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 280,
+            foto: "https://placehold.co/300x200/DEB887/8B4513?text=Quarto+Vintage",
+            acessibilidade: ["Elevadores Disponíveis"],
+          },
+        ],
+      },
+      {
+        id: 4,
+        destinoId: 1,
+        nome: "Hotel Carris Porto Ribeira",
+        foto: "https://placehold.co/600x400/B8860B/FFFFFF?text=Hotel+Porto+4",
+        quartos: [
+          {
+            tipo: "Standard",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 150,
+            foto: "https://placehold.co/300x200/F4A460/000000?text=Quarto+Standard",
+            acessibilidade: ["Quartos Adaptados"],
+          },
+        ],
+      },
+      {
+        id: 5,
+        destinoId: 1,
+        nome: "Torel Avantgarde",
+        foto: "https://placehold.co/600x400/8B4513/FFFFE0?text=Hotel+Porto+5",
+        quartos: [
+          {
+            tipo: "Executivo Vista Rio",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 320,
+            foto: "https://placehold.co/300x200/CD853F/F5F5F5?text=Quarto+Executivo",
+            acessibilidade: ["Elevadores Disponíveis", "Acesso Sem Degraus"],
+          },
+        ],
+      },
+      {
+        id: 6,
+        destinoId: 2,
+        nome: "Four Seasons Hotel Ritz Lisbon",
+        foto: "https://placehold.co/600x400/ADD8E6/000080?text=Hotel+Lisboa+1",
+        quartos: [
+          {
+            tipo: "Quarto Premier",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 600,
+            foto: "https://placehold.co/300x200/B0E0E6/4682B4?text=Quarto+Premier",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Quartos Adaptados",
+              "Casas de Banho Adaptadas",
+            ],
+          },
+        ],
+      },
+      {
+        id: 7,
+        destinoId: 2,
+        nome: "Bairro Alto Hotel",
+        foto: "https://placehold.co/600x400/87CEEB/0000CD?text=Hotel+Lisboa+2",
+        quartos: [
+          {
+            tipo: "Suite Chiado",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 480,
+            foto: "https://placehold.co/300x200/AFEEEE/191970?text=Suite+Chiado",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Aceita Cães-Guia/Assistência",
+            ],
+          },
+        ],
+      },
+      {
+        id: 8,
+        destinoId: 2,
+        nome: "Memmo Alfama - Design Hotels",
+        foto: "https://placehold.co/600x400/B0C4DE/708090?text=Hotel+Lisboa+3",
+        quartos: [
+          {
+            tipo: "Quarto Terraço Vista Rio",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 350,
+            foto: "https://placehold.co/300x200/E6E6FA/778899?text=Quarto+Vista",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Acesso Sem Degraus (limitado)",
+            ],
+          },
+        ],
+      },
+      {
+        id: 9,
+        destinoId: 2,
+        nome: "Corinthia Lisbon",
+        foto: "https://placehold.co/600x400/4682B4/F0F8FF?text=Hotel+Lisboa+4",
+        quartos: [
+          {
+            tipo: "Deluxe King",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 280,
+            foto: "https://placehold.co/300x200/87CEFA/2F4F4F?text=Quarto+Deluxe",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Quartos Adaptados",
+              "Spa Acessível",
+            ],
+          },
+        ],
+      },
+      {
+        id: 10,
+        destinoId: 2,
+        nome: "The Lumiares Hotel & Spa",
+        foto: "https://placehold.co/600x400/6495ED/F8F8FF?text=Hotel+Lisboa+5",
+        quartos: [
+          {
+            tipo: "Apartamento Penthouse",
+            camas: 2,
+            capacidade: 4,
+            precoNoite: 550,
+            foto: "https://placehold.co/300x200/B0E0E6/4169E1?text=Penthouse",
+            acessibilidade: ["Elevadores Disponíveis", "Acesso Sem Degraus"],
+          },
+        ],
+      },
+      {
+        id: 11,
+        destinoId: 3,
+        nome: "The Savoy",
+        foto: "https://placehold.co/600x400/36454F/E0E0E0?text=Hotel+Londres+1",
+        quartos: [
+          {
+            tipo: "Edwardian Suite",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 1200,
+            foto: "https://placehold.co/300x200/708090/F5F5F5?text=Suite+Edwardian",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Quartos Adaptados",
+              "Aceita Cães-Guia/Assistência",
+            ],
+          },
+        ],
+      },
+      {
+        id: 12,
+        destinoId: 3,
+        nome: "The Ritz London",
+        foto: "https://placehold.co/600x400/465945/FFFACD?text=Hotel+Londres+2",
+        quartos: [
+          {
+            tipo: "Superior King",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 800,
+            foto: "https://placehold.co/300x200/8FBC8F/FAF0E6?text=Quarto+Superior",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Acesso Sem Degraus (com assistência)",
+            ],
+          },
+        ],
+      },
+      {
+        id: 13,
+        destinoId: 3,
+        nome: "Shangri-La The Shard, London",
+        foto: "https://placehold.co/600x400/536878/F0FFFF?text=Hotel+Londres+3",
+        quartos: [
+          {
+            tipo: "Quarto Premier Shard",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 750,
+            foto: "https://placehold.co/300x200/A0AEC0/E6F0FF?text=Quarto+Shard",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Acesso Sem Degraus",
+              "Quartos Adaptados",
+            ],
+          },
+        ],
+      },
+      {
+        id: 14,
+        destinoId: 4,
+        nome: "The Langham, London",
+        foto: "https://placehold.co/600x400/6A5ACD/FFE4E1?text=Hotel+Londres+4",
+        quartos: [
+          {
+            tipo: "Executivo",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 650,
+            foto: "https://placehold.co/300x200/B0A4E3/FFF0F5?text=Quarto+Executivo",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Acesso Sem Degraus",
+              "Casas de Banho Adaptadas",
+            ],
+          },
+        ],
+      },
+      {
+        id: 15,
+        destinoId: 5,
+        nome: "The Z Hotel Piccadilly",
+        foto: "https://placehold.co/600x400/778899/F8F8FF?text=Hotel+Londres+5",
+        quartos: [
+          {
+            tipo: "Z Double",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 180,
+            foto: "https://placehold.co/300x200/BCC6CC/F5F5F5?text=Quarto+Z",
+            acessibilidade: ["Elevadores Disponíveis"],
+          },
+        ],
+      },
+      {
+        id: 16,
+        destinoId: 8,
+        nome: "Hôtel Plaza Athénée",
+        foto: "https://placehold.co/600x400/FF6347/FFF5EE?text=Hotel+Paris+1",
+        quartos: [
+          {
+            tipo: "Suite Eiffel Signature",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 2500,
+            foto: "https://placehold.co/300x200/FFA07A/FFEBCD?text=Suite+Eiffel",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Quartos Adaptados",
+            ],
+          },
+        ],
+      },
+      {
+        id: 17,
+        destinoId: 8,
+        nome: "Le Bristol Paris",
+        foto: "https://placehold.co/600x400/FF7F50/FDF5E6?text=Hotel+Paris+2",
+        quartos: [
+          {
+            tipo: "Quarto Deluxe com Jardim",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 1500,
+            foto: "https://placehold.co/300x200/FFB347/FFF8DC?text=Quarto+Jardim",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Aceita Cães-Guia/Assistência",
+            ],
+          },
+        ],
+      },
+      {
+        id: 18,
+        destinoId: 9,
+        nome: "Mandarin Oriental, Paris",
+        foto: "https://placehold.co/600x400/FF8C00/FFFFF0?text=Hotel+Paris+3",
+        quartos: [
+          {
+            tipo: "Suite Couture",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 1800,
+            foto: "https://placehold.co/300x200/FFA500/F5FFFA?text=Suite+Couture",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Spa Acessível",
+            ],
+          },
+        ],
+      },
+      {
+        id: 19,
+        destinoId: 9,
+        nome: "Hotel Lutetia",
+        foto: "https://placehold.co/600x400/FF4500/FFFAFA?text=Hotel+Paris+4",
+        quartos: [
+          {
+            tipo: "Junior Suite Art Deco",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 1100,
+            foto: "https://placehold.co/300x200/FF6347/F8F8FF?text=Suite+Art+Deco",
+            acessibilidade: ["Elevadores Disponíveis", "Quartos Adaptados"],
+          },
+        ],
+      },
+      {
+        id: 20,
+        destinoId: 10,
+        nome: "Generator Paris",
+        foto: "https://placehold.co/600x400/FF0000/FFFFFF?text=Hostel+Paris+5",
+        quartos: [
+          {
+            tipo: "Cama em Dormitório Premium",
+            camas: 1,
+            capacidade: 1,
+            precoNoite: 40,
+            foto: "https://placehold.co/300x200/FA8072/F5F5F5?text=Dorm+Premium",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Ambiente Acolhedor LGBTQIA+",
+            ],
+          },
+        ],
+      },
+      {
+        id: 21,
+        destinoId: 11,
+        nome: "Conservatorium Hotel",
+        foto: "https://placehold.co/600x400/008080/E0FFFF?text=Hotel+Amesterdão+1",
+        quartos: [
+          {
+            tipo: "Suite Duplex",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 700,
+            foto: "https://placehold.co/300x200/20B2AA/F0FFFF?text=Suite+Duplex",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Piscina Acessível",
+            ],
+          },
+        ],
+      },
+      {
+        id: 22,
+        destinoId: 11,
+        nome: "Pulitzer Amsterdam",
+        foto: "https://placehold.co/600x400/48D1CC/F5FFFA?text=Hotel+Amesterdão+2",
+        quartos: [
+          {
+            tipo: "Quarto Generoso Vista Canal",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 550,
+            foto: "https://placehold.co/300x200/AFEEEE/F0FFF0?text=Quarto+Canal",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Aceita Cães-Guia/Assistência",
+            ],
+          },
+        ],
+      },
+      {
+        id: 23,
+        destinoId: 11,
+        nome: "The Hoxton, Amsterdam",
+        foto: "https://placehold.co/600x400/40E0D0/F8F8FF?text=Hotel+Amesterdão+3",
+        quartos: [
+          {
+            tipo: "Cosy Room",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 280,
+            foto: "https://placehold.co/300x200/7FFFD4/F5F5F5?text=Quarto+Cosy",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Ambiente Acolhedor LGBTQIA+",
+            ],
+          },
+        ],
+      },
+      {
+        id: 24,
+        destinoId: 11,
+        nome: "Hotel V Nesplein",
+        foto: "https://placehold.co/600x400/00CED1/FFFACD?text=Hotel+Amesterdão+4",
+        quartos: [
+          {
+            tipo: "Loft",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 350,
+            foto: "https://placehold.co/300x200/5F9EA0/FFF8DC?text=Quarto+Loft",
+            acessibilidade: ["Elevadores Disponíveis"],
+          },
+        ],
+      },
+      {
+        id: 25,
+        destinoId: 11,
+        nome: "Flying Pig Downtown Hostel",
+        foto: "https://placehold.co/600x400/5F9EA0/FFFAF0?text=Hostel+Amesterdão+5",
+        quartos: [
+          {
+            tipo: "Cama em Dormitório Misto",
+            camas: 1,
+            capacidade: 1,
+            precoNoite: 35,
+            foto: "https://placehold.co/300x200/B0E0E6/F5F5DC?text=Dorm+Misto",
+            acessibilidade: [],
+          },
+        ],
+      },
+      {
+        id: 26,
+        destinoId: 12,
+        nome: "Four Seasons Hotel Madrid",
+        foto: "https://placehold.co/600x400/FFD700/8B0000?text=Hotel+Madrid+1",
+        quartos: [
+          {
+            tipo: "Suite Real",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 3000,
+            foto: "https://placehold.co/300x200/F0E68C/B22222?text=Suite+Real",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Quartos Adaptados",
+            ],
+          },
+        ],
+      },
+      {
+        id: 27,
+        destinoId: 12,
+        nome: "Hotel Regina",
+        foto: "https://placehold.co/600x400/FFA500/A52A2A?text=Hotel+Madrid+2",
+        quartos: [
+          {
+            tipo: "Duplo Superior",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 180,
+            foto: "https://placehold.co/300x200/FFEC8B/800000?text=Quarto+Superior",
+            acessibilidade: ["Elevadores Disponíveis"],
+          },
+        ],
+      },
+      {
+        id: 28,
+        destinoId: 12,
+        nome: "Only YOU Boutique Hotel Madrid",
+        foto: "https://placehold.co/600x400/FF8C00/FFFFFF?text=Hotel+Madrid+3",
+        quartos: [
+          {
+            tipo: "Deluxe Premium",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 350,
+            foto: "https://placehold.co/300x200/FFDAB9/000000?text=Quarto+Premium",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Ambiente Acolhedor LGBTQIA+",
+            ],
+          },
+        ],
+      },
+      {
+        id: 29,
+        destinoId: 12,
+        nome: "Pestana Plaza Mayor Madrid",
+        foto: "https://placehold.co/600x400/CD853F/F5F5DC?text=Hotel+Madrid+4",
+        quartos: [
+          {
+            tipo: "Quarto Histórico",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 280,
+            foto: "https://placehold.co/300x200/F4A460/8B4513?text=Quarto+Histórico",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Piscina Acessível",
+            ],
+          },
+        ],
+      },
+      {
+        id: 30,
+        destinoId: 12,
+        nome: "The Hat Madrid",
+        foto: "https://placehold.co/600x400/D2691E/FFFFF0?text=Hostel+Madrid+5",
+        quartos: [
+          {
+            tipo: "Cama em Dormitório 4 camas",
+            camas: 1,
+            capacidade: 1,
+            precoNoite: 30,
+            foto: "https://placehold.co/300x200/FF7F50/F8F8FF?text=Dorm+4+camas",
+            acessibilidade: ["Elevadores Disponíveis"],
+          },
+        ],
+      },
+      {
+        id: 31,
+        destinoId: 13,
+        nome: "Hotel Eden - Dorchester Collection",
+        foto: "https://placehold.co/600x400/B22222/FFF5EE?text=Hotel+Roma+1",
+        quartos: [
+          {
+            tipo: "Suite Villa Medici Penthouse",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 4000,
+            foto: "https://placehold.co/300x200/CD5C5C/FFFAFA?text=Suite+Penthouse",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Quartos Adaptados",
+            ],
+          },
+        ],
+      },
+      {
+        id: 32,
+        destinoId: 13,
+        nome: "Hotel Artemide",
+        foto: "https://placehold.co/600x400/A52A2A/F5F5F5?text=Hotel+Roma+2",
+        quartos: [
+          {
+            tipo: "Duplo Comfort",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 250,
+            foto: "https://placehold.co/300x200/E9967A/F8F8FF?text=Quarto+Comfort",
+            acessibilidade: ["Elevadores Disponíveis", "Spa Acessível"],
+          },
+        ],
+      },
+      {
+        id: 33,
+        destinoId: 14,
+        nome: "St. Regis Rome",
+        foto: "https://placehold.co/600x400/8B0000/FFF0F5?text=Hotel+Roma+3",
+        quartos: [
+          {
+            tipo: "Imperial Room",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 700,
+            foto: "https://placehold.co/300x200/DC143C/FFFAF0?text=Quarto+Imperial",
+            acessibilidade: [
+              "Acesso Sem Degraus",
+              "Elevadores Disponíveis",
+              "Aceita Cães-Guia/Assistência",
+            ],
+          },
+        ],
+      },
+      {
+        id: 34,
+        destinoId: 14,
+        nome: "Hotel Vilòn - Small Luxury Hotels of the World",
+        foto: "https://placehold.co/600x400/800000/FFF8DC?text=Hotel+Roma+4",
+        quartos: [
+          {
+            tipo: "Vilòn Charming",
+            camas: 1,
+            capacidade: 2,
+            precoNoite: 550,
+            foto: "https://placehold.co/300x200/BC8F8F/FFFFF0?text=Quarto+Charming",
+            acessibilidade: ["Elevadores Disponíveis", "Pátio Acessível"],
+          },
+        ],
+      },
+      {
+        id: 35,
+        destinoId: 13,
+        nome: "The RomeHello Hostel",
+        foto: "https://placehold.co/600x400/A0522D/FFFFFF?text=Hostel+Roma+5",
+        quartos: [
+          {
+            tipo: "Cama em Dormitório Feminino",
+            camas: 1,
+            capacidade: 1,
+            precoNoite: 38,
+            foto: "https://placehold.co/300x200/D2B48C/F5F5F5?text=Dorm+Feminino",
+            acessibilidade: [
+              "Elevadores Disponíveis",
+              "Acesso Sem Degraus (limitado)",
+            ],
+          },
+        ],
+      },
+    ];
+    localStorage.setItem("hoteis", JSON.stringify(hoteis));
+  }
+  // Atividades
+  if (!localStorage.atividades) {
+    const atividades = [
+      {
+        id: 1,
+        destinoId: 1,
+        tipoTurismo: "Enoturismo",
+        nome: "Cruzeiro das 6 Pontes e Visita a Cave",
+        foto: "https://placehold.co/600x400/A0522D/FFFFFF?text=Atividade+Porto+1",
+        descricao:
+          "Combine um cruzeiro panorâmico com uma prova de Vinho do Porto.",
+        acessibilidade: [
+          "Acesso Sem Degraus (barco variável)",
+          "Elevadores Disponíveis (algumas caves)",
+        ],
+      },
+      {
+        id: 2,
+        destinoId: 1,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita Guiada à Torre dos Clérigos",
+        foto: "https://placehold.co/600x400/B8860B/000000?text=Atividade+Porto+2",
+        descricao:
+          "Suba à torre para vistas incríveis e conheça a igreja barroca.",
+        acessibilidade: ["Elevadores Disponíveis (parcial)", "Muitos degraus"],
+      },
+      {
+        id: 3,
+        destinoId: 1,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Entrada na Livraria Lello",
+        foto: "https://placehold.co/600x400/8B4513/FFFFFF?text=Atividade+Porto+3",
+        descricao: "Visite uma das livrarias mais famosas do mundo.",
+        acessibilidade: ["Acesso Sem Degraus (limitado)", "Multidões"],
+      },
+      {
+        id: 4,
+        destinoId: 1,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Passeio de Tuk Tuk pela Ribeira e Centro Histórico",
+        foto: "https://placehold.co/600x400/CD853F/000000?text=Atividade+Porto+4",
+        descricao:
+          "Descubra os cantos pitorescos da cidade de forma divertida.",
+        acessibilidade: ["Transporte Acessível (variável)"],
+      },
+      {
+        id: 5,
+        destinoId: 1,
+        tipoTurismo: "Turismo Gastronómico",
+        nome: "Workshop de Pastel de Nata no Porto",
+        foto: "https://placehold.co/600x400/F4A460/FFFFFF?text=Atividade+Porto+5",
+        descricao: "Aprenda a fazer o famoso doce português.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Opções Alimentares Específicas (informar)",
+        ],
+      },
+      {
+        id: 6,
+        destinoId: 2,
+        tipoTurismo: "Turismo Histórico",
+        nome: "Visita Guiada ao Mosteiro dos Jerónimos",
+        foto: "https://placehold.co/600x400/ADD8E6/000000?text=Atividade+Lisboa+1",
+        descricao: "Explore a obra-prima do estilo manuelino.",
+        acessibilidade: [
+          "Acesso Sem Degraus (parcial)",
+          "Casas de Banho Adaptadas",
+        ],
+      },
+      {
+        id: 7,
+        destinoId: 2,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Tour a Pé por Alfama e Castelo",
+        foto: "https://placehold.co/600x400/87CEEB/000000?text=Atividade+Lisboa+2",
+        descricao:
+          "Perca-se nas ruas estreitas e descubra vistas deslumbrantes.",
+        acessibilidade: [
+          "Acesso Sem Degraus (muito limitado)",
+          "Percurso com subidas",
+        ],
+      },
+      {
+        id: 8,
+        destinoId: 2,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Espetáculo de Fado com Jantar",
+        foto: "https://placehold.co/600x400/B0C4DE/000000?text=Atividade+Lisboa+3",
+        descricao: "Viva a emoção da música tradicional portuguesa.",
+        acessibilidade: [
+          "Acesso Sem Degraus (depende do local)",
+          "Ambientes Sensoriais Calmos (relativamente)",
+        ],
+      },
+      {
+        id: 9,
+        destinoId: 2,
+        tipoTurismo: "Turismo Gastronómico",
+        nome: "Tour de Elétrico 28 com Prova de Pastéis de Belém",
+        foto: "https://placehold.co/600x400/4682B4/FFFFFF?text=Atividade+Lisboa+4",
+        descricao: "Combine o icónico elétrico com o doce mais famoso.",
+        acessibilidade: ["Transporte Acessível (muito limitado no elétrico)"],
+      },
+      {
+        id: 10,
+        destinoId: 2,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita ao Museu Nacional do Azulejo",
+        foto: "https://placehold.co/600x400/6495ED/000000?text=Atividade+Lisboa+5",
+        descricao: "Descubra a história e a arte do azulejo português.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+        ],
+      },
+      {
+        id: 11,
+        destinoId: 3,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita à Torre de Londres e Joias da Coroa",
+        foto: "https://placehold.co/600x400/36454F/FFFFFF?text=Atividade+Londres+1",
+        descricao: "Explore a história e veja as famosas joias.",
+        acessibilidade: [
+          "Acesso Sem Degraus (limitado)",
+          "Aluguer de Equipamento de Mobilidade",
+          "Guia Áudio",
+        ],
+      },
+      {
+        id: 12,
+        destinoId: 4,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Passeio no London Eye com Vista Panorâmica",
+        foto: "https://placehold.co/600x400/465945/000000?text=Atividade+Londres+2",
+        descricao: "Desfrute de vistas de 360 graus sobre a cidade.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas (próximo)",
+        ],
+      },
+      {
+        id: 13,
+        destinoId: 5,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita ao British Museum",
+        foto: "https://placehold.co/600x400/536878/FFFFFF?text=Atividade+Londres+3",
+        descricao: "Descubra tesouros de todo o mundo.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+          "Informação em Braille/Áudio (limitado)",
+        ],
+      },
+      {
+        id: 14,
+        destinoId: 6,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Tour pelos Mercados de Londres (Borough, Camden)",
+        foto: "https://placehold.co/600x400/6A5ACD/000000?text=Atividade+Londres+4",
+        descricao: "Experimente a diversidade gastronómica e cultural.",
+        acessibilidade: ["Acesso Sem Degraus (variável)", "Multidões"],
+      },
+      {
+        id: 15,
+        destinoId: 7,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Bilhete para Musical no West End",
+        foto: "https://placehold.co/600x400/778899/FFFFFF?text=Atividade+Londres+5",
+        descricao: "Assista a um espetáculo de renome mundial.",
+        acessibilidade: [
+          "Acesso Sem Degraus (verificar teatro)",
+          "Casas de Banho Adaptadas (verificar teatro)",
+        ],
+      },
+      {
+        id: 16,
+        destinoId: 8,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Bilhete Sem Fila para o Museu do Louvre",
+        foto: "https://placehold.co/600x400/FF6347/000000?text=Atividade+Paris+1",
+        descricao: "Evite as filas e veja obras-primas como a Mona Lisa.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+      },
+      {
+        id: 17,
+        destinoId: 9,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Subida ao 2º Andar ou Topo da Torre Eiffel",
+        foto: "https://placehold.co/600x400/FF7F50/000000?text=Atividade+Paris+2",
+        descricao: "A vista icónica de Paris.",
+        acessibilidade: [
+          "Elevadores Disponíveis",
+          "Acesso Sem Degraus (limitado na base)",
+        ],
+      },
+      {
+        id: 18,
+        destinoId: 10,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Cruzeiro no Sena com Guia Áudio",
+        foto: "https://placehold.co/600x400/FF8C00/000000?text=Atividade+Paris+3",
+        descricao: "Veja os monumentos parisienses a partir do rio.",
+        acessibilidade: ["Acesso Sem Degraus (barco variável)", "Guia Áudio"],
+      },
+      {
+        id: 19,
+        destinoId: 8,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita ao Museu d'Orsay",
+        foto: "https://placehold.co/600x400/FF4500/FFFFFF?text=Atividade+Paris+4",
+        descricao: "Explore a arte impressionista e pós-impressionista.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+        ],
+      },
+      {
+        id: 20,
+        destinoId: 9,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Passeio Guiado por Montmartre e Sacré-Cœur",
+        foto: "https://placehold.co/600x400/FF0000/000000?text=Atividade+Paris+5",
+        descricao: "Descubra o bairro dos artistas e a basílica.",
+        acessibilidade: [
+          "Acesso Sem Degraus (muito limitado)",
+          "Percurso com subidas",
+        ],
+      },
+      {
+        id: 21,
+        destinoId: 11,
+        tipoTurismo: "Turismo Histórico",
+        nome: "Bilhete para a Casa de Anne Frank",
+        foto: "https://placehold.co/600x400/008080/FFFFFF?text=Atividade+Amesterdão+1",
+        descricao: "Visite o anexo secreto e conheça a história.",
+        acessibilidade: [
+          "Acesso Sem Degraus (limitado)",
+          "Espaços apertados",
+          "Necessário reservar com antecedência",
+        ],
+      },
+      {
+        id: 22,
+        destinoId: 11,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita ao Rijksmuseum com Obras de Rembrandt",
+        foto: "https://placehold.co/600x400/48D1CC/000000?text=Atividade+Amesterdão+2",
+        descricao: "Veja a 'Ronda da Noite' e outros mestres holandeses.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+          "Guia Áudio",
+        ],
+      },
+      {
+        id: 23,
+        destinoId: 11,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Passeio de Barco Clássico pelos Canais",
+        foto: "https://placehold.co/600x400/40E0D0/000000?text=Atividade+Amesterdão+3",
+        descricao: "Descubra a cidade a partir da água.",
+        acessibilidade: ["Acesso Sem Degraus (barco variável)", "Guia Áudio"],
+      },
+      {
+        id: 24,
+        destinoId: 11,
+        tipoTurismo: "Turismo Gastronómico",
+        nome: "Tour de Comida de Rua e Mercados",
+        foto: "https://placehold.co/600x400/00CED1/FFFFFF?text=Atividade+Amesterdão+4",
+        descricao: "Prove stroopwafels, arenque e queijos locais.",
+        acessibilidade: [
+          "Percurso pedestre",
+          "Opções Alimentares Específicas (limitado)",
+        ],
+      },
+      {
+        id: 25,
+        destinoId: 11,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Aluguer de Bicicleta por um Dia",
+        foto: "https://placehold.co/600x400/5F9EA0/000000?text=Atividade+Amesterdão+5",
+        descricao: "Explore Amesterdão como um local.",
+        acessibilidade: ["Requer capacidade física"],
+      },
+      {
+        id: 26,
+        destinoId: 12,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita Guiada ao Museu do Prado",
+        foto: "https://placehold.co/600x400/FFD700/000000?text=Atividade+Madrid+1",
+        descricao: "Conheça as obras-primas de Goya, Velázquez e El Greco.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Casas de Banho Adaptadas",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+      },
+      {
+        id: 27,
+        destinoId: 12,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita ao Palácio Real e Jardins de Sabatini",
+        foto: "https://placehold.co/600x400/FFA500/000000?text=Atividade+Madrid+2",
+        descricao: "Explore a residência oficial da monarquia espanhola.",
+        acessibilidade: [
+          "Acesso Sem Degraus (parcial)",
+          "Elevadores Disponíveis",
+        ],
+      },
+      {
+        id: 28,
+        destinoId: 12,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Passeio pelo Parque del Retiro e Barco no Lago",
+        foto: "https://placehold.co/600x400/FF8C00/FFFFFF?text=Atividade+Madrid+3",
+        descricao: "Relaxe no pulmão verde de Madrid.",
+        acessibilidade: ["Acesso Sem Degraus", "Casas de Banho Adaptadas"],
+      },
+      {
+        id: 29,
+        destinoId: 12,
+        tipoTurismo: "Turismo Gastronómico",
+        nome: "Tour de Tapas pelos Bairros Históricos",
+        foto: "https://placehold.co/600x400/CD853F/FFFFFF?text=Atividade+Madrid+4",
+        descricao: "Descubra os sabores autênticos de Madrid.",
+        acessibilidade: [
+          "Percurso pedestre",
+          "Opções Alimentares Específicas (informar)",
+        ],
+      },
+      {
+        id: 30,
+        destinoId: 12,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Espetáculo de Flamenco Tradicional",
+        foto: "https://placehold.co/600x400/D2691E/FFFFFF?text=Atividade+Madrid+5",
+        descricao: "Sinta a paixão e a arte do flamenco.",
+        acessibilidade: [
+          "Acesso Sem Degraus (verificar local)",
+          "Ambiente com música alta",
+        ],
+      },
+      {
+        id: 31,
+        destinoId: 13,
+        tipoTurismo: "Turismo Histórico",
+        nome: "Visita Guiada ao Coliseu, Fórum Romano e Monte Palatino",
+        foto: "https://placehold.co/600x400/B22222/FFFFFF?text=Atividade+Roma+1",
+        descricao: "Viaje no tempo até à Roma Antiga.",
+        acessibilidade: [
+          "Acesso Sem Degraus (limitado, terreno irregular)",
+          "Elevadores Disponíveis (Coliseu)",
+        ],
+      },
+      {
+        id: 32,
+        destinoId: 14,
+        tipoTurismo: "Turismo Religioso",
+        nome: "Visita aos Museus Vaticanos, Capela Sistina e Basílica de São Pedro",
+        foto: "https://placehold.co/600x400/A52A2A/FFFFFF?text=Atividade+Roma+2",
+        descricao: "Explore os tesouros artísticos e religiosos do Vaticano.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+      },
+      {
+        id: 33,
+        destinoId: 13,
+        tipoTurismo: "Turismo Urbano",
+        nome: "Passeio pela Fontana di Trevi e Panteão",
+        foto: "https://placehold.co/600x400/8B0000/FFFFFF?text=Atividade+Roma+3",
+        descricao: "Visite dois dos monumentos mais icónicos de Roma.",
+        acessibilidade: ["Acesso Sem Degraus (Panteão)", "Multidões"],
+      },
+      {
+        id: 34,
+        destinoId: 14,
+        tipoTurismo: "Turismo Gastronómico",
+        nome: "Aula de Culinária: Pasta e Tiramisu",
+        foto: "https://placehold.co/600x400/800000/FFFFFF?text=Atividade+Roma+4",
+        descricao: "Aprenda a cozinhar pratos italianos clássicos.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Opções Alimentares Específicas (informar)",
+        ],
+      },
+      {
+        id: 35,
+        destinoId: 13,
+        tipoTurismo: "Turismo Cultural",
+        nome: "Visita à Galeria Borghese e Jardins",
+        foto: "https://placehold.co/600x400/A0522D/FFFFFF?text=Atividade+Roma+5",
+        descricao: "Admire esculturas de Bernini e pinturas de Caravaggio.",
+        acessibilidade: [
+          "Acesso Sem Degraus",
+          "Elevadores Disponíveis",
+          "Necessário reservar com antecedência",
+        ],
+      },
+    ];
+    localStorage.setItem("atividades", JSON.stringify(atividades));
+  }
+  // Tipos de Turismo
+  if (!localStorage.tiposTurismo) {
+    const tiposTurismo = [
+      "Turismo religioso",
+      "Turismo cultural",
+      "Ecoturismo",
+      "Turismo rural",
+      "Turismo gastronómico",
+      "Turismo de Sol e Praia",
+      "Turismo de negócios",
+      "Saúde e Bem-Estar",
+      "Turismo Urbano",
+    ];
+    localStorage.setItem("tiposTurismo", JSON.stringify(tiposTurismo));
+  }
+  // Acessibilidade
+  if (!localStorage.acessibilidade) {
+    const acessibilidade = [
+      "Acesso Sem Degraus",
+      "Elevadores Disponíveis",
+      "Casas de Banho Adaptadas",
+      "Quartos Adaptados",
+      "Transporte Acessível",
+      "Informação em Braille/Áudio",
+      "Alarmes Visuais/Vibratórios",
+      "Aceita Cães-Guia/Assistência",
+      "Ambientes Sensoriais Calmos",
+      "Opções Alimentares Específicas",
+      "Comunicação Visual/Simplificada",
+      "Aluguer de Equipamento de Mobilidade",
+      "Superfícies Táteis/Guia",
+      "Proximidade a Serviços Médicos",
+      "Ambiente Acolhedor LGBTQIA+",
+      "Alojamento Inclusivo Declarado",
+      "Negócios de Proprietários de Minorias",
+      "Casas de Banho Neutras em Género",
+    ];
+    localStorage.setItem("acessibilidade", JSON.stringify(acessibilidade));
+  }
+}
