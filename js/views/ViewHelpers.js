@@ -7,6 +7,7 @@ tailwind.config = {
         "Main-Primary": "#1B9AAA", // cor primária
         "Main-Secondary": "#126B76",
         "brand-secondary": "#126B76", // cor secundária
+        "Main-Gray": "#F0F0F0",
         "Button-Main": "#126B76", // cor secundária
         "Background-Card-Bg-Gami": "#F7F7F7",
         "Text-Subtitles": "#808080",
