@@ -1,7 +1,7 @@
-import { loadFromLocalStorage, saveToLocalStorage } from './ModelHelpers.js';
+import { loadFromLocalStorage, saveToLocalStorage } from "./ModelHelpers.js";
 
 export default class FlightModel {
-  static storageKey = 'flights';
+  static storageKey = "flights";
   static _items = [];
 
   static init() {
@@ -15,7 +15,7 @@ export default class FlightModel {
 
   static _getNextId() {
     return this._items.length
-      ? Math.max(...this._items.map(i => i.id || 0)) + 1
+      ? Math.max(...this._items.map((i) => i.id || 0)) + 1
       : 1;
   }
 
@@ -27,7 +27,7 @@ export default class FlightModel {
   }
 
   static update(id, data) {
-    const idx = this._items.findIndex(i => i.id == id);
+    const idx = this._items.findIndex((i) => i.id == id);
     if (idx !== -1) {
       this._items[idx] = { ...data, id };
       saveToLocalStorage(this.storageKey, this._items);
@@ -37,12 +37,21 @@ export default class FlightModel {
   }
 
   static delete(id) {
-    const idx = this._items.findIndex(i => i.id == id);
+    const idx = this._items.findIndex((i) => i.id == id);
     if (idx !== -1) {
       this._items.splice(idx, 1);
       saveToLocalStorage(this.storageKey, this._items);
       return true;
     }
     return false;
+  }
+
+  static getRandomFlightsFromOPO(count = 18) {
+    // Filtra voos cuja origem é OPO (Porto)
+    const opoFlights = this.voos.filter((f) => f.from === "OPO - Porto");
+    // Embaralha o array
+    const shuffled = opoFlights.sort(() => 0.5 - Math.random());
+    // Retorna os primeiros 'count' voos
+    return shuffled.slice(0, count);
   }
 }

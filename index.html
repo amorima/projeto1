@@ -15,13 +15,16 @@
     <link rel="stylesheet" href="assets/css/style.css">
 
 </head>
+
 <body class="font-sans">
   <header id="header-placeholder"></header>
   <nav id="menu-placeholder"></nav>
 
-  <section class="h-auto bg-Main-Primary w-full mt-[96px] px-[120px]">
+  <!-- Módulo de pesquisa -->
+  <section class="relative bg-Main-Primary w-full mt-[96px] px-4 sm:px-8 md:px-[120px] pb-14">
+    <div class="max-w-[1270px] mx-auto">
     <p class="justify-start text-white text-2xl font-bold font-['Space_Mono'] px-8 py-4">Não complique,</p>
-    <form class="grid grid-cols-1 sm:grid-cols-3 gap-4 px-8">
+    <form class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-8">
       <button onclick="openModal(`modal-from`)" class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
         <span class="material-symbols-outlined text-Main-Primary cursor-pointer">trip_origin</span>
         <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Porto</p>
@@ -53,41 +56,206 @@
         </div class=>
         <p class="justify-start px-9 text-neutral-950 text-white text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
       </div>
-      <div class="px-16 py-3 bg-Button-Main rounded-[4rem] col-start-2 flex justify-center items-center gap-2.5">
+      <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10">
+      <button class="px-16 py-2 bg-Button-Main rounded-[4rem] col-start-2 flex justify-center items-center gap-2.5 w-64 h-14">
         <p class="justify-center text-center"><span class="text-white text-xl font-bold font-['Space_Mono']">Plan</span><span class="text-white text-xl font-normal font-['Space_Mono']">It</span></p>
+      </button>
       </div>
     </form>
+    </div>
   </section>
 
-  <section class="h-auto w-full px-[120px] pt-12">
-    <!-- Pages -->
-    <div class="grid grid-cols-3  gap-4 w-full">
-      <div class="inline-flex bg-Main-Primary rounded-lg h-20 w-96 justify-start items-center px-8 gap-6">
+  <!-- Corpo -->
+  <section class="h-auto pt-12 pb-12 max-w-[1270px] mx-auto sm:px-6 lg:px-8">
+
+    <!-- Botões de atalho (Explorar / Hoteis / Carros) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full px-4 sm:px-0">
+
+      <button class="flex bg-Main-Primary rounded-lg h-20 w-full justify-start items-center px-4 sm:px-8 gap-6">
         <span class="material-symbols-outlined text-white cursor-pointer">explore</span>
-        <p class="justify-start text-neutral-950 text-white text-xl font-bold font-['IBM_Plex_Sans']">Explorar</p>
-      </div>
-      <div class="inline-flex bg-Main-Primary rounded-lg h-20 w-96 justify-start items-center px-8 gap-6">
+        <p class="text-white text-xl font-bold font-['IBM_Plex_Sans']">Explorar</p>
+      </button>
+
+      <button class="flex bg-Main-Primary rounded-lg h-20 w-full justify-start items-center px-4 sm:px-8 gap-6">
         <span class="material-symbols-outlined text-white cursor-pointer">king_bed</span>
-        <p class="justify-start text-neutral-950 text-white text-xl font-bold font-['IBM_Plex_Sans']">Hotéis</p>
-      </div>
-      <div class="inline-flex bg-Main-Primary rounded-lg h-20 w-96 justify-start items-center px-8 gap-6">
+        <p class="text-white text-xl font-bold font-['IBM_Plex_Sans']">Hotéis</p>
+      </button>
+
+      <button class="flex bg-Main-Primary rounded-lg h-20 w-full justify-start items-center px-4 sm:px-8 gap-6">
         <span class="material-symbols-outlined text-white cursor-pointer">directions_car</span>
-        <p class="justify-start text-neutral-950 text-white text-xl font-bold font-['IBM_Plex_Sans']">Aluguer de carros</p>
-      </div>
+        <p class="text-white text-xl font-bold font-['IBM_Plex_Sans']">Aluguer de carros</p>
+      </button>
+
     </div>
+
     <!-- Hero => Gamificação Explained -->
-    <div class="h-auto w-full px-8 mt-11">
-      <a href="#"><img src="/assets/img/hero.svg" class="w-full" alt=""></a>
+    <div class="h-auto pt-12 pb-12 w-full px-4 sm:px-0">
+      <a href="#"><img src="./img/hero.svg" class="" alt=""></a>
     </div>
-    <!-- Horizontal Scroll Tipos de Turismo -->
-    <div class="h-auto w-full snap-x col-span-3 px-8">
 
+    <div class="relative w-full">
+  <!-- seta esquerda -->
+  <button id="btn-left"
+      class="absolute left-6 sm:left-3 top-1/2 transform -translate-y-1/2 z-20 p-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full shadow">
+      <!-- ícone seta esquerda -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+  <!-- slider -->
+  <div
+    id="slider"
+    class="w-full flex justify-start items-center gap-6
+            overflow-hidden hide-scrollbar px-4 sm:px-0"
+  >
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/praia.png"
+        alt="sol e praia"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        sol e praia
+      </div>
     </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/urbano.png"
+        alt="urbano"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        urbano
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/Gastronómico.png"
+        alt="gastronómico"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        gastronómico
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/Cultural.png"
+        alt="cultural"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        cultural
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/bem-estar.png"
+        alt="bem-estar"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        bem-estar
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        saúde e
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/Eco.png"
+        alt="ecoturismo"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        ecoturismo
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/Rural.png"
+        alt="rural"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        rural
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/Religioso.png"
+        alt="religioso"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        religioso
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
+    </div>
+
+    <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover rounded-none"
+        src="./img/tipos-turismo/negocios.png"
+        alt="negócios"
+      />
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        negócios
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo de
+      </div>
+    </div>
+  </div>
+
+  <button id="btn-right"
+      class="absolute right-6 sm:right-3 top-1/2 transform -translate-y-1/2 z-20 p-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full shadow">
+      <!-- ícone seta direita -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+
+
     <!-- Cards -->
-    <div class="grid grid-cols-3 gap-4 w-full px-8 mt-11">
+    <div class="card-viagens grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-12 px-4 sm:px-0">
       <!-- Card -->
-      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-Components-Limit-Color overflow-hidden">
-        <img class="w-full h-80" src="" alt="">
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="https://placehold.co/413x327" alt="">
         <div class="p-4">
           <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
           <div class="inline-flex">
@@ -100,75 +268,80 @@
           <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
         </div>
       </div>
-      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-Components-Limit-Color overflow-hidden">
-        <img class="w-full h-80" src="" alt="">
-        <div class="p-4">
-          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
-          <div class="inline-flex">
-            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
-            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
-          </div>
-          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
-          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
-          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
-        </div>
-      </div>
-      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-Components-Limit-Color overflow-hidden">
-        <img class="w-full h-80" src="" alt="">
-        <div class="p-4">
-          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
-          <div class="inline-flex">
-            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
-            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
-          </div>
-          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
-          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
-          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
-        </div>
-      </div>
-      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-Components-Limit-Color overflow-hidden">
-        <img class="w-full h-80" src="" alt="">
-        <div class="p-4">
-          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
-          <div class="inline-flex">
-            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
-            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
-          </div>
-          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
-          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
-          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
-        </div>
-      </div>
-    </div>
-  </section>
 
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="https://placehold.co/413x327" alt="">
+        <div class="p-4">
+          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
+          <div class="inline-flex">
+            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
+            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
+          </div>
+          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
+          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
+          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
+        </div>
+      </div>
+
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="https://placehold.co/413x327" alt="">
+        <div class="p-4">
+          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
+          <div class="inline-flex">
+            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
+            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
+          </div>
+          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
+          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
+          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Newsletter -->
+    <div class="w-full mt-12 px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-l from-cyan-800 to-cyan-400 sm:rounded-lg overflow-hidden flex flex-col items-center justify-center max-w-screen-xl mx-auto">
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12 w-full max-w-screen-lg ">
+
+        <div class="w-full sm:flex-1 p-4 text-center text-white text-3xl font-bold font-['Space_Mono'] tracking-widest">
+            Junta-te ao maior e melhor planeador de viagens inteligente da ESMAD!
+        </div>
+
+        <form action="#" method="post" class="w-full sm:flex-1 p-4 flex flex-col items-center gap-4 max-w-sm mx-auto sm:max-w-none sm:mx-0">
+          <div class="w-full flex flex-col gap-2">
+            <input
+              type="email"
+              name="email"
+              placeholder="email@planit.com"
+              required
+              class="w-full h-12 bg-Main-Gray rounded-lg border border-gray-200 px-3 text-Text-Subtitles text-base font-semibold font-['IBM_Plex_Sans'] focus:outline-none"
+            />
+            <button
+              type="submit"
+              class="w-full h-12 bg-Main-Gray rounded-lg border border-gray-200 text-Button-Main text-base font-semibold font-['IBM_Plex_Sans'] flex items-center justify-center"
+            >
+              Subscrever
+            </button>
+          </div>
+          <div class="w-full text-center text-white text-xs font-semibold font-['IBM_Plex_Sans'] max-w-prose mx-auto">
+            Ao inscreveres-te concordas em receber ofertas de acordo com as condições descritas na nossa Política de Privacidade.
+          </div>
+        </form>
+
+    </div>
+
+</div>
+
+
+  </section>
 
   <footer id="footer-placeholder"></footer>
 
-  <div id="modal-from" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
-    <!-- Conteudo -->
-        <div class="bg-white w-full max-w-2xl mx-auto rounded-xl shadow-lg p-8">
-            <!-- Header -->
-            <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">De</h2>
-            <!-- Procura -->
-
-            <!-- Opções -->
-  
-            <!-- Acções -->
-            <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
-                <button onclick="closeModal(`modal-from`)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
-                    <div class="flex justify-start items-center gap-2.5">
-                        <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
-
      <script type="module" src="./js/views/FlightView.js"></script>
      <script src="./js/init.js"></script>
+
 </body>
 </html>
