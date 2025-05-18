@@ -48,11 +48,11 @@ tailwind.config = {
 
 export function showCookieBanner() {
   // Só mostra se ainda não foi aceite
-  if (localStorage.getItem('cookieAccepted') === 'true') return;
+  if (localStorage.getItem("cookieAccepted") === "true") return;
 
   // Cria o banner
-  const banner = document.createElement('div');
-  banner.id = 'cookie-banner';
+  const banner = document.createElement("div");
+  banner.id = "cookie-banner";
   banner.className = `
     fixed left-1/2 bottom-8 transform -translate-x-1/2 z-50
     w-[95vw] max-w-xl md:max-w-3xl px-4 py-4
@@ -60,7 +60,7 @@ export function showCookieBanner() {
   `;
 
   banner.innerHTML = `
-    <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white-800 bg-opacity-50 backdrop-filter backdrop-blur-sm">
+    <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm">
   <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow">
     <img class="w-7 h-7" src="/img/cookie.svg" alt="cookie">
   </div>
@@ -75,8 +75,8 @@ export function showCookieBanner() {
 
   document.body.appendChild(banner);
 
-  document.getElementById('accept-cookies-btn').onclick = () => {
-    localStorage.setItem('cookieAccepted', 'true');
+  document.getElementById("accept-cookies-btn").onclick = () => {
+    localStorage.setItem("cookieAccepted", "true");
     banner.remove();
   };
 }

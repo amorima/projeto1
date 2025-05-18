@@ -24,7 +24,7 @@
   <section class="relative bg-Main-Primary w-full mt-[96px] px-4 sm:px-8 md:px-[120px] pb-14">
     <div class="max-w-[1270px] mx-auto">
     <p class="justify-start text-white text-2xl font-bold font-['Space_Mono'] px-8 py-4">Não complique,</p>
-    <form class="grid grid-cols-1 sm:grid-cols-3 gap-4 px-8">
+    <form class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-8">
       <button onclick="openModal(`modal-from`)" class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
         <span class="material-symbols-outlined text-Main-Primary cursor-pointer">trip_origin</span>
         <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Porto</p>
@@ -69,7 +69,7 @@
   <section class="h-auto pt-12 pb-12 max-w-[1270px] mx-auto sm:px-6 lg:px-8">
 
     <!-- Botões de atalho (Explorar / Hoteis / Carros) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full px-4 sm:px-0">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full px-4 sm:px-0">
 
       <button class="flex bg-Main-Primary rounded-lg h-20 w-full justify-start items-center px-4 sm:px-8 gap-6">
         <span class="material-symbols-outlined text-white cursor-pointer">explore</span>
@@ -191,10 +191,40 @@
     </div>
 
     <!-- Cards -->
-    <div class="grid grid-cols-3 gap-4 w-full px-8 mt-12">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-12 px-4 sm:px-0">
       <!-- Card -->
-      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-Components-Limit-Color overflow-hidden">
-        <img class="w-full h-80" src="" alt="">
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="https://placehold.co/413x327" alt="">
+        <div class="p-4">
+          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
+          <div class="inline-flex">
+            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
+            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
+          </div>
+          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
+          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
+          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
+        </div>
+      </div>
+
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="https://placehold.co/413x327" alt="">
+        <div class="p-4">
+          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
+          <div class="inline-flex">
+            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
+            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">06 Mai - 12 Mai</p>
+          </div>
+          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">65 €</p>
+          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
+          <a href="" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
+        </div>
+      </div>
+
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="https://placehold.co/413x327" alt="">
         <div class="p-4">
           <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">Londres</p>
           <div class="inline-flex">
