@@ -14,7 +14,7 @@ export function add(username, password) {
     throw Error(`User with username "${username}" already exists!`);
   } else {
     users.push(new User(username, password));
-    localStorage.setItem("users", JSON.stringify(users));
+    saveToLocalStorage('users', users);
   }
 }
 
