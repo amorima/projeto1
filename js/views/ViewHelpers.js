@@ -93,7 +93,19 @@ export function getFormData(formId) {
 }
 
 export function showToast(msg, type = "success") {
-  alert(msg);
+  const toast = document.createElement(`div`)
+    toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50 
+        ${type === `success` ? `bg-green-500 text-white` : `bg-red-500 text-white`}`
+    toast.innerText = msg
+    document.body.appendChild(toast)
+    setTimeout(() => toast.remove(), 3000)
+}
+
+export function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export function closeModal(modalId, formId, modalTitle) {

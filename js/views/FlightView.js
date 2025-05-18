@@ -1,4 +1,3 @@
-import StorageModel from "../models/StorageModel.js";
 import FlightModel from "../models/FlightModel.js";
 import { showCookieBanner } from "./ViewHelpers.js";
 import {
@@ -18,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const slider = document.getElementById("slider");
   const btnLeft = document.getElementById("btn-left");
   const btnRight = document.getElementById("btn-right");
+  const btnOpenModal = document.getElementById("btn-open");
+
   if (!slider || !btnLeft || !btnRight) return;
 
   // quanto rolar ao clicar setas (20% da largura visível)
@@ -29,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
   btnRight.addEventListener("click", () =>
     slider.scrollBy({ left: scrollAmount, behavior: "smooth" })
   );
+  btnOpenModal.addEventListener("click", () => {
+    openModal(`modal-from`)
+  });
 
   let isDown = false;
   let startX = 0;
@@ -82,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 export default class FlightView {
   static async init() {
-    await StorageModel.loadInitialData();
     FlightModel.init();
     const data = FlightModel.getAll();
     const config = {
@@ -138,7 +141,6 @@ export default class FlightView {
   }
 
   static async renderRandomOPOCards(containerClass) {
-    await StorageModel.loadInitialData();
     // Buscar viagens e destinos diretamente da localStorage
     const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
     const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
