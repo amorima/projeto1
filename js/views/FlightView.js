@@ -9,9 +9,69 @@ import {
   updateTable,
 } from "./ViewHelpers.js";
 
-//Inicialização do Cookie Banner
+// aguarda o DOM
 document.addEventListener("DOMContentLoaded", () => {
+  //Inicialização do Cookie Banner
   showCookieBanner();
+
+  // Inicialização do slider
+  const slider = document.getElementById("slider");
+  const btnLeft = document.getElementById("btn-left");
+  const btnRight = document.getElementById("btn-right");
+  if (!slider || !btnLeft || !btnRight) return;
+
+  // quanto rolar ao clicar setas (20% da largura visível)
+  const scrollAmount = slider.clientWidth * 0.2;
+
+  btnLeft.addEventListener("click", () =>
+    slider.scrollBy({ left: -scrollAmount, behavior: "smooth" })
+  );
+  btnRight.addEventListener("click", () =>
+    slider.scrollBy({ left: scrollAmount, behavior: "smooth" })
+  );
+
+  let isDown = false;
+  let startX = 0;
+  let scrollLeft = 0;
+
+  // desktop: mouse
+  slider.addEventListener("mousedown", (e) => {
+    isDown = true;
+    slider.classList.add("grabbing");
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+  });
+  slider.addEventListener("mouseup", () => {
+    isDown = false;
+    slider.classList.remove("grabbing");
+  });
+  slider.addEventListener("mouseleave", () => {
+    isDown = false;
+    slider.classList.remove("grabbing");
+  });
+  slider.addEventListener("mousemove", (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 1;
+    slider.scrollLeft = scrollLeft - walk;
+  });
+
+  // mobile: touch
+  slider.addEventListener("touchstart", (e) => {
+    isDown = true;
+    startX = e.touches[0].pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+  });
+  slider.addEventListener("touchend", () => {
+    isDown = false;
+  });
+  slider.addEventListener("touchmove", (e) => {
+    if (!isDown) return;
+    const x = e.touches[0].pageX - slider.offsetLeft;
+    const walk = (x - startX) * 1;
+    slider.scrollLeft = scrollLeft - walk;
+  });
 });
 
 export default class FlightView {

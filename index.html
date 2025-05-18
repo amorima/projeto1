@@ -93,102 +93,163 @@
       <a href="#"><img src="./img/hero.svg" class="" alt=""></a>
     </div>
 
-    <!-- Horizontal Scroll Tipos de Turismo -->
-    <div class="w-full h-full flex justify-start items-center gap-5 overflow-x-auto px-4 sm:px-0">
+    <div class="relative w-full">
+  <!-- seta esquerda -->
+  <button id="btn-left"
+      class="absolute left-6 sm:left-3 top-1/2 transform -translate-y-1/2 z-20 p-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full shadow">
+      <!-- ícone seta esquerda -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
 
+  <!-- slider -->
+  <div
+    id="slider"
+    class="w-full flex justify-start items-center gap-6
+            overflow-hidden hide-scrollbar px-4 sm:px-0"
+  >
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/praia.png"
-        alt="Card background sol e praia"
+        alt="sol e praia"
       />
-      <div
-        class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7"
-      >
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
         sol e praia
       </div>
-      </div>
+    </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/urbano.png"
-        alt="Card background image"
+        alt="urbano"
       />
-      <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">urbano</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">turismo</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        urbano
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
     </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/Gastronómico.png"
-        alt="Card background image"
+        alt="gastronómico"
       />
-      <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">gastronómico</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">turismo</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        gastronómico
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
     </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/Cultural.png"
-        alt="Card background image"
+        alt="cultural"
       />
-      <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">cultural</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">turismo</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        cultural
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
     </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/bem-estar.png"
-        alt="Card background image"
+        alt="bem-estar"
       />
-      <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">bem-estar</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">saúde e</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        bem-estar
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        saúde e
+      </div>
     </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/Eco.png"
-        alt="Card background image"
+        alt="ecoturismo"
       />
-       <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">ecoturismo</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        ecoturismo
       </div>
+    </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/Rural.png"
-        alt="Card background image"
+        alt="rural"
       />
-       <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">rural</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">turismo</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        rural
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
     </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/Religioso.png"
-        alt="Card background image"
+        alt="religioso"
       />
-       <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">religioso</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">turismo</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        religioso
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo
+      </div>
     </div>
 
     <div class="w-56 h-44 relative rounded-lg overflow-hidden flex-shrink-0">
       <img
+        draggable="false"
         class="absolute inset-0 w-full h-full object-cover rounded-none"
         src="./img/tipos-turismo/negocios.png"
-        alt="Card background image"
+        alt="negócios"
       />
-      <div class="left-[18px] top-[125.75px] absolute text-white text-2xl font-bold font-['Space_Mono'] leading-7">negócios</div>
-      <div class="left-[18.50px] top-[101.25px] absolute text-white text-2xl font-normal font-['Space_Mono'] leading-7">turismo de</div>
+      <div class="absolute left-[18px] top-[125.75px] text-white text-2xl font-bold font-['Space_Mono'] leading-7">
+        negócios
+      </div>
+      <div class="absolute left-[18.50px] top-[101.25px] text-white text-2xl font-normal font-['Space_Mono'] leading-7">
+        turismo de
+      </div>
     </div>
+  </div>
 
-    </div>
+  <button id="btn-right"
+      class="absolute right-6 sm:right-3 top-1/2 transform -translate-y-1/2 z-20 p-2 bg-white bg-opacity-75 hover:bg-opacity-100 rounded-full shadow">
+      <!-- ícone seta direita -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+
 
     <!-- Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-12 px-4 sm:px-0">
