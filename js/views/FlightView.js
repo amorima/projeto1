@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   slider.addEventListener("mouseup", () => {
     isDown = false;
+    0;
     slider.classList.remove("grabbing");
   });
   slider.addEventListener("mouseleave", () => {
@@ -72,6 +73,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const walk = (x - startX) * 1;
     slider.scrollLeft = scrollLeft - walk;
   });
+
+  // Renderizar cards de viagens aleatórias de OPO na homepage
+  if (document.querySelector(".card-viagens")) {
+    FlightView.renderRandomOPOCards("card-viagens");
+  }
 });
 
 export default class FlightView {
@@ -131,5 +137,68 @@ export default class FlightView {
     updateTable(config);
   }
 
-  // Métodos edit(id) e delete(id) podem ser implementados aqui...
+  static async renderRandomOPOCards(containerClass) {
+    await StorageModel.loadInitialData();
+    // Buscar viagens e destinos diretamente da localStorage
+    const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
+    const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
+    // Filtrar viagens de OPO - Porto
+    const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
+    // Embaralhar e escolher 18
+    const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18);
+    // Obter container por classe
+    const container = document.querySelector(`.${containerClass}`);
+    if (!container) return;
+    container.innerHTML = "";
+    shuffled.forEach((viagem) => {
+      // Buscar destino pelo destinoId
+      const destino = destinos.find((d) => d.id === viagem.destinoId);
+      const cidade = destino ? destino.cidade : "Destino";
+      // Formatar datas (ex: 22 Mai - 27 Mai)
+      const formatarData = (dataStr) => {
+        if (!dataStr) return "";
+        // Suporta formatos tipo "25/05/2025 08:15"
+        const [dia, mes, anoHora] = dataStr.split("/");
+        const [ano, hora] = anoHora.split(" ");
+        const meses = [
+          "Jan",
+          "Fev",
+          "Mar",
+          "Abr",
+          "Mai",
+          "Jun",
+          "Jul",
+          "Ago",
+          "Set",
+          "Out",
+          "Nov",
+          "Dez",
+        ];
+        return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
+      };
+      const dataPartida = formatarData(viagem.partida);
+      const dataChegada = formatarData(viagem.chegada);
+      const datas =
+        dataPartida && dataChegada ? `${dataPartida} - ${dataChegada}` : "";
+      const preco = viagem.custo || "-";
+      const imagem = viagem.imagem || "https://placehold.co/413x327";
+      const card = `
+      <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
+        <img class="w-full h-80 object-cover" src="${imagem}" alt="Imagem do destino">
+        <div class="p-4">
+          <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">${cidade}</p>
+          <div class="inline-flex">
+            <span class="material-symbols-outlined text-Text-Subtitles">calendar_month</span>
+            <p class="text-Text-Subtitles align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">${datas}</p>
+          </div>
+          <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
+          <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
+          <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
+        </div>
+      </div>
+      `;
+      container.innerHTML += card;
+    });
+  }
 }
