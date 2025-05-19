@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body class="font-sans">
+  <header id="header-placeholder"></header>
+  <nav id="menu-placeholder"></nav>
+
+  <!-- Módulo de pesquisa -->
+  <section class="relative bg-Main-Primary w-full mt-[96px] px-4 sm:px-8 md:px-[120px] pb-14">
+    <div class="max-w-[1270px] mx-auto">
+    <p class="justify-start text-white text-2xl font-bold font-['Space_Mono'] px-8 py-4">Não complique,</p>
+    <form class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 px-8">
+      <button id="btn-open" class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
+        <span class="material-symbols-outlined text-Main-Primary cursor-pointer">trip_origin</span>
+        <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Porto</p>
+      </button>
+      <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5">
+        <span class="material-symbols-outlined text-Main-Primary cursor-pointer">location_on</span>
+        <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans']">Londres</p>
+      </div>
+      <div class="w-full h-20 bg-white rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5 divide-x-2 divide-solid divide-Main-Primary">
+        <div class="w-1/2 inline-flex">
+          <span class="material-symbols-outlined text-Main-Primary cursor-pointer">calendar_month</span>
+          <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">06 Mai - 13 Mai</p>
+        </div>
+        <div class="w-1/2">
+          <p class="justify-start text-neutral-950 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">1 Viajante</p>
+        </div>
+      </div>
+      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white overflow-hidden flex-row items-center px-[11px] gap-1.5">
+        <div class="inline-flex gap-3 py-2 items-center">
+          <span class="material-symbols-outlined text-white cursor-pointer">travel_luggage_and_bags</span>
+          <p class="justify-start text-white text-base font-normal font-['IBM_Plex_Sans']">Tipo Turimo</p>
+        </div>
+        <p class="justify-start px-9 text-white text-xl font-semibold font-['IBM_Plex_Sans']">Turimo Urbano</p>
+      </div>
+      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white overflow-hidden flex-row items-center px-[11px] gap-1.5">
+        <div class="inline-flex gap-3 py-2 items-center">
+          <span class="material-symbols-outlined text-white cursor-pointer">travel_luggage_and_bags</span>
+          <p class="justify-start text-neutral-950 text-white text-base font-normal font-['IBM_Plex_Sans']">Acessibilidade / Segurança</p>
+        </div class=>
+        <p class="justify-start px-9 text-neutral-950 text-white text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
+      </div>
+      <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10">
+      <button class="px-16 py-2 bg-Button-Main rounded-[4rem] col-start-2 flex justify-center items-center gap-2.5 w-64 h-14">
+        <p class="justify-center text-center"><span class="text-white text-xl font-bold font-['Space_Mono']">Plan</span><span class="text-white text-xl font-normal font-['Space_Mono']">It</span></p>
+      </button>
+      </div>
+    </form>
+    </div>
+  </section>
+
+  <!-- Filtros -->
+  <div class="bg-white p-4 rounded-lg shadow-md flex flex-col md:flex-row md:justify-between my-10 max-w-[1206px] lg:mx-4 mx-4 xl:mx-auto border border-gray-200">
+
+  <div class="flex items-center space-x-2 w-full md:w-auto mb-3 md:mb-0">
+    <label for="sort-date" class="text-gray-700 text-sm whitespace-nowrap">Ordenar Data:</label>
+    <select id="sort-date" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+      <option value="">Nenhuma</option>
+      <option value="recent">Mais Recente</option>
+      <option value="oldest">Mais Antiga</option>
+    </select>
+  </div>
+
+  <div class="flex items-center space-x-2 w-full md:w-auto mb-3 md:mb-0">
+    <label for="sort-price" class="text-gray-700 text-sm whitespace-nowrap">Ordenar Preço:</label>
+    <select id="sort-price" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+      <option value="">Nenhum</option>
+      <option value="price-asc">Mais Barato</option>
+      <option value="price-desc">Mais Caro</option>
+    </select>
+  </div>
+
+  <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto mb-3 md:mb-0">
+    <span class="text-gray-700 text-sm whitespace-nowrap md:hidden">Preço:</span>
+    <div class="flex items-center space-x-2 w-full">
+      <label for="min-price" class="sr-only">Preço Mínimo</label>
+      <div class="relative rounded-md shadow-sm w-1/2">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <input type="number" name="min-price" id="min-price" class="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Mín.">
+      </div>
+      <span class="text-gray-500">-</span>
+      <div class="relative rounded-md shadow-sm w-1/2">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <input type="number" name="max-price" id="max-price" class="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Máx.">
+      </div>
+    </div>
+  </div>
+
+  <button class="bg-Button-Main hover:bg-Main-Primary text-white font-semibold py-2 px-4 ml-4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-full md:w-auto">
+    Aplicar Filtros
+  </button>
+
+</div>
+
+    <!-- Cards -->
+    <div class="card-viagens grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mt-12 px-4 sm:px-0">
+
+    </div>
+
+</div>
+
+  </section>
+
+  <footer id="footer-placeholder"></footer>
+
+     <script type="module" src="../js/views/FlightView.js"></script>
+     <script src="../js/init.js"></script>
+
+</body>
+</html>
