@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     slider.scrollBy({ left: scrollAmount, behavior: "smooth" })
   );
   btnOpenModal.addEventListener("click", () => {
-    openModal(`modal-from`)
+    openModal(`modal-from`);
   });
 
   let isDown = false;
@@ -141,9 +141,8 @@ export default class FlightView {
   }
 
   static async renderRandomOPOCards(containerClass) {
-    // Buscar viagens e destinos diretamente da localStorage
+    // Buscar viagens diretamente da localStorage
     const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
-    const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
     // Filtrar viagens de OPO - Porto
     const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
     // Embaralhar e escolher 18
@@ -153,9 +152,8 @@ export default class FlightView {
     if (!container) return;
     container.innerHTML = "";
     shuffled.forEach((viagem) => {
-      // Buscar destino pelo destinoId
-      const destino = destinos.find((d) => d.id === viagem.destinoId);
-      const cidade = destino ? destino.cidade : "Destino";
+      // destino já é uma string
+      const cidade = viagem.destino || "Destino";
       // Formatar datas (ex: 22 Mai - 27 Mai)
       const formatarData = (dataStr) => {
         if (!dataStr) return "";
@@ -179,9 +177,9 @@ export default class FlightView {
         return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
       };
       const dataPartida = formatarData(viagem.partida);
-      const dataChegada = formatarData(viagem.chegada);
+      const dataVolta = formatarData(viagem.dataVolta);
       const datas =
-        dataPartida && dataChegada ? `${dataPartida} - ${dataChegada}` : "";
+        dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
       const preco = viagem.custo || "-";
       const imagem = viagem.imagem || "https://placehold.co/413x327";
       const card = `
