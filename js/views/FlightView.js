@@ -193,7 +193,7 @@ export default class FlightView {
           </div>
           <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-          <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono']">Ver oferta</a>
+          <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary transition duration-300 ease-in-out">Ver oferta</a>
           <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
         </div>
       </div>
