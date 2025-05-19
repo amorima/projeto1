@@ -1,48 +1,111 @@
-import { loadFromLocalStorage, saveToLocalStorage } from './ModelHelpers.js';
+import { loadFromLocalStorage, saveToLocalStorage, getNextId} from './ModelHelpers.js';
 
-export default class HotelModel {
-  static storageKey = 'hotels';
-  static _items = [];
+// ARRAY HOTELS
+let hotels
 
-  static init() {
-    this._items = [];
-    loadFromLocalStorage(this.storageKey, this._items);
+// CARREGAR HOTEIS DA LOCAL STORAGE
+export function init() {
+  hotels = localStorage.hotels ? loadFromLocalStorage('hotels',hotels) : []
+}
+
+// ADICIONAR HOTEL
+export function add(name, location, image){
+  if (hotels.some((hotel) => hotel.id === id)) {
+    throw Error(`Hotel "${name}" already exists!`);
+  } else {
+    hotels.push(new Hotel(getNextId(hotels), name, location, image));
+    saveToLocalStorage('hotels', hotels);
   }
+}
 
-  static getAll(filterFn = null) {
-    return filterFn ? this._items.filter(filterFn) : this._items;
+// ALTERAR DADOS DE HOTEL
+export function update(id, newHotel) {
+  const index = hotels.findIndex(h => h.id == id)
+  if (index !== -1){
+    hotels[index] = newHotel
+    return true
   }
+  throw Error ('No Hotel Found')
+}
 
-  static _getNextId() {
-    return this._items.length
-      ? Math.max(...this._items.map(i => i.id || 0)) + 1
-      : 1;
+// APAGAR HOTEL
+export function deleteHotel (id) {
+  const index = hotels.findIndex(h => h.id == id)
+  if(index !== -1){
+    hotels.splice(index,1)
+    saveToLocalStorage('hotels',hotels)
+    return true
   }
+  throw Error ('No Hotel Found')
+}
 
-  static add(data) {
-    const item = { ...data, id: this._getNextId() };
-    this._items.push(item);
-    saveToLocalStorage(this.storageKey, this._items);
-    return item;
+// ADICIONAR QUARTO 
+export function addRoom (hotel, room) {
+  const index = hotels.findIndex(h => h.id == hotel.id)
+  if (index !== -1){
+    hotels[index].quartos.push(room)
+    saveToLocalStorage('hotels',hotels)
+    return true
   }
+  throw Error ('No Hotel Found')
+}
 
-  static update(id, data) {
-    const idx = this._items.findIndex(i => i.id == id);
-    if (idx !== -1) {
-      this._items[idx] = { ...data, id };
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
+// REMOVER QUARTO
+export function removeRoom (room) {
+  const index = hotels.findIndex(h => h.quartos == room)
+  if (index !== -1){
+    const roomIndex = hotels[index].quartos.findIndex(r => r == room)
+    if (roomIndex !== -1){
+      hotels[index].quartos.splice(roomIndex,1)
+      saveToLocalStorage('hotels',hotels)
+      return true
     }
-    return false;
+    throw Error ('No Room Found')
   }
+  throw Error ('No Hotel Found')
+}
 
-  static delete(id) {
-    const idx = this._items.findIndex(i => i.id == id);
-    if (idx !== -1) {
-      this._items.splice(idx, 1);
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
+/**
+ * CLASSE QUE MODELA UM HOTEL NA APLICAÇÃO
+ */
+class Hotel {
+  id = 0;
+  destinoId = 0;
+  nome = '';
+  foto = '';
+  quartos = [];
+
+  constructor(id, destinoId, nome, foto, quartos = []) {
+    this.id = id;
+    this.destinoId = destinoId;
+    this.nome = nome;
+    this.foto = foto;
+    this.quartos = quartos;
+  }
+}
+
+class Room {
+  tipo = '';
+  camas = 0;
+  capacidade = 0;
+  precoNoite = 0;
+  foto = '';
+  acessibilidade = [];
+  available = true;
+
+  constructor(tipo, camas, capacidade, precoNoite, foto, acessibilidade = [], available = true) {
+    this.tipo = tipo;
+    this.camas = camas;
+    this.capacidade = capacidade;
+    this.precoNoite = precoNoite;
+    this.foto = foto;
+    this.acessibilidade = acessibilidade;
+    this.available = available;
+  }
+  occupy() {
+    this.available = false;
+  }
+  free() {
+    this.available = true;
   }
 }
