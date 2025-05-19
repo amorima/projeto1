@@ -1,0 +1,48 @@
+<nav class="w-full bg-Main-Primary fixed top-0 left-0 z-50 shadow-[0px_0.5px_4px_0px_rgba(0,0,0,0.25)]">
+    <div class="max-w-[1270px] h-24 mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+  
+      <div class="flex-shrink-0">
+        <img class="h-8 w-auto" src="../img/logo.svg" alt="Logo da Empresa">
+      </div>
+  
+      <div class="flex items-center gap-3.5">
+        <span class="material-symbols-outlined text-white cursor-pointer">dark_mode</span>
+        <span class="material-symbols-outlined text-white cursor-pointer">favorite</span>
+        <div class="flex items-center gap-1 cursor-pointer">
+          <span class="material-symbols-outlined text-white">account_circle</span>
+          <span class="text-white text-base font-normal font-['IBM_Plex_Sans'] hidden md:block">Iniciar sessão</span>
+        </div>
+        <button id="menu-button" class="flex items-center">
+          <span class="material-symbols-outlined text-white cursor-pointer">menu</span>
+        </button>
+      </div>
+  
+    </div>
+  
+    <div id="mobile-menu" class="hidden bg-Main-Primary md:hidden">
+      <div class="px-4 py-3 space-y-2">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-white cursor-pointer">dark_mode</span>
+          <span class="text-white">Modo Escuro</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-white cursor-pointer">favorite</span>
+          <span class="text-white">Favoritos</span>
+        </div>
+        <div class="flex items-center gap-2 cursor-pointer">
+          <span class="material-symbols-outlined text-white">account_circle</span>
+          <span class="text-white">Iniciar sessão</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <script>
+    const btn = document.getElementById('menu-button');
+    const menu = document.getElementById('mobile-menu');
+  
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+  

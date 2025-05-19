@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/ui.js" defer></script>
+
+</head>
+<body class="font-sans"><header id="header-placeholder"></header>
+     
+    <nav id="menu-placeholder"></nav>
+    
+    <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mt-[126px] w-full h-24 p-8 bg-Background-Card-Bg-Gami rounded-lg overflow-hidden inline-flex justify-between">
+            <h2 class="w-full sm:w-[592px] justify-center text-Button-Main text-4xl font-bold font-['Space_Mono'] justify-start">Gestão de hoteis</h2>
+            <div class="inline-flex">
+                <div class="w-80 h-11">
+                    <input type="text" id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm">
+                </div>
+                <button onclick="handleSearch('searchInput',hotelTableConfig)" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
+                    <span class="material-symbols-outlined text-white cursor-pointer">search</span>
+                </button>
+                <button onclick="openModal('modal-adicionar')" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5">
+                    <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
+                    <p class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-auto">
+        <!-- Table -->
+        <table class="table w-full rounded-t-lg overflow-hidden">
+            <!-- Table Header -->
+            <thead class="table-header-group bg-Background-Card-Bg-Gami">
+                <tr class="table-row rounded-tl-lg rounded-tr-lg overflow-hidden">
+                    <th onclick="sortTableBy('destinoId', hotelTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans'] ">Localização
+                        <span id="sort-icon-destinoId" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('name', hotelTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nome
+                        <span id="sort-icon-name" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th onclick="sortTableBy('quartos', hotelTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Quartos
+                        <span id="sort-icon-quartos" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
+                    </th>
+                    <th class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']"></th>
+                </tr>
+            </thead>
+            <!-- Table Content -->
+            <tbody id="tableContent" class="table-row-group"><!-- Clean the table row when finished -->
+                <tr class="table-row h-[42px]">
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-bold font-['IBM_Plex_Sans']">TRD783</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">OPO</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">25/05/2025 10:25</td>
+                    <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
+                        <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6">edit_square</button>
+                        <button class="material-symbols-outlined text-red-600 cursor-pointer">delete</button>
+                    </td>
+                </tr>
+            </tbody>            
+        </table>
+
+        <!-- Table Tabs -->
+        <div id="pagination-controls" class="inline-flex justify-start items-center gap-[5px] pt-6"><!-- Clean the table tabs when finished -->
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
+                <span class="material-symbols-outlined text-zinc-900 cursor-pointer">chevron_left</span>
+            </button>
+            <button class="w-8 h-8 px-2.5 py-2 bg-Main-Primary rounded-lg inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-white text-lg font-normal font-['IBM_Plex_Sans']">1</p>
+            </button>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">2</p>
+            </button>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">3</p>
+            </button>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">...</p>
+            </button>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">89</p>
+            </button>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
+                <span class="material-symbols-outlined text-zinc-900 cursor-pointer">chevron_right</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Modal Adicionar -->
+    <div id="modal-adicionar" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+    <!-- Conteudo -->
+        <div class="bg-white w-full max-w-2xl mx-auto rounded-xl shadow-lg p-8">
+            <!-- Header -->
+            <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">Adicionar hotel manual</h2>
+            <!-- Formulario -->
+            <form class="space-y-4" id="add_hotel_form">
+                <input type="hidden" id="id">
+                <div>
+                    <label for="destinoId" class="block text-base font-light text-Text-Subtitles">Lozalização</label>
+                    <select id="destinoId" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                    
+                    </select>
+                </div>
+
+                <div>
+                    <label for="name" class="block text-base font-light text-Text-Subtitles">Nome</label>
+                    <input id="name" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                </div>
+  
+                <div>
+                    <label for="" class="block text-base font-light text-Text-Subtitles">Foto</label>
+<!--                <input type="image" class="w-full h-11 bg-zinc-100 rounded-lg px-3" > -->
+                </div>
+  
+                <div>
+                    <label for="quartos" class="block text-base font-light text-Text-Subtitles">quartos</label>
+                    <input id="quartos" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" />
+                </div>
+            </form>
+            <!-- Carregar Imagem -->
+            <!-- Acções -->
+            <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
+                <button onclick="createHotel()" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
+                    <div class="inline-flex justify-start items-center gap-2.5">
+                        <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
+                        <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
+                    </div>
+                </button>
+                <button onclick="closeModal(`modal-adicionar`,'add_hotel_form','Adicionar hotel manual',createHotel)" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                    <div class="flex justify-start items-center gap-2.5">
+                        <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+      
+     
+    
+    <script src="assets/js/main.js" defer></script>
+    <script type="module" src="../js/init.js" defer></script>
+    <script type="module" src="../js/views/ViewHelpers.js"></script>
+</body>
+</html>

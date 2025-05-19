@@ -1,0 +1,55 @@
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    font-style: normal;
+    src: url(/assets/font/material.woff2) format('woff2');
+  }
+
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px; 
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    font-variation-settings: 'FILL' 1;
+  }
+
+/* Esconde as scrollbars no slider de tipos de turismo */
+#slider::-webkit-scrollbar {
+  display: none;
+}
+#slider {
+  -ms-overflow-style: none;   /* IE/Edge */
+  scrollbar-width: none;      /* Firefox */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;    /* roll suave */
+}
+
+/* Cursor “grabbing” e desativa seleção de texto/imagem ao arrastar */
+#slider.grabbing {
+  cursor: grabbing;
+  user-select: none;
+}
+
+/* Estilos para os botões de navegação do slider */
+.btn-slider {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  padding: 0.5rem;
+  background-color: rgba(255,255,255,0.75);
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background-color 0.2s ease;
+}
+.btn-slider:hover {
+  background-color: rgba(255,255,255,1);
+}
+
