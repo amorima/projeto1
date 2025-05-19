@@ -46,15 +46,6 @@ Este projeto foi construído com as seguintes tecnologias principais:
 * **Gestão de Projeto:** Notion, GitHub Projects
 * **Controlo de Versão:** Git & GitHub
 
-## 🗺️ Roadmap
-
-* [ ] Finalizar implementação dos Requisitos Funcionais.
-* [ ] Refinar a implementação dos Requisitos Não Funcionais (Usabilidade, Desempenho, Segurança).
-* [ ] Expandir as funcionalidades de gamificação (mais desafios, recompensas).
-* [ ] Realizar testes de utilizador e iterar com base no feedback.
-
-Consulta os [issues abertos](https://github.com/amorima/projeto1/issues) para uma lista completa das funcionalidades propostas (e bugs conhecidos).
-
 ## 📜 Licença
 
 Distribuído sob a Licença MIT. Vê o ficheiro `LICENSE` para mais informações.

@@ -7,6 +7,7 @@ tailwind.config = {
         "Main-Primary": "#1B9AAA", // cor primária
         "Main-Secondary": "#126B76",
         "brand-secondary": "#126B76", // cor secundária
+        "Main-Gray": "#F0F0F0",
         "Button-Main": "#126B76", // cor secundária
         "Background-Card-Bg-Gami": "#F7F7F7",
         "Text-Subtitles": "#808080",
@@ -48,11 +49,11 @@ tailwind.config = {
 
 export function showCookieBanner() {
   // Só mostra se ainda não foi aceite
-  if (localStorage.getItem('cookieAccepted') === 'true') return;
+  if (localStorage.getItem("cookieAccepted") === "true") return;
 
   // Cria o banner
-  const banner = document.createElement('div');
-  banner.id = 'cookie-banner';
+  const banner = document.createElement("div");
+  banner.id = "cookie-banner";
   banner.className = `
     fixed left-1/2 bottom-8 transform -translate-x-1/2 z-50
     w-[95vw] max-w-xl md:max-w-3xl px-4 py-4
@@ -60,7 +61,7 @@ export function showCookieBanner() {
   `;
 
   banner.innerHTML = `
-    <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white-800 bg-opacity-50 backdrop-filter backdrop-blur-sm">
+    <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm">
   <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow">
     <img class="w-7 h-7" src="/img/cookie.svg" alt="cookie">
   </div>
@@ -75,8 +76,8 @@ export function showCookieBanner() {
 
   document.body.appendChild(banner);
 
-  document.getElementById('accept-cookies-btn').onclick = () => {
-    localStorage.setItem('cookieAccepted', 'true');
+  document.getElementById("accept-cookies-btn").onclick = () => {
+    localStorage.setItem("cookieAccepted", "true");
     banner.remove();
   };
 }
@@ -92,7 +93,19 @@ export function getFormData(formId) {
 }
 
 export function showToast(msg, type = "success") {
-  alert(msg);
+  const toast = document.createElement(`div`)
+    toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50 
+        ${type === `success` ? `bg-green-500 text-white` : `bg-red-500 text-white`}`
+    toast.innerText = msg
+    document.body.appendChild(toast)
+    setTimeout(() => toast.remove(), 3000)
+}
+
+export function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 export function closeModal(modalId, formId, modalTitle) {
