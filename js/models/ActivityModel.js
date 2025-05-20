@@ -1,48 +1,64 @@
-import { loadFromLocalStorage, saveToLocalStorage } from './ModelHelpers.js';
+import { loadFromLocalStorage, saveToLocalStorage, getNextId} from './ModelHelpers.js';
 
-export default class ActivityModel {
-  static storageKey = 'activities';
-  static _items = [];
+// ARRAY ACTIVITIES
+let activities;
 
-  static init() {
-    this._items = [];
-    loadFromLocalStorage(this.storageKey, this._items);
+// CARREGAR ACTIVIDADES DA LOCAL STORAGE
+export function init() {
+  activities = localStorage.activities ? loadFromLocalStorage('activities', activities) : [];
+}
+
+// ADICIONAR ACTIVIDADE
+export function add(destino, tipoTurismo, nome, foto, descricao, acessibilidade) {
+  if (activities.some((a) => a.nome === nome)) {
+    throw Error(`Activity "${a.nome}" already exists!`);
+  } else {
+    const id = getNextId(activities);
+    activities.push(new Activity(id,destino, tipoTurismo, nome, foto, descricao, acessibilidade));
+    saveToLocalStorage('activities', activities);
   }
+}
 
-  static getAll(filterFn = null) {
-    return filterFn ? this._items.filter(filterFn) : this._items;
+// ALTERAR DADOS DE ACTIVIDADE
+export function update(name, newActivity) {
+  const index = activities.findIndex(a => a.nome == name);
+  if (index !== -1) {
+    activities[index] = newActivity;
+    saveToLocalStorage('activities', activities);
+    return true;
   }
+  throw Error('No Activity Found');
+}
 
-  static _getNextId() {
-    return this._items.length
-      ? Math.max(...this._items.map(i => i.id || 0)) + 1
-      : 1;
+// APAGAR ACTIVIDADE
+export function deleteActivity(id) {
+  const index = activities.findIndex(a => a.id == id);
+  if (index !== -1) {
+    activities.splice(index, 1);
+    saveToLocalStorage('activities', activities);
+    return true;
   }
+  throw Error('No Activity Found');
+}
 
-  static add(data) {
-    const item = { ...data, id: this._getNextId() };
-    this._items.push(item);
-    saveToLocalStorage(this.storageKey, this._items);
-    return item;
-  }
-
-  static update(id, data) {
-    const idx = this._items.findIndex(i => i.id == id);
-    if (idx !== -1) {
-      this._items[idx] = { ...data, id };
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
-  }
-
-  static delete(id) {
-    const idx = this._items.findIndex(i => i.id == id);
-    if (idx !== -1) {
-      this._items.splice(idx, 1);
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
+/**
+ * CLASSE QUE MODELA UMA ATIVIDADE NA APLICAÇÃO
+ */
+class Activity {
+  id = 0;
+  destino = 0;
+  tipoTurismo = "";
+  nome = "";
+  foto = "";
+  descricao = "";
+  acessibilidade = [];
+  constructor(id, destino, tipoTurismo, nome, foto, descricao, acessibilidade = []) {
+    this.id = id;
+    this.destino = destino;
+    this.tipoTurismo = tipoTurismo;
+    this.nome = nome;
+    this.foto = foto;
+    this.descricao = descricao;
+    this.acessibilidade = acessibilidade;
   }
 }
