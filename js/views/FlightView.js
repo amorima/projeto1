@@ -1,4 +1,4 @@
-import FlightModel from "../models/FlightModel.js";
+import * as Flight from "../models/FlightModel.js";
 import { showCookieBanner } from "./ViewHelpers.js";
 import {
   getFormData,
@@ -86,8 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 export default class FlightView {
   static async init() {
-    FlightModel.init();
-    const data = FlightModel.getAll();
+    Flight.init();
+    const data = Flight.getAll();
     const config = {
       data,
       columns: [
