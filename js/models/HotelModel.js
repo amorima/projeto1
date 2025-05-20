@@ -23,6 +23,7 @@ export function update(id, newHotel) {
   const index = hotels.findIndex(h => h.id == id)
   if (index !== -1){
     hotels[index] = newHotel
+    saveToLocalStorage('hotels',hotels)
     return true
   }
   throw Error ('No Hotel Found')

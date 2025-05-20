@@ -1,57 +1,79 @@
 import { loadFromLocalStorage, saveToLocalStorage } from "./ModelHelpers.js";
 
-export default class FlightModel {
-  static storageKey = "flights";
-  static _items = [];
+// ARRAY FLIGHTS
+let viagens;
 
-  static init() {
-    this._items = [];
-    loadFromLocalStorage(this.storageKey, this._items);
+// CARREGAR VIAGEM DA LOCAL STORAGE
+export function init() {
+  viagens = localStorage.viagens ? loadFromLocalStorage("viagens", viagens) : [];
+}
+
+// ADICIONAR VIAGEM
+export function add(numeroVoo, origem, destino, companhia, partida, chegada, direto, custo, imagem, dataVolta) {
+  if (viagens.some((v) => v.numeroVoo ===  numeroVoo)) {
+    throw Error(`Flight "${numeroVoo}" already exists!`);
+  } else {
+    viagens.push(new Trip(numeroVoo, origem, destino, companhia, partida, chegada, direto, custo, imagem, dataVolta));
+    saveToLocalStorage("viagens", viagens);
   }
+}
 
-  static getAll(filterFn = null) {
-    return filterFn ? this._items.filter(filterFn) : this._items;
+// ALTERAR DADOS DE VIAGEM
+export function update(numeroVoo, newTrip) {
+  const index = viagens.findIndex((v) => v.numeroVoo == numeroVoo);
+  if (index !== -1) {
+    viagens[index] = newTrip;
+    saveToLocalStorage("viagens", viagens);
+    return true;
   }
+  throw Error("No Flight Found");
+}
 
-  static _getNextId() {
-    return this._items.length
-      ? Math.max(...this._items.map((i) => i.id || 0)) + 1
-      : 1;
+// APAGAR VIAGEM
+export function deleteTrip(numeroVoo) {
+  const index = viagens.findIndex((v) => v.numeroVoo == numeroVoo);
+  if (index !== -1) {
+    viagens.splice(index, 1);
+    saveToLocalStorage("viagens", viagens);
+    return true;
   }
+  throw Error("No Flight Found");
+}
 
-  static add(data) {
-    const item = { ...data, id: this._getNextId() };
-    this._items.push(item);
-    saveToLocalStorage(this.storageKey, this._items);
-    return item;
-  }
+// GET FLIGHTS
+export function getTripsFrom(origem = "OPO - Porto",count = 18) {
+  // Filtra voos cuja origem é OPO (Porto)
+  const Trips = viagens.filter(v => v.origem === origem);
+  // Embaralha o array
+  const shuffled = Trips.sort(() => 0.5 - Math.random());
+  // Retorna os primeiros 'count' voos
+  return shuffled.slice(0, count);
+}
 
-  static update(id, data) {
-    const idx = this._items.findIndex((i) => i.id == id);
-    if (idx !== -1) {
-      this._items[idx] = { ...data, id };
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
-  }
-
-  static delete(id) {
-    const idx = this._items.findIndex((i) => i.id == id);
-    if (idx !== -1) {
-      this._items.splice(idx, 1);
-      saveToLocalStorage(this.storageKey, this._items);
-      return true;
-    }
-    return false;
-  }
-
-  static getRandomFlightsFromOPO(count = 18) {
-    // Filtra voos cuja origem é OPO (Porto)
-    const opoFlights = this.voos.filter((f) => f.from === "OPO - Porto");
-    // Embaralha o array
-    const shuffled = opoFlights.sort(() => 0.5 - Math.random());
-    // Retorna os primeiros 'count' voos
-    return shuffled.slice(0, count);
+/**
+ * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
+ */
+class Trip {
+  numeroVoo = "";
+  origem = "";
+  destino = "";
+  companhia = "";
+  partida = "";
+  chegada = "";
+  direto = "";
+  custo = 0;
+  imagem = "";
+  dataVolta = "";
+    constructor(numeroVoo, origem, destino, companhia, partida, chegada, direto, custo, imagem, dataVolta) {
+    this.numeroVoo = numeroVoo;
+    this.origem = origem;
+    this.destino = destino;
+    this.companhia = companhia;
+    this.partida = partida;
+    this.chegada = chegada;
+    this.direto = direto;
+    this.custo = custo;
+    this.imagem = imagem;
+    this.dataVolta = dataVolta;
   }
 }
