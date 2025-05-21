@@ -1,7 +1,7 @@
 import { loadFromLocalStorage, saveToLocalStorage } from "./ModelHelpers.js";
 
 // ARRAY FLIGHTS
-let viagens;
+let viagens = [];
 
 // CARREGAR VIAGEM DA LOCAL STORAGE ATRAVES DO MODEL HELPER
 export function init() {
