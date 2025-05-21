@@ -3,8 +3,9 @@ import { loadFromLocalStorage, saveToLocalStorage } from "./ModelHelpers.js";
 // ARRAY FLIGHTS
 let viagens;
 
-// CARREGAR VIAGEM DA LOCAL STORAGE
+// CARREGAR VIAGEM DA LOCAL STORAGE ATRAVES DO MODEL HELPER
 export function init() {
+  // Se Key exite carrega da Local Storage, else cria uma array vazio
   viagens = localStorage.viagens ? loadFromLocalStorage("viagens", viagens) : [];
 }
 

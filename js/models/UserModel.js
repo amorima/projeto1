@@ -9,11 +9,11 @@ export function init() {
 }
 
 // ADICIONAR UTILIZADOR
-export function add(username, password) {
-  if (users.some((user) => user.username === username)) {
-    throw Error(`User with username "${username}" already exists!`);
+export function add(username, password, mail) {
+  if (users.some((user) => user.mail === mail)) {
+    throw Error(`User with user "${mail}" already exists!`);
   } else {
-    users.push(new User(username, password));
+    users.push(new User(username, password, mail));
     saveToLocalStorage('users', users);
   }
 }
@@ -73,13 +73,15 @@ export function getUserLogged() {
 class User {
   username = "";
   password = "";
+  mail = "";
   points = 0;
   private = false
   admin = false
 
-  constructor(username, password, points = 50, private = false ,admin = false) {
+  constructor(username, password, mail, points = 50, private = false, admin = false) {
     this.username = username;
     this.password = password;
+    this.mail = mail;
     this.points = points;
     this.private = private;
     this.admin = admin;

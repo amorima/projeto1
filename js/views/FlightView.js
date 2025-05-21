@@ -133,7 +133,7 @@ function createTableConfig(data) {
       {
         icon: "delete",
         class: "text-red-600",
-        handler: Flight.delete,
+        handler: Flight.deleteTrip,
       },
     ],
     rowsPerPage: 10,
