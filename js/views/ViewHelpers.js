@@ -93,12 +93,16 @@ export function getFormData(formId) {
 }
 
 export function showToast(msg, type = "success") {
-  const toast = document.createElement(`div`)
-    toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50 
-        ${type === `success` ? `bg-green-500 text-white` : `bg-red-500 text-white`}`
-    toast.innerText = msg
-    document.body.appendChild(toast)
-    setTimeout(() => toast.remove(), 3000)
+  const toast = document.createElement(`div`);
+  toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50 
+        ${
+          type === `success`
+            ? `bg-green-500 text-white`
+            : `bg-red-500 text-white`
+        }`;
+  toast.innerText = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 
 export function openModal(modalId) {
@@ -213,10 +217,25 @@ export function loadComponent(componentPath, elementId) {
     })
     .then((html) => {
       document.getElementById(elementId).innerHTML = html;
+      // Se for o header, registar o evento do tema
+      if (componentPath.includes('_header.html')) {
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+          themeToggle.addEventListener('click', () => toggleThemeIcon(themeToggle));
+        }
+      }
     })
     .catch((error) => {
       console.error(error);
     });
+}
+
+// Alterna o ícone entre dark_mode e light_mode para um elemento passado
+export function toggleThemeIcon(element) {
+  if (!element) return;
+  const isDark = element.textContent === "dark_mode";
+  element.textContent = isDark ? "light_mode" : "dark_mode";
+  // Aqui pode adicionar lógica para alternar o tema global, se necessário
 }
 
 // Carregar header automaticamente se existir o placeholder
