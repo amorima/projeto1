@@ -46,9 +46,9 @@ export function deleteTrip(numeroVoo) {
 }
 
 // GET FLIGHTS
-export function getTripsFrom(origem = "OPO - Porto",perPage = 18, page = 1) {
+export function getTripsFrom(filtro = "OPO - Porto",perPage = 18, page = 1) {
   // Filtra voos cuja origem é OPO (Porto)
-  const Trips = viagens.filter(v => v.origem === origem);
+  const Trips = viagens.filter(v => v.origem === filtro || v.destino === filtro);
   // Embaralha o array
   const shuffled = Trips.sort(() => 0.5 - Math.random());
   // Retorna os n voos (perPage) dependendo da pagina (page)
