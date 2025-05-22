@@ -249,5 +249,5 @@ function renderRandomOPOCards(containerClass) {
     });
   });
 }
-initView();
+
 
