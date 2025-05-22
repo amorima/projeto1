@@ -1,11 +1,12 @@
 // Importação de helpers e modelos necessários para a renderização dos componentes e manipulação dos dados das viagens
 import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
+import { getTripsByTurismo } from "../models/FlightModel.js";
 
 // Importa apenas a função de renderização dos cards do FlightView
 import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
 
-// Dicionário de tradução para os tipos de turismo, utilizado para apresentar os nomes de forma amigável nos cards
+// Tradução dos tipos de turismo para apresentação nos cards
 const TURISMO_LABELS = {
   TurismodeSolePraia: "turismo de sol e praia",
   Turismoreligioso: "turismo religioso",
@@ -17,27 +18,18 @@ const TURISMO_LABELS = {
   TurismoRural: "turismo rural",
   TurismoDesportivo: "turismo desportivo",
   TurismoSaude: "turismo saúde",
+  Turismodenegocios: "turismo de negócios",
+  SaudeeBemEstar: "saúde e bem-estar",
+  Ecoturismo: "ecoturismo",
 };
 
-// Função responsável por filtrar as viagens de acordo com o tipo de turismo selecionado
-function getTripsByTurismo(turismoTipo) {
-  const all = Flight.getAll();
-  // O campo turismo é um array de strings, pode ter nomes como "TurismodeSolePraia"
-  return all.filter(
-    (v) =>
-      Array.isArray(v.turismo) &&
-      v.turismo.some((t) => t.toLowerCase() === turismoTipo.toLowerCase())
-  );
-}
-
-// Função principal para renderizar os cards das viagens filtradas, incluindo a apresentação dos "pills" de turismo
+// Renderiza os cards das viagens filtradas
 function renderFilteredCards(tipoTurismo) {
   const container = document.querySelector(".card-viagens");
   if (!container) return;
   const viagens = getTripsByTurismo(tipoTurismo);
   container.innerHTML = "";
   viagens.forEach((viagem) => {
-    // Copiado do renderRandomOPOCards, mas para viagens filtradas
     const cidade = viagem.destino || "Destino";
     const formatarData = (dataStr) => {
       if (!dataStr) return "";
@@ -65,7 +57,6 @@ function renderFilteredCards(tipoTurismo) {
       dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
     const preco = viagem.custo || "-";
     const imagem = viagem.imagem || "https://placehold.co/413x327";
-    // Novo: gerar os pills dos tipos de turismo
     const turismoPills = Array.isArray(viagem.turismo)
       ? viagem.turismo
           .map((tipo) => {
@@ -104,7 +95,7 @@ function renderFilteredCards(tipoTurismo) {
       </div>
     `;
   });
-  // Ativar toggle de favorito (igual ao FlightView)
+  // Ativa/desativa favorito ao clicar no ícone
   container.querySelectorAll(".favorite-icon").forEach((icon) => {
     const initialIsFav = icon.getAttribute("data-favorito") === "true";
     icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
@@ -119,22 +110,18 @@ function renderFilteredCards(tipoTurismo) {
   });
 }
 
-// Função auxiliar para obter o tipo de turismo a partir da query string da URL
+// Obtém o tipo de turismo da query string
 function getTipoTurismoFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("turismo") || "";
 }
 
-// Evento que garante o carregamento dos componentes principais da página e inicialização dos dados ao carregar o DOM
+// Carrega componentes e inicializa dados ao carregar a página
 document.addEventListener("DOMContentLoaded", () => {
   loadComponent("../html/_header.html", "header-placeholder");
   loadComponent("../html/_footer.html", "footer-placeholder");
   loadComponent("../html/_slider.html", "slider-placeholder");
-
-  // Inicializar modelo de viagens
   Flight.init();
-
-  // Obter tipo de turismo da query string
   const tipoTurismo = getTipoTurismoFromURL();
   if (tipoTurismo) {
     renderFilteredCards(tipoTurismo);
