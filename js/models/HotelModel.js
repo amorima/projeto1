@@ -68,38 +68,37 @@ export function removeRoom (room) {
 
 /**
  * CLASSE QUE MODELA UM HOTEL NA APLICAÇÃO
+ * @param {number} id - ID do hotel
+ * @param {number} destinoId - ID do destino
+ * @param {string} nome - Nome do hotel
+ * @param {string} foto - URL da foto do hotel
+ * @param {string} tipo - Tipo de hotel
+ * @param {number} camas - Número de camas
+ * @param {number} capacidade - Capacidade do hotel
+ * @param {number} precoNoite - Preço por noite
+ * @param {Array} acessibilidade - Lista de acessibilidade
+ * @param {boolean} available - Disponibilidade do hotel
  */
 class Hotel {
   id = 0;
   destinoId = 0;
   nome = '';
-  foto = '';
-  quartos = [];
-
-  constructor(id, destinoId, nome, foto, quartos = []) {
-    this.id = id;
-    this.destinoId = destinoId;
-    this.nome = nome;
-    this.foto = foto;
-    this.quartos = quartos;
-  }
-}
-
-class Room {
+  foto = ''; // Improvement => []
   tipo = '';
   camas = 0;
   capacidade = 0;
   precoNoite = 0;
-  foto = '';
   acessibilidade = [];
   available = true;
-
-  constructor(tipo, camas, capacidade, precoNoite, foto, acessibilidade = [], available = true) {
+  constructor(id, destinoId, nome, foto, tipo, camas, capacidade, precoNoite, acessibilidade = [], available = true) {
+    this.id = id;
+    this.destinoId = destinoId;
+    this.nome = nome;
+    this.foto = foto;
     this.tipo = tipo;
     this.camas = camas;
     this.capacidade = capacidade;
     this.precoNoite = precoNoite;
-    this.foto = foto;
     this.acessibilidade = acessibilidade;
     this.available = available;
   }
