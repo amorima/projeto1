@@ -172,13 +172,27 @@ export function renderRandomOPOCards(containerClass) {
       if (!dataStr) return "";
       const [dia, mes, anoHora] = dataStr.split("/");
       const [ano, hora] = anoHora.split(" ");
-      const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      const meses = [
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Set",
+        "Out",
+        "Nov",
+        "Dez",
+      ];
       return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
     };
 
     const dataPartida = formatarData(viagem.partida);
     const dataVolta = formatarData(viagem.dataVolta);
-    const datas = dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
+    const datas =
+      dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
 
     const preco = viagem.custo || "-";
     const imagem = viagem.imagem || "https://placehold.co/413x327";
@@ -195,10 +209,39 @@ export function renderRandomOPOCards(containerClass) {
           <p class="text-Button-Main text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
           <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary transition duration-300 ease-in-out">Ver oferta</a>
-          <span class="absolute top-4 right-6 material-symbols-outlined text-text-Text-Subtitles cursor-pointer">favorite</span>
+          <span 
+            class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"
+            data-favorito="false" 
+            
+          >favorite</span>
         </div>
       </div>
       `;
   });
+
+  // Ativar toggle de favorito
+  container.querySelectorAll(".favorite-icon").forEach((icon) => {
+    // Definir o estado visual inicial com base no atributo data-favorito
+    const initialIsFav = icon.getAttribute("data-favorito") === "true";
+    icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
+
+    icon.addEventListener("click", function () {
+      const currentIsFav = this.getAttribute("data-favorito") === "true";
+      const newIsFav = !currentIsFav;
+
+      this.setAttribute("data-favorito", String(newIsFav));
+
+      // Altera diretamente o estilo inline para 'FILL' 1 (preenchido) ou 'FILL' 0 (contorno)
+      if (newIsFav) {
+        this.style.fontVariationSettings = "'FILL' 1";
+      } else {
+        this.style.fontVariationSettings = "'FILL' 0";
+      }
+      
+      // Animação de feedback visual
+      this.classList.add("scale-110");
+      setTimeout(() => this.classList.remove("scale-110"), 150);
+    });
+  });
 }
-initView()
+initView();

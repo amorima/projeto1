@@ -16,7 +16,7 @@
     word-wrap: normal;
     white-space: nowrap;
     direction: ltr;
-    font-variation-settings: 'FILL' 1;
+    font-variation-settings: 'FILL' 0;
   }
 
 /* Esconde as scrollbars no slider de tipos de turismo */
