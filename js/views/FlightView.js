@@ -8,6 +8,9 @@ import {
   updateTable,
 } from "./ViewHelpers.js";
 
+Flight.init()
+initView()
+
 // Main init function to be called on DOMContentLoaded
 function initView() {
   showCookieBanner();
@@ -20,8 +23,7 @@ function initView() {
   }
 
   // Initialize table view
-  Flight.init();
-  const data = Flight.getAll();
+  const data = Flight.getAll()
   const config = createTableConfig(data);
   updateTable(config);
 
@@ -156,10 +158,12 @@ function createFlight(config) {
 
 // --- Home Card Renderer ---
 
-export function renderRandomOPOCards(containerClass) {
-  const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
+function renderRandomOPOCards(containerClass) {
+/*   const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
   const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
-  const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18);
+  const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18); */
+
+  const shuffled = Flight.getTripsFrom()
 
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
@@ -219,6 +223,7 @@ export function renderRandomOPOCards(containerClass) {
       `;
   });
 
+
   // Ativar toggle de favorito
   container.querySelectorAll(".favorite-icon").forEach((icon) => {
     // Definir o estado visual inicial com base no atributo data-favorito
@@ -245,3 +250,4 @@ export function renderRandomOPOCards(containerClass) {
   });
 }
 initView();
+
