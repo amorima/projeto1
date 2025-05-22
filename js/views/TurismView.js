@@ -1,10 +1,25 @@
+// Importação de helpers e modelos necessários para a renderização dos componentes e manipulação dos dados das viagens
 import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
 
 // Importa apenas a função de renderização dos cards do FlightView
 import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
 
-// Função para filtrar viagens por tipo de turismo
+// Dicionário de tradução para os tipos de turismo, utilizado para apresentar os nomes de forma amigável nos cards
+const TURISMO_LABELS = {
+  TurismodeSolePraia: "turismo de sol e praia",
+  Turismoreligioso: "turismo religioso",
+  TurismoUrbano: "turismo urbano",
+  Turismogastronomico: "turismo gastronómico",
+  TurismoNatureza: "turismo natureza",
+  TurismoAventura: "turismo aventura",
+  Turismocultural: "turismo cultural",
+  TurismoRural: "turismo rural",
+  TurismoDesportivo: "turismo desportivo",
+  TurismoSaude: "turismo saúde",
+};
+
+// Função responsável por filtrar as viagens de acordo com o tipo de turismo selecionado
 function getTripsByTurismo(turismoTipo) {
   const all = Flight.getAll();
   // O campo turismo é um array de strings, pode ter nomes como "TurismodeSolePraia"
@@ -15,7 +30,7 @@ function getTripsByTurismo(turismoTipo) {
   );
 }
 
-// Função para renderizar cards filtrados
+// Função principal para renderizar os cards das viagens filtradas, incluindo a apresentação dos "pills" de turismo
 function renderFilteredCards(tipoTurismo) {
   const container = document.querySelector(".card-viagens");
   if (!container) return;
@@ -50,9 +65,28 @@ function renderFilteredCards(tipoTurismo) {
       dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
     const preco = viagem.custo || "-";
     const imagem = viagem.imagem || "https://placehold.co/413x327";
+    // Novo: gerar os pills dos tipos de turismo
+    const turismoPills = Array.isArray(viagem.turismo)
+      ? viagem.turismo
+          .map((tipo) => {
+            const nome = TURISMO_LABELS[tipo] || tipo;
+            return `
+                <span class="bg-Main-Secondary text-white text-xs font-semibold rounded-full px-3 py-1 mr-1 mb-1 shadow-sm whitespace-nowrap" style="backdrop-filter: blur(2px); opacity: 0.95;">
+                  ${nome}
+                </span>
+              `;
+          })
+          .join("")
+      : "";
+
     container.innerHTML += `
       <div class="bg-white w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 overflow-hidden">
-        <img class="w-full h-80 object-cover" src="${imagem}" alt="Imagem do destino">
+        <div class="relative w-full h-80">
+          <img class="w-full h-80 object-cover" src="${imagem}" alt="Imagem do destino">
+          <div class="absolute bottom-2 right-2 flex flex-wrap justify-end items-end gap-1 z-10">
+            ${turismoPills}
+          </div>
+        </div>
         <div class="p-4">
           <p class="text-Text-Body text-2xl font-bold font-['Space_Mono'] mb-2">${cidade}</p>
           <div class="inline-flex">
@@ -85,13 +119,13 @@ function renderFilteredCards(tipoTurismo) {
   });
 }
 
-// Função para obter o tipo de turismo da query string (?turismo=TurismodeSolePraia)
+// Função auxiliar para obter o tipo de turismo a partir da query string da URL
 function getTipoTurismoFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("turismo") || "";
 }
 
-// Carregar header, slider e footer
+// Evento que garante o carregamento dos componentes principais da página e inicialização dos dados ao carregar o DOM
 document.addEventListener("DOMContentLoaded", () => {
   loadComponent("../html/_header.html", "header-placeholder");
   loadComponent("../html/_footer.html", "footer-placeholder");
