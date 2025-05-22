@@ -16,7 +16,7 @@
     word-wrap: normal;
     white-space: nowrap;
     direction: ltr;
-    font-variation-settings: 'FILL' 0;
+    font-variation-settings: 'FILL' 1;
   }
 
 /* Esconde as scrollbars no slider de tipos de turismo */
@@ -53,30 +53,3 @@
   background-color: rgba(255,255,255,1);
 }
 
-/* Light mode */
-.bg-main-background { background-color: #FFFFFF !important; }
-.bg-main-card-bg-gami { background-color: #F7F7F7 !important; }
-.bg-main-primary { background-color: #1B9AAA !important; }
-.bg-main-gray { background-color: #F0F0F0 !important; }
-.bg-main-secondary { background-color: #126B76 !important; }
-.bg-brand-secondary { background-color: #126B76 !important; }
-.text-titles { color: #222222 !important; }
-.text-body { color: #222222 !important; }
-.text-subtitles { color: #808080 !important; }
-.bg-button-main { background-color: #126B76 !important; }
-.bg-components-mapa-fundo { background-color: #6CD2E7 !important; }
-.bg-background-card-bg-gami { background-color: #F7F7F7 !important; }
-
-/* Dark mode */
-.dark .bg-main-background { background-color: #202124 !important; }
-.dark .bg-main-card-bg-gami { background-color: #404145 !important; }
-.dark .bg-main-primary { background-color: #0E5A63 !important; }
-.dark .bg-main-gray { background-color: #23272F !important; }
-.dark .bg-main-secondary { background-color: #0A3A40 !important; }
-.dark .bg-brand-secondary { background-color: #0A3A40 !important; }
-.dark .text-titles { color: #F7F7F7 !important; }
-.dark .text-body { color: #E0E0E0 !important; }
-.dark .text-subtitles { color: #B0B0B0 !important; }
-.dark .bg-button-main { background-color: #1B9AAA !important; }
-.dark .bg-components-mapa-fundo { background-color: #00102E !important; }
-.dark .bg-background-card-bg-gami { background-color: #23272F !important; }

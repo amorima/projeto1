@@ -1,62 +1,17 @@
 // ViewHelpers.js – funções de UI para as Views
 
 tailwind.config = {
-  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        "Main-Background": {
-          DEFAULT: "#FFFFFF",
-          dark: "#202124",
-        },
-        "Main-Card-Bg-Gami": {
-          DEFAULT: "#F7F7F7",
-          dark: "#404145",
-        },
-        "Main-Primary": {
-          DEFAULT: "#1B9AAA",
-          dark: "#0E5A63",
-        },
-        "Main-Gray": {
-          DEFAULT: "#F0F0F0",
-          dark: "#23272F",
-        },
-        "Main-Secondary": {
-          DEFAULT: "#126B76",
-          dark: "#0A3A40",
-        },
-        "brand-secondary": {
-          DEFAULT: "#126B76",
-          dark: "#0A3A40",
-        },
-        "Text-Titles": {
-          DEFAULT: "#222222",
-          dark: "#F7F7F7",
-        },
-        "Text-Body": {
-          DEFAULT: "#222222",
-          dark: "#E0E0E0",
-        },
-        "Text-Subtitles": {
-          DEFAULT: "#808080",
-          dark: "#B0B0B0",
-        },
-        "Button-Main": {
-          DEFAULT: "#126B76",
-          dark: "#1B9AAA",
-        },
-        "Components-Limit-Color": {
-          DEFAULT: "linear-gradient(90deg, #1B9AAA 0%, #126B76 100%)",
-          dark: "linear-gradient(90deg, #0E5A63 0%, #0A3A40 100%)",
-        },
-        "Components-Mapa-Fundo": {
-          DEFAULT: "#6CD2E7",
-          dark: "#00102E",
-        },
-        "Background-Card-Bg-Gami": {
-          DEFAULT: "#F7F7F7",
-          dark: "#23272F",
-        },
+        "Main-Primary": "#1B9AAA", // cor primária
+        "Main-Secondary": "#126B76",
+        "brand-secondary": "#126B76", // cor secundária
+        "Main-Gray": "#F0F0F0",
+        "Button-Main": "#126B76", // cor secundária
+        "Background-Card-Bg-Gami": "#F7F7F7",
+        "Text-Subtitles": "#808080",
+        "Components-Limit-Color": "", //Gradiente
       },
       fontFamily: {
         sans: [
@@ -263,12 +218,10 @@ export function loadComponent(componentPath, elementId) {
     .then((html) => {
       document.getElementById(elementId).innerHTML = html;
       // Se for o header, registar o evento do tema
-      if (componentPath.includes("_header.html")) {
-        const themeToggle = document.getElementById("theme-toggle");
+      if (componentPath.includes('_header.html')) {
+        const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
-          themeToggle.addEventListener("click", () =>
-            toggleThemeIcon(themeToggle)
-          );
+          themeToggle.addEventListener('click', () => toggleThemeIcon(themeToggle));
         }
       }
     })
