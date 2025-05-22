@@ -8,6 +8,9 @@ import {
   updateTable,
 } from "./ViewHelpers.js";
 
+Flight.init()
+initView()
+
 // Main init function to be called on DOMContentLoaded
 function initView() {
   showCookieBanner();
@@ -20,7 +23,7 @@ function initView() {
   }
 
   // Initialize table view
-  const data = Flight.init()
+  const data = Flight.getAll()
   const config = createTableConfig(data);
   updateTable(config);
 
@@ -149,17 +152,17 @@ function createFlight(config) {
   Flight.add(data);
   showToast("Flight adicionado com sucesso!");
   closeModal("modal-adicionar", "add_flight_form", "Adicionar Flight");
-  config.data = Flight.init();
+  config.data = Flight.getAll();
   updateTable(config);
 }
 
 // --- Home Card Renderer ---
 
-export function renderRandomOPOCards(containerClass) {
+function renderRandomOPOCards(containerClass) {
 /*   const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
   const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
   const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18); */
-  Flight.init()
+
   const shuffled = Flight.getTripsFrom()
 
   const container = document.querySelector(`.${containerClass}`);
@@ -202,4 +205,3 @@ export function renderRandomOPOCards(containerClass) {
       `;
   });
 }
-initView()

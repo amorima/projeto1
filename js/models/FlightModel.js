@@ -5,8 +5,12 @@ let viagens = [];
 
 // CARREGAR VIAGEM DA LOCAL STORAGE ATRAVES DO MODEL HELPER
 export function init() {
-  // Se Key exite carrega da Local Storage, else cria uma array vazio
   viagens = localStorage.viagens ? loadFromLocalStorage("viagens", viagens) : [];
+  return viagens;
+}
+
+export function getAll() {
+  return viagens ? viagens : [];
 }
 
 // ADICIONAR VIAGEM
@@ -44,6 +48,7 @@ export function deleteTrip(numeroVoo) {
 // GET FLIGHTS
 export function getTripsFrom(origem = "OPO - Porto",count = 18) {
   // Filtra voos cuja origem é OPO (Porto)
+  console.log(viagens)
   const Trips = viagens.filter(v => v.origem === origem);
   // Embaralha o array
   const shuffled = Trips.sort(() => 0.5 - Math.random());
