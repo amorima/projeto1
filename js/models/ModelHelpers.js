@@ -6,6 +6,7 @@ export function loadFromLocalStorage(key, target) {
     const arr = JSON.parse(raw);
     if (Array.isArray(arr)) {
       target.splice(0, target.length, ...arr);
+      return target;
     }
   }
 }
