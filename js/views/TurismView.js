@@ -121,5 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const tipoTurismo = getTipoTurismoFromURL();
   if (tipoTurismo) {
     renderFilteredCards(tipoTurismo);
+    // Atualiza o título
+    const title = document.getElementById("tourism-title");
+    if (title) {
+      title.textContent = TURISMO_LABELS[tipoTurismo] || "Turismo";
+    }
   }
 });
