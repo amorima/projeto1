@@ -6,6 +6,8 @@ import {
   closeModal,
   selectOptions,
   updateTable,
+  getUserLocation,
+  closestAirport,
 } from "./ViewHelpers.js";
 
 Flight.init()
@@ -13,6 +15,12 @@ initView()
 
 // Main init function to be called on DOMContentLoaded
 function initView() {
+  getUserLocation((location) => {
+  if (!location) return;
+  const aeroportos = JSON.parse(localStorage.getItem("aeroportos"));
+  const closest = closestAirport(location, aeroportos);
+  document.querySelector("#btn-open p").innerText = closest.cidade;
+  });
   showCookieBanner();
   initSlider();
   setupModalButton();
