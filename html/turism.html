@@ -19,19 +19,73 @@
 <body class="font-sans">
   <header id="header-placeholder"></header>
   <nav id="menu-placeholder"></nav>
-  <div>
+
+  <section class="h-auto pb-12 max-w-[1270px] mx-auto sm:px-6 lg:px-8">
+    <!-- Barra de tipos de turismo -->
     <div>
-        <h1 class="mt-[120px] text-2xl font-bold font-['Space_Mono']" id="tourism-title">Turismo</h1>
+        <div class="mt-[120px]">
+            <div id="tourism-types-bar" class="w-full flex flex-wrap gap-3 justify-center mt-6 mb-8"></div>
+            <h1 class="text-2xl font-bold px-6 sm:px-6 lg:px-3 font-['Space_Mono']" id="tourism-title">Turismo</h1>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+  <div class="bg-white p-4 rounded-lg shadow-md flex flex-col md:flex-row md:justify-between my-10 max-w-[1206px] lg:mx-4 mx-4 xl:mx-4 border border-gray-200">
+
+  <div class="flex items-center space-x-2 w-full md:w-auto mb-3 md:mb-0">
+    <label for="sort-date" class="text-gray-700 text-sm whitespace-nowrap">Ordenar Data:</label>
+    <select id="sort-date" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-Main-Primary focus:border-Main-Primary sm:text-sm">
+      <option value="">Nenhuma</option>
+      <option value="recent">Mais Recente</option>
+      <option value="oldest">Mais Antiga</option>
+    </select>
+  </div>
+
+  <div class="flex items-center space-x-2 w-full md:w-auto mb-3 md:mb-0">
+    <label for="sort-price" class="text-gray-700 text-sm whitespace-nowrap">Ordenar Preço:</label>
+    <select id="sort-price" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-Main-Primary focus:border-Main-Primary sm:text-sm">
+      <option value="">Nenhum</option>
+      <option value="price-asc">Mais Barato</option>
+      <option value="price-desc">Mais Caro</option>
+    </select>
+  </div>
+
+  <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4 w-full md:w-auto mb-3 md:mb-0">
+    <span class="text-gray-700 text-sm whitespace-nowrap md:hidden">Preço:</span>
+    <div class="flex items-center space-x-2 w-full">
+      <label for="min-price" class="sr-only">Preço Mínimo</label>
+      <div class="relative rounded-md shadow-sm w-1/2">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <input type="number" name="min-price" id="min-price" class="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-Main-Primary focus:border-Main-Primary sm:text-sm" placeholder="Mín.">
+      </div>
+      <span class="text-gray-500">-</span>
+      <div class="relative rounded-md shadow-sm w-1/2">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <span class="text-gray-500 sm:text-sm">€</span>
+        </div>
+        <input type="number" name="max-price" id="max-price" class="block w-full pl-7 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-Main-Primary focus:border-Main-Primary sm:text-sm" placeholder="Máx.">
+      </div>
     </div>
   </div>
-  <main class="container mx-auto px-4">
-    <section class="my-8">
-      <div id="slider-placeholder"></div>
-    </section>
-    <section>
-      <div class="card-viagens grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </section>
-  </main>
+
+  <button class="bg-Button-Main hover:bg-Main-Primary text-white font-semibold py-2 px-4 ml-4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-Main-Primary w-full md:w-auto transition duration-300 ease-in-out">
+    Aplicar Filtros
+  </button>
+
+</div>
+
+    <main class="container mx-auto px-4">
+        <section class="my-8">
+        <div id="slider-placeholder"></div>
+        </section>
+        <section>
+        <div class="card-viagens grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+    </main>
+  </section>
+
   <div id="footer-placeholder"></div>
   <script type="module" src="../js/views/TurismView.js"></script>
 </body>

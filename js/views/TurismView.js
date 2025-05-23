@@ -19,6 +19,55 @@ const TURISMO_LABELS = {
   Ecourismo: "Ecoturismo",
 };
 
+// Dados dos tipos de turismo (imagem, label, query)
+const TURISMO_CARDS = [
+  {
+    key: "TurismodeSolePraia",
+    label: "Sol e Praia",
+    img: "../img/tipos-turismo/praia.png",
+  },
+  {
+    key: "TurismoUrbano",
+    label: "Turismo Urbano",
+    img: "../img/tipos-turismo/urbano.png",
+  },
+  {
+    key: "Turismogastronomico",
+    label: "Turismo Gastronómico",
+    img: "../img/tipos-turismo/Gastronómico.png",
+  },
+  {
+    key: "Turismocultural",
+    label: "Turismo Cultural",
+    img: "../img/tipos-turismo/Cultural.png",
+  },
+  {
+    key: "SaudeeBemEstar",
+    label: "Saúde e Bem-estar",
+    img: "../img/tipos-turismo/bem-estar.png",
+  },
+  {
+    key: "Ecoturismo",
+    label: "Ecoturismo",
+    img: "../img/tipos-turismo/Eco.png",
+  },
+  {
+    key: "Turismorural",
+    label: "Turismo Rural",
+    img: "../img/tipos-turismo/Rural.png",
+  },
+  {
+    key: "Turismoreligioso",
+    label: "Turismo Religioso",
+    img: "../img/tipos-turismo/Religioso.png",
+  },
+  {
+    key: "Turismodenegocios",
+    label: "Turismo de Negócios",
+    img: "../img/tipos-turismo/negocios.png",
+  },
+];
+
 // Renderiza os cards das viagens filtradas
 function renderFilteredCards(tipoTurismo) {
   const container = document.querySelector(".card-viagens");
@@ -106,6 +155,28 @@ function renderFilteredCards(tipoTurismo) {
   });
 }
 
+// Renderiza a barra de tipos de turismo
+function renderTourismTypesBar() {
+  const bar = document.getElementById("tourism-types-bar");
+  if (!bar) return;
+  bar.innerHTML = TURISMO_CARDS.map(
+    (t) => `
+    <div onclick="window.location.href='turism.html?turismo=${t.key}'"
+      class="w-[120px] h-32 relative rounded-lg overflow-hidden flex-shrink-0 cursor-pointer group transition-transform hover:scale-105 shadow-md bg-white">
+      <img
+        draggable="false"
+        class="absolute inset-0 w-full h-full object-cover"
+        src="${t.img}"
+        alt="${t.label}"
+      />
+      <div class="absolute left-4 bottom-4 text-white text-sm font-bold font-['Space_Mono'] drop-shadow-lg">
+        ${t.label}
+      </div>
+    </div>
+  `
+  ).join("");
+}
+
 // Obtém o tipo de turismo da query string
 function getTipoTurismoFromURL() {
   const params = new URLSearchParams(window.location.search);
@@ -127,4 +198,5 @@ document.addEventListener("DOMContentLoaded", () => {
       title.textContent = TURISMO_LABELS[tipoTurismo] || "Turismo";
     }
   }
+  renderTourismTypesBar();
 });
