@@ -74,7 +74,10 @@ function getAllTripsForTipoTurismo(tipoTurismo) {
 }
 
 // Função para filtrar e ordenar viagens
-function filterAndSortTrips(trips, { sortDate, sortPrice, minPrice, maxPrice }) {
+function filterAndSortTrips(
+  trips,
+  { sortDate, sortPrice, minPrice, maxPrice }
+) {
   let filtered = [...trips];
 
   // Filtrar por preço mínimo/máximo
@@ -97,7 +100,9 @@ function filterAndSortTrips(trips, { sortDate, sortPrice, minPrice, maxPrice }) 
       };
       const dateA = parseDate(a.partida);
       const dateB = parseDate(b.partida);
-      return sortDate === "recent" ? dateB - dateA : dateA - dateB;
+      // "recent": mais próxima da data atual primeiro (crescente)
+      // "oldest": mais distante primeiro (decrescente)
+      return sortDate === "recent" ? dateA - dateB : dateB - dateA;
     });
   }
 
@@ -257,7 +262,7 @@ function setupFilterListeners(tipoTurismo) {
     }
   });
   // Botão "Limpar Filtros"
-  const btn = document.querySelector("button.bg-Button-Main");
+  const btn = document.getElementById("clear-filters");
   if (btn) {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
