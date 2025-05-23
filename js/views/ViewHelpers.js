@@ -297,3 +297,48 @@ document.addEventListener("DOMContentLoaded", () => {
     loadComponent("../html/_menu.html", "menu-placeholder");
   }
 });
+
+export function getUserLocation(callback) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      callback({ latitude, longitude });
+    },
+    (error) => {
+      console.error("Erro ao obter localização:", error);
+      callback(false);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    }
+  );
+}
+
+export function compareLocation(userLocation, location){
+  if (!userLocation || !location || typeof userLocation.latitude !== "number" || typeof userLocation.longitude !== "number" || typeof location.latitude !== "number" || typeof location.longitude !== "number") {
+    return Infinity;
+  }
+  const distance = Math.sqrt(
+    Math.pow(userLocation.latitude - location.latitude, 2) +
+      Math.pow(userLocation.longitude - location.longitude, 2)
+  );
+  return distance;
+}
+
+export function closestAirport(userLocation, locationArray){
+  let closest = null;
+  let minDistance = Infinity;
+
+  locationArray.forEach((location) => {
+    if (!location || !location.location) return;
+    const distance = compareLocation(userLocation, location.location);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closest = location;
+    }
+  });
+
+  return closest;
+}

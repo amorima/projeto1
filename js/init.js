@@ -6,20 +6,20 @@ function initdata() {
   // Aeroportos
   if (!localStorage.aeroportos) {
     const aeroportos = [
-      { codigo: "OPO", cidade: "Porto", pais: "Portugal" },
-      { codigo: "LIS", cidade: "Lisboa", pais: "Portugal" },
-      { codigo: "LHR", cidade: "Londres", pais: "Reino Unido" },
-      { codigo: "LGW", cidade: "Londres", pais: "Reino Unido" },
-      { codigo: "STN", cidade: "Londres", pais: "Reino Unido" },
-      { codigo: "LTN", cidade: "Londres", pais: "Reino Unido" },
-      { codigo: "LCY", cidade: "Londres", pais: "Reino Unido" },
-      { codigo: "CDG", cidade: "Paris", pais: "França" },
-      { codigo: "ORY", cidade: "Paris", pais: "França" },
-      { codigo: "BVA", cidade: "Paris", pais: "França" },
-      { codigo: "AMS", cidade: "Amesterdão", pais: "Países Baixos" },
-      { codigo: "MAD", cidade: "Madrid", pais: "Espanha" },
-      { codigo: "FCO", cidade: "Roma", pais: "Itália" },
-      { codigo: "CIA", cidade: "Roma", pais: "Itália" },
+      { codigo: "OPO", cidade: "Porto", pais: "Portugal", location: { latitude: 41.2421, longitude: -8.6781 } },
+      { codigo: "LIS", cidade: "Lisboa", pais: "Portugal", location: { latitude: 38.7742, longitude: -9.1342 } },
+      { codigo: "LHR", cidade: "Londres", pais: "Reino Unido", location: { latitude: 51.4700, longitude: -0.4543 } },
+      { codigo: "LGW", cidade: "Londres", pais: "Reino Unido", location: { latitude: 51.1537, longitude: -0.1821 } },
+      { codigo: "STN", cidade: "Londres", pais: "Reino Unido", location: { latitude: 51.8850, longitude: 0.2350 } },
+      { codigo: "LTN", cidade: "Londres", pais: "Reino Unido", location: { latitude: 51.8747, longitude: -0.3683 } },
+      { codigo: "LCY", cidade: "Londres", pais: "Reino Unido", location: { latitude: 51.5053, longitude: 0.0553 } },
+      { codigo: "CDG", cidade: "Paris", pais: "França", location: { latitude: 49.0097, longitude: 2.5479 } },
+      { codigo: "ORY", cidade: "Paris", pais: "França", location: { latitude: 48.7262, longitude: 2.3652 } },
+      { codigo: "BVA", cidade: "Paris", pais: "França", location: { latitude: 49.4544, longitude: 2.1128 } },
+      { codigo: "AMS", cidade: "Amesterdão", pais: "Países Baixos", location: { latitude: 52.3105, longitude: 4.7683 } },
+      { codigo: "MAD", cidade: "Madrid", pais: "Espanha", location: { latitude: 40.4983, longitude: -3.5676 } },
+      { codigo: "FCO", cidade: "Roma", pais: "Itália", location: { latitude: 41.8003, longitude: 12.2389 } },
+      { codigo: "CIA", cidade: "Roma", pais: "Itália", location: { latitude: 41.7999, longitude: 12.5949 } },
     ];
     localStorage.setItem("aeroportos", JSON.stringify(aeroportos));
   }
