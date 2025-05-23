@@ -5,7 +5,9 @@ let viagens = [];
 
 // CARREGAR VIAGEM DA LOCAL STORAGE ATRAVES DO MODEL HELPER
 export function init() {
-  viagens = localStorage.viagens ? loadFromLocalStorage("viagens", viagens) : [];
+  viagens = localStorage.viagens
+    ? loadFromLocalStorage("viagens", viagens)
+    : [];
   return viagens;
 }
 
@@ -14,11 +16,35 @@ export function getAll() {
 }
 
 // ADICIONAR VIAGEM
-export function add(numeroVoo, origem, destino, companhia, partida, chegada, direto, custo, imagem, dataVolta) {
-  if (viagens.some((v) => v.numeroVoo ===  numeroVoo)) {
+export function add(
+  numeroVoo,
+  origem,
+  destino,
+  companhia,
+  partida,
+  chegada,
+  direto,
+  custo,
+  imagem,
+  dataVolta
+) {
+  if (viagens.some((v) => v.numeroVoo === numeroVoo)) {
     throw Error(`Flight "${numeroVoo}" already exists!`);
   } else {
-    viagens.push(new Trip(numeroVoo, origem, destino, companhia, partida, chegada, direto, custo, imagem, dataVolta));
+    viagens.push(
+      new Trip(
+        numeroVoo,
+        origem,
+        destino,
+        companhia,
+        partida,
+        chegada,
+        direto,
+        custo,
+        imagem,
+        dataVolta
+      )
+    );
     saveToLocalStorage("viagens", viagens);
   }
 }
@@ -46,13 +72,23 @@ export function deleteTrip(numeroVoo) {
 }
 
 // GET FLIGHTS
-export function getTripsFrom(filtro = "OPO - Porto",perPage = 18, page = 1) {
+export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
   // Filtra voos cuja origem é OPO (Porto)
-  const Trips = viagens.filter(v => v.origem === filtro || v.destino === filtro);
+  const Trips = viagens.filter(
+    (v) => v.origem === filtro || v.turismo === filtro
+  );
   // Embaralha o array
   const shuffled = Trips.sort(() => 0.5 - Math.random());
   // Retorna os n voos (perPage) dependendo da pagina (page)
-  return shuffled.slice(perPage*(page-1), perPage*page);
+  return shuffled.slice(perPage * (page - 1), perPage * page);
+}
+
+export function getTripsByTurismo(turismoTipo) {
+  return viagens.filter(
+    (v) =>
+      Array.isArray(v.turismo) &&
+      v.turismo.some((t) => t.toLowerCase() === turismoTipo.toLowerCase())
+  );
 }
 
 /**
@@ -69,7 +105,18 @@ class Trip {
   custo = 0;
   imagem = "";
   dataVolta = "";
-    constructor(numeroVoo, origem, destino, companhia, partida, chegada, direto, custo, imagem, dataVolta) {
+  constructor(
+    numeroVoo,
+    origem,
+    destino,
+    companhia,
+    partida,
+    chegada,
+    direto,
+    custo,
+    imagem,
+    dataVolta
+  ) {
     this.numeroVoo = numeroVoo;
     this.origem = origem;
     this.destino = destino;

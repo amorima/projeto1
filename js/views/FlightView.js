@@ -10,8 +10,8 @@ import {
   closestAirport,
 } from "./ViewHelpers.js";
 
-Flight.init()
-initView()
+Flight.init();
+initView();
 
 // Main init function to be called on DOMContentLoaded
 function initView() {
@@ -31,7 +31,7 @@ function initView() {
   }
 
   // Initialize table view
-  const data = Flight.getAll()
+  const data = Flight.getAll();
   const config = createTableConfig(data);
   updateTable(config);
 
@@ -166,12 +166,12 @@ function createFlight(config) {
 
 // --- Home Card Renderer ---
 
-function renderRandomOPOCards(containerClass) {
-/*   const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
+export function renderRandomOPOCards(containerClass) {
+  /*   const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
   const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
   const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18); */
 
-  const shuffled = Flight.getTripsFrom()
+  const shuffled = Flight.getTripsFrom();
 
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
@@ -231,7 +231,6 @@ function renderRandomOPOCards(containerClass) {
       `;
   });
 
-
   // Ativar toggle de favorito
   container.querySelectorAll(".favorite-icon").forEach((icon) => {
     // Definir o estado visual inicial com base no atributo data-favorito
@@ -250,12 +249,10 @@ function renderRandomOPOCards(containerClass) {
       } else {
         this.style.fontVariationSettings = "'FILL' 0";
       }
-      
+
       // Animação de feedback visual
       this.classList.add("scale-110");
       setTimeout(() => this.classList.remove("scale-110"), 150);
     });
   });
 }
-
-
