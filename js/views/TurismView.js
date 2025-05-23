@@ -1,12 +1,12 @@
-// Importação de helpers e modelos necessários para a renderização dos componentes e manipulação dos dados das viagens
+/* Importação de helpers e modelos necessários para a renderização dos componentes e manipulação dos dados das viagens */
 import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
 import { getTripsByTurismo } from "../models/FlightModel.js";
 
-// Importa apenas a função de renderização dos cards do FlightView
+/* Importa apenas a função de renderização dos cards do FlightView */
 import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
 
-// Tradução dos tipos de turismo para apresentação nos cards
+/* Tradução dos tipos de turismo para apresentação nos cards */
 const TURISMO_LABELS = {
   TurismodeSolePraia: "Turismo de Sol e Praia",
   Turismoreligioso: "Turismo Religioso",
@@ -19,7 +19,7 @@ const TURISMO_LABELS = {
   Ecourismo: "Ecoturismo",
 };
 
-// Dados dos tipos de turismo (imagem, label, query)
+/* Dados dos tipos de turismo */
 const TURISMO_CARDS = [
   {
     key: "TurismodeSolePraia",
@@ -111,7 +111,7 @@ function filterAndSortTrips(trips, { sortDate, sortPrice, minPrice, maxPrice }) 
   return filtered;
 }
 
-// Renderiza os cards das viagens filtradas (agora recebe lista de viagens)
+// Renderiza os cards das viagens filtradas
 function renderFilteredCardsFromList(viagens, tipoTurismo) {
   const container = document.querySelector(".card-viagens");
   if (!container) return;
