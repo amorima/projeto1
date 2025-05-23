@@ -68,12 +68,58 @@ const TURISMO_CARDS = [
   },
 ];
 
-// Renderiza os cards das viagens filtradas
-function renderFilteredCards(tipoTurismo) {
+// Função para obter todas as viagens de um tipo de turismo
+function getAllTripsForTipoTurismo(tipoTurismo) {
+  return getTripsByTurismo(tipoTurismo);
+}
+
+// Função para filtrar e ordenar viagens
+function filterAndSortTrips(trips, { sortDate, sortPrice, minPrice, maxPrice }) {
+  let filtered = [...trips];
+
+  // Filtrar por preço mínimo/máximo
+  if (minPrice !== "" && !isNaN(Number(minPrice))) {
+    filtered = filtered.filter((v) => Number(v.custo) >= Number(minPrice));
+  }
+  if (maxPrice !== "" && !isNaN(Number(maxPrice))) {
+    filtered = filtered.filter((v) => Number(v.custo) <= Number(maxPrice));
+  }
+
+  // Ordenar por data
+  if (sortDate === "recent" || sortDate === "oldest") {
+    filtered.sort((a, b) => {
+      // Assume formato "dd/mm/yyyy ..." para partida
+      const parseDate = (str) => {
+        if (!str) return new Date(0);
+        const [d, m, yRest] = str.split("/");
+        const [y] = yRest ? yRest.split(" ") : [""];
+        return new Date(`${y}-${m}-${d}`);
+      };
+      const dateA = parseDate(a.partida);
+      const dateB = parseDate(b.partida);
+      return sortDate === "recent" ? dateB - dateA : dateA - dateB;
+    });
+  }
+
+  // Ordenar por preço
+  if (sortPrice === "price-asc") {
+    filtered.sort((a, b) => Number(a.custo) - Number(b.custo));
+  } else if (sortPrice === "price-desc") {
+    filtered.sort((a, b) => Number(b.custo) - Number(a.custo));
+  }
+
+  return filtered;
+}
+
+// Renderiza os cards das viagens filtradas (agora recebe lista de viagens)
+function renderFilteredCardsFromList(viagens, tipoTurismo) {
   const container = document.querySelector(".card-viagens");
   if (!container) return;
-  const viagens = getTripsByTurismo(tipoTurismo);
   container.innerHTML = "";
+  if (!viagens.length) {
+    container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Nenhuma viagem encontrada.</div>`;
+    return;
+  }
   viagens.forEach((viagem) => {
     const cidade = viagem.destino || "Destino";
     const formatarData = (dataStr) => {
@@ -183,6 +229,52 @@ function getTipoTurismoFromURL() {
   return params.get("turismo") || "";
 }
 
+// Função para ler os valores dos filtros
+function getFilterValues() {
+  return {
+    sortDate: document.getElementById("sort-date")?.value || "",
+    sortPrice: document.getElementById("sort-price")?.value || "",
+    minPrice: document.getElementById("min-price")?.value || "",
+    maxPrice: document.getElementById("max-price")?.value || "",
+  };
+}
+
+// Função principal para aplicar filtros e renderizar
+function applyFiltersAndRender(tipoTurismo) {
+  const allTrips = getAllTripsForTipoTurismo(tipoTurismo);
+  const filters = getFilterValues();
+  const filteredTrips = filterAndSortTrips(allTrips, filters);
+  renderFilteredCardsFromList(filteredTrips, tipoTurismo);
+}
+
+// Adiciona listeners aos filtros
+function setupFilterListeners(tipoTurismo) {
+  ["sort-date", "sort-price", "min-price", "max-price"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("change", () => applyFiltersAndRender(tipoTurismo));
+      el.addEventListener("input", () => applyFiltersAndRender(tipoTurismo));
+    }
+  });
+  // Botão "Limpar Filtros"
+  const btn = document.querySelector("button.bg-Button-Main");
+  if (btn) {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Limpa os filtros
+      const sortDate = document.getElementById("sort-date");
+      const sortPrice = document.getElementById("sort-price");
+      const minPrice = document.getElementById("min-price");
+      const maxPrice = document.getElementById("max-price");
+      if (sortDate) sortDate.value = "";
+      if (sortPrice) sortPrice.value = "";
+      if (minPrice) minPrice.value = "";
+      if (maxPrice) maxPrice.value = "";
+      applyFiltersAndRender(tipoTurismo);
+    });
+  }
+}
+
 // Carrega componentes e inicializa dados ao carregar a página
 document.addEventListener("DOMContentLoaded", () => {
   loadComponent("../html/_header.html", "header-placeholder");
@@ -191,12 +283,13 @@ document.addEventListener("DOMContentLoaded", () => {
   Flight.init();
   const tipoTurismo = getTipoTurismoFromURL();
   if (tipoTurismo) {
-    renderFilteredCards(tipoTurismo);
+    applyFiltersAndRender(tipoTurismo);
     // Atualiza o título
     const title = document.getElementById("tourism-title");
     if (title) {
       title.textContent = TURISMO_LABELS[tipoTurismo] || "Turismo";
     }
+    setupFilterListeners(tipoTurismo);
   }
   renderTourismTypesBar();
 });
