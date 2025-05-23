@@ -8,19 +8,15 @@ import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
 
 // Tradução dos tipos de turismo para apresentação nos cards
 const TURISMO_LABELS = {
-  TurismodeSolePraia: "turismo de sol e praia",
-  Turismoreligioso: "turismo religioso",
-  TurismoUrbano: "turismo urbano",
-  Turismogastronomico: "turismo gastronómico",
-  TurismoNatureza: "turismo natureza",
-  TurismoAventura: "turismo aventura",
-  Turismocultural: "turismo cultural",
-  TurismoRural: "turismo rural",
-  TurismoDesportivo: "turismo desportivo",
-  TurismoSaude: "turismo saúde",
-  Turismodenegocios: "turismo de negócios",
-  SaudeeBemEstar: "saúde e bem-estar",
-  Ecoturismo: "ecoturismo",
+  TurismodeSolePraia: "Turismo de Sol e Praia",
+  Turismoreligioso: "Turismo Religioso",
+  TurismoUrbano: "Turismo Urbano",
+  Turismogastronomico: "Turismo Gastronómico",
+  Turismocultural: "Turismo Cultural",
+  Turismorural: "Turismo Rural",
+  Turismodenegocios: "Turismo de negócios",
+  SaudeeBemEstar: "Saúde e Bem-estar",
+  Ecourismo: "Ecoturismo",
 };
 
 // Renderiza os cards das viagens filtradas
