@@ -227,6 +227,9 @@ export function loadComponent(componentPath, elementId) {
       if (componentPath.includes("_header.html")) {
         const themeToggle = document.getElementById("theme-toggle");
         if (themeToggle) {
+          // Atualiza o ícone do tema de acordo com o tema atual
+          const theme = localStorage.getItem("theme");
+          themeToggle.textContent = theme === "dark" ? "light_mode" : "dark_mode";
           themeToggle.addEventListener("click", () =>
             toggleThemeIcon(themeToggle)
           );
