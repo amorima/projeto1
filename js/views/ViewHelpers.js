@@ -15,7 +15,8 @@ tailwind.config = {
         "Text-Body": "#222222",
         "Text-Subtitles": "#808080",
         "Button-Main": "#126B76",
-        "Components-Limit-Color": "linear-gradient(90deg, #1B9AAA 0%, #126B76 100%)",
+        "Components-Limit-Color":
+          "linear-gradient(90deg, #1B9AAA 0%, #126B76 100%)",
         "Components-Mapa-Fundo": "#6CD2E7",
         "Background-Card-Bg-Gami": "#F7F7F7",
       },
@@ -69,7 +70,7 @@ export function showCookieBanner() {
   banner.innerHTML = `
     <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm">
   <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow">
-    <img class="w-7 h-7" src="/img/cookie.svg" alt="cookie">
+    <img class="w-7 h-7" src="./img/cookie.svg" alt="cookie">
   </div>
   <div class="flex-1 text-text-body text-xs md:text-sm font-normal font-['IBM_Plex_Sans'] uppercase tracking-wide text-center md:text-left text-black">
     Usamos cookies para personalizar a sua experiência, recomendações e medir o desempenho do site. Ao usar o nosso site, concorda com a nossa política de privacidade.
@@ -229,7 +230,8 @@ export function loadComponent(componentPath, elementId) {
         if (themeToggle) {
           // Atualiza o ícone do tema de acordo com o tema atual
           const theme = localStorage.getItem("theme");
-          themeToggle.textContent = theme === "dark" ? "light_mode" : "dark_mode";
+          themeToggle.textContent =
+            theme === "dark" ? "light_mode" : "dark_mode";
           themeToggle.addEventListener("click", () =>
             toggleThemeIcon(themeToggle)
           );
@@ -269,16 +271,26 @@ function applyStoredTheme() {
 }
 applyStoredTheme();
 
+// Função para obter o caminho correto para os componentes
+function getComponentPath(component) {
+  // Se o ficheiro atual está dentro de /html/, usa ../html/
+  if (window.location.pathname.includes('/html/')) {
+    return `../html/${component}`;
+  }
+  // Caso contrário, estamos na raiz
+  return `./html/${component}`;
+}
+
 // Carregar header automaticamente se existir o placeholder
 document.addEventListener("DOMContentLoaded", () => {
   if (document.getElementById("header-placeholder")) {
-    loadComponent("../html/_header.html", "header-placeholder");
+    loadComponent(getComponentPath("_header.html"), "header-placeholder");
   }
   if (document.getElementById("footer-placeholder")) {
-    loadComponent("../html/_footer.html", "footer-placeholder");
+    loadComponent(getComponentPath("_footer.html"), "footer-placeholder");
   }
   if (document.getElementById("menu-placeholder")) {
-    loadComponent("../html/_menu.html", "menu-placeholder");
+    loadComponent(getComponentPath("_menu.html"), "menu-placeholder");
   }
 });
 
