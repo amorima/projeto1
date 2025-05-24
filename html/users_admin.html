@@ -15,21 +15,21 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <script src="assets/js/ui.js" defer></script>
 </head>
-<body class="font-sans"><header id="header-placeholder"></header>
+<body class="font-sans dark:bg-gray-950 dark:text-gray-100"><header id="header-placeholder"></header>
      
     <nav id="menu-placeholder"></nav>
 
     <section class="max-w-[1270px] mt-6 mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="mt-[126px] w-full h-24 p-8 bg-Background-Card-Bg-Gami rounded-lg overflow-hidden inline-flex justify-between">
-            <h2 class="w-full sm:w-[592px] justify-center text-Button-Main text-4xl font-bold font-['Space_Mono'] justify-start">Gestão de utilizadores</h2>
+        <div class="mt-[126px] w-full h-24 p-8 bg-Background-Card-Bg-Gami dark:bg-gray-900 rounded-lg overflow-hidden inline-flex justify-between">
+            <h2 class="w-full sm:w-[592px] justify-center text-Button-Main dark:text-cyan-400 text-4xl font-bold font-['Space_Mono'] justify-start">Gestão de utilizadores</h2>
             <div class="inline-flex">
                 <div class="w-80 h-11">
-                    <input id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm">
+                    <input id="searchInput" placeholder="Pesquisar..." class="w-full h-full px-4 py-2 border rounded-l-lg shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100">
                 </div>
-                <button id="searchBar" class="h-11 px-5 py-2 mr-4 bg-cyan-600 rounded-r-[5.09px] inline-flex gap-1.5">
+                <button id="searchBar" class="h-11 px-5 py-2 mr-4 bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-800 dark:hover:bg-cyan-700 rounded-r-[5.09px] inline-flex gap-1.5">
                     <span class="material-symbols-outlined text-white cursor-pointer">search</span>
                 </button>
-                <button id="openModal" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5.09px] inline-flex gap-1.5 items-center">
+                <button id="openModal" class="w-40 h-11 px-5 py-2 bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-800 dark:hover:bg-cyan-700 rounded-[5.09px] inline-flex gap-1.5 items-center">
                     <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                     <p class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</p>
                 </button>
@@ -41,43 +41,43 @@
         <!-- Table -->
         <table class="table w-full rounded-t-lg overflow-hidden">
             <!-- Table Header -->
-            <thead class="table-header-group bg-Background-Card-Bg-Gami">
+            <thead class="table-header-group bg-Background-Card-Bg-Gami dark:bg-gray-900">
                 <tr class="table-row rounded-tl-lg rounded-tr-lg overflow-hidden">
-                    <th onclick="sortTableBy('username', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans'] ">Nome de Utilizador
+                    <th onclick="sortTableBy('username', userTableConfig)" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans'] ">Nome de Utilizador
                         <span id="sort-icon-username" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th id="email" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Email
+                    <th id="email" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']">Email
                         <span id="sort-icon-email" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th id="password" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Password
+                    <th id="password" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']">Password
                         <span id="sort-icon-password" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th id="points" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Pontos
+                    <th id="points" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']">Pontos
                         <span id="sort-icon-points" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th id="level" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Nivel
+                    <th id="level" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']">Nivel
                         <span id="sort-icon-level" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th id="private" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">Privacidade
+                    <th id="private" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']">Privacidade
                         <span id="sort-icon-private" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th id="admin" class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']">User/Admin
+                    <th id="admin" class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']">User/Admin
                         <span id="sort-icon-admin" class="material-symbols-outlined text-Text-Subtitles cursor-pointer"></span>
                     </th>
-                    <th class="table-cell py-[16px] text-center text-Text-Subtitles text-xl font-bold font-['IBM_Plex_Sans']"></th>
+                    <th class="table-cell py-[16px] text-center text-Text-Subtitles dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans']"></th>
                 </tr>
             </thead>
             <!-- Table Content -->
             <tbody id="tableContent" class="table-row-group"><!-- Clean the table row when finished -->
                 <tr class="table-row h-[42px]">
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-bold font-['IBM_Plex_Sans']">TRD783</td>
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">OPO</td>
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">STD</td>
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">Tap Air Portugal</td>
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">25/05/2025 10:25</td>
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">S</td>
-                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 text-center text-black text-xl font-normal font-['IBM_Plex_Sans']">S</td>
-                    <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 inline-flex justify-center items-center text-center">
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-bold font-['IBM_Plex_Sans']">TRD783</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-normal font-['IBM_Plex_Sans']">OPO</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-normal font-['IBM_Plex_Sans']">STD</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-normal font-['IBM_Plex_Sans']">Tap Air Portugal</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-normal font-['IBM_Plex_Sans']">25/05/2025 10:25</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-normal font-['IBM_Plex_Sans']">S</td>
+                    <td class="table-cell outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 text-center text-black dark:text-gray-100 text-xl font-normal font-['IBM_Plex_Sans']">S</td>
+                    <td class="table-cell w-48 py-3.5 outline outline-[3px] outline-offset-[-3px] outline-neutral-100 dark:outline-gray-700 inline-flex justify-center items-center text-center">
                         <button class="material-symbols-outlined text-Main-Primary cursor-pointer mr-6">edit_square</button>
                         <button class="material-symbols-outlined text-red-600 cursor-pointer">delete</button>
                     </td>
@@ -85,27 +85,28 @@
             </tbody>            
         </table>
         <!-- Table Tabs -->
-        <div id="pagination-controls" class="inline-flex justify-start items-center gap-[5px] pt-6"><!-- Clean the table tabs when finished -->
-            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
-                <span class="material-symbols-outlined text-zinc-900 cursor-pointer">chevron_left</span>
+        <div id="pagination-controls" class="inline-flex justify-start items-center gap-[5px] pt-6">
+            <!-- Clean the table tabs when finished -->
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color dark:outline-gray-700 inline-flex flex-col justify-center items-center gap-2.5">
+                <span class="material-symbols-outlined text-zinc-900 dark:text-gray-100 cursor-pointer">chevron_left</span>
             </button>
-            <button class="w-8 h-8 px-2.5 py-2 bg-Main-Primary rounded-lg inline-flex flex-col justify-center items-center gap-2.5">
-                <p class="justify-start text-white text-lg font-normal font-['IBM_Plex_Sans']">1</p>
+            <button class="w-8 h-8 px-2.5 py-2 bg-Main-Primary dark:bg-gray-800 rounded-lg inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-white dark:text-gray-100 text-lg font-normal font-['IBM_Plex_Sans']">1</p>
             </button>
-            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
-                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">2</p>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color dark:outline-gray-700 inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black dark:text-gray-100 text-lg font-normal font-['IBM_Plex_Sans']">2</p>
             </button>
-            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
-                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">3</p>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color dark:outline-gray-700 inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black dark:text-gray-100 text-lg font-normal font-['IBM_Plex_Sans']">3</p>
             </button>
-            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
-                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">...</p>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color dark:outline-gray-700 inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black dark:text-gray-100 text-lg font-normal font-['IBM_Plex_Sans']">...</p>
             </button>
-            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
-                <p class="justify-start text-black text-lg font-normal font-['IBM_Plex_Sans']">89</p>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color dark:outline-gray-700 inline-flex flex-col justify-center items-center gap-2.5">
+                <p class="justify-start text-black dark:text-gray-100 text-lg font-normal font-['IBM_Plex_Sans']">89</p>
             </button>
-            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color inline-flex flex-col justify-center items-center gap-2.5">
-                <span class="material-symbols-outlined text-zinc-900 cursor-pointer">chevron_right</span>
+            <button class="w-8 h-8 px-2.5 py-2 rounded-lg outline outline-2 outline-offset-[-2px] outline-Components-Limit-Color dark:outline-gray-700 inline-flex flex-col justify-center items-center gap-2.5">
+                <span class="material-symbols-outlined text-zinc-900 dark:text-gray-100 cursor-pointer">chevron_right</span>
             </button>
         </div>
     </section>
@@ -113,40 +114,40 @@
             <!-- Modal Adicionar -->
     <div id="modal-adicionar" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
         <!-- Conteudo -->
-            <div class="bg-white w-full max-w-2xl mx-auto rounded-xl shadow-lg p-8">
+            <div class="bg-white dark:bg-gray-900 w-full max-w-2xl mx-auto rounded-xl shadow-lg p-8">
                 <!-- Header -->
-                <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main">Adicionar utilizador manual</h2>
+                <h2 class="text-3xl font-bold font-['Space_Mono'] mb-6 text-Button-Main dark:text-cyan-400">Adicionar utilizador manual</h2>
                 <!-- Formulario -->
                 <form class="space-y-4" id="add_user_form">
                     <div>
                         <label for="username" class="block text-base font-light text-Text-Subtitles">Username</label>
-                        <input id="username" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" >
+                        <input id="username" type="text" class="w-full h-11 bg-zinc-100 dark:bg-gray-800 rounded-lg px-3 dark:text-gray-100" >
                     </div>
                     <div>
                         <label for="password" class="block text-base font-light text-Text-Subtitles">Password</label>
-                        <input id="password" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" >
+                        <input id="password" type="text" class="w-full h-11 bg-zinc-100 dark:bg-gray-800 rounded-lg px-3 dark:text-gray-100" >
                     </div>
       
                     <div>
                         <label for="email" class="block text-base font-light text-Text-Subtitles">Email</label>
-                        <input id="email" type="text" class="w-full h-11 bg-zinc-100 rounded-lg px-3" >
+                        <input id="email" type="text" class="w-full h-11 bg-zinc-100 dark:bg-gray-800 rounded-lg px-3 dark:text-gray-100" >
                     </div>
       
                     <div>
                         <label for="points" class="block text-base font-light text-Text-Subtitles">Pontos</label>
-                        <input id="points" type="number" class="w-full h-11 bg-zinc-100 rounded-lg px-3" value="50" min="0">
+                        <input id="points" type="number" class="w-full h-11 bg-zinc-100 dark:bg-gray-800 rounded-lg px-3" value="50" min="0">
                     </div>
       
                     <div>
                         <label for="private" class="block text-base font-light text-Text-Subtitles">Privado</label>
-                        <select id="private" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                        <select id="private" class="w-full h-11 bg-zinc-100 dark:bg-gray-800 rounded-lg px-3">
                             <option value="S">Sim</option>
                             <option value="N">Não</option>
                         </select>
                     </div>
                     <div>
                         <label for="admin" class="block text-base font-light text-Text-Subtitles">Admin</label>
-                        <select id="admin" class="w-full h-11 bg-zinc-100 rounded-lg px-3">
+                        <select id="admin" class="w-full h-11 bg-zinc-100 dark:bg-gray-800 rounded-lg px-3">
                             <option value="Admin">Sim</option>
                             <option value="User">Não</option>
                         </select>
@@ -154,14 +155,14 @@
                 </form>
       
                 <!-- Acções -->
-                <div class="bg-gray-50 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
-                    <button id="createUser" class="w-40 h-11 px-5 py-2 bg-cyan-600 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
+                <div class="bg-gray-50 dark:bg-gray-800 pl-4 mt-3 sm:flex sm:flex-row-reverse sm:pl-6">
+                    <button id="createUser" class="w-40 h-11 px-5 py-2 bg-cyan-600 hover:bg-cyan-700 dark:bg-cyan-800 dark:hover:bg-cyan-700 rounded-[5px] inline-flex flex-col justify-start items-start gap-1.5">
                         <div class="inline-flex justify-start items-center gap-2.5">
                             <span class="material-symbols-outlined text-white cursor-pointer">add_circle</span>
                             <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Adicionar</div>
                         </div>
                     </button>
-                    <button id="cancel" class="w-40 h-11 px-5 py-2 bg-red-600 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
+                    <button id="cancel" class="w-40 h-11 px-5 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-700 rounded-[5px] inline-flex justify-center items-center gap-1.5 mr-8">
                         <div class="flex justify-start items-center gap-2.5">
                             <div class="justify-center text-white text-xl font-bold font-['IBM_Plex_Sans']">Cancelar</div>
                         </div>
