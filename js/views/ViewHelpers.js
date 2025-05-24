@@ -274,8 +274,11 @@ applyStoredTheme();
 // Carregar header automaticamente se existir o placeholder
 document.addEventListener("DOMContentLoaded", () => {
   // Determina o caminho base (root)
-  let root = "./"; // Por defeito, para index.html
-  if (!window.location.pathname.endsWith("/") && !window.location.pathname.endsWith("/index.html")) {
+  let root = "/"; // Por defeito, para index.html
+  if (
+    !window.location.pathname.endsWith("/") &&
+    !window.location.pathname.endsWith("/index.html")
+  ) {
     root = "../";
   }
 
