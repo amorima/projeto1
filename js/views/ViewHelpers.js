@@ -5,58 +5,19 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        "Main-Background": {
-          DEFAULT: "#FFFFFF",
-          dark: "#202124",
-        },
-        "Main-Card-Bg-Gami": {
-          DEFAULT: "#F7F7F7",
-          dark: "#404145",
-        },
-        "Main-Primary": {
-          DEFAULT: "#1B9AAA",
-          dark: "#0E5A63",
-        },
-        "Main-Gray": {
-          DEFAULT: "#F0F0F0",
-          dark: "#23272F",
-        },
-        "Main-Secondary": {
-          DEFAULT: "#126B76",
-          dark: "#0A3A40",
-        },
-        "brand-secondary": {
-          DEFAULT: "#126B76",
-          dark: "#0A3A40",
-        },
-        "Text-Titles": {
-          DEFAULT: "#222222",
-          dark: "#F7F7F7",
-        },
-        "Text-Body": {
-          DEFAULT: "#222222",
-          dark: "#E0E0E0",
-        },
-        "Text-Subtitles": {
-          DEFAULT: "#808080",
-          dark: "#B0B0B0",
-        },
-        "Button-Main": {
-          DEFAULT: "#126B76",
-          dark: "#1B9AAA",
-        },
-        "Components-Limit-Color": {
-          DEFAULT: "linear-gradient(90deg, #1B9AAA 0%, #126B76 100%)",
-          dark: "linear-gradient(90deg, #0E5A63 0%, #0A3A40 100%)",
-        },
-        "Components-Mapa-Fundo": {
-          DEFAULT: "#6CD2E7",
-          dark: "#00102E",
-        },
-        "Background-Card-Bg-Gami": {
-          DEFAULT: "#F7F7F7",
-          dark: "#23272F",
-        },
+        "Main-Background": "#FFFFFF",
+        "Main-Card-Bg-Gami": "#F7F7F7",
+        "Main-Primary": "#1B9AAA",
+        "Main-Gray": "#F0F0F0",
+        "Main-Secondary": "#126B76",
+        "brand-secondary": "#126B76",
+        "Text-Titles": "#222222",
+        "Text-Body": "#222222",
+        "Text-Subtitles": "#808080",
+        "Button-Main": "#126B76",
+        "Components-Limit-Color": "linear-gradient(90deg, #1B9AAA 0%, #126B76 100%)",
+        "Components-Mapa-Fundo": "#6CD2E7",
+        "Background-Card-Bg-Gami": "#F7F7F7",
       },
       fontFamily: {
         sans: [
@@ -280,10 +241,30 @@ export function loadComponent(componentPath, elementId) {
 // Alterna o ícone entre dark_mode e light_mode para um elemento passado
 export function toggleThemeIcon(element) {
   if (!element) return;
-  const isDark = element.textContent === "dark_mode";
-  element.textContent = isDark ? "light_mode" : "dark_mode";
-  // Aqui pode adicionar lógica para alternar o tema global, se necessário
+  const html = document.documentElement;
+  const isDark = html.classList.contains("dark");
+  if (isDark) {
+    html.classList.remove("dark");
+    element.textContent = "dark_mode";
+    localStorage.setItem("theme", "light");
+  } else {
+    html.classList.add("dark");
+    element.textContent = "light_mode";
+    localStorage.setItem("theme", "dark");
+  }
 }
+
+// Aplica o tema guardado no localStorage ao carregar a página
+function applyStoredTheme() {
+  const html = document.documentElement;
+  const theme = localStorage.getItem("theme");
+  if (theme === "dark") {
+    html.classList.add("dark");
+  } else {
+    html.classList.remove("dark");
+  }
+}
+applyStoredTheme();
 
 // Carregar header automaticamente se existir o placeholder
 document.addEventListener("DOMContentLoaded", () => {
@@ -316,8 +297,15 @@ export function getUserLocation(callback) {
   );
 }
 
-export function compareLocation(userLocation, location){
-  if (!userLocation || !location || typeof userLocation.latitude !== "number" || typeof userLocation.longitude !== "number" || typeof location.latitude !== "number" || typeof location.longitude !== "number") {
+export function compareLocation(userLocation, location) {
+  if (
+    !userLocation ||
+    !location ||
+    typeof userLocation.latitude !== "number" ||
+    typeof userLocation.longitude !== "number" ||
+    typeof location.latitude !== "number" ||
+    typeof location.longitude !== "number"
+  ) {
     return Infinity;
   }
   const distance = Math.sqrt(
@@ -327,7 +315,7 @@ export function compareLocation(userLocation, location){
   return distance;
 }
 
-export function closestAirport(userLocation, locationArray){
+export function closestAirport(userLocation, locationArray) {
   let closest = null;
   let minDistance = Infinity;
 
