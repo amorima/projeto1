@@ -1,5 +1,12 @@
 // ViewHelpers.js – funções de UI para as Views
 
+import {
+  getUserPreference,
+  setUserPreference,
+  isSystemDarkTheme,
+  getThemePreference,
+} from "../models/ModelHelpers.js";
+
 tailwind.config = {
   darkMode: "class",
   theme: {
@@ -56,7 +63,7 @@ tailwind.config = {
 
 export function showCookieBanner() {
   // Só mostra se ainda não foi aceite
-  if (localStorage.getItem("cookieAccepted") === "true") return;
+  if (getUserPreference("cookieAccepted") === "true") return;
 
   // Cria o banner
   const banner = document.createElement("div");
@@ -84,7 +91,7 @@ export function showCookieBanner() {
   document.body.appendChild(banner);
 
   document.getElementById("accept-cookies-btn").onclick = () => {
-    localStorage.setItem("cookieAccepted", "true");
+    setUserPreference("cookieAccepted", "true");
     banner.remove();
   };
 }
@@ -229,9 +236,8 @@ export function loadComponent(componentPath, elementId) {
         const themeToggle = document.getElementById("theme-toggle");
         if (themeToggle) {
           // Atualiza o ícone do tema de acordo com o tema atual
-          const theme = localStorage.getItem("theme");
-          themeToggle.textContent =
-            theme === "dark" ? "light_mode" : "dark_mode";
+          const isDark = document.documentElement.classList.contains("dark");
+          themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
           themeToggle.addEventListener("click", () =>
             toggleThemeIcon(themeToggle)
           );
@@ -251,18 +257,19 @@ export function toggleThemeIcon(element) {
   if (isDark) {
     html.classList.remove("dark");
     element.textContent = "dark_mode";
-    localStorage.setItem("theme", "light");
+    setUserPreference("theme", "light");
   } else {
     html.classList.add("dark");
     element.textContent = "light_mode";
-    localStorage.setItem("theme", "dark");
+    setUserPreference("theme", "dark");
   }
 }
 
-// Aplica o tema guardado no localStorage ao carregar a página
+// Aplica o tema guardado no localStorage ou a preferência do sistema ao carregar a página
 function applyStoredTheme() {
   const html = document.documentElement;
-  const theme = localStorage.getItem("theme");
+  const theme = getThemePreference();
+
   if (theme === "dark") {
     html.classList.add("dark");
   } else {
