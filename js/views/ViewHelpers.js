@@ -271,26 +271,22 @@ function applyStoredTheme() {
 }
 applyStoredTheme();
 
-// Função para obter o caminho correto para os componentes
-function getComponentPath(component) {
-  // Se o ficheiro atual está dentro de /html/, usa ../html/
-  if (window.location.pathname.includes('/html/')) {
-    return `../html/${component}`;
-  }
-  // Caso contrário, estamos na raiz
-  return `./html/${component}`;
-}
-
 // Carregar header automaticamente se existir o placeholder
 document.addEventListener("DOMContentLoaded", () => {
+  // Determina o caminho base (root)
+  let root = "./"; // Por defeito, para index.html
+  if (!window.location.pathname.endsWith("/") && !window.location.pathname.endsWith("/index.html")) {
+    root = "../";
+  }
+
   if (document.getElementById("header-placeholder")) {
-    loadComponent(getComponentPath("_header.html"), "header-placeholder");
+    loadComponent(`${root}html/_header.html`, "header-placeholder");
   }
   if (document.getElementById("footer-placeholder")) {
-    loadComponent(getComponentPath("_footer.html"), "footer-placeholder");
+    loadComponent(`${root}html/_footer.html`, "footer-placeholder");
   }
   if (document.getElementById("menu-placeholder")) {
-    loadComponent(getComponentPath("_menu.html"), "menu-placeholder");
+    loadComponent(`${root}html/_menu.html`, "menu-placeholder");
   }
 });
 
