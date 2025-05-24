@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planeador de Viagens Inteligente</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
@@ -13,8 +14,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
     <link rel="stylesheet" href="../css/main.css">
-    <script src="../js/ui.js" defer></script>
     <script src="../js/views/NavbarView.js" defer></script>
+    <script>
+    try {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+        }
+    } catch (e) {}
+    </script>
 
 </head>
 <body class="font-sans">
