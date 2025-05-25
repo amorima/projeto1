@@ -30,27 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }).observe(document.documentElement, { attributes: true });
 
-  // Configuração do painel deslizante
+  // Configuração do painel deslizante usando classes Tailwind
   const panel = document.getElementById("slide-panel");
-  Object.assign(panel.style, {
-    position: "fixed",
-    top: "6rem",
-    left: "0",
-    bottom: "0",
-    width: "0",
-    overflow: "auto",
-    transition: "width 0.3s ease",
-    boxShadow: "2px 0 6px rgba(0,0,0,0.1)",
-    zIndex: "1000",
-  });
-  // classes Tailwind para cores e tipografia
-  panel.classList.add(
-    "bg-white",
-    "dark:bg-gray-800",
-    "text-gray-900",
-    "dark:text-gray-100",
-    "font-sans"
-  );
+  panel.className =
+    "fixed top-24 left-0 bottom-0 w-0 overflow-auto transition-all duration-300 ease-in-out " +
+    "shadow-md z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans";
+
+  // Certifica que o painel está acima do mapa
+  document.getElementById("map").style.zIndex = "10";
 
   /**
    * Preenche o painel com os dados da viagem e anima a sua aparição.
@@ -85,10 +72,31 @@ document.addEventListener("DOMContentLoaded", () => {
     panel.style.width = "25%";
   }
 
+  // Função para criar um marcador personalizado com o preço da viagem
+  function criarMarcadorPreco(trip, latlng) {
+    const customIcon = L.divIcon({
+      className: "price-marker",
+      html: `
+        <div class="bg-Main-Primary dark:bg-Main-Primary text-white font-sans font-bold py-1 px-3 rounded-lg text-sm whitespace-nowrap">
+          €${trip.custo}
+        </div>
+      `,
+      iconSize: [60, 25],
+      iconAnchor: [30, 13], // Centra o marcador na posição
+    });
+
+    // Cria o marcador com o ícone personalizado
+    return L.marker(latlng, { icon: customIcon });
+  }
+
   // Criação dos marcadores para cada viagem com coords
   enriched.forEach(({ trip, coords }) => {
     const { latitude, longitude } = coords;
-    const marker = L.marker([latitude, longitude]).addTo(map);
+
+    // Cria um marcador personalizado com o preço
+    const marker = criarMarcadorPreco(trip, [latitude, longitude]).addTo(map);
+
+    // Adiciona o evento de clique para mostrar o painel
     marker.on("click", () => showPanel(trip));
   });
 });
