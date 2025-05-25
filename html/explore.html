@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <!-- ...existing head... -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+  <!-- ...existing head... -->
+</head>
+<body class="font-sans dark:bg-gray-950 dark:text-gray-100">
+  <!-- header e menu carregados via ViewHelpers.js -->
+  <header id="header-placeholder"></header>
+  <nav id="menu-placeholder"></nav>
+
+  <!-- área do mapa em full screen (menos o header de 6rem) -->
+  <div
+    id="map"
+    style="height: calc(100vh - 6rem); margin-top: 6rem;"
+  ></div>
+
+  <!-- painel deslizante escondido por defeito -->
+  <div id="slide-panel"></div>
+
+  <!-- footer carregado via ViewHelpers.js -->
+  <footer id="footer-placeholder"></footer>
+
+  <!-- scripts -->
+  <script src="../js/init.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script type="module" src="../js/views/ExploreView.js"></script>
+</body>
+</html>
