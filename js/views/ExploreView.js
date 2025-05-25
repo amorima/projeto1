@@ -5,11 +5,30 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
   const enriched = getTripsWithCoordinates();
-  
+
+  // URLs para tile layers claro e escuro
+  const lightTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const darkTileUrl =
+    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+
+  // Criação do mapa centrado na Europa e layer inicial conforme o tema
   const map = L.map("map").setView([47.526, 8.2551], 5);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map);
+  const baseLayer = L.tileLayer(
+    document.documentElement.classList.contains("dark")
+      ? darkTileUrl
+      : lightTileUrl,
+    { attribution: "&copy; OpenStreetMap contributors" }
+  ).addTo(map);
+
+  // Observa alterações na classe 'dark' para alternar o tile layer
+  new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (m.attributeName === "class") {
+        const isDark = document.documentElement.classList.contains("dark");
+        baseLayer.setUrl(isDark ? darkTileUrl : lightTileUrl);
+      }
+    }
+  }).observe(document.documentElement, { attributes: true });
 
   // Configuração do painel deslizante
   const panel = document.getElementById("slide-panel");
@@ -38,10 +57,12 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function showPanel(trip) {
     panel.innerHTML = `
-      <button id="close-panel" class="absolute top-4 right-4 text-2xl">✕</button>
-      <div class="p-4 mt-8">
-        <img src="${trip.imagem}" alt="${trip.destino}" class="w-full h-auto rounded"/>
-        <h2 class="mt-4 text-2xl font-bold">${trip.destino}</h2>
+      <div class="relative">
+        <img src="${trip.imagem}" alt="${trip.destino}" class="w-full h-48 object-cover"/>
+        <button id="close-panel" class="absolute top-2 right-2 text-2xl bg-black bg-opacity-50 text-white rounded-full w-8 h-8 flex items-center justify-center">✕</button>
+      </div>
+      <div class="p-4">
+        <h2 class="text-2xl font-bold">${trip.destino}</h2>
         <p class="mt-2">Ida: ${trip.partida}</p>
         <p>Volta: ${trip.dataVolta}</p>
         <div id="rating" class="flex gap-1 mt-2"></div>
