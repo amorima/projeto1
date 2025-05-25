@@ -22,25 +22,31 @@ document.addEventListener("DOMContentLoaded", () => {
     bottom: "0",
     width: "0",
     overflow: "auto",
-    background: "#ffffff",
     transition: "width 0.3s ease",
     boxShadow: "2px 0 6px rgba(0,0,0,0.1)",
     zIndex: "1000",
   });
+  // classes Tailwind para cores e tipografia
+  panel.classList.add(
+    "bg-white",
+    "dark:bg-gray-800",
+    "text-gray-900",
+    "dark:text-gray-100",
+    "font-sans"
+  );
 
   /**
    * Preenche o painel com os dados da viagem e anima a sua aparição.
-   * @param {Object} trip  – objeto viagem
    */
   function showPanel(trip) {
     panel.innerHTML = `
-      <button id="close-panel" style="position:absolute; top:1rem; right:1rem;">✕</button>
-      <div style="padding:1rem; margin-top:2rem;">
-        <img src="${trip.imagem}" alt="${trip.destino}" style="width:100%; height:auto;"/>
-        <h2>${trip.destino}</h2>
-        <p>Ida: ${trip.partida}</p>
+      <button id="close-panel" class="absolute top-4 right-4 text-2xl">✕</button>
+      <div class="p-4 mt-8">
+        <img src="${trip.imagem}" alt="${trip.destino}" class="w-full h-auto rounded"/>
+        <h2 class="mt-4 text-2xl font-bold">${trip.destino}</h2>
+        <p class="mt-2">Ida: ${trip.partida}</p>
         <p>Volta: ${trip.dataVolta}</p>
-        <div id="rating" style="display:flex; gap:0.25rem; margin-top:0.5rem;"></div>
+        <div id="rating" class="flex gap-1 mt-2"></div>
       </div>
     `;
     // Geração de estrelas de avaliação (0 a 5)
@@ -48,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const stars = trip.avaliacao || 0;
     for (let i = 0; i < 5; i++) {
       const star = document.createElement("span");
-      star.className = "material-symbols-outlined";
+      star.className = "material-symbols-outlined text-yellow-400";
       star.textContent = i < stars ? "star" : "star_border";
       ratingDiv.appendChild(star);
     }

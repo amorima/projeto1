@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-  <!-- ...existing head... -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
-  />
-  <!-- ...existing head... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+    <link rel="icon" type="image/ico" href="img/favicon.ico">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 </head>
 <body class="font-sans dark:bg-gray-950 dark:text-gray-100">
-  <!-- header e menu carregados via ViewHelpers.js -->
   <header id="header-placeholder"></header>
   <nav id="menu-placeholder"></nav>
 
-  <!-- área do mapa em full screen (menos o header de 6rem) -->
+  <!-- área do mapa em full screen (menos o header) -->
   <div
     id="map"
     style="height: calc(100vh - 6rem); margin-top: 6rem;"
@@ -22,12 +29,10 @@
   <!-- painel deslizante escondido por defeito -->
   <div id="slide-panel"></div>
 
-  <!-- footer carregado via ViewHelpers.js -->
-  <footer id="footer-placeholder"></footer>
-
   <!-- scripts -->
   <script src="../js/init.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script type="module" src="../js/views/ExploreView.js"></script>
+  <script type="module" src="../js/views/ViewHelpers.js"></script>
 </body>
 </html>
