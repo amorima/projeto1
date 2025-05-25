@@ -10,7 +10,12 @@
   scroll-behavior: smooth;    /* roll suave */
 }
 
-/* Cursor “grabbing” e desativa seleção de texto/imagem ao arrastar */
+#map { 
+  height: calc(100vh - 6rem); 
+  margin-top: 6rem;
+}
+
+/* Cursor grabbing e desativa seleção de texto/imagem ao arrastar */
 #slider.grabbing {
   cursor: grabbing;
   user-select: none;
