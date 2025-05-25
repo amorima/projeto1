@@ -8,16 +8,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // URLs para tile layers claro e escuro
   const lightTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-  const darkTileUrl =
-    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+  const darkTileUrl = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
 
   // Criação do mapa centrado na Europa e layer inicial conforme o tema
-  const map = L.map("map").setView([47.526, 8.2551], 5);
+  const map = L.map("map", { zoomControl: false }).setView([47.526, 8.2551], 5);
   const baseLayer = L.tileLayer(
     document.documentElement.classList.contains("dark")
       ? darkTileUrl
       : lightTileUrl,
-    { attribution: "&copy; OpenStreetMap contributors" }
+    { attribution: "&copy; OpenStreetMap - ESMAD - P.PORTO" }
   ).addTo(map);
 
   // Observa alterações na classe 'dark' para alternar o tile layer
@@ -77,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const customIcon = L.divIcon({
       className: "price-marker",
       html: `
-        <div class="bg-Main-Primary dark:bg-Main-Primary text-white font-sans font-bold py-1 px-3 rounded-lg text-sm whitespace-nowrap">
+        <div class="bg-Main-Primary dark:bg-Main-Primary text-white font-sans font-bold py-1 px-3 rounded-full text-sm whitespace-nowrap">
           €${trip.custo}
         </div>
       `,
