@@ -1,14 +1,12 @@
-import { init, getAll } from "../models/FlightModel.js";
+import { init, getTripsWithCoordinates } from "../models/FlightModel.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização do modelo de viagens
   init();
-  const trips = getAll();
-  // Carregamento dos aeroportos existentes para obter coordenadas
-  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
 
-  // Criação do mapa centrado na Europa
-  const map = L.map("map").setView([54.526, 15.2551], 4);
+  const enriched = getTripsWithCoordinates();
+  
+  const map = L.map("map").setView([47.526, 8.2551], 5);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
@@ -66,16 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
     panel.style.width = "25%";
   }
 
-  // Criação dos marcadores para cada viagem
-  trips.forEach((trip) => {
-    // Encontrar coordenadas do destino pelo nome de cidade
-    const aeroport = aeroportos.find(
-      (a) => a.cidade.toLowerCase() === trip.destino.toLowerCase()
-    );
-    if (aeroport?.location) {
-      const { latitude, longitude } = aeroport.location;
-      const marker = L.marker([latitude, longitude]).addTo(map);
-      marker.on("click", () => showPanel(trip));
-    }
+  // Criação dos marcadores para cada viagem com coords
+  enriched.forEach(({ trip, coords }) => {
+    const { latitude, longitude } = coords;
+    const marker = L.marker([latitude, longitude]).addTo(map);
+    marker.on("click", () => showPanel(trip));
   });
 });

@@ -92,6 +92,31 @@ export function getTripsByTurismo(turismoTipo) {
 }
 
 /**
+ * Devolve array de aeroportos do localStorage.
+ * @returns {Array<{cidade:string,location:{latitude:number,longitude:number}}>}
+ */
+export function getAeroportos() {
+  return JSON.parse(localStorage.getItem("aeroportos")) || [];
+}
+
+/**
+ * Associa a cada viagem as suas coordenadas, filtrando as que têm dados.
+ * @returns {Array<{trip:Object,coords:{latitude:number,longitude:number}}>}
+ */
+export function getTripsWithCoordinates() {
+  const aps = getAeroportos();
+  return viagens
+    .map((trip) => {
+      const ap = aps.find(
+        (a) => a.cidade.toLowerCase() === trip.destino.toLowerCase()
+      );
+      if (ap?.location) return { trip, coords: ap.location };
+      return null;
+    })
+    .filter((x) => x !== null);
+}
+
+/**
  * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
  */
 class Trip {
