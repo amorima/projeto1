@@ -65,10 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     // Fechar painel ao clicar no botão
     panel.querySelector("#close-panel").onclick = () => {
-      panel.style.width = "0";
+      panel.className = "w-0";
     };
     // Animação de abertura
-    panel.style.width = "25%";
+    panel.classList.remove("w-0");
+    panel.className = "fixed top-24 left-0 bottom-0 w-full sm:w-96 overflow-auto transition-all duration-300 ease-in-out shadow-md z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans";
   }
 
   // Função para criar um marcador personalizado com o preço da viagem
