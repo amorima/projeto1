@@ -34,15 +34,19 @@ const loadComponent = async (url, placeholderId) => {
 
 // Carregar os componentes quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('_header.html', 'header-placeholder');
+    loadComponent('_header.html', 'header-placeholder').then(()=>{
+        LogIn();
+    });
     loadComponent('_footer.html', 'footer-placeholder');
     loadComponent('_menu.html', 'menu-placeholder');
 });
 
 function LogIn () {
     document.getElementById('profile').addEventListener('click', ()=>{
+        console.log("clicked")
         if(User.isLogged()){
             //go to profile
+            window.location.href = 'profile.html'; 
         }else{
             openModal('profile-modal')
             document.getElementById('').addEventListener('submit', (e)=>{ //TODO: When modal Ready add o id do form
