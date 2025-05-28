@@ -2,16 +2,18 @@ import { loadFromLocalStorage, saveToLocalStorage } from './ModelHelpers.js';
 
 // ARRAY USERS
 let users;
+let newsletter
 
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
   users = localStorage.users ? loadFromLocalStorage('users', users) : [];
+  newsletter = localStorage.newsletter ? loadFromLocalStorage('newsletter', newsletter) : []
 }
 
 // ADICIONAR UTILIZADOR
 export function add(username, password, mail) {
   if (users.some((user) => user.mail === mail)) {
-    throw Error(`User with user "${mail}" already exists!`);
+    throw Error(`User with email "${mail}" already exists!`);
   } else {
     users.push(new User(username, password, mail));
     saveToLocalStorage('users', users);
@@ -67,6 +69,26 @@ export function getUserLogged() {
   return JSON.parse(sessionStorage.getItem("loggedUser"));
 }
 
+// USER NEWSLETTER
+export function addNewsletterUser(mail) {
+  const newsletterUser = new User('','',mail)
+  newsletter.push(newsletterUser)
+  saveToLocalStorage('newsletter',newsletter)
+}
+export function removeNewsletterUser(mail) {
+  const index = newsletter.findIndex(n => n.mail == mail)
+  if(index !== -1){
+    newsletter.splice(index,1)
+    saveToLocalStorage('newsletter',newsletter)
+    return true
+  }
+  throw Error ('No Subscription Found')
+}
+export function newsletterToUser(username, password, mail){ //! May not be needed
+  removeNewsletterUser(mail)
+  add(username, password, mail)
+}
+
 /**
  * CLASSE QUE MODELA UM UTILIZADOR NA APLICAÇÃO
  */
@@ -78,7 +100,7 @@ class User {
   private = false
   admin = false
 
-  constructor(username, password, mail, points = 50, private = false, admin = false) {
+  constructor(username = '', password = '', mail, points = 50, private = false, admin = false) {
     this.username = username;
     this.password = password;
     this.mail = mail;

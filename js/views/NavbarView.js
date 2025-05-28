@@ -1,3 +1,15 @@
+import * as User from '../models/UserModel.js'
+import {
+  showCookieBanner,
+  getFormData,
+  showToast,
+  closeModal,
+  selectOptions,
+  updateTable,
+  getUserLocation,
+  closestAirport,
+  openModal,
+} from "./ViewHelpers.js";
 // Função para carregar HTML de um ficheiro para um elemento
 const loadComponent = async (url, placeholderId) => {
     const placeholder = document.getElementById(placeholderId);
@@ -26,3 +38,31 @@ document.addEventListener('DOMContentLoaded', () => {
     loadComponent('_footer.html', 'footer-placeholder');
     loadComponent('_menu.html', 'menu-placeholder');
 });
+
+function LogIn () {
+    document.getElementById('profile').addEventListener('click', ()=>{
+        if(User.isLogged()){
+            //go to profile
+        }else{
+            openModal('profile-modal')
+            document.getElementById('').addEventListener('submit', (e)=>{ //TODO: When modal Ready add o id do form
+                e.preventDefault()
+                data = getFormData('') //TODO: When modal Ready add o id do form
+                username = data.username
+                email = data.email
+                password = data.password
+                User.add(username, password, email)
+                User.login(username, password)
+                closeModal('')//id modal
+                openModal('newletter-modal')
+                document.getElementById('').addEventListener('click', () => {//add yes button id
+                    //sign for newletter
+                    closeModal('newsletter-modal')
+                })
+                document.getElementById('').addEventListener('click', () => {//add no button id
+                    closeModal('newsletter-modal')
+                })
+            })
+        }
+    })
+}
