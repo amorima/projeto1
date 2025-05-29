@@ -34,14 +34,13 @@ const loadComponent = async (url, placeholderId) => {
 
 // Carregar os componentes quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('_header.html', 'header-placeholder').then(()=>{
-        LogIn();
-    });
+    loadComponent('_header.html', 'header-placeholder')
     loadComponent('_footer.html', 'footer-placeholder');
     loadComponent('_menu.html', 'menu-placeholder');
+    LoginNav(); //! Inst Loading correctly
 });
 
-function LogIn () {
+function LoginNav () {
     document.getElementById('profile').addEventListener('click', ()=>{
         console.log("clicked")
         if(User.isLogged()){
@@ -59,11 +58,11 @@ function LogIn () {
                 User.login(username, password)
                 closeModal('')//id modal
                 openModal('newletter-modal')
-                document.getElementById('').addEventListener('click', () => {//add yes button id
-                    //sign for newletter
+                document.getElementById('').addEventListener('click', () => {//TODO: add yes button id
+                    User.addNewsletterUser(email)
                     closeModal('newsletter-modal')
                 })
-                document.getElementById('').addEventListener('click', () => {//add no button id
+                document.getElementById('').addEventListener('click', () => {//TODO: add no button id
                     closeModal('newsletter-modal')
                 })
             })
