@@ -46,7 +46,11 @@ export function LoginNav() {
     console.log("clicked");
     if (User.isLogged()) {
       //go to profile
-      window.location.href = "profile.html";
+      if(isAdmin(User.getUserLogged())){
+        window.location.href = "dashboard_admin.html"
+      }else{
+        window.location.href = "profile.html";
+      }
     } else {
       openModal("profile-modal");
       document.getElementById("").addEventListener("submit", (e) => {

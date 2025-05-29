@@ -89,6 +89,10 @@ export function newsletterToUser(username, password, mail){ //! May not be neede
   add(username, password, mail)
 }
 
+export function isAdmin(user){
+  user.admin ? true : false;
+}
+
 /**
  * CLASSE QUE MODELA UM UTILIZADOR NA APLICAÇÃO
  */
@@ -96,14 +100,16 @@ class User {
   username = "";
   password = "";
   mail = "";
+  avatar = "";
   points = 0;
   private = false
   admin = false
 
-  constructor(username = '', password = '', mail, points = 50, private = false, admin = false) {
+  constructor(username = '', password = '', mail, avatar = '', points = 50, private = false, admin = false) {
     this.username = username;
     this.password = password;
     this.mail = mail;
+    this.avatar = avatar
     this.points = points;
     this.private = private;
     this.admin = admin;
