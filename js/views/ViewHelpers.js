@@ -239,6 +239,7 @@ export function loadComponent(componentPath, elementId) {
           typeof window.navbarView.initThemeToggle === "function"
         ) {
           window.navbarView.initThemeToggle();
+          window.navbarView.loginNav();
         } else {
           // Inicialização direta caso o módulo não esteja disponível
           const themeToggle = document.getElementById("theme-toggle");
