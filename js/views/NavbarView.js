@@ -35,13 +35,13 @@ const loadComponent = async (url, placeholderId) => {
 // Carregar os componentes quando o DOM estiver pronto
 document.addEventListener("DOMContentLoaded", () => {
   loadComponent("_header.html", "header-placeholder").then(() => {
-    LogIn();
+    LoginNav();
   });
   loadComponent("_footer.html", "footer-placeholder");
   loadComponent("_menu.html", "menu-placeholder");
 });
 
-function LogIn() {
+export function LoginNav() {
   document.getElementById("profile").addEventListener("click", () => {
     console.log("clicked");
     if (User.isLogged()) {
@@ -86,4 +86,5 @@ export function initThemeToggle() {
 
 window.navbarView = {
   initThemeToggle,
+  LoginNav,
 };
