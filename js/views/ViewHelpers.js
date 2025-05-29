@@ -231,16 +231,24 @@ export function loadComponent(componentPath, elementId) {
     })
     .then((html) => {
       document.getElementById(elementId).innerHTML = html;
-      // Se for o header, registar o evento do tema
+      // Se for o header, inicializar o botão de tema
       if (componentPath.includes("_header.html")) {
-        const themeToggle = document.getElementById("theme-toggle");
-        if (themeToggle) {
-          // Atualiza o ícone do tema de acordo com o tema atual
-          const isDark = document.documentElement.classList.contains("dark");
-          themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
-          themeToggle.addEventListener("click", () =>
-            toggleThemeIcon(themeToggle)
-          );
+        // Chamar função global para inicializar o botão de tema
+        if (
+          typeof window.navbarView !== "undefined" &&
+          typeof window.navbarView.initThemeToggle === "function"
+        ) {
+          window.navbarView.initThemeToggle();
+        } else {
+          // Inicialização direta caso o módulo não esteja disponível
+          const themeToggle = document.getElementById("theme-toggle");
+          if (themeToggle) {
+            const isDark = document.documentElement.classList.contains("dark");
+            themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
+            themeToggle.addEventListener("click", () =>
+              toggleThemeIcon(themeToggle)
+            );
+          }
         }
       }
     })
