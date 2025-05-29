@@ -3,6 +3,30 @@ console.log("init.js carregado");
 initdata();
 
 function initdata() {
+  // Utilizador inicial
+  if (!localStorage.user) {
+    const user = [
+      {
+        username: "António Amorim",
+        avatar: "/img/users/40240119.jpg",
+        pontos: "3500",
+        email: "40240119@esmad.ipp.pt",
+        password: "40240119",
+        private: false,
+        admin: false,
+      },
+      {
+        username: "Gabriel Paiva",
+        avatar: "/img/users/40240137.jpg",
+        pontos: "0",
+        email: "40240137@esmad.ipp.pt",
+        password: "40240137",
+        private: false,
+        admin: true,
+      },
+    ];
+    localStorage.setItem("user", JSON.stringify(user));
+  }
   // Aeroportos
   if (!localStorage.aeroportos) {
     const aeroportos = [
@@ -2136,7 +2160,7 @@ function initdata() {
         partida: "11/10/2025 11:15",
         chegada: "11/10/2025 13:20",
         direto: "S",
-        custo:  150,
+        custo: 150,
         imagem: "https://placehold.co/413x327",
         dataVolta: "16/10/2025 11:15",
         turismo: ["TurismoUrbano", "Turismogastronomico"],
