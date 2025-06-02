@@ -106,3 +106,33 @@ function mostrarConfettiNoToast() {
     confettiDiv.remove();
   }, 2000);
 }
+
+/* toggle do coração favorito no itinerário */
+const favItinerary = document.getElementById("fav-itinerary");
+if (favItinerary) {
+  /* impede que o coração seja selecionável */
+  favItinerary.style.userSelect = "none";
+  favItinerary.addEventListener("mousedown", function (e) {
+    /* impede seleção de texto ao clicar rápido */
+    e.preventDefault();
+  });
+  favItinerary.addEventListener("click", function () {
+    /* apanha o span do ícone */
+    const icon = favItinerary.querySelector("span");
+    /* verifica o estado atual */
+    const isFav = favItinerary.getAttribute("data-favorito") === "true";
+    /* alterna o estado */
+    favItinerary.setAttribute("data-favorito", String(!isFav));
+    /* muda o FILL do ícone */
+    if (!isFav) {
+      icon.style.fontVariationSettings = "'FILL' 1";
+    } else {
+      icon.style.fontVariationSettings = "'FILL' 0";
+    }
+    /* animação simples */
+    icon.classList.add("scale-110");
+    setTimeout(function () {
+      icon.classList.remove("scale-110");
+    }, 150);
+  });
+}
