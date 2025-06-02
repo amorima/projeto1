@@ -46,6 +46,22 @@ export function deleteHotel(id) {
   throw Error('No Hotel Found');
 }
 
+/**
+ * Obtém uma lista de hotéis filtrados por destino.
+ * @param {number} destinoId - ID do destino para filtrar os hotéis.
+ * @param {number} perPage - Número de hotéis por página (padrão é 18).
+ * @param {number} page - Número da página a ser retornada (padrão é 1).
+ * @return {Array} - Lista de hotéis filtrados e embaralhados, limitada ao número de itens por página.
+ * @description
+ * Esta função filtra os hotéis disponíveis com base no ID do destino fornecido.
+ * Em seguida, embaralha a lista de hotéis e retorna apenas os itens correspondentes à página solicitada.
+ * Se o número de hotéis for menor que o número solicitado, retorna todos os disponíveis.
+ * @example
+ * import { getHotelsFrom } from './HotelModel.js';
+ * const hotels = getHotelsFrom(1, 10, 2);
+ * Neste exemplo, a função retorna os hotéis do destino com ID 1,
+ * limitados a 10 por página, e retorna a segunda página de resultados.
+ */
 export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
   // Filtra hoteis cuja origem é OPO (Porto)
   const Hotels = hotels.filter(h => h.destinoId === destinoId);
@@ -67,6 +83,13 @@ export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
  * @param {number} precoNoite - Preço por noite
  * @param {Array} acessibilidade - Lista de acessibilidade
  * @param {boolean} available - Disponibilidade do hotel
+ * @description
+ * Esta classe representa um hotel na aplicação, contendo informações como ID, destino, nome, foto, tipo, número de camas, capacidade, preço por noite e acessibilidade.
+ * Além disso, possui métodos para ocupar e liberar o hotel.
+ * @example
+ * const hotel = new Hotel(1, 2, 'Hotel Exemplo', 'https://example.com/hotel.jpg', 'Luxo', 2, 4, 150, ['Wi-Fi', 'Acessível'], true);
+ * hotel.occupy(); // Marca o hotel como ocupado
+ * hotel.free(); // Marca o hotel como disponível novamente
  */
 class Hotel {
   id = 0;

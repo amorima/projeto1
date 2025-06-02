@@ -320,6 +320,8 @@ export function getTripsWithCoordinates() {
  * @property {number} custo - Custo do voo
  * @property {string} imagem - URL da imagem do voo
  * @property {string} dataVolta - Data de volta do voo (se aplicável)
+ * @description
+ * Esta classe representa uma viagem na aplicação, contendo informações como número do voo, origem, destino, companhia aérea, horários de partida e chegada, se é um voo direto, custo, imagem e data de volta (se aplicável).
  */
 class Trip {
   numeroVoo = "";
