@@ -21,23 +21,28 @@
   <nav id="menu-placeholder"></nav>
 
   <!-- hero -->
-  <section class="h-auto pb-12 max-w-[1206px] w-full mx-auto mt-[120px] px-2 sm:px-4">
-   <div class="w-full sm:w-[1206px] h-[300px] sm:h-[464px] relative mx-auto">
-    <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700 absolute left-2 top-2 sm:static">arrow_circle_left</span>
-    <div class="w-36 h-14 left-2 sm:left-[38px] top-0 absolute">
-        <div class="left-[3px] top-0 absolute justify-start text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
-        <div class="left-0 top-[28px] absolute inline-flex justify-start items-center gap-1">
-            <div class="w-6 h-6 relative overflow-hidden">
-                <span class="material-symbols-outlined">calendar_month</span>
+  <section class="h-auto sm:pb-12 max-w-[1206px] w-full mx-auto mt-[120px] px-2 sm:px-4">
+ <div class="w-full sm:w-[1206px] h-[300px] sm:h-[464px] relative mx-auto">
+    <!-- bloco do topo do hero -->
+    <div class="flex items-center justify-between lg-2 pl-2 pt-2 sm:static">
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700">arrow_circle_left</span>
+            <div>
+                <div class="text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
+                <div class="inline-flex justify-start items-center gap-1">
+                    <div class="w-6 h-6 relative overflow-hidden">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                    </div>
+                    <div class="justify-start text-Text-Subtitles text-base font-normal font-['IBM_Plex_Sans'] leading-tight">06 Mai - 12 Mai</div>
+                </div>
             </div>
-            <div class="justify-start text-Text-Subtitles text-base font-normal font-['IBM_Plex_Sans'] leading-tight">06 Mai - 12 Mai</div>
+        </div>
+        <div id="fav-itinerary" data-favorito="false" class="w-8 h-8 overflow-hidden cursor-pointer user-select-none flex items-center justify-center">
+            <span class="material-symbols-outlined text-red-500 transition-all duration-300 ease-in-out"
+                  style="font-variation-settings: 'FILL' 0;">favorite</span>
         </div>
     </div>
-    <div id="fav-itinerary" data-favorito="false" class="absolute top-0 right-0 w-8 h-8 overflow-hidden cursor-pointer user-select-none">
-        <span class="material-symbols-outlined text-red-500 transition-all duration-300 ease-in-out"
-              style="font-variation-settings: 'FILL' 0;">favorite</span>
-    </div>
-    <img class="w-full h-48 sm:h-96 left-0 top-[64px] absolute rounded-2xl object-cover" src="https://placehold.co/1270x400" />
+    <img class="w-full h-48 sm:h-96  left-0 top-[64px] absolute rounded-2xl object-cover" src="https://placehold.co/1270x400" />
 </div>
   </section>
 
@@ -48,34 +53,42 @@
         <!-- Itinerário -->
         <div>
           <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Itinerário</h2>
-          <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6">
+          <!-- cartão itinerário ocupa largura total em ecrãs pequenos -->
+          <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 max-lg:w-full">
+              <!-- imagem com cantos arredondados condicionais baseados no tamanho do ecrã -->
               <img
-                  class="h-40 w-40 sm:h-full sm:w-auto aspect-square object-cover rounded-l-xl"
+                  class="h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover"
                   src="https://placehold.co/200x200"
                   alt="Imagem promocional"
               />
-              <div class="flex flex-col gap-2 flex-1 p-4">
-                  <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">Londres</span>
-                  <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
-                      06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
-                  </span>
-                  <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
-                      12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
-                  </span>
-                  <span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo OPO - LDN</span>
-              </div>
-              <div class="pr-0 sm:pr-5 pb-4 sm:pb-0">
-              <img
-                  class="w-16 h-16 rounded-full"
-                  src="https://placehold.co/66x66"
-                  alt="Companhia aérea"
-              />
+              <!-- área abaixo da imagem principal com flexbox para manter conteúdo na mesma linha -->
+              <div class="flex flex-row items-center justify-between flex-1 p-4 w-full">
+                  <!-- conteúdo do itinerário com texto alinhado à esquerda -->
+                  <div class="flex flex-col gap-2 text-left flex-1">
+                      <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">Londres</span>
+                      <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
+                          06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
+                      </span>
+                      <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
+                          12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
+                      </span>
+                      <span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo OPO - LDN</span>
+                  </div>
+                  <!-- imagem da companhia aérea bem à direita -->
+                  <div class="pl-4 flex-shrink-0 flex items-center">
+                      <img
+                          class="w-16 h-16 rounded-full"
+                          src="https://placehold.co/66x66"
+                          alt="Companhia aérea"
+                      />
+                  </div>
               </div>
           </div>
         </div>
         <!-- Carro -->
         <div>
-          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition">
+          <!-- cartão carro ocupa largura total em ecrãs pequenos -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition max-lg:w-full">
             <img src="/img/misc/car.png" alt="Carro" class="w-20 sm:w-32 rounded-lg">
             <div class="flex flex-col gap-2 flex-1">
               <span class="text-Text-Titles text-xl font-semibold dark:text-cyan-300">Viagem sem carro adicionado.</span>
@@ -85,7 +98,8 @@
           </div>
         </div>
         <!-- Hotel -->
-          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition">
+          <!-- cartão hotel ocupa largura total em ecrãs pequenos -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition max-lg:w-full">
             <img src="/img/misc/bed.png" alt="Hotel" class="w-20 sm:w-32 rounded-lg">
             <div class="flex flex-col gap-2 flex-1">
               <span class="text-Text-Titles text-xl font-semibold dark:text-cyan-300">Viagem sem hotel</span>
@@ -97,7 +111,8 @@
         <div class="relative mt-10">
           <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Bagagem</h2>
           <img class="w-40 sm:w-52 md:w-72 h-24 sm:h-36 md:h-52 absolute right-[-10px] sm:right-[-30px] md:right-[-60px] top-[-10px] sm:top-[-20px] md:top-[-40px] z-10" src="/img/misc/mochila.png" alt="Mochila">
-          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col gap-2 relative z-0">
+          <!-- cartão bagagem ocupa largura total em ecrãs pequenos -->
+          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col gap-2 relative z-0 max-lg:w-full">
             <div class="bg-cyan-800 rounded-[34px] px-8 py-1 w-fit text-white text-xs font-bold font-['Space_Mono'] mb-2">Incluído</div>
             <span class="text-xl font-normal font-['Space_Mono']">1 x <b>Mochila</b></span>
             <span class="text-base font-light">Podes levar gratuitamente uma mochila debaixo do assento.<br>
@@ -107,7 +122,8 @@
         <!-- Seguro -->
         <div>
           <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Seguro</h2>
-          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition">
+          <!-- cartão seguro ocupa largura total em ecrãs pequenos -->
+          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition max-lg:w-full">
             <div class="flex flex-col gap-2 flex-1">
               <span class="text-xl font-normal font-['Space_Mono']">Viaje em segurançacom <b>Secure</b>It</span>
               <span class="flex items-center gap-2 text-base font-medium">
@@ -129,8 +145,9 @@
         </div>
       </div>
       <!-- Sidebar do lado direito -->
-      <div class="w-full max-w-xs mx-auto lg:mx-0 lg:block lg:mt-16 mt-8">
-        <div class="bg-Background-Background dark:bg-gray-900 rounded-2xl shadow-md p-6 sticky top-[120px] flex flex-col space-y-6 outline outline-1 outline-gray-200 dark:outline-gray-700">
+      <div class="w-full lg:max-w-xs mx-auto lg:mx-0 lg:block lg:mt-16 mt-8">
+        <!-- o cartão da sidebar ocupa toda a largura em ecrãs pequenos -->
+        <div class="bg-Background-Background dark:bg-gray-900 rounded-2xl shadow-md p-6 sticky top-[120px] flex flex-col space-y-6 outline outline-1 outline-gray-200 dark:outline-gray-700 w-full">
           <div class="flex items-center gap-3 justify-between">
             <div class="flex items-baseline gap-3">
               <div class="text-3xl font-bold text-Button-Main dark:text-cyan-400">65 €</div>
