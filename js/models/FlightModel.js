@@ -149,6 +149,19 @@ export function getTripsMulti(
   return rotas.slice(start, start + perPage);
 }
 
+/**
+ * Recomenda viagens multi-destino a partir de uma origem e timeframe.
+ * @param {string} origem
+ * @param {string} dataInicio
+ * @param {string} dataFim
+ * @param {number} maxDestinos
+ * @param {Object} filtros
+ * @returns {Array} Rotas recomendadas
+ */
+export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3, filtros = {}) {
+
+}
+
 export function getTripsByTurismo(turismoTipo) {
   return viagens.filter(
     (v) =>
