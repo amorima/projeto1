@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body class="font-sans dark:bg-gray-950 dark:text-gray-100">
+  <header id="header-placeholder"></header>
+  <nav id="menu-placeholder"></nav>
+
+  <!-- hero -->
+  <section class="h-auto pb-12 max-w-[1206px] mx-auto mt-[120px]">
+   <div class="w-[1206px] h-[464px] relative">
+    <div class="w-8 h-8 left-0 top-0 absolute bg-Background-Background rounded-2xl outline outline-2 outline-stone-400 flex items-center justify-center">
+        <span class="material-symbols-outlined leading-none">chevron_left</span>
+    </div>
+    <div class="w-36 h-14 left-[38px] top-0 absolute">
+        <div class="left-[3px] top-0 absolute justify-start text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
+        <div class="left-0 top-[28px] absolute inline-flex justify-start items-center gap-1">
+            <div class="w-6 h-6 relative overflow-hidden">
+                <span class="material-symbols-outlined">calendar_month</span>
+            </div>
+            <div class="justify-start text-Text-Subtitles text-base font-normal font-['IBM_Plex_Sans'] leading-tight">06 Mai - 12 Mai</div>
+        </div>
+    </div>
+    <div data-property-1="off" class="absolute top-0 right-0 w-8 h-8 overflow-hidden">
+        <span class="material-symbols-outlined">favorite</span>
+    </div>
+    <img class="w-[1270px] h-96 left-0 top-[64px] absolute rounded-2xl mx-auto" src="https://placehold.co/1270x400" />
+</div>
+  </section>
+
+  <!-- Corpo da Página -->
+   <section class="h-auto pb-12 max-w-[1206px] mx-auto">
+    <div class="w-full max-w-[900px] relative flex flex-col gap-8">
+      <!-- Itinerário -->
+      <div>
+        <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Itinerário</h2>
+        <div class="bg-white rounded-xl shadow-md outline outline-1 outline-Background-Background flex items-center p-o gap-6">
+            <img
+                class="h-full aspect-square object-cover rounded-l-xl"
+                src="https://placehold.co/200x200"
+                alt="Imagem promocional"
+            />
+            <!-- Info do voo -->
+            <div class="flex flex-col gap-2 flex-1">
+                <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary">Londres</span>
+                <span class="text-sm font-semibold text-Main-Secondary">
+                    06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
+                </span>
+                <span class="text-sm font-semibold text-Main-Secondary">
+                    12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
+                </span>
+                <span class="text-base font-light text-Main-Secondary">Voo OPO - LDN</span>
+            </div>
+            <div class="pr-5">
+            <img
+                class="w-16 h-16 rounded-full"
+                src="https://placehold.co/66x66"
+                alt="Companhia aérea"
+            />
+            </div>
+        </div>
+      </div>
+      <!-- Carro -->
+      <div>
+        <div class="bg-white rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex items-center gap-6">
+          <!-- imagem do carro -->
+          <img src="https://placehold.co/100x100?text=Carro" alt="Carro" class="w-[100px] h-[100px] object-cover rounded-lg">
+          <div class="flex flex-col gap-2">
+            <span class="text-Text-Titles text-xl font-semibold">Viagem sem carro adicionado.</span>
+            <span class="text-base font-light">Adiciona um carro e ganha <b>mais pontos</b>!</span>
+          </div>
+        </div>
+      </div>
+      <!-- Hotel -->
+        <div class="bg-white rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex items-center gap-6">
+          <!-- imagem do hotel -->
+          <img src="https://placehold.co/100x100?text=Hotel" alt="Hotel" class="w-[100px] h-[100px] object-cover rounded-lg">
+          <div class="flex flex-col gap-2">
+            <span class="text-Text-Titles text-xl font-semibold">Viagem sem hotel</span>
+            <span class="text-base font-light">Adiciona um quarto e ganha <b>mais pontos</b>!</span>
+          </div>
+        </div>
+      <!-- Bagagem -->
+      <div class="relative mt-10">
+        <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Bagagem</h2>
+        <!-- Imagem da mochila sobreposta -->
+        <img class="w-72 h-52 absolute right-[-60px] top-[-40px] z-10" src="/img/misc/mochila.png" alt="Mochila">
+        <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex flex-col gap-2 relative z-0">
+          <!-- objeto da bagagem -->
+          <div class="bg-cyan-800 rounded-[34px] px-8 py-1 w-fit text-white text-xs font-bold font-['Space_Mono'] mb-2">Incluído</div>
+          <span class="text-xl font-normal font-['Space_Mono']">1 x <b>Mochila</b></span>
+          <span class="text-base font-light">Podes levar gratuitamente uma mochila debaixo do assento.<br>
+            Utilizadores <b>Globetrotter</b> e <b>Embaixador</b> podem levar uma mala de cabine extra.</span>
+        </div>
+        <!-- comentário: imagem da mochila está fora do objeto para ficar sobreposta -->
+      </div>
+      <!-- Seguro -->
+      <div>
+        <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Seguro</h2>
+        <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex flex-col gap-2">
+          <span class="text-xl font-normal font-['Space_Mono']">Viaje com <b>Secure</b>It</span>
+          <span class="text-base font-medium">Reembolso da viagem garantido</span>
+          <span class="text-base font-medium">Cancelar sempre que quiser</span>
+          <span class="text-base font-medium">Devolução instantânea</span>
+          <span class="text-base font-light mt-2">Adicione o plano <b>Secure</b>It no checkout e ganhe mais pontos!</span>
+        </div>
+      </div>
+    </div>
+    </section>
+
+  <footer id="footer-placeholder"></footer>
+
+     <script type="module" src="../js/views/FlightView.js"></script>
+     <script src="../js/init.js"></script>
+
+</body>
+</html>
