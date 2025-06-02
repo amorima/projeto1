@@ -87,14 +87,108 @@
         </div>
         <!-- Carro -->
         <div>
-          <!-- cartão carro ocupa largura total em ecrãs pequenos -->
-          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition max-lg:w-full">
-            <img src="/img/misc/car.png" alt="Carro" class="w-20 sm:w-32 rounded-lg">
-            <div class="flex flex-col gap-2 flex-1">
-              <span class="text-Text-Titles text-xl font-semibold dark:text-cyan-300">Viagem sem carro adicionado.</span>
-              <span class="text-base font-light dark:text-cyan-100">Adiciona um carro e ganha <b>mais pontos</b>!</span>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Aluguer de Carro</h2>
+          <!-- cartão carro com opções de escolha -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col gap-4 transition max-lg:w-full">
+            
+            <!-- Título e subtítulo mais próximos -->
+            <div class="ml-8 flex flex-col space-y-1">
+              <div class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-cyan-700 dark:text-cyan-400">directions_car</span>
+                <span class="text-xl font-semibold">Escolhe um carro para a tua viagem</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 ml-8">Ganha pontos extra ao adicionar uma viatura!</p>
             </div>
-            <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-cyan-400 transition hover:text-cyan-700 dark:hover:text-cyan-300">arrow_circle_right</span>
+            
+            <!-- Opção 1 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/ford.png" alt="Carro compacto" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Ford Fiesta</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>2</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">24€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 2 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/Volkswagen.png" alt="Carro familiar" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Volkswagen Golf</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">32€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 3 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/HYUNDAi.png" alt="SUV" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Hyundai Tucson</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>5</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">45€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 4 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/Peugeot.png" alt="Carrinha" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Peugeot 5008</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>7</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>6</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">52€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 5 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/mercedes.png" alt="Premium" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Mercedes Classe C</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">68€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Hotel -->
