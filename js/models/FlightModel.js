@@ -82,15 +82,21 @@ export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
   // Retorna os n voos (perPage) dependendo da pagina (page)
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
-
+getTrip
 /**
  * @param {Array} destinos 
+ * - Locais a Visitar (por ordem)
  * @param {Object} filtros
- * Datas :
- * filtros.dataPartidaMin
- * filtros.dataChagadaMax
+ * -Se não incluir apresenta todas as viagens
+ * -Datas:
+ *  filtros.dataPartidaMin
+ *  filtros.dataChagadaMax
  * @param {number} [page=1] 
+ * -Página atula
  * @param {number} [perPage=18]  
+ * -Limite Paginação
+ * @param {boolean} [circular=true] 
+ * -Viagem começa e termina no mesmo local
  */
 export function getTripsMulti(
   destinos,
@@ -100,7 +106,8 @@ export function getTripsMulti(
     ...filtrosSemDatas
   } = {},
   perPage = 18,
-  page = 1
+  page = 1,
+  circular = true
 ) {
   // 1. Obter todosos Voos
   const segmentos = [];
@@ -140,6 +147,10 @@ export function getTripsMulti(
           if (partidaAtual < chegadaAnterior) return false;
         }
       }
+      // Se circular, o último destino deve ser igual ao primeiro
+      if (circular && segmentos.length > 0) {
+        if (segmentos[segmentos.length - 1].destino !== destinos[0]) return false;
+      }
       return true;
     })
     .map(segmentos => ({viagens: segmentos }));
@@ -158,8 +169,49 @@ export function getTripsMulti(
  * @param {Object} filtros
  * @returns {Array} Rotas recomendadas
  */
-export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3, filtros = {}) {
+export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3, filtros = {}, circular = true) {
+  const results = [];
 
+  function rota(atual, rotaAtual, dataAtual, visitados) {
+    // Se já atingiu o número máximo de destinos
+    if (rotaAtual.length >= maxDestinos) {
+      // Se circular, só guarda se o último destino for igual à origem
+      if (!circular || (rotaAtual.length > 0 && rotaAtual[rotaAtual.length - 1].destino === origem)) {
+        results.push({ viagens: [...rotaAtual] });
+      }
+      return;
+    }
+
+    const proximosVoos = viagens.filter(v =>
+      v.origem === atual &&
+      !visitados.includes(v.destino) &&
+      new Date(v.partida) >= new Date(dataAtual) &&
+      new Date(v.chegada) <= new Date(dataFim) &&
+      Object.entries(filtros).every(([key, value]) =>
+        v[key] !== undefined &&
+        (Array.isArray(value) ? value.includes(v[key]) : v[key] == value)
+      )
+    );
+
+    for (const voo of proximosVoos) {
+      rota(
+        voo.destino,
+        [...rotaAtual, voo],
+        voo.chegada,
+        [...visitados, voo.destino]
+      );
+    }
+
+    // Se já tem pelo menos 1 destino, pode guardar a rota parcial
+    if (rotaAtual.length > 0) {
+      if (!circular || (rotaAtual[rotaAtual.length - 1].destino === origem)) {
+        results.push({ viagens: [...rotaAtual] });
+      }
+    }
+  }
+
+  rota(origem, [], dataInicio, [origem]);
+  return results;
 }
 
 export function getTripsByTurismo(turismoTipo) {
