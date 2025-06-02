@@ -82,7 +82,7 @@ export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
   // Retorna os n voos (perPage) dependendo da pagina (page)
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
-getTrip
+
 /**
  * @param {Array} destinos 
  * - Locais a Visitar (por ordem)
