@@ -23,9 +23,7 @@
   <!-- hero -->
   <section class="h-auto pb-12 max-w-[1206px] mx-auto mt-[120px]">
    <div class="w-[1206px] h-[464px] relative">
-    <div class="w-8 h-8 left-0 top-0 absolute bg-Background-Background rounded-2xl outline outline-2 outline-stone-400 flex items-center justify-center">
-        <span class="material-symbols-outlined leading-none">chevron_left</span>
-    </div>
+    <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700">arrow_circle_left</span>
     <div class="w-36 h-14 left-[38px] top-0 absolute">
         <div class="left-[3px] top-0 absolute justify-start text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
         <div class="left-0 top-[28px] absolute inline-flex justify-start items-center gap-1">
@@ -43,89 +41,162 @@
   </section>
 
   <!-- Corpo da Página -->
-   <section class="h-auto pb-12 max-w-[1206px] mx-auto">
-    <div class="w-full max-w-[900px] relative flex flex-col gap-8">
-      <!-- Itinerário -->
-      <div>
-        <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Itinerário</h2>
-        <div class="bg-white rounded-xl shadow-md outline outline-1 outline-Background-Background flex items-center p-o gap-6">
-            <img
-                class="h-full aspect-square object-cover rounded-l-xl"
-                src="https://placehold.co/200x200"
-                alt="Imagem promocional"
-            />
-            <!-- Info do voo -->
+  <section class="h-auto pb-12 max-w-[1206px] mx-auto">
+    <div class="w-full max-w-[1206px] mx-auto flex flex-col lg:flex-row gap-8 px-2 sm:px-4 relative">
+      <div class="flex-1 flex flex-col gap-8">
+        <!-- Itinerário -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Itinerário</h2>
+          <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6">
+              <img
+                  class="h-40 w-40 sm:h-full sm:w-auto aspect-square object-cover rounded-l-xl"
+                  src="https://placehold.co/200x200"
+                  alt="Imagem promocional"
+              />
+              <!-- Info do voo -->
+              <div class="flex flex-col gap-2 flex-1 p-4">
+                  <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">Londres</span>
+                  <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
+                      06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
+                  </span>
+                  <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
+                      12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
+                  </span>
+                  <span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo OPO - LDN</span>
+              </div>
+              <div class="pr-0 sm:pr-5 pb-4 sm:pb-0">
+              <img
+                  class="w-16 h-16 rounded-full"
+                  src="https://placehold.co/66x66"
+                  alt="Companhia aérea"
+              />
+              </div>
+          </div>
+        </div>
+        <!-- Carro -->
+        <div>
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex items-center gap-4 sm:gap-6 transition">
+            <!-- imagem do carro -->
+            <img src="/img/misc/car.png" alt="Carro" class="w-20 sm:w-32 rounded-lg">
             <div class="flex flex-col gap-2 flex-1">
-                <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary">Londres</span>
-                <span class="text-sm font-semibold text-Main-Secondary">
-                    06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
-                </span>
-                <span class="text-sm font-semibold text-Main-Secondary">
-                    12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
-                </span>
-                <span class="text-base font-light text-Main-Secondary">Voo OPO - LDN</span>
+              <span class="text-Text-Titles text-xl font-semibold dark:text-cyan-300">Viagem sem carro adicionado.</span>
+              <span class="text-base font-light dark:text-cyan-100">Adiciona um carro e ganha <b>mais pontos</b>!</span>
             </div>
-            <div class="pr-5">
-            <img
-                class="w-16 h-16 rounded-full"
-                src="https://placehold.co/66x66"
-                alt="Companhia aérea"
+            <!-- seta para a direita -->
+            <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-cyan-400 transition hover:text-cyan-700 dark:hover:text-cyan-300">arrow_circle_right</span>
+          </div>
+        </div>
+        <!-- Hotel -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex items-center gap-4 sm:gap-6 transition">
+            <!-- imagem do hotel -->
+            <img src="/img/misc/bed.png" alt="Hotel" class="w-20 sm:w-32 rounded-lg">
+            <div class="flex flex-col gap-2 flex-1">
+              <span class="text-Text-Titles text-xl font-semibold dark:text-cyan-300">Viagem sem hotel</span>
+              <span class="text-base font-light dark:text-cyan-100">Adiciona um quarto e ganha <b>mais pontos</b>!</span>
+            </div>
+            <!-- seta para a direita -->
+            <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-cyan-400 transition hover:text-cyan-700 dark:hover:text-cyan-300">arrow_circle_right</span>
+          </div>
+        <!-- Bagagem -->
+        <div class="relative mt-10">
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Bagagem</h2>
+          <!-- Imagem da mochila sobreposta -->
+          <img class="w-52 sm:w-72 h-36 sm:h-52 absolute right-[-30px] sm:right-[-60px] top-[-20px] sm:top-[-40px] z-10" src="/img/misc/mochila.png" alt="Mochila">
+          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col gap-2 relative z-0">
+            <!-- objeto da bagagem -->
+            <div class="bg-cyan-800 rounded-[34px] px-8 py-1 w-fit text-white text-xs font-bold font-['Space_Mono'] mb-2">Incluído</div>
+            <span class="text-xl font-normal font-['Space_Mono']">1 x <b>Mochila</b></span>
+            <span class="text-base font-light">Podes levar gratuitamente uma mochila debaixo do assento.<br>
+              Utilizadores <b>Globetrotter</b> e <b>Embaixador</b> podem levar uma mala de cabine extra.</span>
+          </div>
+          <!-- comentário: imagem da mochila está fora do objeto para ficar sobreposta -->
+        </div>
+        <!-- Seguro -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Seguro</h2>
+          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex items-center gap-4 sm:gap-6 transition">
+            <div class="flex flex-col gap-2 flex-1">
+              <span class="text-xl font-normal font-['Space_Mono']">Viaje em segurançacom <b>Secure</b>It</span>
+              <span class="flex items-center gap-2 text-base font-medium">
+                <span class="material-symbols-outlined">attach_money</span>
+                Reembolso da viagem garantido
+              </span>
+              <span class="flex items-center gap-2 text-base font-medium">
+                <span class="material-symbols-outlined">event_busy</span>
+                Cancelar sempre que quiser
+              </span>
+              <span class="flex items-center gap-2 text-base font-medium">
+                <span class="material-symbols-outlined">currency_exchange</span>
+                Devolução instantânea
+              </span>
+              <span class="text-base font-light mt-2">Adicione o plano <b>Secure</b>It no checkout e ganhe mais pontos!</span>
+            </div>
+            <!-- seta para a direita -->
+            <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700">arrow_circle_right</span>
+          </div>
+        </div>
+      </div>
+      <!-- Sidebar do lado direito -->
+      <div class="w-full max-w-xs mx-auto lg:mx-0 lg:block">
+        <div class="bg-Background-Background dark:bg-gray-900 rounded-2xl shadow-md p-6 sticky top-[120px] flex flex-col space-y-6 outline outline-1 outline-gray-200 dark:outline-gray-700">
+          <!-- Preço e desconto -->
+          <div class="flex items-center gap-3 justify-between">
+            <div class="flex items-baseline gap-3">
+              <div class="text-3xl font-bold text-Button-Main dark:text-cyan-400">65 €</div>
+              <div class="text-base font-bold text-Text-Subtitles line-through dark:text-gray-400">91 €</div>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-Button-Main dark:text-cyan-400">globe</span>
+              <span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded">40% desconto</span>
+            </div>
+          </div>
+          <!-- Detalhes -->
+          <ul class="space-y-3 text-sm text-Text-Body font-medium dark:text-gray-200">
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined">flight</span>
+              Ida e volta
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined">calendar_month</span>
+              06 Mai - 12 Mai
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined">star</span>
+              Acumula <b>65</b> pontos
+            </li>
+          </ul>
+          <!-- Campo de pessoas tipo "sandwichão" -->
+          <div class="flex items-center justify-between gap-2">
+            <!-- botão menos -->
+            <button id="btn-menos" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <!-- input de pessoas -->
+            <input
+              id="input-pessoas"
+              type="text"
+              inputmode="numeric"
+              pattern="\d*"
+              value="1"
+              class="appearance-none w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700"
             />
-            </div>
-        </div>
-      </div>
-      <!-- Carro -->
-      <div>
-        <div class="bg-white rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex items-center gap-6">
-          <!-- imagem do carro -->
-          <img src="https://placehold.co/100x100?text=Carro" alt="Carro" class="w-[100px] h-[100px] object-cover rounded-lg">
-          <div class="flex flex-col gap-2">
-            <span class="text-Text-Titles text-xl font-semibold">Viagem sem carro adicionado.</span>
-            <span class="text-base font-light">Adiciona um carro e ganha <b>mais pontos</b>!</span>
+            <!-- botão mais -->
+            <button id="btn-mais" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700">
+              <span class="material-symbols-outlined">add</span>
+            </button>
           </div>
-        </div>
-      </div>
-      <!-- Hotel -->
-        <div class="bg-white rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex items-center gap-6">
-          <!-- imagem do hotel -->
-          <img src="https://placehold.co/100x100?text=Hotel" alt="Hotel" class="w-[100px] h-[100px] object-cover rounded-lg">
-          <div class="flex flex-col gap-2">
-            <span class="text-Text-Titles text-xl font-semibold">Viagem sem hotel</span>
-            <span class="text-base font-light">Adiciona um quarto e ganha <b>mais pontos</b>!</span>
-          </div>
-        </div>
-      <!-- Bagagem -->
-      <div class="relative mt-10">
-        <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Bagagem</h2>
-        <!-- Imagem da mochila sobreposta -->
-        <img class="w-72 h-52 absolute right-[-60px] top-[-40px] z-10" src="/img/misc/mochila.png" alt="Mochila">
-        <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex flex-col gap-2 relative z-0">
-          <!-- objeto da bagagem -->
-          <div class="bg-cyan-800 rounded-[34px] px-8 py-1 w-fit text-white text-xs font-bold font-['Space_Mono'] mb-2">Incluído</div>
-          <span class="text-xl font-normal font-['Space_Mono']">1 x <b>Mochila</b></span>
-          <span class="text-base font-light">Podes levar gratuitamente uma mochila debaixo do assento.<br>
-            Utilizadores <b>Globetrotter</b> e <b>Embaixador</b> podem levar uma mala de cabine extra.</span>
-        </div>
-        <!-- comentário: imagem da mochila está fora do objeto para ficar sobreposta -->
-      </div>
-      <!-- Seguro -->
-      <div>
-        <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Seguro</h2>
-        <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-Components-Limit-Color p-6 flex flex-col gap-2">
-          <span class="text-xl font-normal font-['Space_Mono']">Viaje com <b>Secure</b>It</span>
-          <span class="text-base font-medium">Reembolso da viagem garantido</span>
-          <span class="text-base font-medium">Cancelar sempre que quiser</span>
-          <span class="text-base font-medium">Devolução instantânea</span>
-          <span class="text-base font-light mt-2">Adicione o plano <b>Secure</b>It no checkout e ganhe mais pontos!</span>
+          <!-- Botão Reservar -->
+          <button class="w-full bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 font-bold py-3 rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-500 transition outline outline-1 outline-gray-200 dark:outline-gray-700">
+            Reservar
+          </button>
         </div>
       </div>
     </div>
-    </section>
+  </section>
 
   <footer id="footer-placeholder"></footer>
 
-     <script type="module" src="../js/views/FlightView.js"></script>
+     <script type="module" src="../js/views/FlightItineraryView.js"></script>
      <script src="../js/init.js"></script>
-
 </body>
 </html>
