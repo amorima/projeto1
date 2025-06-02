@@ -11,6 +11,7 @@ export function init() {
   return viagens;
 }
 
+// LER VIAGEM
 export function getAll() {
   return viagens ? viagens : [];
 }
@@ -71,7 +72,26 @@ export function deleteTrip(numeroVoo) {
   throw Error("No Flight Found");
 }
 
-// GET FLIGHTS
+/**
+ * Devolve array de viagens filtradas por origem.
+ * @param {string} filtro 
+ * - Local de origem ou turismo a filtrar (ex: "OPO - Porto", "cultural")
+ * - Ignora maiúsculas/minúsculas
+ * @param {number} perPage 
+ * - Número de viagens por página (default: 18)
+ * @param {number} page 
+ * - Página atual (default: 1)
+ * - Se page = 1, devolve as primeiras perPage viagens
+ * @returns 
+ * - Array de viagens filtradas por origem ou turismo
+ * @example
+ * getTripsFrom("OPO - Porto");
+ * Returns: [
+ *   { numeroVoo: "TP123", origem: "OPO", destino: "LIS", turismo: ["cultural"] },
+ *   { numeroVoo: "TP456", origem: "OPO", destino: "MAD", turismo: ["cultural", "aventura"] },
+ *  ...
+ * ]
+ */
 export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
   // Filtra voos cuja origem é OPO (Porto)
   const Trips = viagens.filter(
@@ -163,11 +183,22 @@ export function getTripsMulti(
 /**
  * Recomenda viagens multi-destino a partir de uma origem e timeframe.
  * @param {string} origem
+ * - Local de partida
  * @param {string} dataInicio
+ * - Data de início da viagem (formato ISO 8601)
  * @param {string} dataFim
+ * - Data de fim da viagem (formato ISO 8601)
  * @param {number} maxDestinos
+ * - Número máximo de destinos na rota (default: 3)
  * @param {Object} filtros
+ * - Filtros adicionais para as viagens (ex: companhia, custo, etc.)
+ * - Exemplo: { companhia: 'TAP', custo: 100, direto: true }
+ * - Se não incluir, apresenta todas as viagens
+ * @param {boolean} circular
+ * - Se true, a rota deve começar e terminar no mesmo local
  * @returns {Array} Rotas recomendadas
+ * - Cada rota é um objeto com a propriedade 'viagens' contendo os voos
+ * - Exemplo: [{ viagens: [voo1, voo2, ...] }, ...]
  */
 export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3, filtros = {}, circular = true) {
   const results = [];
@@ -214,6 +245,20 @@ export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3
   return results;
 }
 
+/**
+ * Devolve array de viagens filtradas por tipo de turismo.
+ * @param {string} turismoTipo 
+ * - Tipo de turismo a filtrar (ex: "cultural", "aventura", etc.)
+ * - Ignora maiúsculas/minúsculas
+ * @returns {Array}
+ * - Array de viagens que incluem o tipo de turismo especificado
+ * @example
+ * getTripsByTurismo("cultural");
+ * Returns: [
+ *   { numeroVoo: "TP123", origem: "OPO", destino: "LIS", turismo: ["cultural"] },
+ *   { numeroVoo: "TP456", origem: "OPO", destino: "MAD", turismo: ["cultural", "aventura"] }
+ * ]
+ */
 export function getTripsByTurismo(turismoTipo) {
   return viagens.filter(
     (v) =>
@@ -225,6 +270,14 @@ export function getTripsByTurismo(turismoTipo) {
 /**
  * Devolve array de aeroportos do localStorage.
  * @returns {Array<{cidade:string,location:{latitude:number,longitude:number}}>}
+ * - Array de objetos com a cidade e as coordenadas (latitude, longitude)
+ * @example
+ * getAeroportos();
+ * Returns: [
+ *   { cidade: "Porto", location: { latitude: 41.248, longitude: -8.681 } },
+ *   { cidade: "Lisboa", location: { latitude: 38.774, longitude: -9.134 } },
+ *   { cidade: "Madrid", location: { latitude: 40.416, longitude: -3.703 } }
+ * ]
  */
 export function getAeroportos() {
   return JSON.parse(localStorage.getItem("aeroportos")) || [];
@@ -233,6 +286,13 @@ export function getAeroportos() {
 /**
  * Associa a cada viagem as suas coordenadas, filtrando as que têm dados.
  * @returns {Array<{trip:Object,coords:{latitude:number,longitude:number}}>}
+ * - Array de objetos com a viagem e as coordenadas do destino
+ * @example
+ * getTripsWithCoordinates();
+ * Returns: [
+ *   { trip: { numeroVoo: "TP123", origem: "OPO", destino: "LIS", ... }, coords: { latitude: 38.774, longitude: -9.134 } },
+ *   { trip: { numeroVoo: "TP456", origem: "OPO", destino: "MAD", ... }, coords: { latitude: 40.416, longitude: -3.703 } }
+ * ]
  */
 export function getTripsWithCoordinates() {
   const aps = getAeroportos();
@@ -249,6 +309,17 @@ export function getTripsWithCoordinates() {
 
 /**
  * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
+ * @class Trip
+ * @property {string} numeroVoo - Número do voo
+ * @property {string} origem - Cidade de origem do voo
+ * @property {string} destino - Cidade de destino do voo
+ * @property {string} companhia - Companhia aérea do voo
+ * @property {string} partida - Data e hora de partida do voo
+ * @property {string} chegada - Data e hora de chegada do voo
+ * @property {string} direto - Indica se o voo é direto (sim/não)
+ * @property {number} custo - Custo do voo
+ * @property {string} imagem - URL da imagem do voo
+ * @property {string} dataVolta - Data de volta do voo (se aplicável)
  */
 class Trip {
   numeroVoo = "";
