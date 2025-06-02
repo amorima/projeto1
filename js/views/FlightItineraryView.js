@@ -5,6 +5,8 @@ import {
   getUserLocation,
 } from "./ViewHelpers.js";
 
+import * as HotelModel from "../models/HotelModel.js";
+
 /* Controlos de número de pessoas */
 const btnMais = document.getElementById("btn-mais");
 const btnMenos = document.getElementById("btn-menos");
@@ -125,4 +127,114 @@ if (favItinerary) {
       icon.classList.remove("scale-110");
     }, 150);
   });
+}
+
+/* Carrega os hoteis quando a página carrega */
+document.addEventListener("DOMContentLoaded", () => {
+  carregarHoteis();
+});
+
+/* Função para carregar hoteis */
+function carregarHoteis() {
+  try {
+    /* inicializar o modelo e obter os primeiros 5 hoteis */
+    const hoteis = HotelModel.init();
+    const primeirosHoteis = HotelModel.getFirst(5);
+
+    /* seleciona o elemento onde os hoteis serão mostrados */
+    const containerHoteis = document.getElementById("container-hoteis");
+
+    if (containerHoteis && primeirosHoteis.length > 0) {
+      /* esvazia o container */
+      containerHoteis.innerHTML = "";
+
+      /* cria os elementos de hotel */
+      primeirosHoteis.forEach((hotel) => {
+        /* cria um elemento para o hotel */
+        const divHotel = document.createElement("div");
+        divHotel.className =
+          "flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700";
+
+        /* informação base do hotel (primeira coluna) */
+        const divInfo = document.createElement("div");
+        divInfo.className = "flex items-center gap-3";
+
+        /* foto do hotel */
+        const imgHotel = document.createElement("img");
+        imgHotel.src = hotel.foto || "https://placehold.co/60x40";
+        imgHotel.alt = hotel.nome;
+        imgHotel.className = "w-16 h-10 object-cover rounded-lg";
+
+        /* nome e informações do hotel */
+        const divNomeInfo = document.createElement("div");
+        divNomeInfo.className = "flex flex-col";
+
+        const spanNome = document.createElement("span");
+        spanNome.className = "font-semibold";
+        spanNome.textContent = hotel.nome;
+
+        /* info de quartos e acessibilidade */
+        const divDetalhes = document.createElement("div");
+        divDetalhes.className =
+          "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300";
+
+        /* verifica se há quartos */
+        if (hotel.quartos && hotel.quartos.length > 0) {
+          const quarto = hotel.quartos[0];
+
+          /* span para camas */
+          const spanCama = document.createElement("span");
+          spanCama.className = "flex items-center gap-1";
+          spanCama.innerHTML = `<span class="material-symbols-outlined text-sm">bed</span>${quarto.camas}`;
+
+          /* span para capacidade */
+          const spanPessoa = document.createElement("span");
+          spanPessoa.className = "flex items-center gap-1";
+          spanPessoa.innerHTML = `<span class="material-symbols-outlined text-sm">person</span>${quarto.capacidade}`;
+
+          divDetalhes.appendChild(spanCama);
+          divDetalhes.appendChild(spanPessoa);
+        }
+
+        /* monta a div de nome e info */
+        divNomeInfo.appendChild(spanNome);
+        divNomeInfo.appendChild(divDetalhes);
+
+        /* monta a primeira coluna */
+        divInfo.appendChild(imgHotel);
+        divInfo.appendChild(divNomeInfo);
+
+        /* informação de preço e botão (segunda coluna) */
+        const divPreco = document.createElement("div");
+        divPreco.className = "flex items-center gap-3";
+
+        /* preço (se tiver quartos) */
+        if (hotel.quartos && hotel.quartos.length > 0) {
+          const spanPreco = document.createElement("span");
+          spanPreco.className = "font-bold text-cyan-700 dark:text-cyan-400";
+          spanPreco.textContent = `${hotel.quartos[0].precoNoite}€/noite`;
+          divPreco.appendChild(spanPreco);
+        }
+
+        /* botão de adicionar */
+        const spanAdicionar = document.createElement("span");
+        spanAdicionar.className =
+          "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
+        spanAdicionar.textContent = "add_circle";
+        spanAdicionar.onclick = function () {
+          showToast("Hotel adicionado!", "success");
+        };
+        divPreco.appendChild(spanAdicionar);
+
+        /* monta o hotel */
+        divHotel.appendChild(divInfo);
+        divHotel.appendChild(divPreco);
+
+        /* adiciona o hotel ao container */
+        containerHoteis.appendChild(divHotel);
+      });
+    }
+  } catch (erro) {
+    console.error("Erro ao carregar hoteis:", erro);
+  }
 }

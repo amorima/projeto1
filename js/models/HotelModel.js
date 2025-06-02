@@ -1,49 +1,31 @@
-import { loadFromLocalStorage, saveToLocalStorage, getNextId} from './ModelHelpers.js';
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  getNextId,
+} from "./ModelHelpers.js";
 
-// ARRAY HOTELS
-let hotels
+/* array para os hoteis */
+let hoteis = [];
 
-// CARREGAR HOTEIS DA LOCAL STORAGE
+/* função para iniciar o modelo com dados da localStorage */
 export function init() {
-  hotels = localStorage.hotels ? loadFromLocalStorage('hotels',hotels) : [];
-  return hotels;
+  hoteis = localStorage.hoteis ? JSON.parse(localStorage.hoteis) : [];
+  return hoteis;
 }
 
+/* função para obter todos os hoteis */
 export function getAll() {
-  return hotels ? hotels : [];
+  return hoteis;
 }
 
-// ADICIONAR HOTEL
-export function add(destinoId, nome, foto, tipo, camas, capacidade, precoNoite, acessibilidade = [], available = true) {
-  const id = getNextId(hotels);
-  if (hotels.some((h) => h.name === nome && h.destinoId === destinoId)) {
-    throw Error(`Hotel "${nome}" already exists!`);
-  } else {
-    hotels.push(new Hotel(id, destinoId, nome, foto, tipo, camas, capacidade, precoNoite, acessibilidade, available));
-    saveToLocalStorage('hotels', hotels);
-  }
+/* função para obter os primeiros X hoteis */
+export function getFirst(quantidade = 5) {
+  return hoteis.slice(0, quantidade);
 }
 
-// ALTERAR DADOS DE HOTEL
-export function update(id, newHotel) {
-  const index = hotels.findIndex((h) => h.id == id);
-  if (index !== -1) {
-    hotels[index] = newHotel;
-    saveToLocalStorage('hotels', hotels);
-    return true;
-  }
-  throw Error('No Hotel Found');
-}
-
-// APAGAR HOTEL
-export function deleteHotel(id) {
-  const index = hotels.findIndex((h) => h.id == id);
-  if (index !== -1) {
-    hotels.splice(index, 1);
-    saveToLocalStorage('hotels', hotels);
-    return true;
-  }
-  throw Error('No Hotel Found');
+/* obter hoteis por cidade */
+export function getHoteisByCidade(cidade) {
+  return hoteis.filter((hotel) => hotel.cidade === cidade);
 }
 
 /**
@@ -64,11 +46,11 @@ export function deleteHotel(id) {
  */
 export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
   // Filtra hoteis cuja origem é OPO (Porto)
-  const Hotels = hotels.filter(h => h.destinoId === destinoId);
+  const Hotels = hoteis.filter((h) => h.destinoId === destinoId);
   // Embaralha o array
   const shuffled = Hotels.sort(() => 0.5 - Math.random());
   // Retorna os primeiros 'count' voos
-  return shuffled.slice(perPage*(page-1), perPage*page);
+  return shuffled.slice(perPage * (page - 1), perPage * page);
 }
 
 /**
@@ -94,15 +76,26 @@ export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
 class Hotel {
   id = 0;
   destinoId = 0;
-  nome = '';
-  foto = ''; // Improvement => []
-  tipo = '';
+  nome = "";
+  foto = ""; // Improvement => []
+  tipo = "";
   camas = 0;
   capacidade = 0;
   precoNoite = 0;
   acessibilidade = [];
   available = true;
-  constructor(id, destinoId, nome, foto, tipo, camas, capacidade, precoNoite, acessibilidade = [], available = true) {
+  constructor(
+    id,
+    destinoId,
+    nome,
+    foto,
+    tipo,
+    camas,
+    capacidade,
+    precoNoite,
+    acessibilidade = [],
+    available = true
+  ) {
     this.id = id;
     this.destinoId = destinoId;
     this.nome = nome;

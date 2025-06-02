@@ -192,15 +192,25 @@
           </div>
         </div>
         <!-- Hotel -->
-          <!-- cartão hotel ocupa largura total em ecrãs pequenos -->
-          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition max-lg:w-full">
-            <img src="/img/misc/bed.png" alt="Hotel" class="w-20 sm:w-32 rounded-lg">
-            <div class="flex flex-col gap-2 flex-1">
-              <span class="text-Text-Titles text-xl font-semibold dark:text-cyan-300">Viagem sem hotel</span>
-              <span class="text-base font-light dark:text-cyan-100">Adiciona um quarto e ganha <b>mais pontos</b>!</span>
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Alojamento</h2>
+          <!-- cartão hotel com opções de escolha -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col gap-4 transition max-lg:w-full">
+            
+            <div class="mb-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-cyan-700 dark:text-cyan-400">hotel</span>
+                <span class="text-xl font-semibold">Escolhe um hotel para a tua estadia</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 ml-8">Ganha pontos extra com a reserva de alojamento!</p>
             </div>
-            <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-cyan-400 transition hover:text-cyan-700 dark:hover:text-cyan-300">arrow_circle_right</span>
+            
+            <!-- Container para os hoteis -->
+            <div id="container-hoteis" class="flex flex-col gap-4">
+              <!-- Aqui serão inseridos os hoteis dinamicamente via JavaScript -->
+            </div>
           </div>
+        </div>
         <!-- Bagagem -->
         <div class="relative mt-10">
           <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Bagagem</h2>
