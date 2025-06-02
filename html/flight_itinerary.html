@@ -21,41 +21,41 @@
   <nav id="menu-placeholder"></nav>
 
   <!-- hero -->
-  <section class="h-auto sm:pb-12 max-w-[1206px] w-full mx-auto mt-[120px] px-2 sm:px-4">
- <div class="w-full sm:w-[1206px] h-[300px] sm:h-[464px] relative mx-auto">
-    <!-- bloco do topo do hero -->
-    <div class="flex items-center justify-between lg-2 pl-2 pt-2 sm:static">
-        <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700">arrow_circle_left</span>
-            <div>
-                <div class="text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
-                <div class="inline-flex justify-start items-center gap-1">
-                    <div class="w-6 h-6 relative overflow-hidden">
-                        <span class="material-symbols-outlined">calendar_month</span>
+  <section class="h-auto sm:pb-12 w-full mx-auto mt-[120px] px-2 sm:px-4">
+    <div class="w-full max-w-[1206px] mx-auto h-[300px] sm:h-[464px] relative">
+        <div class="flex items-center justify-between mb-2 pl-2 pt-2 sm:static">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700">arrow_circle_left</span>
+                <div>
+                    <div class="text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
+                    <div class="inline-flex justify-start items-center gap-1">
+                        <div class="w-6 h-6 relative overflow-hidden">
+                            <span class="material-symbols-outlined">calendar_month</span>
+                        </div>
+                        <div class="justify-start text-Text-Subtitles text-base font-normal font-['IBM_Plex_Sans'] leading-tight">06 Mai - 12 Mai</div>
                     </div>
-                    <div class="justify-start text-Text-Subtitles text-base font-normal font-['IBM_Plex_Sans'] leading-tight">06 Mai - 12 Mai</div>
                 </div>
             </div>
+            <div id="fav-itinerary" data-favorito="false" class="w-8 h-8 overflow-hidden cursor-pointer user-select-none flex items-center justify-center">
+                <span class="material-symbols-outlined text-red-500 transition-all duration-300 ease-in-out"
+                      style="font-variation-settings: 'FILL' 0;">favorite</span>
+            </div>
         </div>
-        <div id="fav-itinerary" data-favorito="false" class="w-8 h-8 overflow-hidden cursor-pointer user-select-none flex items-center justify-center">
-            <span class="material-symbols-outlined text-red-500 transition-all duration-300 ease-in-out"
-                  style="font-variation-settings: 'FILL' 0;">favorite</span>
+        <!-- imagem responsiva -->
+        <div class="w-full h-48 sm:h-96 left-0 top-[64px] absolute overflow-hidden rounded-2xl">
+            <img class="w-full h-full object-cover" src="https://placehold.co/1270x400" />
         </div>
     </div>
-    <img class="w-full h-48 sm:h-96  left-0 top-[64px] absolute rounded-2xl object-cover" src="https://placehold.co/1270x400" />
-</div>
   </section>
 
-  <!-- Corpo da Página -->
+  <!-- conteúdo principal -->
   <section class="h-auto pb-12 max-w-[1206px] w-full mx-auto">
     <div class="w-full max-w-[1206px] mx-auto flex flex-col lg:flex-row gap-8 px-2 sm:px-4 relative">
       <div class="flex-1 flex flex-col gap-8">
         <!-- Itinerário -->
         <div>
           <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Itinerário</h2>
-          <!-- cartão itinerário ocupa largura total em ecrãs pequenos -->
           <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 max-lg:w-full">
-              <!-- imagem com cantos arredondados condicionais baseados no tamanho do ecrã -->
               <img
                   class="h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover"
                   src="https://placehold.co/200x200"
