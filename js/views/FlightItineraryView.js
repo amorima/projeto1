@@ -6,8 +6,8 @@ import {
 } from "./ViewHelpers.js";
 
 import * as HotelModel from "../models/HotelModel.js";
+import * as ActivityModel from "../models/ActivityModel.js";
 
-/* Controlos de número de pessoas */
 const btnMais = document.getElementById("btn-mais");
 const btnMenos = document.getElementById("btn-menos");
 const inputPessoas = document.getElementById("input-pessoas");
@@ -44,13 +44,10 @@ if (btnMais && btnMenos && inputPessoas) {
   };
 }
 
-/* efeito ao reservar viagem */
 if (btnReservar) {
   btnReservar.onclick = function () {
-    /* mostra toast verde */
     showToast("Viagem reservada!", "success");
 
-    /* carrega o dotlottie-player só se não existir */
     if (
       !window.customElements ||
       !window.customElements.get("dotlottie-player")
@@ -63,7 +60,6 @@ if (btnReservar) {
         mostrarConfettiNoToast();
       };
       document.body.appendChild(script);
-      /* fallback para o caso de o onload não disparar a tempo */
       setTimeout(mostrarConfettiNoToast, 500);
     } else {
       mostrarConfettiNoToast();
@@ -71,14 +67,10 @@ if (btnReservar) {
   };
 }
 
-/* função para mostrar o lottie atrás do toast */
 function mostrarConfettiNoToast() {
-  /* procura o toast mais recente para referência, embora não seja estritamente necessário para posicionar o lottie */
   let toast = document.querySelector(".fixed.bottom-5.right-5");
 
-  /* cria o container do lottie */
   let confettiDiv = document.createElement("div");
-  /* posiciona o lottie no canto inferior direito, atrás do toast */
   confettiDiv.style.position = "fixed";
   confettiDiv.style.right = "-50px"; /* um pouco para dentro do canto */
   confettiDiv.style.bottom = "-50px"; /* um pouco para dentro do canto */
@@ -90,38 +82,28 @@ function mostrarConfettiNoToast() {
   confettiDiv.innerHTML = `
       <dotlottie-player src="https://lottie.host/639683f1-4beb-47c3-bda1-a0270b3a9600/Qg9ZzwHWqP.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
     `;
-  /* adiciona o lottie ao corpo do documento */
   document.body.appendChild(confettiDiv);
 
-  /* remove o lottie depois de 2.5s */
   setTimeout(function () {
     confettiDiv.remove();
   }, 2000);
 }
 
-/* toggle do coração favorito no itinerário */
 const favItinerary = document.getElementById("fav-itinerary");
 if (favItinerary) {
-  /* impede que o coração seja selecionável */
   favItinerary.style.userSelect = "none";
   favItinerary.addEventListener("mousedown", function (e) {
-    /* impede seleção de texto ao clicar rápido */
     e.preventDefault();
   });
   favItinerary.addEventListener("click", function () {
-    /* apanha o span do ícone */
     const icon = favItinerary.querySelector("span");
-    /* verifica o estado atual */
     const isFav = favItinerary.getAttribute("data-favorito") === "true";
-    /* alterna o estado */
     favItinerary.setAttribute("data-favorito", String(!isFav));
-    /* muda o FILL do ícone */
     if (!isFav) {
       icon.style.fontVariationSettings = "'FILL' 1";
     } else {
       icon.style.fontVariationSettings = "'FILL' 0";
     }
-    /* animação simples */
     icon.classList.add("scale-110");
     setTimeout(function () {
       icon.classList.remove("scale-110");
@@ -129,43 +111,29 @@ if (favItinerary) {
   });
 }
 
-/* Carrega os hoteis quando a página carrega */
-document.addEventListener("DOMContentLoaded", () => {
-  carregarHoteis();
-});
-
-/* Função para carregar hoteis */
 function carregarHoteis() {
   try {
-    /* inicializar o modelo e obter os primeiros 5 hoteis */
     const hoteis = HotelModel.init();
     const primeirosHoteis = HotelModel.getFirst(5);
 
-    /* seleciona o elemento onde os hoteis serão mostrados */
     const containerHoteis = document.getElementById("container-hoteis");
 
     if (containerHoteis && primeirosHoteis.length > 0) {
-      /* esvazia o container */
       containerHoteis.innerHTML = "";
 
-      /* cria os elementos de hotel */
       primeirosHoteis.forEach((hotel) => {
-        /* cria um elemento para o hotel */
         const divHotel = document.createElement("div");
         divHotel.className =
           "flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700";
 
-        /* informação base do hotel (primeira coluna) */
         const divInfo = document.createElement("div");
         divInfo.className = "flex items-center gap-3";
 
-        /* foto do hotel */
         const imgHotel = document.createElement("img");
         imgHotel.src = hotel.foto || "https://placehold.co/60x40";
         imgHotel.alt = hotel.nome;
         imgHotel.className = "w-16 h-10 object-cover rounded-lg";
 
-        /* nome e informações do hotel */
         const divNomeInfo = document.createElement("div");
         divNomeInfo.className = "flex flex-col";
 
@@ -173,21 +141,17 @@ function carregarHoteis() {
         spanNome.className = "font-semibold";
         spanNome.textContent = hotel.nome;
 
-        /* info de quartos e acessibilidade */
         const divDetalhes = document.createElement("div");
         divDetalhes.className =
           "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300";
 
-        /* verifica se há quartos */
         if (hotel.quartos && hotel.quartos.length > 0) {
           const quarto = hotel.quartos[0];
 
-          /* span para camas */
           const spanCama = document.createElement("span");
           spanCama.className = "flex items-center gap-1";
           spanCama.innerHTML = `<span class="material-symbols-outlined text-sm">bed</span>${quarto.camas}`;
 
-          /* span para capacidade */
           const spanPessoa = document.createElement("span");
           spanPessoa.className = "flex items-center gap-1";
           spanPessoa.innerHTML = `<span class="material-symbols-outlined text-sm">person</span>${quarto.capacidade}`;
@@ -196,19 +160,15 @@ function carregarHoteis() {
           divDetalhes.appendChild(spanPessoa);
         }
 
-        /* monta a div de nome e info */
         divNomeInfo.appendChild(spanNome);
         divNomeInfo.appendChild(divDetalhes);
 
-        /* monta a primeira coluna */
         divInfo.appendChild(imgHotel);
         divInfo.appendChild(divNomeInfo);
 
-        /* informação de preço e botão (segunda coluna) */
         const divPreco = document.createElement("div");
         divPreco.className = "flex items-center gap-3";
 
-        /* preço (se tiver quartos) */
         if (hotel.quartos && hotel.quartos.length > 0) {
           const spanPreco = document.createElement("span");
           spanPreco.className = "font-bold text-cyan-700 dark:text-cyan-400";
@@ -216,21 +176,21 @@ function carregarHoteis() {
           divPreco.appendChild(spanPreco);
         }
 
-        /* botão de adicionar */
         const spanAdicionar = document.createElement("span");
         spanAdicionar.className =
           "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
         spanAdicionar.textContent = "add_circle";
-        spanAdicionar.onclick = function () {
+
+        spanAdicionar.onclick = function (e) {
+          e.stopPropagation();
           showToast("Hotel adicionado!", "success");
         };
+
         divPreco.appendChild(spanAdicionar);
 
-        /* monta o hotel */
         divHotel.appendChild(divInfo);
         divHotel.appendChild(divPreco);
 
-        /* adiciona o hotel ao container */
         containerHoteis.appendChild(divHotel);
       });
     }
@@ -238,3 +198,167 @@ function carregarHoteis() {
     console.error("Erro ao carregar hoteis:", erro);
   }
 }
+
+function carregarActividades() {
+  try {
+    const atividades = ActivityModel.init();
+    const primeirasAtividades = ActivityModel.getFirst(5);
+
+    const containerAtividades = document.getElementById("container-atividades");
+
+    if (containerAtividades && primeirasAtividades.length > 0) {
+      containerAtividades.innerHTML = "";
+
+      primeirasAtividades.forEach((atividade) => {
+        const divAtividade = document.createElement("div");
+        divAtividade.className =
+          "flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700";
+
+        const divInfo = document.createElement("div");
+        divInfo.className = "flex items-center gap-3";
+
+        const imgAtividade = document.createElement("img");
+        imgAtividade.src = atividade.foto || "https://placehold.co/60x40";
+        imgAtividade.alt = atividade.nome;
+        imgAtividade.className = "w-16 h-10 object-cover rounded-lg";
+
+        const divNomeInfo = document.createElement("div");
+        divNomeInfo.className = "flex flex-col";
+
+        const spanNome = document.createElement("span");
+        spanNome.className = "font-semibold";
+        spanNome.textContent = atividade.nome;
+
+        const divDetalhes = document.createElement("div");
+        divDetalhes.className =
+          "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300";
+
+        let icone = "tour";
+        if (atividade.tipoTurismo.includes("Gastronomic")) {
+          icone = "restaurant";
+        } else if (atividade.tipoTurismo.includes("Cultural")) {
+          icone = "museum";
+        } else if (atividade.tipoTurismo.includes("Urbano")) {
+          icone = "location_city";
+        } else if (atividade.tipoTurismo.includes("Religioso")) {
+          icone = "church";
+        }
+
+        const spanTipo = document.createElement("span");
+        spanTipo.className = "flex items-center gap-1";
+        spanTipo.innerHTML = `<span class="material-symbols-outlined text-sm">${icone}</span>${atividade.tipoTurismo}`;
+
+        divDetalhes.appendChild(spanTipo);
+        divNomeInfo.appendChild(spanNome);
+        divNomeInfo.appendChild(divDetalhes);
+        divInfo.appendChild(imgAtividade);
+        divInfo.appendChild(divNomeInfo);
+
+        const divBotoes = document.createElement("div");
+        divBotoes.className = "flex items-center gap-3";
+
+        const spanAdicionar = document.createElement("span");
+        spanAdicionar.className =
+          "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
+        spanAdicionar.textContent = "add_circle";
+
+        spanAdicionar.onclick = function (e) {
+          e.stopPropagation();
+          showToast("Atividade adicionada!", "success");
+        };
+
+        divBotoes.appendChild(spanAdicionar);
+
+        divAtividade.appendChild(divInfo);
+        divAtividade.appendChild(divBotoes);
+
+        containerAtividades.appendChild(divAtividade);
+      });
+    }
+  } catch (erro) {
+    console.error("Erro ao carregar atividades:", erro);
+  }
+}
+
+function adicionarEventosCarros() {
+  const botoesCarro = document.querySelectorAll(".material-symbols-outlined");
+
+  botoesCarro.forEach(function (botao) {
+    if (botao.textContent === "add_circle") {
+      let elementoPai = botao.parentElement;
+      while (elementoPai && !elementoPai.querySelector("h2")) {
+        elementoPai = elementoPai.parentElement;
+      }
+
+      if (
+        elementoPai &&
+        elementoPai.querySelector("h2") &&
+        elementoPai.querySelector("h2").textContent.includes("Aluguer de Carro")
+      ) {
+        botao.onclick = function () {
+          showToast("Carro adicionado!", "success");
+        };
+      }
+    }
+  });
+
+  const seccaoCarros = document.querySelectorAll(
+    "div.flex.items-center.justify-between"
+  );
+  seccaoCarros.forEach(function (carro) {
+    const botao = carro.querySelector(".material-symbols-outlined");
+    if (botao && botao.textContent === "add_circle") {
+      botao.onclick = function () {
+        showToast("Carro adicionado!", "success");
+      };
+    }
+  });
+}
+
+function adicionarEventoSeguro() {
+  const h2Seguro = Array.from(document.querySelectorAll("h2")).find((h2) =>
+    h2.textContent.includes("Seguro")
+  );
+
+  if (h2Seguro) {
+    const secaoSeguro = h2Seguro.closest("div");
+
+    if (secaoSeguro) {
+      const botaoSeguro = secaoSeguro.querySelector(
+        ".material-symbols-outlined"
+      );
+      if (botaoSeguro && botaoSeguro.textContent === "arrow_circle_right") {
+        botaoSeguro.textContent = "add_circle";
+        botaoSeguro.id = "btn-add-seguro";
+        botaoSeguro.className =
+          "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400 cursor-pointer";
+
+        botaoSeguro.onclick = function () {
+          showToast("Seguro SecureIt adicionado!", "success");
+        };
+      }
+    }
+  }
+
+  const btnAddSeguro = document.getElementById("btn-add-seguro");
+  if (btnAddSeguro) {
+    btnAddSeguro.onclick = function () {
+      showToast("Seguro SecureIt adicionado!", "success");
+    };
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  carregarHoteis();
+  carregarActividades();
+
+  setTimeout(function () {
+    adicionarEventosCarros();
+    adicionarEventoSeguro();
+  }, 500);
+});
+
+window.onload = function () {
+  adicionarEventosCarros();
+  adicionarEventoSeguro();
+};

@@ -9,9 +9,20 @@ let activities;
 
 // CARREGAR ACTIVIDADES DA LOCAL STORAGE
 export function init() {
-  activities = localStorage.activities
-    ? loadFromLocalStorage("activities", activities)
+  activities = localStorage.atividades
+    ? JSON.parse(localStorage.atividades)
     : [];
+  return activities;
+}
+
+// LER ACTIVIDADE
+export function getAll() {
+  return activities ? activities : [];
+}
+
+// OBTER PRIMEIRAS ACTIVIDADES
+export function getFirst(quantidade = 5) {
+  return activities ? activities.slice(0, quantidade) : [];
 }
 
 // ADICIONAR ACTIVIDADE
