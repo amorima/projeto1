@@ -5,13 +5,22 @@ import {
 } from "./ModelHelpers.js";
 
 // ARRAY ACTIVITIES
-let activities;
+let activities = [];
 
 // CARREGAR ACTIVIDADES DA LOCAL STORAGE
 export function init() {
-  activities = localStorage.activities
-    ? loadFromLocalStorage("activities", activities)
-    : [];
+  activities = localStorage.atividades ? loadFromLocalStorage('atividades', activities) : [];
+  return activities;
+}
+
+// LER ACTIVIDADE
+export function getAll() {
+  return activities ? activities : [];
+}
+
+// OBTER PRIMEIRAS ACTIVIDADES
+export function getFirst(quantidade = 5) {
+  return activities ? activities.slice(0, quantidade) : [];
 }
 
 // ADICIONAR ACTIVIDADE
@@ -66,6 +75,17 @@ export function deleteActivity(id) {
 
 /**
  * CLASSE QUE MODELA UMA ATIVIDADE NA APLICAÇÃO
+ * @class Activity
+ * @property {number} id - Identificador único da atividade.
+ * @property {number} destino - ID do destino associado à atividade.
+ * @property {string} tipoTurismo - Tipo de turismo da atividade (ex: cultural, aventura).
+ * @property {string} nome - Nome da atividade.
+ * @property {string} foto - URL da foto da atividade.
+ * @property {string} descricao - Descrição da atividade.
+ * @property {Array} acessibilidade - Lista de características de acessibilidade da atividade.
+ * @description
+ * Esta classe representa uma atividade turística, contendo informações como ID, destino, tipo de turismo, nome, foto, descrição e características de acessibilidade.
+ * É utilizada para gerenciar as atividades disponíveis na aplicação, permitindo adicionar, atualizar e remover atividades.
  */
 class Activity {
   id = 0;

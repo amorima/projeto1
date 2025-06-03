@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planeador de Viagens Inteligente</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body class="font-sans dark:bg-gray-950 dark:text-gray-100">
+  <header id="header-placeholder"></header>
+  <nav id="menu-placeholder"></nav>
+
+  <!-- hero -->
+  <section class="h-auto sm:pb-12 w-full mx-auto mt-[120px] px-2 sm:px-4">
+    <div class="w-full max-w-[1206px] mx-auto h-[300px] sm:h-[464px] relative">
+        <div class="flex items-center justify-between mb-2 pl-2 pt-2 sm:static">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-4xl text-gray-400 transition hover:text-cyan-700">arrow_circle_left</span>
+                <div>
+                    <div class="text-2xl font-bold font-['Space_Mono'] leading-7">Londres</div>
+                    <div class="inline-flex justify-start items-center gap-1">
+                        <div class="w-6 h-6 relative overflow-hidden">
+                            <span class="material-symbols-outlined">calendar_month</span>
+                        </div>
+                        <div class="justify-start text-Text-Subtitles text-base font-normal font-['IBM_Plex_Sans'] leading-tight">06 Mai - 12 Mai</div>
+                    </div>
+                </div>
+            </div>
+            <div id="fav-itinerary" data-favorito="false" class="w-8 h-8 overflow-hidden cursor-pointer user-select-none flex items-center justify-center">
+                <span class="material-symbols-outlined text-red-500 transition-all duration-300 ease-in-out"
+                      style="font-variation-settings: 'FILL' 0;">favorite</span>
+            </div>
+        </div>
+        <!-- imagem responsiva -->
+        <div class="w-full h-48 sm:h-96 left-0 top-[64px] absolute overflow-hidden rounded-2xl">
+            <img class="w-full h-full object-cover" src="https://placehold.co/1270x400" />
+        </div>
+    </div>
+  </section>
+
+  <!-- conteúdo principal -->
+  <section class="h-auto pb-12 max-w-[1206px] w-full mx-auto">
+    <div class="w-full max-w-[1206px] mx-auto flex flex-col lg:flex-row gap-8 px-2 sm:px-4 relative">
+      <div class="flex-1 flex flex-col gap-8">
+        <!-- Itinerário -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Itinerário</h2>
+          <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 max-lg:w-full">
+              <img
+                  class="h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover"
+                  src="https://placehold.co/200x200"
+                  alt="Imagem promocional"
+              />
+              <!-- área abaixo da imagem principal com flexbox para manter conteúdo na mesma linha -->
+              <div class="flex flex-row items-center justify-between flex-1 p-4 w-full">
+                  <!-- conteúdo do itinerário com texto alinhado à esquerda -->
+                  <div class="flex flex-col gap-2 text-left flex-1">
+                      <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">Londres</span>
+                      <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
+                          06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
+                      </span>
+                      <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
+                          12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
+                      </span>
+                      <span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo OPO - LDN</span>
+                  </div>
+                  <!-- imagem da companhia aérea bem à direita -->
+                  <div class="pl-4 flex-shrink-0 flex items-center">
+                      <img
+                          class="w-16 h-16 rounded-full"
+                          src="https://placehold.co/66x66"
+                          alt="Companhia aérea"
+                      />
+                  </div>
+              </div>
+          </div>
+        </div>
+        <!-- Carro -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Aluguer de Carro</h2>
+          <!-- cartão carro com opções de escolha -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col gap-4 transition max-lg:w-full">
+            
+            <!-- Título e subtítulo mais próximos -->
+            <div class="ml-8 flex flex-col space-y-1">
+              <div class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-cyan-700 dark:text-cyan-400">directions_car</span>
+                <span class="text-xl font-semibold">Escolhe um carro para a tua viagem</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 ml-8">Ganha pontos extra ao adicionar uma viatura!</p>
+            </div>
+            
+            <!-- Opção 1 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/ford.png" alt="Carro compacto" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Ford Fiesta</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>2</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">24€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 2 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/Volkswagen.png" alt="Carro familiar" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Volkswagen Golf</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">32€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 3 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/HYUNDAi.png" alt="SUV" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Hyundai Tucson</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>5</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">45€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 4 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/Peugeot.png" alt="Carrinha" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Peugeot 5008</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>7</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>6</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">52€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+            
+            <!-- Opção 5 -->
+            <div class="flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
+              <div class="flex items-center gap-3">
+                <img src="/img/misc/carros/mercedes.png" alt="Premium" class="w-16 rounded-lg">
+                <div class="flex flex-col">
+                  <span class="font-semibold">Mercedes Classe C</span>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">door_front</span>5</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">work</span>3</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold text-cyan-700 dark:text-cyan-400">68€/dia</span>
+                <span class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400">add_circle</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Hotel -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Alojamento</h2>
+          <!-- cartão hotel com opções de escolha -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col gap-4 transition max-lg:w-full">
+            
+            <div class="mb-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-cyan-700 dark:text-cyan-400">hotel</span>
+                <span class="text-xl font-semibold">Escolhe um hotel para a tua estadia</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 ml-8">Ganha pontos extra com a reserva de alojamento!</p>
+            </div>
+            
+            <!-- Container para os hoteis -->
+            <div id="container-hoteis" class="flex flex-col gap-4">
+              <!-- Aqui serão inseridos os hoteis dinamicamente via JavaScript -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Atividades -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Atividades</h2>
+          <!-- cartão atividades com opções de escolha -->
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 sm:p-6 flex flex-col gap-4 transition max-lg:w-full">
+            
+            <div class="mb-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-cyan-700 dark:text-cyan-400">attractions</span>
+                <span class="text-xl font-semibold">Descobre atividades para a tua viagem</span>
+              </div>
+              <p class="text-sm text-gray-500 dark:text-gray-400 ml-8">Ganha pontos extra ao adicionar atividades à tua viagem!</p>
+            </div>
+            
+            <!-- Container para as atividades -->
+            <div id="container-atividades" class="flex flex-col gap-4">
+              <!-- Aqui serão inseridas as atividades dinamicamente via JavaScript -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bagagem -->
+        <div class="relative mt-10">
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Bagagem</h2>
+          <img class="w-40 sm:w-52 md:w-72 h-24 sm:h-36 md:h-52 absolute right-[-10px] sm:right-[-30px] md:right-[-60px] top-[-10px] sm:top-[-20px] md:top-[-40px] z-10" src="/img/misc/mochila.png" alt="Mochila">
+          <!-- cartão bagagem ocupa largura total em ecrãs pequenos -->
+          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col gap-2 relative z-0 max-lg:w-full">
+            <div class="bg-cyan-800 rounded-[34px] px-8 py-1 w-fit text-white text-xs font-bold font-['Space_Mono'] mb-2">Incluído</div>
+            <span class="text-xl font-normal font-['Space_Mono']">1 x <b>Mochila</b></span>
+            <span class="text-base font-light">Podes levar gratuitamente uma mochila debaixo do assento.<br>
+              Utilizadores <b>Globetrotter</b> e <b>Embaixador</b> podem levar uma mala de cabine extra.</span>
+          </div>
+        </div>
+        <!-- Seguro -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-4">Seguro</h2>
+          <!-- cartão seguro ocupa largura total em ecrãs pequenos -->
+          <div class="bg-Background-Background rounded-lg shadow-md outline outline-1 outline-gray-200 p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 transition max-lg:w-full">
+            <div class="flex flex-col gap-2 flex-1">
+              <span class="text-xl font-normal font-['Space_Mono']">Viaje em segurançacom <b>Secure</b>It</span>
+              <span class="flex items-center gap-2 text-base font-medium">
+                <span class="material-symbols-outlined">attach_money</span>
+                Reembolso da viagem garantido
+              </span>
+              <span class="flex items-center gap-2 text-base font-medium">
+                <span class="material-symbols-outlined">event_busy</span>
+                Cancelar sempre que quiser
+              </span>
+              <span class="flex items-center gap-2 text-base font-medium">
+                <span class="material-symbols-outlined">currency_exchange</span>
+                Devolução instantânea
+              </span>
+              <span class="text-base font-light mt-2">Adicione o plano <b>Secure</b>It no checkout e ganhe mais pontos!</span>
+            </div>
+            <span id="btn-add-seguro" class="material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400 cursor-pointer">add_circle</span>
+          </div>
+        </div>
+      </div>
+      <!-- Sidebar do lado direito -->
+      <div class="w-full lg:max-w-xs mx-auto lg:mx-0 lg:block lg:mt-16 mt-8">
+        <!-- o cartão da sidebar ocupa toda a largura em ecrãs pequenos -->
+        <div class="bg-Background-Background dark:bg-gray-900 rounded-2xl shadow-md p-6 sticky top-[120px] flex flex-col space-y-6 outline outline-1 outline-gray-200 dark:outline-gray-700 w-full">
+          <div class="flex items-center gap-3 justify-between">
+            <div class="flex items-baseline gap-3">
+              <div class="text-3xl font-bold text-Button-Main dark:text-cyan-400">65 €</div>
+              <div class="text-base font-bold text-Text-Subtitles line-through dark:text-gray-400">91 €</div>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-Button-Main dark:text-cyan-400">globe</span>
+              <span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded">40% desconto</span>
+            </div>
+          </div>
+          <ul class="space-y-3 text-sm text-Text-Body font-medium dark:text-gray-200">
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined">flight</span>
+              Ida e volta
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined">calendar_month</span>
+              06 Mai - 12 Mai
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined">star</span>
+              Acumula <b>65</b> pontos
+            </li>
+          </ul>
+          <div class="flex items-center justify-between gap-2">
+            <button id="btn-menos" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700">
+              <span class="material-symbols-outlined">remove</span>
+            </button>
+            <input
+              id="input-pessoas"
+              type="text"
+              inputmode="numeric"
+              pattern="\d*"
+              value="1"
+              class="appearance-none w-32 sm:w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700"
+            />
+            <button id="btn-mais" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+          <button class="w-full bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 font-bold py-3 rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-500 transition outline outline-1 outline-gray-200 dark:outline-gray-700">
+            Reservar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer-placeholder"></footer>
+
+     <script type="module" src="../js/views/FlightItineraryView.js"></script>
+     <script src="../js/init.js"></script>
+
+</body>
+</html>

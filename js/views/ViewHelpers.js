@@ -107,16 +107,32 @@ export function getFormData(formId) {
 }
 
 export function showToast(msg, type = "success") {
-  const toast = document.createElement(`div`);
-  toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50 
+  /* mostra um toast com animação suave */
+  const toast = document.createElement("div");
+  toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50
         ${
-          type === `success`
-            ? `bg-green-500 text-white`
-            : `bg-red-500 text-white`
-        }`;
+          type === "success"
+            ? "bg-green-500 text-white"
+            : "bg-red-500 text-white"
+        }
+        transition-all duration-500 ease-in-out opacity-0 translate-y-4
+  `;
   toast.innerText = msg;
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+
+  /* força o reflow para ativar a transição */
+  void toast.offsetWidth;
+
+  /* aplica o efeito de fade in */
+  toast.classList.remove("opacity-0", "translate-y-4");
+  toast.classList.add("opacity-100", "translate-y-0");
+
+  setTimeout(() => {
+    /* fade out */
+    toast.classList.remove("opacity-100", "translate-y-0");
+    toast.classList.add("opacity-0", "translate-y-4");
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
 }
 
 export function openModal(modalId) {
