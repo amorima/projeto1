@@ -9,7 +9,7 @@ let hoteis = [];
 
 /* função para iniciar o modelo com dados da localStorage */
 export function init() {
-  hoteis = localStorage.hoteis ? JSON.parse(localStorage.hoteis) : [];
+  hoteis = localStorage.hoteis ? loadFromLocalStorage('hoteis', hoteis) : [];
   return hoteis;
 }
 
