@@ -5,13 +5,11 @@ import {
 } from "./ModelHelpers.js";
 
 // ARRAY ACTIVITIES
-let activities;
+let activities = [];
 
 // CARREGAR ACTIVIDADES DA LOCAL STORAGE
 export function init() {
-  activities = localStorage.atividades
-    ? JSON.parse(localStorage.atividades)
-    : [];
+  activities = localStorage.atividades ? loadFromLocalStorage('atividades', activities) : [];
   return activities;
 }
 
