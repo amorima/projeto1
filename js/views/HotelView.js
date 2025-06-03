@@ -7,26 +7,26 @@ import {
   updateTable,
 } from "./ViewHelpers.js";
 
+/*  Classe para gerir a visualização dos hotéis  */
 export default class HotelView {
   static async init() {
-    /*  inicializar hotéis  */
+    /*  Inicializa os hotéis  */
     HotelModel.init();
 
-    /*  ver se tem id na url  */
+    /*  Verifica se existe id na url  */
     const urlParams = new URLSearchParams(window.location.search);
-    const hotelId = urlParams.get("id");
+    /* const hotelId = urlParams.get("id"); */
+    const hotelId = 18; /*  Para testes, sempre mostrar o hotel com ID 1  */
 
     if (hotelId) {
-      /*  mostrar detalhes do hotel  */
       this.renderHotelDetail(hotelId);
     } else {
-      /*  mostrar lista de hotéis  */
       this.renderHotelList();
     }
   }
 
   static renderHotelList() {
-    /*  buscar todos os hotéis  */
+    /*  Busca todos os hotéis  */
     const data = HotelModel.getAll();
     const config = {
       data,
@@ -55,7 +55,7 @@ export default class HotelView {
     };
     updateTable(config);
 
-    /*  só adiciona evento se o formulário existir  */
+    /*  Só adiciona evento se o formulário existir  */
     var form = document.getElementById("add_hotel_form");
     if (form) {
       form.addEventListener("submit", (e) => {
@@ -66,63 +66,46 @@ export default class HotelView {
   }
 
   static renderHotelDetail(hotelId) {
-    /*  buscar hotel pelo id  */
+    /*  Vai buscar o hotel ao modelo  */
     const hotel = HotelModel.getById(hotelId);
 
     if (!hotel) {
-      /*  se não existir, volta para lista  */
       window.location.href = "hotel-list.html";
       return;
     }
 
-    /*  preencher dados do hotel na página  */
+    /*  Preenche os dados básicos do hotel na página  */
     document.title = hotel.nome + " - Detalhes do Hotel";
     document.getElementById("hotel-nome").textContent = hotel.nome;
     document.getElementById("hotel-foto").src = hotel.foto;
     document.getElementById("hotel-tipo").textContent = hotel.tipo;
-    document.getElementById("hotel-camas").textContent = hotel.camas;
-    document.getElementById("hotel-capacidade").textContent = hotel.capacidade;
-    document.getElementById("hotel-preco").textContent =
-      hotel.precoNoite + " €";
-    document.getElementById("hotel-preco-noite").textContent =
-      hotel.precoNoite + " €";
 
-    /*  destino não preenchido porque não há StorageModel, pode-se tirar ou adaptar se necessário  */
+    /*  Vai buscar dados do primeiro quarto  */
+    let camas = 0;
+    let capacidade = 0;
+    let comodidades = [];
+    let acessibilidade = [];
+    let preco = 0;
+    if (hotel.quartos && hotel.quartos.length > 0) {
+      camas = hotel.quartos[0].camas || 0;
+      capacidade = hotel.quartos[0].capacidade || 0;
+      comodidades = hotel.quartos[0].comodidades || [];
+      acessibilidade = hotel.quartos[0].acessibilidade || [];
+      preco = hotel.quartos[0].precoNoite || 0;
+    }
 
-    /*  preencher comodidades  */
-    const acessibilidadeContainer = document.getElementById(
-      "hotel-acessibilidade"
-    );
-    acessibilidadeContainer.innerHTML = "";
+    document.getElementById("hotel-camas").textContent = camas;
+    document.getElementById("hotel-capacidade").textContent = capacidade;
+    document.getElementById("hotel-preco").textContent = preco + " €";
+    document.getElementById("hotel-preco-noite").textContent = preco + " €";
 
-    /*  ícones simples  */
-    const icones = {
-      "Wi-Fi": "wifi",
-      Piscina: "pool",
-      Academia: "fitness_center",
-      Restaurante: "restaurant",
-      "Ar-condicionado": "ac_unit",
-      Estacionamento: "local_parking",
-      Acessível: "accessible",
-      TV: "tv",
-      Bar: "local_bar",
-      Spa: "spa",
-    };
+    /*  Renderiza as comodidades  */
+    this.renderIconsList("hotel-acessibilidade", comodidades);
 
-    hotel.acessibilidade.forEach((item) => {
-      /*  criar div para cada comodidade  */
-      const div = document.createElement("div");
-      div.className = "flex items-center gap-2";
-      div.innerHTML =
-        '<span class="material-symbols-outlined text-cyan-700 dark:text-cyan-400">' +
-        (icones[item] || "check_circle") +
-        "</span><span>" +
-        item +
-        "</span>";
-      acessibilidadeContainer.appendChild(div);
-    });
+    /*  Renderiza a acessibilidade  */
+    this.renderIconsList("hotel-acessibilidade-extra", acessibilidade);
 
-    /*  eventos dos botões  */
+    /*  Eventos dos botões  */
     document
       .getElementById("fav-hotel")
       .addEventListener("click", () => this.toggleFavorito());
@@ -136,7 +119,7 @@ export default class HotelView {
       .getElementById("btn-reservar")
       .addEventListener("click", () => this.reservar(hotel));
 
-    /*  datas para check-in e check-out  */
+    /*  Datas para check-in e check-out  */
     const hoje = new Date();
     const amanha = new Date(hoje);
     amanha.setDate(hoje.getDate() + 1);
@@ -164,10 +147,118 @@ export default class HotelView {
         checkOut.value = formatarData(novaDataMin);
       }
     });
+
+    /*  Mostra o mapa com Leaflet  */
+    setTimeout(() => {
+      if (hotel.cidade && window.L) {
+        const cidades = {
+          Lisboa: [38.7223, -9.1393],
+          Porto: [41.1579, -8.6291],
+          Londres: [51.5074, -0.1278],
+          Madrid: [40.4168, -3.7038],
+          Paris: [48.8566, 2.3522],
+        };
+        let coords = cidades[hotel.cidade] || [38.7223, -9.1393];
+        let mapaDiv = document.getElementById("hotel-mapa");
+        if (!mapaDiv) {
+          mapaDiv = document.createElement("div");
+          mapaDiv.id = "hotel-mapa";
+          mapaDiv.style.width = "100%";
+          mapaDiv.style.height = "250px";
+          const locDiv = document.querySelector(".w-full.h-64.bg-gray-200");
+          if (locDiv) {
+            locDiv.innerHTML = "";
+            locDiv.appendChild(mapaDiv);
+          }
+        }
+        const map = L.map("hotel-mapa").setView(coords, 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+        L.marker(coords).addTo(map).bindPopup(hotel.nome).openPopup();
+      }
+    }, 500);
+  }
+
+  static renderIconsList(containerId, lista) {
+    /*  Mostra lista de ícones numa grelha  */
+    const icones = {
+      "Wi-Fi": "wifi",
+      Piscina: "pool",
+      Ginásio: "fitness_center",
+      Restaurante: "restaurant",
+      "Ar-condicionado": "ac_unit",
+      Estacionamento: "local_parking",
+      Acessível: "accessible",
+      TV: "tv",
+      Bar: "local_bar",
+      Spa: "spa",
+      Cofre: "lock",
+      "Serviço de quartos": "room_service",
+      "Mini-bar": "local_drink",
+      Secador: "dry",
+      Varanda: "balcony",
+      "Vista mar": "waves",
+      "Restaurante Gourmet": "restaurant",
+      "Elevadores Disponíveis": "elevator",
+      "Acesso Sem Degraus": "stairs",
+      "Casas de Banho Adaptadas": "wc",
+      "Quartos Adaptados": "hotel",
+      "Transporte Acessível": "directions_bus",
+      "Informação em Braille/Áudio": "braille",
+      "Alarmes Visuais/Vibratórios": "vibration",
+      "Aceita Cães-Guia/Assistência": "pets",
+      "Ambientes Sensoriais Calmos": "spa",
+      "Opções Alimentares Específicas": "restaurant_menu",
+      "Comunicação Visual/Simplificada": "visibility",
+      "Aluguer de Equipamento de Mobilidade": "wheelchair_pickup",
+      "Superfícies Táteis/Guia": "touch_app",
+      "Proximidade a Serviços Médicos": "local_hospital",
+      "Ambiente Acolhedor LGBTQIA+": "diversity_3",
+      "Alojamento Inclusivo Declarado": "diversity_1",
+      "Negócios de Proprietários de Minorias": "groups",
+      "Casas de Banho Neutras em Género": "wc",
+      "Pátio Acessível": "yard",
+      "Spa Acessível": "spa",
+      "Piscina Acessível": "pool",
+      Terraço: "roofing",
+    };
+
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    container.style.display = "grid";
+    container.style.gridTemplateColumns =
+      "repeat(auto-fit, minmax(120px, 1fr))";
+    container.style.gap = "24px";
+
+    for (let i = 0; i < lista.length; i++) {
+      let item = lista[i];
+      let div = document.createElement("div");
+      div.style.display = "flex";
+      div.style.flexDirection = "column";
+      div.style.alignItems = "center";
+      div.style.justifyContent = "center";
+      div.style.padding = "8px 0";
+      let spanIcon = document.createElement("span");
+      spanIcon.className = "material-symbols-outlined";
+      spanIcon.style.color = "#0891b2";
+      spanIcon.style.fontSize = "44px";
+      spanIcon.style.marginBottom = "6px";
+      spanIcon.textContent = icones[item] || "check_circle";
+      let spanText = document.createElement("span");
+      spanText.style.fontSize = "15px";
+      spanText.style.textAlign = "center";
+      spanText.style.marginTop = "2px";
+      spanText.textContent = item;
+      div.appendChild(spanIcon);
+      div.appendChild(spanText);
+      container.appendChild(div);
+    }
   }
 
   static toggleFavorito() {
-    /*  marcar/desmarcar favorito  */
+    /*  Marcar/desmarcar favorito  */
     const favBtn = document.getElementById("fav-hotel");
     const isFavorito = favBtn.getAttribute("data-favorito") === "true";
     const iconElement = favBtn.querySelector(".material-symbols-outlined");
@@ -184,7 +275,7 @@ export default class HotelView {
   }
 
   static aumentarHospedes() {
-    /*  aumenta número de hóspedes  */
+    /*  Aumenta número de hóspedes  */
     const input = document.getElementById("hospedes");
     const maxValue = Number(
       document.getElementById("hotel-capacidade").textContent
@@ -198,7 +289,7 @@ export default class HotelView {
   }
 
   static diminuirHospedes() {
-    /*  diminui número de hóspedes  */
+    /*  Diminui número de hóspedes  */
     const input = document.getElementById("hospedes");
     let value = parseInt(input.value, 10);
     if (value > 1) {
@@ -207,7 +298,7 @@ export default class HotelView {
   }
 
   static reservar(hotel) {
-    /*  simula reserva  */
+    /*  Simula reserva  */
     const checkIn = document.getElementById("check-in").value;
     const checkOut = document.getElementById("check-out").value;
     const hospedes = document.getElementById("hospedes").value;
@@ -233,7 +324,7 @@ export default class HotelView {
   }
 
   static create(config) {
-    /*  adiciona hotel novo  */
+    /*  Adiciona hotel novo  */
     const data = getFormData("add_hotel_form");
     HotelModel.add(data);
     showToast("Hotel adicionado com sucesso!");
@@ -243,7 +334,7 @@ export default class HotelView {
   }
 
   static edit(id) {
-    /*  editar hotel  */
+    /*  Editar hotel  */
     const hotel = HotelModel.getById(id);
     if (hotel) {
       document.getElementById("edit_id").value = hotel.id;
@@ -275,7 +366,7 @@ export default class HotelView {
   }
 
   static delete(id) {
-    /*  apagar hotel  */
+    /*  Apagar hotel  */
     if (confirm("Tem certeza que deseja eliminar este hotel?")) {
       HotelModel.remove(id);
       showToast("Hotel eliminado com sucesso!");
@@ -285,7 +376,7 @@ export default class HotelView {
   }
 }
 
-/*  inicializar quando a página carrega  */
+/*  Inicializar quando a página carrega  */
 document.addEventListener("DOMContentLoaded", () => {
   HotelView.init();
 });

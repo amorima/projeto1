@@ -324,7 +324,6 @@ function initdata() {
     localStorage.setItem("destinos", JSON.stringify(destinos));
   }
   // Hoteis
-  if (!localStorage.hoteis) {
     const hoteis = [
       {
         id: 1,

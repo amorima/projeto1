@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
     <link rel="stylesheet" href="../css/main.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
 </head>
 
 <body class="font-sans dark:bg-gray-950 dark:text-gray-100">
@@ -92,6 +95,16 @@
               </div>
           </div>
         </div>
+
+        <!-- Acessibilidade -->
+        <div>
+          <h2 class="text-4xl font-semibold font-['IBM_Plex_Sans'] mb-6">Acessibilidade</h2>
+          <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-6 max-lg:w-full">
+              <div id="hotel-acessibilidade-extra" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <!-- Aqui serão inseridas as acessibilidades do hotel via JavaScript -->
+              </div>
+          </div>
+        </div>
         
         <!-- Avaliações -->
         <div>
@@ -154,9 +167,7 @@
           <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-6 max-lg:w-full">
               <div class="w-full h-64 bg-gray-200 dark:bg-gray-800 rounded-lg">
                   <!-- Aqui poderia ser adicionado um mapa -->
-                  <div class="w-full h-full flex items-center justify-center">
-                      <span class="material-symbols-outlined text-6xl text-gray-400">map</span>
-                  </div>
+                  <div id="hotel-mapa" class="w-full h-full"></div>
               </div>
               <p class="mt-4 text-gray-600 dark:text-gray-300">
                   Este hotel está bem localizado próximo ao centro da cidade, com fácil acesso a transportes públicos e atrações turísticas.
@@ -234,6 +245,8 @@
 
   <script type="module" src="../js/views/HotelView.js"></script>
   <script src="../js/init.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 </body>
 </html>
