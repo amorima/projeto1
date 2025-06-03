@@ -9,7 +9,7 @@ let hoteis = [];
 
 /* função para iniciar o modelo com dados da localStorage */
 export function init() {
-  hoteis = localStorage.hoteis ? loadFromLocalStorage('hoteis', hoteis) : [];
+  hoteis = localStorage.hoteis ? loadFromLocalStorage("hoteis", hoteis) : [];
   return hoteis;
 }
 
@@ -26,6 +26,79 @@ export function getFirst(quantidade = 5) {
 /* obter hoteis por cidade */
 export function getHoteisByCidade(cidade) {
   return hoteis.filter((hotel) => hotel.cidade === cidade);
+}
+
+/* obter um hotel por id */
+export function getById(id) {
+  return hoteis.find((hotel) => hotel.id === Number(id));
+}
+
+/* adicionar um novo hotel */
+export function add(dados) {
+  /* cria um novo id único */
+  const id = getNextId(hoteis);
+
+  /* cria objecto de hotel a partir dos dados do formulário */
+  const hotel = new Hotel(
+    id,
+    Number(dados.destinoId),
+    dados.nome,
+    dados.foto,
+    dados.tipo,
+    Number(dados.camas),
+    Number(dados.capacidade),
+    Number(dados.precoNoite),
+    dados.acessibilidade ? dados.acessibilidade.split(",") : [],
+    true
+  );
+
+  /* adiciona o hotel ao array */
+  hoteis.push(hotel);
+
+  /* guarda os hoteis atualizados na localStorage */
+  saveToLocalStorage("hoteis", hoteis);
+
+  return hotel;
+}
+
+/* atualizar um hotel existente */
+export function update(id, dados) {
+  /* encontra o indice do hotel no array */
+  const index = hoteis.findIndex((h) => h.id === Number(id));
+
+  if (index !== -1) {
+    /* atualiza os dados do hotel */
+    hoteis[index].destinoId = Number(dados.destinoId);
+    hoteis[index].nome = dados.nome;
+    hoteis[index].foto = dados.foto;
+    hoteis[index].tipo = dados.tipo;
+    hoteis[index].camas = Number(dados.camas);
+    hoteis[index].capacidade = Number(dados.capacidade);
+    hoteis[index].precoNoite = Number(dados.precoNoite);
+    hoteis[index].acessibilidade = dados.acessibilidade
+      ? dados.acessibilidade.split(",")
+      : [];
+    hoteis[index].available =
+      dados.available === true || dados.available === "true";
+
+    /* guarda os hoteis atualizados na localStorage */
+    saveToLocalStorage("hoteis", hoteis);
+
+    return hoteis[index];
+  }
+
+  return null;
+}
+
+/* remover um hotel */
+export function remove(id) {
+  /* filtra o array para remover o hotel com o id especificado */
+  hoteis = hoteis.filter((h) => h.id !== Number(id));
+
+  /* guarda os hoteis atualizados na localStorage */
+  saveToLocalStorage("hoteis", hoteis);
+
+  return true;
 }
 
 /**
@@ -114,3 +187,16 @@ class Hotel {
     this.available = true;
   }
 }
+
+/* exporta um objeto com todas as funções */
+export default {
+  init,
+  getAll,
+  getFirst,
+  getHoteisByCidade,
+  getHotelsFrom,
+  getById,
+  add,
+  update,
+  remove,
+};
