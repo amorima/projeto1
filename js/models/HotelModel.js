@@ -4,18 +4,51 @@ import {
   getNextId,
 } from "./ModelHelpers.js";
 
-/* array para os hoteis */
+// ARRAY HOTEIS
 let hoteis = [];
 
-/* função para iniciar o modelo com dados da localStorage */
+// CARREGAR HOTEIS DA LOCALSTORAGE
 export function init() {
-  hoteis = localStorage.hoteis ? JSON.parse(localStorage.hoteis) : [];
+  hoteis = localStorage.users ? loadFromLocalStorage('hoteis', hoteis) : [];
   return hoteis;
 }
 
-/* função para obter todos os hoteis */
+// LER HOTEIS
 export function getAll() {
-  return hoteis;
+  return hoteis ? hoteis : [];
+}
+
+// ADICIONAR HOTEL
+export function add(destinoId, nome, foto, tipo, camas, capacidade, precoNoite, acessibilidade = [], available = true) {
+  const id = getNextId(hoteis);
+  if (hoteis.some((h) => h.name === nome && h.destinoId === destinoId)) {
+    throw Error(`Hotel "${nome}" already exists!`);
+  } else {
+    hoteis.push(new Hotel(id, destinoId, nome, foto, tipo, camas, capacidade, precoNoite, acessibilidade, available));
+    saveToLocalStorage('hoteis', hoteis);
+  }
+}
+
+// ALTERAR DADOS DE HOTEL
+export function update(id, newHotel) {
+  const index = hoteis.findIndex((h) => h.id == id);
+  if (index !== -1) {
+    hoteis[index] = newHotel;
+    saveToLocalStorage('hoteis', hoteis);
+    return true;
+  }
+  throw Error('No Hotel Found');
+}
+
+// APAGAR HOTEL
+export function deleteHotel(id) {
+  const index = hoteis.findIndex((h) => h.id == id);
+  if (index !== -1) {
+    hoteis.splice(index, 1);
+    saveToLocalStorage('hoteis', hoteis);
+    return true;
+  }
+  throw Error('No Hotel Found');
 }
 
 /* função para obter os primeiros X hoteis */
@@ -40,7 +73,7 @@ export function getHoteisByCidade(cidade) {
  * Se o número de hotéis for menor que o número solicitado, retorna todos os disponíveis.
  * @example
  * import { getHotelsFrom } from './HotelModel.js';
- * const hotels = getHotelsFrom(1, 10, 2);
+ * const hoteis = getHotelsFrom(1, 10, 2);
  * Neste exemplo, a função retorna os hotéis do destino com ID 1,
  * limitados a 10 por página, e retorna a segunda página de resultados.
  */
