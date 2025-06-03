@@ -5,24 +5,22 @@ import {
 } from "./ModelHelpers.js";
 
 // ARRAY ACTIVITIES
-let activities;
+let atividades;
 
 // CARREGAR ACTIVIDADES DA LOCAL STORAGE
 export function init() {
-  activities = localStorage.atividades
-    ? JSON.parse(localStorage.atividades)
-    : [];
-  return activities;
+  atividades = localStorage.atividades ? loadFromLocalStorage('atividades',atividades) : [];
+  return atividades;
 }
 
 // LER ACTIVIDADE
 export function getAll() {
-  return activities ? activities : [];
+  return atividades ? atividades : [];
 }
 
 // OBTER PRIMEIRAS ACTIVIDADES
 export function getFirst(quantidade = 5) {
-  return activities ? activities.slice(0, quantidade) : [];
+  return atividades ? atividades.slice(0, quantidade) : [];
 }
 
 // ADICIONAR ACTIVIDADE
@@ -34,11 +32,11 @@ export function add(
   descricao,
   acessibilidade
 ) {
-  if (activities.some((a) => a.nome === nome)) {
+  if (atividades.some((a) => a.nome === nome)) {
     throw Error(`Activity "${a.nome}" already exists!`);
   } else {
-    const id = getNextId(activities);
-    activities.push(
+    const id = getNextId(atividades);
+    atividades.push(
       new Activity(
         id,
         destino,
@@ -49,16 +47,16 @@ export function add(
         acessibilidade
       )
     );
-    saveToLocalStorage("activities", activities);
+    saveToLocalStorage("atividades", atividades);
   }
 }
 
 // ALTERAR DADOS DE ACTIVIDADE
 export function update(name, newActivity) {
-  const index = activities.findIndex((a) => a.nome == name);
+  const index = atividades.findIndex((a) => a.nome == name);
   if (index !== -1) {
-    activities[index] = newActivity;
-    saveToLocalStorage("activities", activities);
+    atividades[index] = newActivity;
+    saveToLocalStorage("atividades", atividades);
     return true;
   }
   throw Error("No Activity Found");
@@ -66,10 +64,10 @@ export function update(name, newActivity) {
 
 // APAGAR ACTIVIDADE
 export function deleteActivity(id) {
-  const index = activities.findIndex((a) => a.id == id);
+  const index = atividades.findIndex((a) => a.id == id);
   if (index !== -1) {
-    activities.splice(index, 1);
-    saveToLocalStorage("activities", activities);
+    atividades.splice(index, 1);
+    saveToLocalStorage("atividades", atividades);
     return true;
   }
   throw Error("No Activity Found");
