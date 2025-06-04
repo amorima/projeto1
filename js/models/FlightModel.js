@@ -183,6 +183,7 @@ export function getAirports() {
   return JSON.parse(localStorage.getItem("aeroportos")) || [];
 }
 
+/* Funcao para filtrar aeroportos por termo de pesquisa */
 export function filterAirports(searchTerm) {
   const airports = getAirports();
   return airports.filter(
@@ -195,26 +196,31 @@ export function filterAirports(searchTerm) {
   );
 }
 
+/* Funcao para definir o aeroporto de origem */
 export function setOrigin(aeroporto) {
   selectedOrigin = aeroporto;
   localStorage.setItem("origemSelecionada", JSON.stringify(aeroporto));
 }
 
+/* Funcao para obter o aeroporto de origem selecionado */
 export function getSelectedOrigin() {
   return selectedOrigin;
 }
 
 /* Funcoes para gestao de destino */
+/* Funcao para definir o aeroporto de destino */
 export function setDestination(aeroporto) {
   selectedDestination = aeroporto;
   localStorage.setItem("destinoSelecionado", JSON.stringify(aeroporto));
 }
 
+/* Funcao para obter o aeroporto de destino selecionado */
 export function getSelectedDestination() {
   return selectedDestination;
 }
 
 /* Funcoes para gestao de datas e viajantes */
+/* Funcao para definir datas da viagem e numero de viajantes */
 export function setDatesTravelers(
   dataPartida,
   dataRegresso,
@@ -233,14 +239,17 @@ export function setDatesTravelers(
   localStorage.setItem("datasViajantes", JSON.stringify(datesTravelers));
 }
 
+/* Funcao para obter as datas e viajantes definidos */
 export function getDatesTravelers() {
   return datesTravelers;
 }
 
+/* Funcao para formatar datas para mostrar ao utilizador */
 export function formatDatesForDisplay(dataPartida, dataRegresso) {
   const partida = new Date(dataPartida);
   const regresso = new Date(dataRegresso);
 
+  /* Array com nomes dos meses abreviados */
   const meses = [
     "Jan",
     "Fev",
@@ -347,14 +356,15 @@ export function getAccessibilityIcon(acessibilidade) {
   return "accessibility";
 }
 
+/* Funcao para obter viagens de uma origem especifica */
 export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
-  // Filtra voos cuja origem é OPO (Porto)
+  /* Filtra voos cuja origem e OPO (Porto) */
   const Trips = viagens.filter(
     (v) => v.origem === filtro || v.turismo === filtro
   );
-  // Embaralha o array
+  /* Embaralha o array para mostrar viagens diferentes */
   const shuffled = Trips.sort(() => 0.5 - Math.random());
-  // Retorna os n voos (perPage) dependendo da pagina (page)
+  /* Retorna apenas o numero de viagens pedido para a pagina atual */
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
 

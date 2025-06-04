@@ -63,10 +63,12 @@ function initSlider() {
     slider.scrollBy({ left: scrollAmount, behavior: "smooth" })
   );
 
+  /* Variaveis para controlar o arrastar do slider */
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
 
+  /* Quando o utilizador pressiona o botao do rato */
   slider.addEventListener("mousedown", (e) => {
     isDown = true;
     slider.classList.add("grabbing");
@@ -74,16 +76,19 @@ function initSlider() {
     scrollLeft = slider.scrollLeft;
   });
 
+  /* Quando o utilizador solta o botao do rato */
   slider.addEventListener("mouseup", () => {
     isDown = false;
     slider.classList.remove("grabbing");
   });
 
+  /* Quando o rato sai do slider */
   slider.addEventListener("mouseleave", () => {
     isDown = false;
     slider.classList.remove("grabbing");
   });
 
+  /* Quando o utilizador move o rato enquanto arrasta */
   slider.addEventListener("mousemove", (e) => {
     if (!isDown) return;
     e.preventDefault();
@@ -91,16 +96,19 @@ function initSlider() {
     slider.scrollLeft = scrollLeft - (x - startX);
   });
 
+  /* Para dispositivos moveis - quando toca no ecra */
   slider.addEventListener("touchstart", (e) => {
     isDown = true;
     startX = e.touches[0].pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
   });
 
+  /* Para dispositivos moveis - quando para de tocar */
   slider.addEventListener("touchend", () => {
     isDown = false;
   });
 
+  /* Para dispositivos moveis - quando move o dedo */
   slider.addEventListener("touchmove", (e) => {
     if (!isDown) return;
     const x = e.touches[0].pageX - slider.offsetLeft;
@@ -151,8 +159,18 @@ function setupModalButtons() {
   }
 }
 
+/* Funcoes para controlar scroll da pagina */
+function pararScroll() {
+  document.body.classList.add("modal-aberto");
+}
+
+function deixarScroll() {
+  document.body.classList.remove("modal-aberto");
+}
+
 /* Funcoes dos modais - apenas interface */
 function abrirModalOrigem() {
+  pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-origem");
   const listaAeroportos = document.getElementById("lista-aeroportos");
   const pesquisaInput = document.getElementById("pesquisa-aeroporto");
@@ -218,6 +236,7 @@ function updateOriginButton(aeroporto) {
 }
 
 function fecharModalOrigem() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-origem");
   const pesquisaInput = document.getElementById("pesquisa-aeroporto");
   modal.classList.add("hidden");
@@ -226,6 +245,7 @@ function fecharModalOrigem() {
 }
 
 function abrirModalDestino() {
+  pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-destino");
   const listaDestinos = document.getElementById("lista-destinos");
   const pesquisaInput = document.getElementById("pesquisa-destino");
@@ -288,6 +308,7 @@ function updateDestinationButton(aeroporto) {
 }
 
 function fecharModalDestino() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-destino");
   const pesquisaInput = document.getElementById("pesquisa-destino");
   modal.classList.add("hidden");
@@ -296,6 +317,7 @@ function fecharModalDestino() {
 }
 
 function abrirModalDatas() {
+  pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-datas");
   modal.classList.remove("hidden");
   modal.classList.add("flex");
@@ -439,12 +461,14 @@ function updateDatesButton(
 }
 
 function fecharModalDatas() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-datas");
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
 
 function abrirModalAcessibilidade() {
+  pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-acessibilidade");
   const listaAcessibilidades = document.getElementById("lista-acessibilidades");
   const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
@@ -522,6 +546,7 @@ function updateAccessibilityButton() {
 }
 
 function fecharModalAcessibilidade() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-acessibilidade");
   const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
   modal.classList.add("hidden");
@@ -530,6 +555,7 @@ function fecharModalAcessibilidade() {
 }
 
 function abrirModalTipoTurismo() {
+  pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-tipo-turismo");
   const gridTipos = document.getElementById("grid-tipos-turismo");
   const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
@@ -588,6 +614,7 @@ function updateTourismButton(tipo) {
 }
 
 function fecharModalTipoTurismo() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-tipo-turismo");
   const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
   modal.classList.add("hidden");
