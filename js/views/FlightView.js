@@ -484,14 +484,14 @@ function confirmarDatasViajantes(
 
   /* atualizar o botao */
   const btnDatas = document.getElementById("btn-datas");
-  const primeiraMetade = btnDatas.querySelector("div:first-child p");
-  const segundaMetade = btnDatas.querySelector("div:last-child p");
+  const textoDatas = btnDatas.querySelector("div:first-child p");
+  const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
 
-  /* mostrar datas na primeira metade */
-  primeiraMetade.innerHTML = `${dataPartidaFormatada}<br><span style="font-size: 14px;">${dataRegressoFormatada}</span>`;
+  /* mostrar datas formatadas */
+  textoDatas.textContent = `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
 
-  /* mostrar viajantes na segunda metade */
-  segundaMetade.textContent = textoViajantes;
+  /* mostrar numero de viajantes */
+  textoViajantesElemento.textContent = textoViajantes;
 
   /* guardar selecao na localStorage */
   const selecao = {
