@@ -10,27 +10,29 @@ import {
   closestAirport,
 } from "./ViewHelpers.js";
 
+/* Inicializar a aplicacao */
 Flight.init();
 initView();
 
-// Main init function to be called on DOMContentLoaded
 function initView() {
+  /* Obter localizacao do utilizador e definir aeroporto mais proximo */
   getUserLocation((location) => {
     if (!location) return;
-    const aeroportos = JSON.parse(localStorage.getItem("aeroportos"));
+    const aeroportos = Flight.getAirports();
     const closest = closestAirport(location, aeroportos);
     document.querySelector("#btn-open p").innerText = closest.cidade;
   });
+
   showCookieBanner();
   initSlider();
-  setupModalButton();
+  setupModalButtons();
 
-  // Render random OPO cards on homepage if container exists
+  /* Renderizar cards na homepage se o container existir */
   if (document.querySelector(".card-viagens")) {
     renderRandomOPOCards("card-viagens");
   }
 
-  // Initialize table view
+  /* Inicializar vista de tabela */
   const data = Flight.getAll();
   const config = createTableConfig(data);
   updateTable(config);
@@ -44,8 +46,7 @@ function initView() {
   }
 }
 
-// --- UI Component Functions ---
-
+/* Funcoes de interface - slider */
 function initSlider() {
   const slider = document.getElementById("slider");
   const btnLeft = document.getElementById("btn-left");
@@ -107,16 +108,16 @@ function initSlider() {
   });
 }
 
-function setupModalButton() {
-  const btnOpenModal = document.getElementById("btn-open");
-  if (btnOpenModal) {
-    btnOpenModal.addEventListener("click", (e) => {
+/* Configurar eventos dos botoes dos modais */
+function setupModalButtons() {
+  const btnOrigem = document.getElementById("btn-open");
+  if (btnOrigem) {
+    btnOrigem.addEventListener("click", (e) => {
       e.preventDefault();
       abrirModalOrigem();
     });
   }
 
-  /* botao para abrir modal de destino */
   const btnDestino = document.getElementById("btn-destino");
   if (btnDestino) {
     btnDestino.addEventListener("click", (e) => {
@@ -125,7 +126,6 @@ function setupModalButton() {
     });
   }
 
-  /* botao para abrir modal de datas */
   const btnDatas = document.getElementById("btn-datas");
   if (btnDatas) {
     btnDatas.addEventListener("click", (e) => {
@@ -134,7 +134,6 @@ function setupModalButton() {
     });
   }
 
-  /* botao para abrir modal de acessibilidade */
   const btnAcessibilidade = document.getElementById("btn-acessibilidade");
   if (btnAcessibilidade) {
     btnAcessibilidade.addEventListener("click", (e) => {
@@ -143,7 +142,6 @@ function setupModalButton() {
     });
   }
 
-  /* botao para abrir modal de tipo de turismo */
   const btnTipoTurismo = document.getElementById("btn-tipo-turismo");
   if (btnTipoTurismo) {
     btnTipoTurismo.addEventListener("click", (e) => {
@@ -153,20 +151,15 @@ function setupModalButton() {
   }
 }
 
-/* Função para abrir modal de seleção de origem */
+/* Funcoes dos modais - apenas interface */
 function abrirModalOrigem() {
   const modal = document.getElementById("modal-origem");
   const listaAeroportos = document.getElementById("lista-aeroportos");
   const pesquisaInput = document.getElementById("pesquisa-aeroporto");
 
-  /* Obter aeroportos da localStorage */
-  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
-
-  /* Mostrar modal */
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 
-  /* Função para mostrar lista de aeroportos */
   function mostrarAeroportos(lista) {
     listaAeroportos.innerHTML = "";
 
@@ -188,9 +181,9 @@ function abrirModalOrigem() {
         </div>
       `;
 
-      /* Evento de clique para selecionar aeroporto */
       li.addEventListener("click", () => {
-        selecionarOrigem(aeroporto);
+        Flight.setOrigin(aeroporto);
+        updateOriginButton(aeroporto);
         fecharModalOrigem();
       });
 
@@ -199,28 +192,19 @@ function abrirModalOrigem() {
   }
 
   /* Mostrar todos os aeroportos inicialmente */
-  mostrarAeroportos(aeroportos);
+  mostrarAeroportos(Flight.getAirports());
 
   /* Pesquisa em tempo real */
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
-    const aeroportosFiltrados = aeroportos.filter(
-      (aeroporto) =>
-        aeroporto.cidade.toLowerCase().includes(termoPesquisa) ||
-        (aeroporto.pais &&
-          aeroporto.pais.toLowerCase().includes(termoPesquisa)) ||
-        (aeroporto.codigo &&
-          aeroporto.codigo.toLowerCase().includes(termoPesquisa))
-    );
+    const aeroportosFiltrados = Flight.filterAirports(termoPesquisa);
     mostrarAeroportos(aeroportosFiltrados);
   });
 
-  /* Evento para fechar modal */
+  /* Eventos para fechar modal */
   document
     .getElementById("fechar-modal-origem")
     .addEventListener("click", fecharModalOrigem);
-
-  /* Fechar modal ao clicar fora */
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       fecharModalOrigem();
@@ -228,39 +212,27 @@ function abrirModalOrigem() {
   });
 }
 
-/* Função para selecionar origem */
-function selecionarOrigem(aeroporto) {
+function updateOriginButton(aeroporto) {
   const btnOrigem = document.querySelector("#btn-open p");
   btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
-
-  /* Guardar seleção no localStorage para uso posterior */
-  localStorage.setItem("origemSelecionada", JSON.stringify(aeroporto));
 }
 
-/* Função para fechar modal de origem */
 function fecharModalOrigem() {
   const modal = document.getElementById("modal-origem");
   const pesquisaInput = document.getElementById("pesquisa-aeroporto");
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
 
-/* Função para abrir modal de seleção de destino */
 function abrirModalDestino() {
   const modal = document.getElementById("modal-destino");
   const listaDestinos = document.getElementById("lista-destinos");
   const pesquisaInput = document.getElementById("pesquisa-destino");
 
-  /* Obter aeroportos da localStorage */
-  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
-
-  /* Mostrar modal */
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 
-  /* Função para mostrar lista de destinos */
   function mostrarDestinos(lista) {
     listaDestinos.innerHTML = "";
 
@@ -282,9 +254,9 @@ function abrirModalDestino() {
         </div>
       `;
 
-      /* Evento de clique para selecionar destino */
       li.addEventListener("click", () => {
-        selecionarDestino(aeroporto);
+        Flight.setDestination(aeroporto);
+        updateDestinationButton(aeroporto);
         fecharModalDestino();
       });
 
@@ -292,29 +264,17 @@ function abrirModalDestino() {
     });
   }
 
-  /* Mostrar todos os destinos inicialmente */
-  mostrarDestinos(aeroportos);
+  mostrarDestinos(Flight.getAirports());
 
-  /* Pesquisa em tempo real */
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
-    const destinosFiltrados = aeroportos.filter(
-      (aeroporto) =>
-        aeroporto.cidade.toLowerCase().includes(termoPesquisa) ||
-        (aeroporto.pais &&
-          aeroporto.pais.toLowerCase().includes(termoPesquisa)) ||
-        (aeroporto.codigo &&
-          aeroporto.codigo.toLowerCase().includes(termoPesquisa))
-    );
+    const destinosFiltrados = Flight.filterAirports(termoPesquisa);
     mostrarDestinos(destinosFiltrados);
   });
 
-  /* Evento para fechar modal */
   document
     .getElementById("fechar-modal-destino")
     .addEventListener("click", fecharModalDestino);
-
-  /* Fechar modal ao clicar fora */
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       fecharModalDestino();
@@ -322,60 +282,100 @@ function abrirModalDestino() {
   });
 }
 
-/* Função para selecionar destino */
-function selecionarDestino(aeroporto) {
+function updateDestinationButton(aeroporto) {
   const btnDestino = document.querySelector("#btn-destino p");
   btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
-
-  /* Guardar seleção no localStorage para uso posterior */
-  localStorage.setItem("destinoSelecionado", JSON.stringify(aeroporto));
 }
 
-/* Função para fechar modal de destino */
 function fecharModalDestino() {
   const modal = document.getElementById("modal-destino");
   const pesquisaInput = document.getElementById("pesquisa-destino");
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
 
-/* variáveis globais para guardar valores */
-let dataPartidaGlobal = "";
-let dataRegressoGlobal = "";
-let adultosGlobal = 1;
-let criancasGlobal = 0;
-let bebesGlobal = 0;
-
-/* funcao para abrir modal de datas e viajantes */
 function abrirModalDatas() {
   const modal = document.getElementById("modal-datas");
-
-  /* mostrar modal */
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 
-  /* configurar valores salvos */
-  let adultos = adultosGlobal;
-  let criancas = criancasGlobal;
-  let bebes = bebesGlobal;
+  /* Obter dados salvos */
+  const savedData = Flight.getDatesTravelers();
+  let adultos = savedData.adultos;
+  let criancas = savedData.criancas;
+  let bebes = savedData.bebes;
 
-  /* elementos dos contadores */
+  /* Elementos dos contadores */
   const contadorAdultos = document.getElementById("contador-adultos");
   const contadorCriancas = document.getElementById("contador-criancas");
   const contadorBebes = document.getElementById("contador-bebes");
   const inputDataPartida = document.getElementById("data-partida");
   const inputDataRegresso = document.getElementById("data-regresso");
 
-  /* carregar valores salvos */
+  /* Carregar valores salvos */
   contadorAdultos.textContent = adultos;
   contadorCriancas.textContent = criancas;
   contadorBebes.textContent = bebes;
-  inputDataPartida.value = dataPartidaGlobal;
-  inputDataRegresso.value = dataRegressoGlobal;
+  inputDataPartida.value = savedData.dataPartida;
+  inputDataRegresso.value = savedData.dataRegresso;
 
-  /* botoes para adultos */
+  /* Configurar botoes de contadores */
+  setupCounters(
+    contadorAdultos,
+    contadorCriancas,
+    contadorBebes,
+    adultos,
+    criancas,
+    bebes
+  );
+
+  /* Configurar datas minimas */
+  const hoje = new Date().toISOString().split("T")[0];
+  inputDataPartida.min = hoje;
+  inputDataRegresso.min = hoje;
+
+  inputDataPartida.addEventListener("change", (e) => {
+    inputDataRegresso.min = e.target.value;
+  });
+
+  /* Botao confirmar */
+  document.getElementById("confirmar-datas").addEventListener("click", () => {
+    const dataPartida = inputDataPartida.value;
+    const dataRegresso = inputDataRegresso.value;
+
+    if (dataPartida && dataRegresso) {
+      Flight.setDatesTravelers(
+        dataPartida,
+        dataRegresso,
+        adultos,
+        criancas,
+        bebes
+      );
+      updateDatesButton(dataPartida, dataRegresso, adultos, criancas, bebes);
+      fecharModalDatas();
+    }
+  });
+
+  document
+    .getElementById("fechar-modal-datas")
+    .addEventListener("click", fecharModalDatas);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalDatas();
+    }
+  });
+}
+
+function setupCounters(
+  contadorAdultos,
+  contadorCriancas,
+  contadorBebes,
+  adultos,
+  criancas,
+  bebes
+) {
+  /* Botoes para adultos */
   document.getElementById("aumentar-adultos").addEventListener("click", () => {
     adultos++;
     contadorAdultos.textContent = adultos;
@@ -388,7 +388,7 @@ function abrirModalDatas() {
     }
   });
 
-  /* botoes para criancas */
+  /* Botoes para criancas */
   document.getElementById("aumentar-criancas").addEventListener("click", () => {
     criancas++;
     contadorCriancas.textContent = criancas;
@@ -401,7 +401,7 @@ function abrirModalDatas() {
     }
   });
 
-  /* botoes para bebes */
+  /* Botoes para bebes */
   document.getElementById("aumentar-bebes").addEventListener("click", () => {
     bebes++;
     contadorBebes.textContent = bebes;
@@ -413,126 +413,189 @@ function abrirModalDatas() {
       contadorBebes.textContent = bebes;
     }
   });
-
-  /* configurar datas minimas */
-  const hoje = new Date().toISOString().split("T")[0];
-  inputDataPartida.min = hoje;
-  inputDataRegresso.min = hoje;
-
-  /* quando a data de partida muda, ajustar data de regresso */
-  inputDataPartida.addEventListener("change", (e) => {
-    inputDataRegresso.min = e.target.value;
-  });
-
-  /* botao confirmar */
-  document.getElementById("confirmar-datas").addEventListener("click", () => {
-    const dataPartida = inputDataPartida.value;
-    const dataRegresso = inputDataRegresso.value;
-
-    if (dataPartida && dataRegresso) {
-      /* guardar valores nas variaveis globais */
-      dataPartidaGlobal = dataPartida;
-      dataRegressoGlobal = dataRegresso;
-      adultosGlobal = adultos;
-      criancasGlobal = criancas;
-      bebesGlobal = bebes;
-
-      confirmarDatasViajantes(
-        dataPartida,
-        dataRegresso,
-        adultos,
-        criancas,
-        bebes
-      );
-      fecharModalDatas();
-    }
-  });
-
-  /* evento para fechar modal */
-  document
-    .getElementById("fechar-modal-datas")
-    .addEventListener("click", fecharModalDatas);
-
-  /* fechar modal ao clicar fora */
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      fecharModalDatas();
-    }
-  });
 }
 
-/* funcao para confirmar selecao de datas e viajantes */
-function confirmarDatasViajantes(
+function updateDatesButton(
   dataPartida,
   dataRegresso,
   adultos,
   criancas,
   bebes
 ) {
-  /* formatar datas para mostrar */
-  const partida = new Date(dataPartida);
-  const regresso = new Date(dataRegresso);
+  const formattedDates = Flight.formatDatesForDisplay(
+    dataPartida,
+    dataRegresso
+  );
+  const totalTravelers = adultos + criancas + bebes;
+  const travelersText =
+    totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
 
-  const meses = [
-    "Jan",
-    "Fev",
-    "Mar",
-    "Abr",
-    "Mai",
-    "Jun",
-    "Jul",
-    "Ago",
-    "Set",
-    "Out",
-    "Nov",
-    "Dez",
-  ];
-
-  const dataPartidaFormatada = `${partida.getDate()} ${
-    meses[partida.getMonth()]
-  }`;
-  const dataRegressoFormatada = `${regresso.getDate()} ${
-    meses[regresso.getMonth()]
-  }`;
-
-  /* calcular total de viajantes */
-  const totalViajantes = adultos + criancas + bebes;
-  const textoViajantes =
-    totalViajantes === 1 ? "1 Viajante" : `${totalViajantes} Viajantes`;
-
-  /* atualizar o botao */
   const btnDatas = document.getElementById("btn-datas");
   const textoDatas = btnDatas.querySelector("div:first-child p");
   const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
 
-  /* mostrar datas formatadas */
-  textoDatas.textContent = `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
-
-  /* mostrar numero de viajantes */
-  textoViajantesElemento.textContent = textoViajantes;
-
-  /* guardar selecao na localStorage */
-  const selecao = {
-    dataPartida: dataPartida,
-    dataRegresso: dataRegresso,
-    adultos: adultos,
-    criancas: criancas,
-    bebes: bebes,
-    totalViajantes: totalViajantes,
-  };
-  localStorage.setItem("datasViajantes", JSON.stringify(selecao));
+  textoDatas.textContent = formattedDates;
+  textoViajantesElemento.textContent = travelersText;
 }
 
-/* funcao para fechar modal de datas */
 function fecharModalDatas() {
   const modal = document.getElementById("modal-datas");
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
 
-/* --- Table & Form Logic --- */
+function abrirModalAcessibilidade() {
+  const modal = document.getElementById("modal-acessibilidade");
+  const listaAcessibilidades = document.getElementById("lista-acessibilidades");
+  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
 
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  function mostrarAcessibilidades(lista) {
+    listaAcessibilidades.innerHTML = "";
+
+    lista.forEach((acessibilidade, index) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+
+      const selected = Flight.getSelectedAccessibilities().includes(index);
+      const icon = Flight.getAccessibilityIcon(acessibilidade);
+
+      li.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">${icon}</span>
+            <p class="font-semibold text-gray-900 dark:text-white">${acessibilidade}</p>
+          </div>
+          <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center ${
+            selected ? "bg-Main-Primary dark:bg-cyan-400" : ""
+          }">
+            ${
+              selected
+                ? '<span class="material-symbols-outlined text-white text-sm">check</span>'
+                : ""
+            }
+          </div>
+        </div>
+      `;
+
+      li.addEventListener("click", () => {
+        Flight.toggleAccessibility(index);
+        mostrarAcessibilidades(lista);
+      });
+
+      listaAcessibilidades.appendChild(li);
+    });
+  }
+
+  mostrarAcessibilidades(Flight.getAccessibilities());
+
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const filteredAccessibilities = Flight.filterAccessibilities(termoPesquisa);
+    mostrarAcessibilidades(filteredAccessibilities);
+  });
+
+  document
+    .getElementById("confirmar-acessibilidade")
+    .addEventListener("click", () => {
+      Flight.confirmAccessibilities();
+      updateAccessibilityButton();
+      fecharModalAcessibilidade();
+    });
+
+  document
+    .getElementById("fechar-modal-acessibilidade")
+    .addEventListener("click", fecharModalAcessibilidade);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalAcessibilidade();
+    }
+  });
+}
+
+function updateAccessibilityButton() {
+  const textoAcessibilidade = document.getElementById("texto-acessibilidade");
+  textoAcessibilidade.textContent = Flight.getAccessibilitiesText();
+}
+
+function fecharModalAcessibilidade() {
+  const modal = document.getElementById("modal-acessibilidade");
+  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+function abrirModalTipoTurismo() {
+  const modal = document.getElementById("modal-tipo-turismo");
+  const gridTipos = document.getElementById("grid-tipos-turismo");
+  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  function mostrarTiposTurismo(lista) {
+    gridTipos.innerHTML = "";
+
+    lista.forEach((tipo) => {
+      const card = document.createElement("div");
+      card.className =
+        "w-full h-32 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200";
+
+      card.innerHTML = `
+        <img draggable="false" class="absolute inset-0 w-full h-full object-cover" src="${tipo.imagem}" alt="${tipo.nome}" />
+        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-end p-3">
+          <div class="text-white text-sm font-bold font-['Space_Mono'] leading-tight">
+            ${tipo.nome}
+          </div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        Flight.setTourismType(tipo);
+        updateTourismButton(tipo);
+        fecharModalTipoTurismo();
+      });
+
+      gridTipos.appendChild(card);
+    });
+  }
+
+  mostrarTiposTurismo(Flight.getTourismTypes());
+
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const filteredTypes = Flight.filterTourismTypes(termoPesquisa);
+    mostrarTiposTurismo(filteredTypes);
+  });
+
+  document
+    .getElementById("fechar-modal-tipo-turismo")
+    .addEventListener("click", fecharModalTipoTurismo);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalTipoTurismo();
+    }
+  });
+}
+
+function updateTourismButton(tipo) {
+  const textoTipoTurismo = document.getElementById("texto-tipo-turismo");
+  textoTipoTurismo.textContent = tipo.nome;
+}
+
+function fecharModalTipoTurismo() {
+  const modal = document.getElementById("modal-tipo-turismo");
+  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+/* Funcoes de tabela e formulario */
 function createTableConfig(data) {
   return {
     data,
@@ -555,11 +618,7 @@ function createTableConfig(data) {
         class: "text-Main-Primary",
         handler: Flight.update,
       },
-      {
-        icon: "delete",
-        class: "text-red-600",
-        handler: Flight.deleteTrip,
-      },
+      { icon: "delete", class: "text-red-600", handler: Flight.deleteTrip },
     ],
     rowsPerPage: 10,
     currentPage: 1,
@@ -579,15 +638,9 @@ function createFlight(config) {
   updateTable(config);
 }
 
-// --- Home Card Renderer ---
-
+/* Renderizar cards na homepage */
 export function renderRandomOPOCards(containerClass) {
-  /*   const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
-  const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
-  const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18); */
-
   const shuffled = Flight.getTripsFrom();
-
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
   container.innerHTML = "";
@@ -636,18 +689,14 @@ export function renderRandomOPOCards(containerClass) {
           <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
           <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
-          <span 
-            class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"
-            data-favorito="false" 
-          >favorite</span>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
         </div>
       </div>
-      `;
+    `;
   });
 
-  // Ativar toggle de favorito
+  /* Ativar toggle de favorito */
   container.querySelectorAll(".favorite-icon").forEach((icon) => {
-    // Definir o estado visual inicial com base no atributo data-favorito
     const initialIsFav = icon.getAttribute("data-favorito") === "true";
     icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
 
@@ -656,351 +705,11 @@ export function renderRandomOPOCards(containerClass) {
       const newIsFav = !currentIsFav;
 
       this.setAttribute("data-favorito", String(newIsFav));
+      this.style.fontVariationSettings = newIsFav ? "'FILL' 1" : "'FILL' 0";
 
-      // Altera diretamente o estilo inline para 'FILL' 1 (preenchido) ou 'FILL' 0 (contorno)
-      if (newIsFav) {
-        this.style.fontVariationSettings = "'FILL' 1";
-      } else {
-        this.style.fontVariationSettings = "'FILL' 0";
-      }
-
-      // Animação de feedback visual
+      /* Animacao de feedback visual */
       this.classList.add("scale-110");
       setTimeout(() => this.classList.remove("scale-110"), 150);
     });
   });
-}
-
-/* array de acessibilidades disponiveis */
-const acessibilidades = [
-  {
-    id: "cadeira_rodas",
-    nome: "Acesso para cadeira de rodas",
-    icone: "accessible",
-  },
-  {
-    id: "deficiencia_visual",
-    nome: "Apoio para deficiência visual",
-    icone: "visibility_off",
-  },
-  {
-    id: "deficiencia_auditiva",
-    nome: "Apoio para deficiência auditiva",
-    icone: "hearing_disabled",
-  },
-  { id: "mobilidade_reduzida", nome: "Mobilidade reduzida", icone: "elderly" },
-  {
-    id: "assistencia_medica",
-    nome: "Assistência médica",
-    icone: "medical_services",
-  },
-  { id: "zona_segura", nome: "Zona segura", icone: "shield" },
-  { id: "emergencia", nome: "Apoio de emergência", icone: "emergency" },
-  { id: "criancas", nome: "Segurança para crianças", icone: "child_care" },
-];
-
-/* variavel global para guardar acessibilidades selecionadas */
-let acessibilidadesSelecionadas = [];
-
-/* funcao para abrir modal de acessibilidade */
-function abrirModalAcessibilidade() {
-  const modal = document.getElementById("modal-acessibilidade");
-  const listaAcessibilidades = document.getElementById("lista-acessibilidades");
-  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
-
-  /* obter acessibilidades da localStorage */
-  const acessibilidades =
-    JSON.parse(localStorage.getItem("acessibilidade")) || [];
-
-  /* mostrar modal */
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-
-  /* funcao para mostrar lista de acessibilidades */
-  function mostrarAcessibilidades(lista) {
-    listaAcessibilidades.innerHTML = "";
-
-    lista.forEach((acessibilidade, index) => {
-      const li = document.createElement("li");
-      li.className =
-        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
-
-      /* verificar se esta selecionada */
-      const selecionada = acessibilidadesSelecionadas.includes(index);
-
-      /* escolher icone baseado no tipo de acessibilidade */
-      let icone = "accessibility";
-      if (acessibilidade.includes("Elevador")) icone = "elevator";
-      else if (acessibilidade.includes("Banho")) icone = "wc";
-      else if (acessibilidade.includes("Quarto")) icone = "bed";
-      else if (acessibilidade.includes("Transporte")) icone = "directions_bus";
-      else if (acessibilidade.includes("Braille")) icone = "visibility_off";
-      else if (acessibilidade.includes("Alarme")) icone = "hearing_disabled";
-      else if (acessibilidade.includes("Cães")) icone = "pets";
-      else if (acessibilidade.includes("Sensorial")) icone = "psychology";
-      else if (acessibilidade.includes("Alimentar")) icone = "restaurant";
-      else if (acessibilidade.includes("Comunicação")) icone = "chat";
-      else if (acessibilidade.includes("Aluguer")) icone = "wheelchair_pickup";
-      else if (acessibilidade.includes("Táteis")) icone = "touch_app";
-      else if (acessibilidade.includes("Médicos")) icone = "medical_services";
-      else if (acessibilidade.includes("LGBTQIA")) icone = "favorite";
-      else if (acessibilidade.includes("Inclusivo")) icone = "groups";
-      else if (acessibilidade.includes("Minorias")) icone = "diversity_3";
-      else if (acessibilidade.includes("Neutras")) icone = "family_restroom";
-
-      li.innerHTML = `
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">${icone}</span>
-            <p class="font-semibold text-gray-900 dark:text-white">${acessibilidade}</p>
-          </div>
-          <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center ${
-            selecionada ? "bg-Main-Primary dark:bg-cyan-400" : ""
-          }">
-            ${
-              selecionada
-                ? '<span class="material-symbols-outlined text-white text-sm">check</span>'
-                : ""
-            }
-          </div>
-        </div>
-      `;
-
-      /* evento de clique para selecionar/desselecionar */
-      li.addEventListener("click", () => {
-        toggleAcessibilidade(index);
-        mostrarAcessibilidades(lista);
-      });
-
-      listaAcessibilidades.appendChild(li);
-    });
-  }
-
-  /* mostrar todas as acessibilidades inicialmente */
-  mostrarAcessibilidades(acessibilidades);
-
-  /* pesquisa em tempo real */
-  pesquisaInput.addEventListener("input", (e) => {
-    const termoPesquisa = e.target.value.toLowerCase();
-    const acessibilidadesFiltradas = acessibilidades.filter((acessibilidade) =>
-      acessibilidade.toLowerCase().includes(termoPesquisa)
-    );
-    mostrarAcessibilidades(acessibilidadesFiltradas);
-  });
-
-  /* evento para confirmar selecao */
-  document
-    .getElementById("confirmar-acessibilidade")
-    .addEventListener("click", () => {
-      confirmarAcessibilidade();
-      fecharModalAcessibilidade();
-    });
-
-  /* evento para fechar modal */
-  document
-    .getElementById("fechar-modal-acessibilidade")
-    .addEventListener("click", fecharModalAcessibilidade);
-
-  /* fechar modal ao clicar fora */
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      fecharModalAcessibilidade();
-    }
-  });
-}
-
-/* funcao para selecionar/desselecionar acessibilidade */
-function toggleAcessibilidade(index) {
-  const posicao = acessibilidadesSelecionadas.indexOf(index);
-  if (posicao > -1) {
-    /* remover se ja esta selecionada */
-    acessibilidadesSelecionadas.splice(posicao, 1);
-  } else {
-    /* adicionar se nao esta selecionada */
-    acessibilidadesSelecionadas.push(index);
-  }
-}
-
-/* funcao para confirmar selecao de acessibilidade */
-function confirmarAcessibilidade() {
-  const textoAcessibilidade = document.getElementById("texto-acessibilidade");
-  const quantidadeSelecionada = acessibilidadesSelecionadas.length;
-
-  /* atualizar texto do botao */
-  if (quantidadeSelecionada === 0) {
-    textoAcessibilidade.textContent = "Nenhum";
-  } else if (quantidadeSelecionada === 1) {
-    textoAcessibilidade.textContent = "1 selecionado";
-  } else {
-    textoAcessibilidade.textContent = `${quantidadeSelecionada} selecionados`;
-  }
-
-  /* guardar selecao na localStorage */
-  localStorage.setItem(
-    "acessibilidadesSelecionadas",
-    JSON.stringify(acessibilidadesSelecionadas)
-  );
-}
-
-/* funcao para fechar modal de acessibilidade */
-function fecharModalAcessibilidade() {
-  const modal = document.getElementById("modal-acessibilidade");
-  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
-
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-  pesquisaInput.value = "";
-}
-
-/* array de tipos de turismo disponiveis */
-const tiposTurismo = [
-  {
-    id: "TurismodeSolePraia",
-    nome: "Sol e Praia",
-    imagem: "./img/tipos-turismo/praia.png",
-    url: "html/turism.html?turismo=TurismodeSolePraia",
-  },
-  {
-    id: "TurismoUrbano",
-    nome: "Turismo Urbano",
-    imagem: "./img/tipos-turismo/urbano.png",
-    url: "html/turism.html?turismo=TurismoUrbano",
-  },
-  {
-    id: "Turismogastronomico",
-    nome: "Turismo Gastronómico",
-    imagem: "./img/tipos-turismo/Gastronómico.png",
-    url: "html/turism.html?turismo=Turismogastronomico",
-  },
-  {
-    id: "Turismocultural",
-    nome: "Turismo Cultural",
-    imagem: "./img/tipos-turismo/Cultural.png",
-    url: "html/turism.html?turismo=Turismocultural",
-  },
-  {
-    id: "SaudeeBemEstar",
-    nome: "Saúde e Bem-estar",
-    imagem: "./img/tipos-turismo/bem-estar.png",
-    url: "html/turism.html?turismo=SaudeeBemEstar",
-  },
-  {
-    id: "Ecoturismo",
-    nome: "Ecoturismo",
-    imagem: "./img/tipos-turismo/Eco.png",
-    url: "html/turism.html?turismo=Ecoturismo",
-  },
-  {
-    id: "Turismorural",
-    nome: "Turismo Rural",
-    imagem: "./img/tipos-turismo/Rural.png",
-    url: "html/turism.html?turismo=Turismorural",
-  },
-  {
-    id: "Turismoreligioso",
-    nome: "Turismo Religioso",
-    imagem: "./img/tipos-turismo/Religioso.png",
-    url: "html/turism.html?turismo=Turismoreligioso",
-  },
-  {
-    id: "Turismodenegocios",
-    nome: "Turismo de Negócios",
-    imagem: "./img/tipos-turismo/negocios.png",
-    url: "html/turism.html?turismo=Turismodenegocios",
-  },
-];
-
-/* variavel global para guardar tipo de turismo selecionado */
-let tipoTurismoSelecionado = null;
-
-/* funcao para abrir modal de tipo de turismo */
-function abrirModalTipoTurismo() {
-  const modal = document.getElementById("modal-tipo-turismo");
-  const gridTipos = document.getElementById("grid-tipos-turismo");
-  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
-
-  /* mostrar modal */
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-
-  /* funcao para mostrar tipos de turismo */
-  function mostrarTiposTurismo(lista) {
-    gridTipos.innerHTML = "";
-
-    lista.forEach((tipo) => {
-      const card = document.createElement("div");
-      card.className =
-        "w-full h-32 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200";
-
-      card.innerHTML = `
-        <img
-          draggable="false"
-          class="absolute inset-0 w-full h-full object-cover"
-          src="${tipo.imagem}"
-          alt="${tipo.nome}"
-        />
-        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-end p-3">
-          <div class="text-white text-sm font-bold font-['Space_Mono'] leading-tight">
-            ${tipo.nome}
-          </div>
-        </div>
-      `;
-
-      /* evento de clique para selecionar tipo de turismo */
-      card.addEventListener("click", () => {
-        selecionarTipoTurismo(tipo);
-        fecharModalTipoTurismo();
-      });
-
-      gridTipos.appendChild(card);
-    });
-  }
-
-  /* mostrar todos os tipos inicialmente */
-  mostrarTiposTurismo(tiposTurismo);
-
-  /* pesquisa em tempo real */
-  pesquisaInput.addEventListener("input", (e) => {
-    const termoPesquisa = e.target.value.toLowerCase();
-    const tiposFiltrados = tiposTurismo.filter((tipo) =>
-      tipo.nome.toLowerCase().includes(termoPesquisa)
-    );
-    mostrarTiposTurismo(tiposFiltrados);
-  });
-
-  /* evento para fechar modal */
-  document
-    .getElementById("fechar-modal-tipo-turismo")
-    .addEventListener("click", fecharModalTipoTurismo);
-
-  /* fechar modal ao clicar fora */
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      fecharModalTipoTurismo();
-    }
-  });
-}
-
-/* funcao para selecionar tipo de turismo */
-function selecionarTipoTurismo(tipo) {
-  const textoTipoTurismo = document.getElementById("texto-tipo-turismo");
-
-  /* atualizar texto do botao */
-  textoTipoTurismo.textContent = tipo.nome;
-
-  /* guardar selecao global */
-  tipoTurismoSelecionado = tipo;
-
-  /* guardar selecao na localStorage */
-  localStorage.setItem("tipoTurismoSelecionado", JSON.stringify(tipo));
-}
-
-/* funcao para fechar modal de tipo de turismo */
-function fecharModalTipoTurismo() {
-  const modal = document.getElementById("modal-tipo-turismo");
-  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
-
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-  pesquisaInput.value = "";
 }

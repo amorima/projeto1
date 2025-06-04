@@ -1,14 +1,120 @@
-import { loadFromLocalStorage, saveToLocalStorage, combinar } from "./ModelHelpers.js";
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  combinar,
+} from "./ModelHelpers.js";
 
-// ARRAY FLIGHTS
+/* Array principal de viagens */
 let viagens = [];
 
-// CARREGAR VIAGEM DA LOCAL STORAGE ATRAVES DO MODEL HELPER
+/* Dados para os modais - devem estar no model */
+let selectedOrigin = null;
+let selectedDestination = null;
+let datesTravelers = {
+  dataPartida: "",
+  dataRegresso: "",
+  adultos: 1,
+  criancas: 0,
+  bebes: 0,
+};
+let selectedAccessibilities = [];
+let selectedTourismType = null;
+
+/* Array de tipos de turismo - dados estáticos */
+const tourismTypes = [
+  {
+    id: "TurismodeSolePraia",
+    nome: "Sol e Praia",
+    imagem: "./img/tipos-turismo/praia.png",
+    url: "html/turism.html?turismo=TurismodeSolePraia",
+  },
+  {
+    id: "TurismoUrbano",
+    nome: "Turismo Urbano",
+    imagem: "./img/tipos-turismo/urbano.png",
+    url: "html/turism.html?turismo=TurismoUrbano",
+  },
+  {
+    id: "Turismogastronomico",
+    nome: "Turismo Gastronómico",
+    imagem: "./img/tipos-turismo/Gastronómico.png",
+    url: "html/turism.html?turismo=Turismogastronomico",
+  },
+  {
+    id: "Turismocultural",
+    nome: "Turismo Cultural",
+    imagem: "./img/tipos-turismo/Cultural.png",
+    url: "html/turism.html?turismo=Turismocultural",
+  },
+  {
+    id: "SaudeeBemEstar",
+    nome: "Saúde e Bem-estar",
+    imagem: "./img/tipos-turismo/bem-estar.png",
+    url: "html/turism.html?turismo=SaudeeBemEstar",
+  },
+  {
+    id: "Ecoturismo",
+    nome: "Ecoturismo",
+    imagem: "./img/tipos-turismo/Eco.png",
+    url: "html/turism.html?turismo=Ecoturismo",
+  },
+  {
+    id: "Turismorural",
+    nome: "Turismo Rural",
+    imagem: "./img/tipos-turismo/Rural.png",
+    url: "html/turism.html?turismo=Turismorural",
+  },
+  {
+    id: "Turismoreligioso",
+    nome: "Turismo Religioso",
+    imagem: "./img/tipos-turismo/Religioso.png",
+    url: "html/turism.html?turismo=Turismoreligioso",
+  },
+  {
+    id: "Turismodenegocios",
+    nome: "Turismo de Negócios",
+    imagem: "./img/tipos-turismo/negocios.png",
+    url: "html/turism.html?turismo=Turismodenegocios",
+  },
+];
+
+/* Inicializar dados */
 export function init() {
   viagens = localStorage.viagens
     ? loadFromLocalStorage("viagens", viagens)
     : [];
+  loadSavedData();
   return viagens;
+}
+
+/* Carregar dados guardados na localStorage */
+function loadSavedData() {
+  const savedOrigin = localStorage.getItem("origemSelecionada");
+  if (savedOrigin) {
+    selectedOrigin = JSON.parse(savedOrigin);
+  }
+
+  const savedDestination = localStorage.getItem("destinoSelecionado");
+  if (savedDestination) {
+    selectedDestination = JSON.parse(savedDestination);
+  }
+
+  const savedDates = localStorage.getItem("datasViajantes");
+  if (savedDates) {
+    datesTravelers = JSON.parse(savedDates);
+  }
+
+  const savedAccessibilities = localStorage.getItem(
+    "acessibilidadesSelecionadas"
+  );
+  if (savedAccessibilities) {
+    selectedAccessibilities = JSON.parse(savedAccessibilities);
+  }
+
+  const savedTourismType = localStorage.getItem("tipoTurismoSelecionado");
+  if (savedTourismType) {
+    selectedTourismType = JSON.parse(savedTourismType);
+  }
 }
 
 // LER VIAGEM
@@ -72,26 +178,175 @@ export function deleteTrip(numeroVoo) {
   throw Error("No Flight Found");
 }
 
-/**
- * Devolve array de viagens filtradas por origem.
- * @param {string} filtro 
- * - Local de origem ou turismo a filtrar (ex: "OPO - Porto", "cultural")
- * - Ignora maiúsculas/minúsculas
- * @param {number} perPage 
- * - Número de viagens por página (default: 18)
- * @param {number} page 
- * - Página atual (default: 1)
- * - Se page = 1, devolve as primeiras perPage viagens
- * @returns 
- * - Array de viagens filtradas por origem ou turismo
- * @example
- * getTripsFrom("OPO - Porto");
- * Returns: [
- *   { numeroVoo: "TP123", origem: "OPO", destino: "LIS", turismo: ["cultural"] },
- *   { numeroVoo: "TP456", origem: "OPO", destino: "MAD", turismo: ["cultural", "aventura"] },
- *  ...
- * ]
- */
+/* Funcoes para gestao de origem */
+export function getAirports() {
+  return JSON.parse(localStorage.getItem("aeroportos")) || [];
+}
+
+export function filterAirports(searchTerm) {
+  const airports = getAirports();
+  return airports.filter(
+    (aeroporto) =>
+      aeroporto.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (aeroporto.pais &&
+        aeroporto.pais.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (aeroporto.codigo &&
+        aeroporto.codigo.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+}
+
+export function setOrigin(aeroporto) {
+  selectedOrigin = aeroporto;
+  localStorage.setItem("origemSelecionada", JSON.stringify(aeroporto));
+}
+
+export function getSelectedOrigin() {
+  return selectedOrigin;
+}
+
+/* Funcoes para gestao de destino */
+export function setDestination(aeroporto) {
+  selectedDestination = aeroporto;
+  localStorage.setItem("destinoSelecionado", JSON.stringify(aeroporto));
+}
+
+export function getSelectedDestination() {
+  return selectedDestination;
+}
+
+/* Funcoes para gestao de datas e viajantes */
+export function setDatesTravelers(
+  dataPartida,
+  dataRegresso,
+  adultos,
+  criancas,
+  bebes
+) {
+  datesTravelers = {
+    dataPartida: dataPartida,
+    dataRegresso: dataRegresso,
+    adultos: adultos,
+    criancas: criancas,
+    bebes: bebes,
+    totalViajantes: adultos + criancas + bebes,
+  };
+  localStorage.setItem("datasViajantes", JSON.stringify(datesTravelers));
+}
+
+export function getDatesTravelers() {
+  return datesTravelers;
+}
+
+export function formatDatesForDisplay(dataPartida, dataRegresso) {
+  const partida = new Date(dataPartida);
+  const regresso = new Date(dataRegresso);
+
+  const meses = [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ];
+
+  const dataPartidaFormatada = `${partida.getDate()} ${
+    meses[partida.getMonth()]
+  }`;
+  const dataRegressoFormatada = `${regresso.getDate()} ${
+    meses[regresso.getMonth()]
+  }`;
+
+  return `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
+}
+
+/* Funcoes para gestao de acessibilidade */
+export function getAccessibilities() {
+  return JSON.parse(localStorage.getItem("acessibilidade")) || [];
+}
+
+export function filterAccessibilities(searchTerm) {
+  const accessibilities = getAccessibilities();
+  return accessibilities.filter((acessibilidade) =>
+    acessibilidade.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+}
+
+export function toggleAccessibility(index) {
+  const position = selectedAccessibilities.indexOf(index);
+  if (position > -1) {
+    selectedAccessibilities.splice(position, 1);
+  } else {
+    selectedAccessibilities.push(index);
+  }
+}
+
+export function confirmAccessibilities() {
+  localStorage.setItem(
+    "acessibilidadesSelecionadas",
+    JSON.stringify(selectedAccessibilities)
+  );
+}
+
+export function getSelectedAccessibilities() {
+  return selectedAccessibilities;
+}
+
+export function getAccessibilitiesText() {
+  const quantidade = selectedAccessibilities.length;
+  if (quantidade === 0) return "Nenhum";
+  if (quantidade === 1) return "1 selecionado";
+  return `${quantidade} selecionados`;
+}
+
+/* Funcoes para gestao de tipos de turismo */
+export function getTourismTypes() {
+  return tourismTypes;
+}
+
+export function filterTourismTypes(searchTerm) {
+  return tourismTypes.filter((tipo) =>
+    tipo.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+}
+
+export function setTourismType(tipo) {
+  selectedTourismType = tipo;
+  localStorage.setItem("tipoTurismoSelecionado", JSON.stringify(tipo));
+}
+
+export function getSelectedTourismType() {
+  return selectedTourismType;
+}
+
+/* Funcao para obter icone de acessibilidade baseado no texto */
+export function getAccessibilityIcon(acessibilidade) {
+  if (acessibilidade.includes("Elevador")) return "elevator";
+  if (acessibilidade.includes("Banho")) return "wc";
+  if (acessibilidade.includes("Quarto")) return "bed";
+  if (acessibilidade.includes("Transporte")) return "directions_bus";
+  if (acessibilidade.includes("Braille")) return "visibility_off";
+  if (acessibilidade.includes("Alarme")) return "hearing_disabled";
+  if (acessibilidade.includes("Cães")) return "pets";
+  if (acessibilidade.includes("Sensorial")) return "psychology";
+  if (acessibilidade.includes("Alimentar")) return "restaurant";
+  if (acessibilidade.includes("Comunicação")) return "chat";
+  if (acessibilidade.includes("Aluguer")) return "wheelchair_pickup";
+  if (acessibilidade.includes("Táteis")) return "touch_app";
+  if (acessibilidade.includes("Médicos")) return "medical_services";
+  if (acessibilidade.includes("LGBTQIA")) return "favorite";
+  if (acessibilidade.includes("Inclusivo")) return "groups";
+  if (acessibilidade.includes("Minorias")) return "diversity_3";
+  if (acessibilidade.includes("Neutras")) return "family_restroom";
+  return "accessibility";
+}
+
 export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
   // Filtra voos cuja origem é OPO (Porto)
   const Trips = viagens.filter(
@@ -103,28 +358,9 @@ export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
 
-/**
- * @param {Array} destinos 
- * - Locais a Visitar (por ordem)
- * @param {Object} filtros
- * -Se não incluir apresenta todas as viagens
- * -Datas:
- *  filtros.dataPartidaMin
- *  filtros.dataChagadaMax
- * @param {number} [page=1] 
- * -Página atula
- * @param {number} [perPage=18]  
- * -Limite Paginação
- * @param {boolean} [circular=true] 
- * -Viagem começa e termina no mesmo local
- */
 export function getTripsMulti(
   destinos,
-  {
-    dataPartidaMin = null,
-    dataChegadaMax = null,
-    ...filtrosSemDatas
-  } = {},
+  { dataPartidaMin = null, dataChegadaMax = null, ...filtrosSemDatas } = {},
   perPage = 18,
   page = 1,
   circular = true
@@ -134,13 +370,15 @@ export function getTripsMulti(
   for (let i = 0; i < destinos.length - 1; i++) {
     const origem = destinos[i];
     const destino = destinos[i + 1];
-    const voos = viagens.filter((v) =>
-      v.origem === origem &&
-      v.destino === destino &&
-      Object.entries(filtrosSemDatas).every(([key, value]) =>
-        v[key] !== undefined &&
-        (Array.isArray(value) ? value.includes(v[key]) : v[key] == value)
-      )
+    const voos = viagens.filter(
+      (v) =>
+        v.origem === origem &&
+        v.destino === destino &&
+        Object.entries(filtrosSemDatas).every(
+          ([key, value]) =>
+            v[key] !== undefined &&
+            (Array.isArray(value) ? value.includes(v[key]) : v[key] == value)
+        )
     );
     if (voos.length === 0) return []; // Not dound
     segmentos.push(voos);
@@ -169,11 +407,12 @@ export function getTripsMulti(
       }
       // Se circular, o último destino deve ser igual ao primeiro
       if (circular && segmentos.length > 0) {
-        if (segmentos[segmentos.length - 1].destino !== destinos[0]) return false;
+        if (segmentos[segmentos.length - 1].destino !== destinos[0])
+          return false;
       }
       return true;
     })
-    .map(segmentos => ({viagens: segmentos }));
+    .map((segmentos) => ({ viagens: segmentos }));
 
   // 4. Paginação
   const start = perPage * (page - 1);
@@ -200,42 +439,53 @@ export function getTripsMulti(
  * - Cada rota é um objeto com a propriedade 'viagens' contendo os voos
  * - Exemplo: [{ viagens: [voo1, voo2, ...] }, ...]
  */
-export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3, filtros = {}, circular = true) {
+export function getRecommendedTrips(
+  origem,
+  dataInicio,
+  dataFim,
+  maxDestinos = 3,
+  filtros = {},
+  circular = true
+) {
   const results = [];
 
   function rota(atual, rotaAtual, dataAtual, visitados) {
     // Se já atingiu o número máximo de destinos
     if (rotaAtual.length >= maxDestinos) {
       // Se circular, só guarda se o último destino for igual à origem
-      if (!circular || (rotaAtual.length > 0 && rotaAtual[rotaAtual.length - 1].destino === origem)) {
+      if (
+        !circular ||
+        (rotaAtual.length > 0 &&
+          rotaAtual[rotaAtual.length - 1].destino === origem)
+      ) {
         results.push({ viagens: [...rotaAtual] });
       }
       return;
     }
 
-    const proximosVoos = viagens.filter(v =>
-      v.origem === atual &&
-      !visitados.includes(v.destino) &&
-      new Date(v.partida) >= new Date(dataAtual) &&
-      new Date(v.chegada) <= new Date(dataFim) &&
-      Object.entries(filtros).every(([key, value]) =>
-        v[key] !== undefined &&
-        (Array.isArray(value) ? value.includes(v[key]) : v[key] == value)
-      )
+    const proximosVoos = viagens.filter(
+      (v) =>
+        v.origem === atual &&
+        !visitados.includes(v.destino) &&
+        new Date(v.partida) >= new Date(dataAtual) &&
+        new Date(v.chegada) <= new Date(dataFim) &&
+        Object.entries(filtros).every(
+          ([key, value]) =>
+            v[key] !== undefined &&
+            (Array.isArray(value) ? value.includes(v[key]) : v[key] == value)
+        )
     );
 
     for (const voo of proximosVoos) {
-      rota(
+      rota(voo.destino, [...rotaAtual, voo], voo.chegada, [
+        ...visitados,
         voo.destino,
-        [...rotaAtual, voo],
-        voo.chegada,
-        [...visitados, voo.destino]
-      );
+      ]);
     }
 
     // Se já tem pelo menos 1 destino, pode guardar a rota parcial
     if (rotaAtual.length > 0) {
-      if (!circular || (rotaAtual[rotaAtual.length - 1].destino === origem)) {
+      if (!circular || rotaAtual[rotaAtual.length - 1].destino === origem) {
         results.push({ viagens: [...rotaAtual] });
       }
     }
@@ -247,7 +497,7 @@ export function getRecommendedTrips(origem, dataInicio, dataFim, maxDestinos = 3
 
 /**
  * Devolve array de viagens filtradas por tipo de turismo.
- * @param {string} turismoTipo 
+ * @param {string} turismoTipo
  * - Tipo de turismo a filtrar (ex: "cultural", "aventura", etc.)
  * - Ignora maiúsculas/minúsculas
  * @returns {Array}
