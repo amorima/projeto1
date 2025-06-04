@@ -10,27 +10,29 @@ import {
   closestAirport,
 } from "./ViewHelpers.js";
 
+/* Inicializar a aplicacao */
 Flight.init();
 initView();
 
-// Main init function to be called on DOMContentLoaded
 function initView() {
+  /* Obter localizacao do utilizador e definir aeroporto mais proximo */
   getUserLocation((location) => {
     if (!location) return;
-    const aeroportos = JSON.parse(localStorage.getItem("aeroportos"));
+    const aeroportos = Flight.getAirports();
     const closest = closestAirport(location, aeroportos);
     document.querySelector("#btn-open p").innerText = closest.cidade;
   });
+
   showCookieBanner();
   initSlider();
-  setupModalButton();
+  setupModalButtons();
 
-  // Render random OPO cards on homepage if container exists
+  /* Renderizar cards na homepage se o container existir */
   if (document.querySelector(".card-viagens")) {
     renderRandomOPOCards("card-viagens");
   }
 
-  // Initialize table view
+  /* Inicializar vista de tabela */
   const data = Flight.getAll();
   const config = createTableConfig(data);
   updateTable(config);
@@ -44,8 +46,7 @@ function initView() {
   }
 }
 
-// --- UI Component Functions ---
-
+/* Funcoes de interface - slider */
 function initSlider() {
   const slider = document.getElementById("slider");
   const btnLeft = document.getElementById("btn-left");
@@ -62,10 +63,12 @@ function initSlider() {
     slider.scrollBy({ left: scrollAmount, behavior: "smooth" })
   );
 
+  /* Variaveis para controlar o arrastar do slider */
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
 
+  /* Quando o utilizador pressiona o botao do rato */
   slider.addEventListener("mousedown", (e) => {
     isDown = true;
     slider.classList.add("grabbing");
@@ -73,16 +76,19 @@ function initSlider() {
     scrollLeft = slider.scrollLeft;
   });
 
+  /* Quando o utilizador solta o botao do rato */
   slider.addEventListener("mouseup", () => {
     isDown = false;
     slider.classList.remove("grabbing");
   });
 
+  /* Quando o rato sai do slider */
   slider.addEventListener("mouseleave", () => {
     isDown = false;
     slider.classList.remove("grabbing");
   });
 
+  /* Quando o utilizador move o rato enquanto arrasta */
   slider.addEventListener("mousemove", (e) => {
     if (!isDown) return;
     e.preventDefault();
@@ -90,16 +96,19 @@ function initSlider() {
     slider.scrollLeft = scrollLeft - (x - startX);
   });
 
+  /* Para dispositivos moveis - quando toca no ecra */
   slider.addEventListener("touchstart", (e) => {
     isDown = true;
     startX = e.touches[0].pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
   });
 
+  /* Para dispositivos moveis - quando para de tocar */
   slider.addEventListener("touchend", () => {
     isDown = false;
   });
 
+  /* Para dispositivos moveis - quando move o dedo */
   slider.addEventListener("touchmove", (e) => {
     if (!isDown) return;
     const x = e.touches[0].pageX - slider.offsetLeft;
@@ -107,17 +116,513 @@ function initSlider() {
   });
 }
 
-function setupModalButton() {
-  const btnOpenModal = document.getElementById("btn-open");
-  if (btnOpenModal) {
-    btnOpenModal.addEventListener("click", () => {
-      openModal("modal-from");
+/* Configurar eventos dos botoes dos modais */
+function setupModalButtons() {
+  const btnOrigem = document.getElementById("btn-open");
+  if (btnOrigem) {
+    btnOrigem.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalOrigem();
+    });
+  }
+
+  const btnDestino = document.getElementById("btn-destino");
+  if (btnDestino) {
+    btnDestino.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalDestino();
+    });
+  }
+
+  const btnDatas = document.getElementById("btn-datas");
+  if (btnDatas) {
+    btnDatas.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalDatas();
+    });
+  }
+
+  const btnAcessibilidade = document.getElementById("btn-acessibilidade");
+  if (btnAcessibilidade) {
+    btnAcessibilidade.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalAcessibilidade();
+    });
+  }
+
+  const btnTipoTurismo = document.getElementById("btn-tipo-turismo");
+  if (btnTipoTurismo) {
+    btnTipoTurismo.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalTipoTurismo();
     });
   }
 }
 
-// --- Table & Form Logic ---
+/* Funcoes para controlar scroll da pagina */
+function pararScroll() {
+  document.body.classList.add("modal-aberto");
+}
 
+function deixarScroll() {
+  document.body.classList.remove("modal-aberto");
+}
+
+/* Funcoes dos modais - apenas interface */
+function abrirModalOrigem() {
+  pararScroll(); /* Parar scroll da pagina */
+  const modal = document.getElementById("modal-origem");
+  const listaAeroportos = document.getElementById("lista-aeroportos");
+  const pesquisaInput = document.getElementById("pesquisa-aeroporto");
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  function mostrarAeroportos(lista) {
+    listaAeroportos.innerHTML = "";
+
+    lista.forEach((aeroporto) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+      li.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">flight_takeoff</span>
+          <div>
+            <p class="font-semibold text-gray-900 dark:text-white">${
+              aeroporto.codigo || "XXX"
+            } - ${aeroporto.cidade}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${
+              aeroporto.pais || "País"
+            }</p>
+          </div>
+        </div>
+      `;
+
+      li.addEventListener("click", () => {
+        Flight.setOrigin(aeroporto);
+        updateOriginButton(aeroporto);
+        fecharModalOrigem();
+      });
+
+      listaAeroportos.appendChild(li);
+    });
+  }
+
+  /* Mostrar todos os aeroportos inicialmente */
+  mostrarAeroportos(Flight.getAirports());
+
+  /* Pesquisa em tempo real */
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const aeroportosFiltrados = Flight.filterAirports(termoPesquisa);
+    mostrarAeroportos(aeroportosFiltrados);
+  });
+
+  /* Eventos para fechar modal */
+  document
+    .getElementById("fechar-modal-origem")
+    .addEventListener("click", fecharModalOrigem);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalOrigem();
+    }
+  });
+}
+
+function updateOriginButton(aeroporto) {
+  const btnOrigem = document.querySelector("#btn-open p");
+  btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+}
+
+function fecharModalOrigem() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
+  const modal = document.getElementById("modal-origem");
+  const pesquisaInput = document.getElementById("pesquisa-aeroporto");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+function abrirModalDestino() {
+  pararScroll(); /* Parar scroll da pagina */
+  const modal = document.getElementById("modal-destino");
+  const listaDestinos = document.getElementById("lista-destinos");
+  const pesquisaInput = document.getElementById("pesquisa-destino");
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  function mostrarDestinos(lista) {
+    listaDestinos.innerHTML = "";
+
+    lista.forEach((aeroporto) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+      li.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">flight_land</span>
+          <div>
+            <p class="font-semibold text-gray-900 dark:text-white">${
+              aeroporto.codigo || "XXX"
+            } - ${aeroporto.cidade}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${
+              aeroporto.pais || "País"
+            }</p>
+          </div>
+        </div>
+      `;
+
+      li.addEventListener("click", () => {
+        Flight.setDestination(aeroporto);
+        updateDestinationButton(aeroporto);
+        fecharModalDestino();
+      });
+
+      listaDestinos.appendChild(li);
+    });
+  }
+
+  mostrarDestinos(Flight.getAirports());
+
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const destinosFiltrados = Flight.filterAirports(termoPesquisa);
+    mostrarDestinos(destinosFiltrados);
+  });
+
+  document
+    .getElementById("fechar-modal-destino")
+    .addEventListener("click", fecharModalDestino);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalDestino();
+    }
+  });
+}
+
+function updateDestinationButton(aeroporto) {
+  const btnDestino = document.querySelector("#btn-destino p");
+  btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+}
+
+function fecharModalDestino() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
+  const modal = document.getElementById("modal-destino");
+  const pesquisaInput = document.getElementById("pesquisa-destino");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+function abrirModalDatas() {
+  pararScroll(); /* Parar scroll da pagina */
+  const modal = document.getElementById("modal-datas");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  /* Obter dados salvos */
+  const savedData = Flight.getDatesTravelers();
+  let adultos = savedData.adultos;
+  let criancas = savedData.criancas;
+  let bebes = savedData.bebes;
+
+  /* Elementos dos contadores */
+  const contadorAdultos = document.getElementById("contador-adultos");
+  const contadorCriancas = document.getElementById("contador-criancas");
+  const contadorBebes = document.getElementById("contador-bebes");
+  const inputDataPartida = document.getElementById("data-partida");
+  const inputDataRegresso = document.getElementById("data-regresso");
+
+  /* Carregar valores salvos */
+  contadorAdultos.textContent = adultos;
+  contadorCriancas.textContent = criancas;
+  contadorBebes.textContent = bebes;
+  inputDataPartida.value = savedData.dataPartida;
+  inputDataRegresso.value = savedData.dataRegresso;
+
+  /* Configurar botoes de contadores */
+  setupCounters(
+    contadorAdultos,
+    contadorCriancas,
+    contadorBebes,
+    adultos,
+    criancas,
+    bebes
+  );
+
+  /* Configurar datas minimas */
+  const hoje = new Date().toISOString().split("T")[0];
+  inputDataPartida.min = hoje;
+  inputDataRegresso.min = hoje;
+
+  inputDataPartida.addEventListener("change", (e) => {
+    inputDataRegresso.min = e.target.value;
+  });
+
+  /* Botao confirmar */
+  document.getElementById("confirmar-datas").addEventListener("click", () => {
+    const dataPartida = inputDataPartida.value;
+    const dataRegresso = inputDataRegresso.value;
+
+    if (dataPartida && dataRegresso) {
+      Flight.setDatesTravelers(
+        dataPartida,
+        dataRegresso,
+        adultos,
+        criancas,
+        bebes
+      );
+      updateDatesButton(dataPartida, dataRegresso, adultos, criancas, bebes);
+      fecharModalDatas();
+    }
+  });
+
+  document
+    .getElementById("fechar-modal-datas")
+    .addEventListener("click", fecharModalDatas);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalDatas();
+    }
+  });
+}
+
+function setupCounters(
+  contadorAdultos,
+  contadorCriancas,
+  contadorBebes,
+  adultos,
+  criancas,
+  bebes
+) {
+  /* Botoes para adultos */
+  document.getElementById("aumentar-adultos").addEventListener("click", () => {
+    adultos++;
+    contadorAdultos.textContent = adultos;
+  });
+
+  document.getElementById("diminuir-adultos").addEventListener("click", () => {
+    if (adultos > 1) {
+      adultos--;
+      contadorAdultos.textContent = adultos;
+    }
+  });
+
+  /* Botoes para criancas */
+  document.getElementById("aumentar-criancas").addEventListener("click", () => {
+    criancas++;
+    contadorCriancas.textContent = criancas;
+  });
+
+  document.getElementById("diminuir-criancas").addEventListener("click", () => {
+    if (criancas > 0) {
+      criancas--;
+      contadorCriancas.textContent = criancas;
+    }
+  });
+
+  /* Botoes para bebes */
+  document.getElementById("aumentar-bebes").addEventListener("click", () => {
+    bebes++;
+    contadorBebes.textContent = bebes;
+  });
+
+  document.getElementById("diminuir-bebes").addEventListener("click", () => {
+    if (bebes > 0) {
+      bebes--;
+      contadorBebes.textContent = bebes;
+    }
+  });
+}
+
+function updateDatesButton(
+  dataPartida,
+  dataRegresso,
+  adultos,
+  criancas,
+  bebes
+) {
+  const formattedDates = Flight.formatDatesForDisplay(
+    dataPartida,
+    dataRegresso
+  );
+  const totalTravelers = adultos + criancas + bebes;
+  const travelersText =
+    totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
+
+  const btnDatas = document.getElementById("btn-datas");
+  const textoDatas = btnDatas.querySelector("div:first-child p");
+  const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
+
+  textoDatas.textContent = formattedDates;
+  textoViajantesElemento.textContent = travelersText;
+}
+
+function fecharModalDatas() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
+  const modal = document.getElementById("modal-datas");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+function abrirModalAcessibilidade() {
+  pararScroll(); /* Parar scroll da pagina */
+  const modal = document.getElementById("modal-acessibilidade");
+  const listaAcessibilidades = document.getElementById("lista-acessibilidades");
+  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  function mostrarAcessibilidades(lista) {
+    listaAcessibilidades.innerHTML = "";
+
+    lista.forEach((acessibilidade, index) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+
+      const selected = Flight.getSelectedAccessibilities().includes(index);
+      const icon = Flight.getAccessibilityIcon(acessibilidade);
+
+      li.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">${icon}</span>
+            <p class="font-semibold text-gray-900 dark:text-white">${acessibilidade}</p>
+          </div>
+          <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center ${
+            selected ? "bg-Main-Primary dark:bg-cyan-400" : ""
+          }">
+            ${
+              selected
+                ? '<span class="material-symbols-outlined text-white text-sm">check</span>'
+                : ""
+            }
+          </div>
+        </div>
+      `;
+
+      li.addEventListener("click", () => {
+        Flight.toggleAccessibility(index);
+        mostrarAcessibilidades(lista);
+      });
+
+      listaAcessibilidades.appendChild(li);
+    });
+  }
+
+  mostrarAcessibilidades(Flight.getAccessibilities());
+
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const filteredAccessibilities = Flight.filterAccessibilities(termoPesquisa);
+    mostrarAcessibilidades(filteredAccessibilities);
+  });
+
+  document
+    .getElementById("confirmar-acessibilidade")
+    .addEventListener("click", () => {
+      Flight.confirmAccessibilities();
+      updateAccessibilityButton();
+      fecharModalAcessibilidade();
+    });
+
+  document
+    .getElementById("fechar-modal-acessibilidade")
+    .addEventListener("click", fecharModalAcessibilidade);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalAcessibilidade();
+    }
+  });
+}
+
+function updateAccessibilityButton() {
+  const textoAcessibilidade = document.getElementById("texto-acessibilidade");
+  textoAcessibilidade.textContent = Flight.getAccessibilitiesText();
+}
+
+function fecharModalAcessibilidade() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
+  const modal = document.getElementById("modal-acessibilidade");
+  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+function abrirModalTipoTurismo() {
+  pararScroll(); /* Parar scroll da pagina */
+  const modal = document.getElementById("modal-tipo-turismo");
+  const gridTipos = document.getElementById("grid-tipos-turismo");
+  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  function mostrarTiposTurismo(lista) {
+    gridTipos.innerHTML = "";
+
+    lista.forEach((tipo) => {
+      const card = document.createElement("div");
+      card.className =
+        "w-full h-32 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200";
+
+      card.innerHTML = `
+        <img draggable="false" class="absolute inset-0 w-full h-full object-cover" src="${tipo.imagem}" alt="${tipo.nome}" />
+        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-end p-3">
+          <div class="text-white text-sm font-bold font-['Space_Mono'] leading-tight">
+            ${tipo.nome}
+          </div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => {
+        Flight.setTourismType(tipo);
+        updateTourismButton(tipo);
+        fecharModalTipoTurismo();
+      });
+
+      gridTipos.appendChild(card);
+    });
+  }
+
+  mostrarTiposTurismo(Flight.getTourismTypes());
+
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const filteredTypes = Flight.filterTourismTypes(termoPesquisa);
+    mostrarTiposTurismo(filteredTypes);
+  });
+
+  document
+    .getElementById("fechar-modal-tipo-turismo")
+    .addEventListener("click", fecharModalTipoTurismo);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalTipoTurismo();
+    }
+  });
+}
+
+function updateTourismButton(tipo) {
+  const textoTipoTurismo = document.getElementById("texto-tipo-turismo");
+  textoTipoTurismo.textContent = tipo.nome;
+}
+
+function fecharModalTipoTurismo() {
+  deixarScroll(); /* Deixar scroll da pagina voltar */
+  const modal = document.getElementById("modal-tipo-turismo");
+  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+/* Funcoes de tabela e formulario */
 function createTableConfig(data) {
   return {
     data,
@@ -140,11 +645,7 @@ function createTableConfig(data) {
         class: "text-Main-Primary",
         handler: Flight.update,
       },
-      {
-        icon: "delete",
-        class: "text-red-600",
-        handler: Flight.deleteTrip,
-      },
+      { icon: "delete", class: "text-red-600", handler: Flight.deleteTrip },
     ],
     rowsPerPage: 10,
     currentPage: 1,
@@ -164,15 +665,9 @@ function createFlight(config) {
   updateTable(config);
 }
 
-// --- Home Card Renderer ---
-
+/* Renderizar cards na homepage */
 export function renderRandomOPOCards(containerClass) {
-  /*   const viagens = JSON.parse(localStorage.getItem("viagens")) || [];
-  const opoViagens = viagens.filter((v) => v.origem === "OPO - Porto");
-  const shuffled = opoViagens.sort(() => 0.5 - Math.random()).slice(0, 18); */
-
   const shuffled = Flight.getTripsFrom();
-
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
   container.innerHTML = "";
@@ -221,18 +716,14 @@ export function renderRandomOPOCards(containerClass) {
           <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
           <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
-          <span 
-            class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"
-            data-favorito="false" 
-          >favorite</span>
+          <span class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
         </div>
       </div>
-      `;
+    `;
   });
 
-  // Ativar toggle de favorito
+  /* Ativar toggle de favorito */
   container.querySelectorAll(".favorite-icon").forEach((icon) => {
-    // Definir o estado visual inicial com base no atributo data-favorito
     const initialIsFav = icon.getAttribute("data-favorito") === "true";
     icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
 
@@ -241,15 +732,9 @@ export function renderRandomOPOCards(containerClass) {
       const newIsFav = !currentIsFav;
 
       this.setAttribute("data-favorito", String(newIsFav));
+      this.style.fontVariationSettings = newIsFav ? "'FILL' 1" : "'FILL' 0";
 
-      // Altera diretamente o estilo inline para 'FILL' 1 (preenchido) ou 'FILL' 0 (contorno)
-      if (newIsFav) {
-        this.style.fontVariationSettings = "'FILL' 1";
-      } else {
-        this.style.fontVariationSettings = "'FILL' 0";
-      }
-
-      // Animação de feedback visual
+      /* Animacao de feedback visual */
       this.classList.add("scale-110");
       setTimeout(() => this.classList.remove("scale-110"), 150);
     });
