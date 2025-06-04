@@ -16,7 +16,7 @@ export default class HotelView {
     /*  Verifica se existe id na url  */
     const urlParams = new URLSearchParams(window.location.search);
     /* const hotelId = urlParams.get("id"); */
-    const hotelId = 18; /*  Para testes, sempre mostrar o hotel com ID 1  */
+    const hotelId = 1; /*  Para testes, sempre mostrar o hotel com ID 1  */
 
     if (hotelId) {
       this.renderHotelDetail(hotelId);
