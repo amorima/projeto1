@@ -142,6 +142,15 @@ function setupModalButton() {
       abrirModalAcessibilidade();
     });
   }
+
+  /* botao para abrir modal de tipo de turismo */
+  const btnTipoTurismo = document.getElementById("btn-tipo-turismo");
+  if (btnTipoTurismo) {
+    btnTipoTurismo.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalTipoTurismo();
+    });
+  }
 }
 
 /* Função para abrir modal de seleção de origem */
@@ -837,6 +846,159 @@ function confirmarAcessibilidade() {
 function fecharModalAcessibilidade() {
   const modal = document.getElementById("modal-acessibilidade");
   const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+/* array de tipos de turismo disponiveis */
+const tiposTurismo = [
+  {
+    id: "TurismodeSolePraia",
+    nome: "Sol e Praia",
+    imagem: "./img/tipos-turismo/praia.png",
+    url: "html/turism.html?turismo=TurismodeSolePraia",
+  },
+  {
+    id: "TurismoUrbano",
+    nome: "Turismo Urbano",
+    imagem: "./img/tipos-turismo/urbano.png",
+    url: "html/turism.html?turismo=TurismoUrbano",
+  },
+  {
+    id: "Turismogastronomico",
+    nome: "Turismo Gastronómico",
+    imagem: "./img/tipos-turismo/Gastronómico.png",
+    url: "html/turism.html?turismo=Turismogastronomico",
+  },
+  {
+    id: "Turismocultural",
+    nome: "Turismo Cultural",
+    imagem: "./img/tipos-turismo/Cultural.png",
+    url: "html/turism.html?turismo=Turismocultural",
+  },
+  {
+    id: "SaudeeBemEstar",
+    nome: "Saúde e Bem-estar",
+    imagem: "./img/tipos-turismo/bem-estar.png",
+    url: "html/turism.html?turismo=SaudeeBemEstar",
+  },
+  {
+    id: "Ecoturismo",
+    nome: "Ecoturismo",
+    imagem: "./img/tipos-turismo/Eco.png",
+    url: "html/turism.html?turismo=Ecoturismo",
+  },
+  {
+    id: "Turismorural",
+    nome: "Turismo Rural",
+    imagem: "./img/tipos-turismo/Rural.png",
+    url: "html/turism.html?turismo=Turismorural",
+  },
+  {
+    id: "Turismoreligioso",
+    nome: "Turismo Religioso",
+    imagem: "./img/tipos-turismo/Religioso.png",
+    url: "html/turism.html?turismo=Turismoreligioso",
+  },
+  {
+    id: "Turismodenegocios",
+    nome: "Turismo de Negócios",
+    imagem: "./img/tipos-turismo/negocios.png",
+    url: "html/turism.html?turismo=Turismodenegocios",
+  },
+];
+
+/* variavel global para guardar tipo de turismo selecionado */
+let tipoTurismoSelecionado = null;
+
+/* funcao para abrir modal de tipo de turismo */
+function abrirModalTipoTurismo() {
+  const modal = document.getElementById("modal-tipo-turismo");
+  const gridTipos = document.getElementById("grid-tipos-turismo");
+  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
+
+  /* mostrar modal */
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  /* funcao para mostrar tipos de turismo */
+  function mostrarTiposTurismo(lista) {
+    gridTipos.innerHTML = "";
+
+    lista.forEach((tipo) => {
+      const card = document.createElement("div");
+      card.className =
+        "w-full h-32 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200";
+
+      card.innerHTML = `
+        <img
+          draggable="false"
+          class="absolute inset-0 w-full h-full object-cover"
+          src="${tipo.imagem}"
+          alt="${tipo.nome}"
+        />
+        <div class="absolute inset-0 bg-black bg-opacity-30 flex items-end p-3">
+          <div class="text-white text-sm font-bold font-['Space_Mono'] leading-tight">
+            ${tipo.nome}
+          </div>
+        </div>
+      `;
+
+      /* evento de clique para selecionar tipo de turismo */
+      card.addEventListener("click", () => {
+        selecionarTipoTurismo(tipo);
+        fecharModalTipoTurismo();
+      });
+
+      gridTipos.appendChild(card);
+    });
+  }
+
+  /* mostrar todos os tipos inicialmente */
+  mostrarTiposTurismo(tiposTurismo);
+
+  /* pesquisa em tempo real */
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const tiposFiltrados = tiposTurismo.filter((tipo) =>
+      tipo.nome.toLowerCase().includes(termoPesquisa)
+    );
+    mostrarTiposTurismo(tiposFiltrados);
+  });
+
+  /* evento para fechar modal */
+  document
+    .getElementById("fechar-modal-tipo-turismo")
+    .addEventListener("click", fecharModalTipoTurismo);
+
+  /* fechar modal ao clicar fora */
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalTipoTurismo();
+    }
+  });
+}
+
+/* funcao para selecionar tipo de turismo */
+function selecionarTipoTurismo(tipo) {
+  const textoTipoTurismo = document.getElementById("texto-tipo-turismo");
+
+  /* atualizar texto do botao */
+  textoTipoTurismo.textContent = tipo.nome;
+
+  /* guardar selecao global */
+  tipoTurismoSelecionado = tipo;
+
+  /* guardar selecao na localStorage */
+  localStorage.setItem("tipoTurismoSelecionado", JSON.stringify(tipo));
+}
+
+/* funcao para fechar modal de tipo de turismo */
+function fecharModalTipoTurismo() {
+  const modal = document.getElementById("modal-tipo-turismo");
+  const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
 
   modal.classList.add("hidden");
   modal.classList.remove("flex");

@@ -43,13 +43,13 @@
           <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">Viajantes</p>
         </div>
       </button>
-      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex-row items-center px-[11px] gap-1.5 dark:text-gray-100">
+      <button id="btn-tipo-turismo" class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex-row items-center px-[11px] gap-1.5 dark:text-gray-100">
         <div class="inline-flex gap-3 py-2 items-center">
           <span class="material-symbols-outlined text-white dark:text-gray-100">travel_luggage_and_bags</span>
           <p class="justify-start text-white dark:text-gray-100 text-base font-normal font-['IBM_Plex_Sans']">Tipo Turismo</p>
         </div>
-        <p class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
-      </div>
+        <p id="texto-tipo-turismo" class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
+      </button>
       <button id="btn-acessibilidade" class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex-row items-center px-[11px] gap-1.5 dark:text-gray-100">
         <div class="inline-flex gap-3 py-2">
           <span class="material-symbols-outlined text-white dark:text-gray-100">accessibility_new</span>
@@ -312,6 +312,33 @@
           <span class="text-white text-xl font-normal font-['Space_Mono']">It</span>
         </p>
       </button>
+    </div>
+  </div>
+
+  <!-- Modal para tipo de turismo -->
+  <div id="modal-tipo-turismo" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Selecionar Tipo de Turismo</h2>
+        <button id="fechar-modal-tipo-turismo" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <!-- Campo de pesquisa -->
+      <div class="mb-6">
+        <input 
+          type="text" 
+          id="pesquisa-tipo-turismo" 
+          placeholder="Pesquisar tipo de turismo..."
+          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+      </div>
+      
+      <!-- Grid de tipos de turismo -->
+      <div id="grid-tipos-turismo" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Os tipos de turismo vão ser inseridos aqui -->
+      </div>
     </div>
   </div>
 
