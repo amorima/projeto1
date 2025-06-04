@@ -116,12 +116,21 @@ function setupModalButton() {
     });
   }
 
-  /* Botão para abrir modal de destino */
+  /* botao para abrir modal de destino */
   const btnDestino = document.getElementById("btn-destino");
   if (btnDestino) {
     btnDestino.addEventListener("click", (e) => {
       e.preventDefault();
       abrirModalDestino();
+    });
+  }
+
+  /* botao para abrir modal de datas */
+  const btnDatas = document.getElementById("btn-datas");
+  if (btnDatas) {
+    btnDatas.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalDatas();
     });
   }
 }
@@ -314,7 +323,197 @@ function fecharModalDestino() {
   pesquisaInput.value = "";
 }
 
-// --- Table & Form Logic ---
+/* variáveis globais para guardar valores */
+let dataPartidaGlobal = "";
+let dataRegressoGlobal = "";
+let adultosGlobal = 1;
+let criancasGlobal = 0;
+let bebesGlobal = 0;
+
+/* funcao para abrir modal de datas e viajantes */
+function abrirModalDatas() {
+  const modal = document.getElementById("modal-datas");
+
+  /* mostrar modal */
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  /* configurar valores salvos */
+  let adultos = adultosGlobal;
+  let criancas = criancasGlobal;
+  let bebes = bebesGlobal;
+
+  /* elementos dos contadores */
+  const contadorAdultos = document.getElementById("contador-adultos");
+  const contadorCriancas = document.getElementById("contador-criancas");
+  const contadorBebes = document.getElementById("contador-bebes");
+  const inputDataPartida = document.getElementById("data-partida");
+  const inputDataRegresso = document.getElementById("data-regresso");
+
+  /* carregar valores salvos */
+  contadorAdultos.textContent = adultos;
+  contadorCriancas.textContent = criancas;
+  contadorBebes.textContent = bebes;
+  inputDataPartida.value = dataPartidaGlobal;
+  inputDataRegresso.value = dataRegressoGlobal;
+
+  /* botoes para adultos */
+  document.getElementById("aumentar-adultos").addEventListener("click", () => {
+    adultos++;
+    contadorAdultos.textContent = adultos;
+  });
+
+  document.getElementById("diminuir-adultos").addEventListener("click", () => {
+    if (adultos > 1) {
+      adultos--;
+      contadorAdultos.textContent = adultos;
+    }
+  });
+
+  /* botoes para criancas */
+  document.getElementById("aumentar-criancas").addEventListener("click", () => {
+    criancas++;
+    contadorCriancas.textContent = criancas;
+  });
+
+  document.getElementById("diminuir-criancas").addEventListener("click", () => {
+    if (criancas > 0) {
+      criancas--;
+      contadorCriancas.textContent = criancas;
+    }
+  });
+
+  /* botoes para bebes */
+  document.getElementById("aumentar-bebes").addEventListener("click", () => {
+    bebes++;
+    contadorBebes.textContent = bebes;
+  });
+
+  document.getElementById("diminuir-bebes").addEventListener("click", () => {
+    if (bebes > 0) {
+      bebes--;
+      contadorBebes.textContent = bebes;
+    }
+  });
+
+  /* configurar datas minimas */
+  const hoje = new Date().toISOString().split("T")[0];
+  inputDataPartida.min = hoje;
+  inputDataRegresso.min = hoje;
+
+  /* quando a data de partida muda, ajustar data de regresso */
+  inputDataPartida.addEventListener("change", (e) => {
+    inputDataRegresso.min = e.target.value;
+  });
+
+  /* botao confirmar */
+  document.getElementById("confirmar-datas").addEventListener("click", () => {
+    const dataPartida = inputDataPartida.value;
+    const dataRegresso = inputDataRegresso.value;
+
+    if (dataPartida && dataRegresso) {
+      /* guardar valores nas variaveis globais */
+      dataPartidaGlobal = dataPartida;
+      dataRegressoGlobal = dataRegresso;
+      adultosGlobal = adultos;
+      criancasGlobal = criancas;
+      bebesGlobal = bebes;
+
+      confirmarDatasViajantes(
+        dataPartida,
+        dataRegresso,
+        adultos,
+        criancas,
+        bebes
+      );
+      fecharModalDatas();
+    }
+  });
+
+  /* evento para fechar modal */
+  document
+    .getElementById("fechar-modal-datas")
+    .addEventListener("click", fecharModalDatas);
+
+  /* fechar modal ao clicar fora */
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalDatas();
+    }
+  });
+}
+
+/* funcao para confirmar selecao de datas e viajantes */
+function confirmarDatasViajantes(
+  dataPartida,
+  dataRegresso,
+  adultos,
+  criancas,
+  bebes
+) {
+  /* formatar datas para mostrar */
+  const partida = new Date(dataPartida);
+  const regresso = new Date(dataRegresso);
+
+  const meses = [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ];
+
+  const dataPartidaFormatada = `${partida.getDate()} ${
+    meses[partida.getMonth()]
+  }`;
+  const dataRegressoFormatada = `${regresso.getDate()} ${
+    meses[regresso.getMonth()]
+  }`;
+
+  /* calcular total de viajantes */
+  const totalViajantes = adultos + criancas + bebes;
+  const textoViajantes =
+    totalViajantes === 1 ? "1 Viajante" : `${totalViajantes} Viajantes`;
+
+  /* atualizar o botao */
+  const btnDatas = document.getElementById("btn-datas");
+  const primeiraMetade = btnDatas.querySelector("div:first-child p");
+  const segundaMetade = btnDatas.querySelector("div:last-child p");
+
+  /* mostrar datas na primeira metade */
+  primeiraMetade.innerHTML = `${dataPartidaFormatada}<br><span style="font-size: 14px;">${dataRegressoFormatada}</span>`;
+
+  /* mostrar viajantes na segunda metade */
+  segundaMetade.textContent = textoViajantes;
+
+  /* guardar selecao na localStorage */
+  const selecao = {
+    dataPartida: dataPartida,
+    dataRegresso: dataRegresso,
+    adultos: adultos,
+    criancas: criancas,
+    bebes: bebes,
+    totalViajantes: totalViajantes,
+  };
+  localStorage.setItem("datasViajantes", JSON.stringify(selecao));
+}
+
+/* funcao para fechar modal de datas */
+function fecharModalDatas() {
+  const modal = document.getElementById("modal-datas");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+/* --- Table & Form Logic --- */
 
 function createTableConfig(data) {
   return {
