@@ -110,10 +110,208 @@ function initSlider() {
 function setupModalButton() {
   const btnOpenModal = document.getElementById("btn-open");
   if (btnOpenModal) {
-    btnOpenModal.addEventListener("click", () => {
-      openModal("modal-from");
+    btnOpenModal.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalOrigem();
     });
   }
+
+  /* Botão para abrir modal de destino */
+  const btnDestino = document.getElementById("btn-destino");
+  if (btnDestino) {
+    btnDestino.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalDestino();
+    });
+  }
+}
+
+/* Função para abrir modal de seleção de origem */
+function abrirModalOrigem() {
+  const modal = document.getElementById("modal-origem");
+  const listaAeroportos = document.getElementById("lista-aeroportos");
+  const pesquisaInput = document.getElementById("pesquisa-aeroporto");
+
+  /* Obter aeroportos da localStorage */
+  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+
+  /* Mostrar modal */
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  /* Função para mostrar lista de aeroportos */
+  function mostrarAeroportos(lista) {
+    listaAeroportos.innerHTML = "";
+
+    lista.forEach((aeroporto) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+      li.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">flight_takeoff</span>
+          <div>
+            <p class="font-semibold text-gray-900 dark:text-white">${
+              aeroporto.codigo || "XXX"
+            } - ${aeroporto.cidade}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${
+              aeroporto.pais || "País"
+            }</p>
+          </div>
+        </div>
+      `;
+
+      /* Evento de clique para selecionar aeroporto */
+      li.addEventListener("click", () => {
+        selecionarOrigem(aeroporto);
+        fecharModalOrigem();
+      });
+
+      listaAeroportos.appendChild(li);
+    });
+  }
+
+  /* Mostrar todos os aeroportos inicialmente */
+  mostrarAeroportos(aeroportos);
+
+  /* Pesquisa em tempo real */
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const aeroportosFiltrados = aeroportos.filter(
+      (aeroporto) =>
+        aeroporto.cidade.toLowerCase().includes(termoPesquisa) ||
+        (aeroporto.pais &&
+          aeroporto.pais.toLowerCase().includes(termoPesquisa)) ||
+        (aeroporto.codigo &&
+          aeroporto.codigo.toLowerCase().includes(termoPesquisa))
+    );
+    mostrarAeroportos(aeroportosFiltrados);
+  });
+
+  /* Evento para fechar modal */
+  document
+    .getElementById("fechar-modal-origem")
+    .addEventListener("click", fecharModalOrigem);
+
+  /* Fechar modal ao clicar fora */
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalOrigem();
+    }
+  });
+}
+
+/* Função para selecionar origem */
+function selecionarOrigem(aeroporto) {
+  const btnOrigem = document.querySelector("#btn-open p");
+  btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+
+  /* Guardar seleção no localStorage para uso posterior */
+  localStorage.setItem("origemSelecionada", JSON.stringify(aeroporto));
+}
+
+/* Função para fechar modal de origem */
+function fecharModalOrigem() {
+  const modal = document.getElementById("modal-origem");
+  const pesquisaInput = document.getElementById("pesquisa-aeroporto");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
+}
+
+/* Função para abrir modal de seleção de destino */
+function abrirModalDestino() {
+  const modal = document.getElementById("modal-destino");
+  const listaDestinos = document.getElementById("lista-destinos");
+  const pesquisaInput = document.getElementById("pesquisa-destino");
+
+  /* Obter aeroportos da localStorage */
+  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+
+  /* Mostrar modal */
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  /* Função para mostrar lista de destinos */
+  function mostrarDestinos(lista) {
+    listaDestinos.innerHTML = "";
+
+    lista.forEach((aeroporto) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+      li.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">flight_land</span>
+          <div>
+            <p class="font-semibold text-gray-900 dark:text-white">${
+              aeroporto.codigo || "XXX"
+            } - ${aeroporto.cidade}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">${
+              aeroporto.pais || "País"
+            }</p>
+          </div>
+        </div>
+      `;
+
+      /* Evento de clique para selecionar destino */
+      li.addEventListener("click", () => {
+        selecionarDestino(aeroporto);
+        fecharModalDestino();
+      });
+
+      listaDestinos.appendChild(li);
+    });
+  }
+
+  /* Mostrar todos os destinos inicialmente */
+  mostrarDestinos(aeroportos);
+
+  /* Pesquisa em tempo real */
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const destinosFiltrados = aeroportos.filter(
+      (aeroporto) =>
+        aeroporto.cidade.toLowerCase().includes(termoPesquisa) ||
+        (aeroporto.pais &&
+          aeroporto.pais.toLowerCase().includes(termoPesquisa)) ||
+        (aeroporto.codigo &&
+          aeroporto.codigo.toLowerCase().includes(termoPesquisa))
+    );
+    mostrarDestinos(destinosFiltrados);
+  });
+
+  /* Evento para fechar modal */
+  document
+    .getElementById("fechar-modal-destino")
+    .addEventListener("click", fecharModalDestino);
+
+  /* Fechar modal ao clicar fora */
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalDestino();
+    }
+  });
+}
+
+/* Função para selecionar destino */
+function selecionarDestino(aeroporto) {
+  const btnDestino = document.querySelector("#btn-destino p");
+  btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+
+  /* Guardar seleção no localStorage para uso posterior */
+  localStorage.setItem("destinoSelecionado", JSON.stringify(aeroporto));
+}
+
+/* Função para fechar modal de destino */
+function fecharModalDestino() {
+  const modal = document.getElementById("modal-destino");
+  const pesquisaInput = document.getElementById("pesquisa-destino");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
 }
 
 // --- Table & Form Logic ---
