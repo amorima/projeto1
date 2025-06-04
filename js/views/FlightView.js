@@ -133,6 +133,15 @@ function setupModalButton() {
       abrirModalDatas();
     });
   }
+
+  /* botao para abrir modal de acessibilidade */
+  const btnAcessibilidade = document.getElementById("btn-acessibilidade");
+  if (btnAcessibilidade) {
+    btnAcessibilidade.addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirModalAcessibilidade();
+    });
+  }
 }
 
 /* Função para abrir modal de seleção de origem */
@@ -651,4 +660,185 @@ export function renderRandomOPOCards(containerClass) {
       setTimeout(() => this.classList.remove("scale-110"), 150);
     });
   });
+}
+
+/* array de acessibilidades disponiveis */
+const acessibilidades = [
+  {
+    id: "cadeira_rodas",
+    nome: "Acesso para cadeira de rodas",
+    icone: "accessible",
+  },
+  {
+    id: "deficiencia_visual",
+    nome: "Apoio para deficiência visual",
+    icone: "visibility_off",
+  },
+  {
+    id: "deficiencia_auditiva",
+    nome: "Apoio para deficiência auditiva",
+    icone: "hearing_disabled",
+  },
+  { id: "mobilidade_reduzida", nome: "Mobilidade reduzida", icone: "elderly" },
+  {
+    id: "assistencia_medica",
+    nome: "Assistência médica",
+    icone: "medical_services",
+  },
+  { id: "zona_segura", nome: "Zona segura", icone: "shield" },
+  { id: "emergencia", nome: "Apoio de emergência", icone: "emergency" },
+  { id: "criancas", nome: "Segurança para crianças", icone: "child_care" },
+];
+
+/* variavel global para guardar acessibilidades selecionadas */
+let acessibilidadesSelecionadas = [];
+
+/* funcao para abrir modal de acessibilidade */
+function abrirModalAcessibilidade() {
+  const modal = document.getElementById("modal-acessibilidade");
+  const listaAcessibilidades = document.getElementById("lista-acessibilidades");
+  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
+
+  /* obter acessibilidades da localStorage */
+  const acessibilidades =
+    JSON.parse(localStorage.getItem("acessibilidade")) || [];
+
+  /* mostrar modal */
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  /* funcao para mostrar lista de acessibilidades */
+  function mostrarAcessibilidades(lista) {
+    listaAcessibilidades.innerHTML = "";
+
+    lista.forEach((acessibilidade, index) => {
+      const li = document.createElement("li");
+      li.className =
+        "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
+
+      /* verificar se esta selecionada */
+      const selecionada = acessibilidadesSelecionadas.includes(index);
+
+      /* escolher icone baseado no tipo de acessibilidade */
+      let icone = "accessibility";
+      if (acessibilidade.includes("Elevador")) icone = "elevator";
+      else if (acessibilidade.includes("Banho")) icone = "wc";
+      else if (acessibilidade.includes("Quarto")) icone = "bed";
+      else if (acessibilidade.includes("Transporte")) icone = "directions_bus";
+      else if (acessibilidade.includes("Braille")) icone = "visibility_off";
+      else if (acessibilidade.includes("Alarme")) icone = "hearing_disabled";
+      else if (acessibilidade.includes("Cães")) icone = "pets";
+      else if (acessibilidade.includes("Sensorial")) icone = "psychology";
+      else if (acessibilidade.includes("Alimentar")) icone = "restaurant";
+      else if (acessibilidade.includes("Comunicação")) icone = "chat";
+      else if (acessibilidade.includes("Aluguer")) icone = "wheelchair_pickup";
+      else if (acessibilidade.includes("Táteis")) icone = "touch_app";
+      else if (acessibilidade.includes("Médicos")) icone = "medical_services";
+      else if (acessibilidade.includes("LGBTQIA")) icone = "favorite";
+      else if (acessibilidade.includes("Inclusivo")) icone = "groups";
+      else if (acessibilidade.includes("Minorias")) icone = "diversity_3";
+      else if (acessibilidade.includes("Neutras")) icone = "family_restroom";
+
+      li.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">${icone}</span>
+            <p class="font-semibold text-gray-900 dark:text-white">${acessibilidade}</p>
+          </div>
+          <div class="w-5 h-5 border-2 border-gray-300 dark:border-gray-600 rounded flex items-center justify-center ${
+            selecionada ? "bg-Main-Primary dark:bg-cyan-400" : ""
+          }">
+            ${
+              selecionada
+                ? '<span class="material-symbols-outlined text-white text-sm">check</span>'
+                : ""
+            }
+          </div>
+        </div>
+      `;
+
+      /* evento de clique para selecionar/desselecionar */
+      li.addEventListener("click", () => {
+        toggleAcessibilidade(index);
+        mostrarAcessibilidades(lista);
+      });
+
+      listaAcessibilidades.appendChild(li);
+    });
+  }
+
+  /* mostrar todas as acessibilidades inicialmente */
+  mostrarAcessibilidades(acessibilidades);
+
+  /* pesquisa em tempo real */
+  pesquisaInput.addEventListener("input", (e) => {
+    const termoPesquisa = e.target.value.toLowerCase();
+    const acessibilidadesFiltradas = acessibilidades.filter((acessibilidade) =>
+      acessibilidade.toLowerCase().includes(termoPesquisa)
+    );
+    mostrarAcessibilidades(acessibilidadesFiltradas);
+  });
+
+  /* evento para confirmar selecao */
+  document
+    .getElementById("confirmar-acessibilidade")
+    .addEventListener("click", () => {
+      confirmarAcessibilidade();
+      fecharModalAcessibilidade();
+    });
+
+  /* evento para fechar modal */
+  document
+    .getElementById("fechar-modal-acessibilidade")
+    .addEventListener("click", fecharModalAcessibilidade);
+
+  /* fechar modal ao clicar fora */
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      fecharModalAcessibilidade();
+    }
+  });
+}
+
+/* funcao para selecionar/desselecionar acessibilidade */
+function toggleAcessibilidade(index) {
+  const posicao = acessibilidadesSelecionadas.indexOf(index);
+  if (posicao > -1) {
+    /* remover se ja esta selecionada */
+    acessibilidadesSelecionadas.splice(posicao, 1);
+  } else {
+    /* adicionar se nao esta selecionada */
+    acessibilidadesSelecionadas.push(index);
+  }
+}
+
+/* funcao para confirmar selecao de acessibilidade */
+function confirmarAcessibilidade() {
+  const textoAcessibilidade = document.getElementById("texto-acessibilidade");
+  const quantidadeSelecionada = acessibilidadesSelecionadas.length;
+
+  /* atualizar texto do botao */
+  if (quantidadeSelecionada === 0) {
+    textoAcessibilidade.textContent = "Nenhum";
+  } else if (quantidadeSelecionada === 1) {
+    textoAcessibilidade.textContent = "1 selecionado";
+  } else {
+    textoAcessibilidade.textContent = `${quantidadeSelecionada} selecionados`;
+  }
+
+  /* guardar selecao na localStorage */
+  localStorage.setItem(
+    "acessibilidadesSelecionadas",
+    JSON.stringify(acessibilidadesSelecionadas)
+  );
+}
+
+/* funcao para fechar modal de acessibilidade */
+function fecharModalAcessibilidade() {
+  const modal = document.getElementById("modal-acessibilidade");
+  const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+  pesquisaInput.value = "";
 }
