@@ -2682,4 +2682,4 @@ function initdata() {
     ];
     localStorage.setItem("viagens", JSON.stringify(viagens));
   }
-}
+
