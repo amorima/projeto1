@@ -70,7 +70,27 @@ export default class HotelView {
     const hotel = HotelModel.getById(hotelId);
 
     if (!hotel) {
-      window.location.href = "hotel-list.html";
+      /*  Se o hotel não for encontrado, limpa o conteúdo principal e mostra uma mensagem de erro.  */
+      /*  Isto evita o erro de tentar ir para uma página que não existe.  */
+      const corpoPrincipal =
+        document.querySelector("main") ||
+        document.body; /*  Tenta encontrar o <main>, senão usa o <body>  */
+
+      /*  Limpa qualquer conteúdo que já exista no corpoPrincipal  */
+      corpoPrincipal.innerHTML = "";
+
+      const mensagemErro = document.createElement("div");
+      mensagemErro.textContent =
+        "Desculpe, o hotel que procura não foi encontrado.";
+      mensagemErro.style.textAlign = "center";
+      mensagemErro.style.marginTop = "50px";
+      mensagemErro.style.fontSize = "1.5rem";
+      mensagemErro.style.color = "red";
+
+      corpoPrincipal.appendChild(mensagemErro);
+
+      document.title =
+        "Hotel Não Encontrado"; /*  Atualiza o título da página  */
       return;
     }
 
