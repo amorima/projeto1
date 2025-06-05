@@ -30,33 +30,33 @@
         <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 cursor-pointer">trip_origin</span>
         <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Origem</p>
       </button>
-      <div class="w-full h-20 bg-white dark:bg-gray-800 rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5 dark:text-gray-100">
+      <button id="btn-destino" class="w-full h-20 bg-white dark:bg-gray-800 rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5 dark:text-gray-100">
         <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 cursor-pointer">location_on</span>
-        <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Londres</p>
-      </div>
-      <div class="w-full h-20 bg-white dark:bg-gray-800 rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5 divide-x-2 divide-solid divide-Main-Primary dark:divide-cyan-400 dark:text-gray-100">
+        <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Destino</p>
+      </button>
+      <button id="btn-datas" class="w-full h-20 bg-white dark:bg-gray-800 rounded-lg overflow-hidden inline-flex items-center px-[11px] gap-1.5 divide-x-2 divide-solid divide-Main-Primary dark:divide-cyan-400 dark:text-gray-100">
         <div class="w-1/2 inline-flex">
           <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 cursor-pointer">calendar_month</span>
-          <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">06 Mai - 13 Mai</p>
+          <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">Datas</p>
         </div>
         <div class="w-1/2">
-          <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">1 Viajante</p>
+          <p class="justify-start text-neutral-950 dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans'] pl-2">Viajantes</p>
         </div>
-      </div>
-      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex-row items-center px-[11px] gap-1.5 dark:text-gray-100">
-        <div class="inline-flex gap-3 py-2 items-center">
-          <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">travel_luggage_and_bags</span>
-          <p class="justify-start text-white dark:text-gray-100 text-base font-normal font-['IBM_Plex_Sans']">Tipo Turimo</p>
+      </button>
+      <button id="btn-tipo-turismo" class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex flex-col justify-center items-start px-[11px] dark:text-gray-100">
+        <div class="inline-flex gap-3 py-1 items-center">
+          <span class="material-symbols-outlined text-white dark:text-gray-100">travel_luggage_and_bags</span>
+          <p class="justify-start text-white dark:text-gray-100 text-base font-normal font-['IBM_Plex_Sans']">Tipo Turismo</p>
         </div>
-        <p class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Turimo Urbano</p>
-      </div>
-      <div class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex-row items-center px-[11px] gap-1.5 dark:text-gray-100">
-        <div class="inline-flex gap-3 py-2 items-center">
-          <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">accessibility_new</span>
+        <p id="texto-tipo-turismo" class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
+      </button>
+      <button id="btn-acessibilidade" class="w-full h-20 rounded-lg outline outline-[3px] outline-offset-[-3px] outline-white dark:outline-gray-700 overflow-hidden flex flex-col justify-center items-start px-[11px] dark:text-gray-100">
+        <div class="inline-flex gap-3 py-1">
+          <span class="material-symbols-outlined text-white dark:text-gray-100">accessibility_new</span>
           <p class="justify-start text-white dark:text-gray-100 text-base font-normal font-['IBM_Plex_Sans']">Acessibilidade / Segurança</p>
-        </div class=>
-        <p class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
-      </div>
+        </div>
+        <p id="texto-acessibilidade" class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Nenhum</p>
+      </button>
           <!-- Botão com animação -->
       <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 z-10">
         <!-- Versão móvel (sem animação) -->
@@ -115,6 +115,232 @@
     </form>
     </div>
   </section>
+
+  <!-- Modal para selecionar origem -->
+  <div id="modal-origem" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Selecionar Origem</h2>
+        <button id="fechar-modal-origem" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <!-- Campo de pesquisa -->
+      <div class="mb-4">
+        <input 
+          type="text" 
+          id="pesquisa-aeroporto" 
+          placeholder="Pesquisar aeroporto..."
+          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+      </div>
+      
+      <!-- Lista de aeroportos -->
+      <div class="max-h-60 overflow-y-auto scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <style>
+          .scrollbar-none::-webkit-scrollbar {
+            display: none;
+          }
+        </style>
+        <ul id="lista-aeroportos" class="space-y-2">
+          <!-- Os aeroportos vão ser inseridos aqui -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para selecionar destino -->
+  <div id="modal-destino" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Selecionar Destino</h2>
+        <button id="fechar-modal-destino" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <!-- Campo de pesquisa -->
+      <div class="mb-4">
+        <input 
+          type="text" 
+          id="pesquisa-destino" 
+          placeholder="Pesquisar destino..."
+          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+      </div>
+      
+      <!-- Lista de destinos -->
+      <div class="max-h-60 overflow-y-auto scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <ul id="lista-destinos" class="space-y-2">
+          <!-- Os destinos vão ser inseridos aqui -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para datas e viajantes -->
+  <div id="modal-datas" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Selecionar Datas e Viajantes</h2>
+        <button id="fechar-modal-datas" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <!-- Seleção de datas -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Datas da Viagem</h3>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data de Partida</label>
+            <input 
+              type="date" 
+              id="data-partida" 
+              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data de Regresso</label>
+            <input 
+              type="date" 
+              id="data-regresso" 
+              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+          </div>
+        </div>
+      </div>
+      
+      <!-- Seleção de viajantes -->
+      <div class="mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Número de Viajantes</h3>
+        
+        <!-- Adultos -->
+        <div class="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-600">
+          <div>
+            <p class="font-medium text-gray-900 dark:text-white">Adultos</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">12+ anos</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="diminuir-adultos" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+            <span id="contador-adultos" class="w-8 text-center font-medium text-gray-900 dark:text-white">1</span>
+            <button id="aumentar-adultos" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Crianças -->
+        <div class="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-600">
+          <div>
+            <p class="font-medium text-gray-900 dark:text-white">Crianças</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">2-11 anos</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="diminuir-criancas" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+            <span id="contador-criancas" class="w-8 text-center font-medium text-gray-900 dark:text-white">0</span>
+            <button id="aumentar-criancas" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Bebés -->
+        <div class="flex justify-between items-center py-3">
+          <div>
+            <p class="font-medium text-gray-900 dark:text-white">Bebés</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">0-2 anos</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="diminuir-bebes" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+            <span id="contador-bebes" class="w-8 text-center font-medium text-gray-900 dark:text-white">0</span>
+            <button id="aumentar-bebes" class="w-8 h-8 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botão confirmar -->
+      <button id="confirmar-datas" class="w-full h-12 bg-Button-Main dark:bg-Button-Main rounded-[4rem] flex justify-center items-center gap-2.5 transition duration-300 ease-in-out">
+        <p class="justify-center text-center">
+          <span class="text-white text-xl font-bold font-['Space_Mono']">Confirm</span>
+          <span class="text-white text-xl font-normal font-['Space_Mono']">It</span>
+        </p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para acessibilidade -->
+  <div id="modal-acessibilidade" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Selecionar Acessibilidade</h2>
+        <button id="fechar-modal-acessibilidade" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <!-- Campo de pesquisa -->
+      <div class="mb-4">
+        <input 
+          type="text" 
+          id="pesquisa-acessibilidade" 
+          placeholder="Pesquisar acessibilidade..."
+          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+      </div>
+      
+      <!-- Lista de acessibilidades -->
+      <div class="max-h-60 overflow-y-auto scrollbar-none" style="scrollbar-width: none; -ms-overflow-style: none;">
+        <ul id="lista-acessibilidades" class="space-y-2">
+          <!-- As acessibilidades vão ser inseridas aqui -->
+        </ul>
+      </div>
+      
+      <!-- Botão confirmar -->
+      <button id="confirmar-acessibilidade" class="w-full h-12 bg-Button-Main dark:bg-Button-Main rounded-[4rem] flex justify-center items-center gap-2.5 transition duration-300 ease-in-out mt-4">
+        <p class="justify-center text-center">
+          <span class="text-white text-xl font-bold font-['Space_Mono']">Confirm</span>
+          <span class="text-white text-xl font-normal font-['Space_Mono']">It</span>
+        </p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para tipo de turismo -->
+  <div id="modal-tipo-turismo" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Selecionar Tipo de Turismo</h2>
+        <button id="fechar-modal-tipo-turismo" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      
+      <!-- Campo de pesquisa -->
+      <div class="mb-6">
+        <input 
+          type="text" 
+          id="pesquisa-tipo-turismo" 
+          placeholder="Pesquisar tipo de turismo..."
+          class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+        >
+      </div>
+      
+      <!-- Grid de tipos de turismo -->
+      <div id="grid-tipos-turismo" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <!-- Os tipos de turismo vão ser inseridos aqui -->
+      </div>
+    </div>
+  </div>
 
   <!-- Corpo -->
   <section class="h-auto pt-12 pb-12 max-w-[1270px] mx-auto sm:px-6 lg:px-8">
@@ -355,8 +581,9 @@
 
   <footer id="footer-placeholder"></footer>
 
-     <script type="module" src="./js/views/FlightView.js"></script>
-     <script src="./js/init.js"></script>
+  <!-- Carregamento dos scripts organizados -->
+  <script type="module" src="./js/views/FlightView.js"></script>
+  <script src="./js/init.js"></script>
 
 </body>
 </html>

@@ -3,25 +3,26 @@
   display: none;
 }
 #slider {
-  -ms-overflow-style: none;   /* IE/Edge */
-  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* Para navegadores IE/Edge */
+  scrollbar-width: none;      /* Para navegador Firefox */
   overflow-x: auto;
   overflow-y: hidden;
-  scroll-behavior: smooth;    /* roll suave */
+  scroll-behavior: smooth;    /* Animacao suave no scroll */
 }
 
+/* Estilos para o mapa na pagina de exploracao */
 #map { 
   height: calc(100vh - 6rem); 
   margin-top: 6rem;
 }
 
-/* Cursor grabbing e desativa seleção de texto/imagem ao arrastar */
+/* Cursor especial quando esta a arrastar o slider */
 #slider.grabbing {
   cursor: grabbing;
-  user-select: none;
+  user-select: none; /* Impede selecao de texto durante o arrastar */
 }
 
-/* Estilos para os botões de navegação do slider */
+/* Estilos para os botoes de navegacao do slider */
 .btn-slider {
   position: absolute;
   top: 50%;
@@ -33,6 +34,14 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   transition: background-color 0.2s ease;
 }
+/* Efeito hover nos botoes do slider */
 .btn-slider:hover {
   background-color: rgba(255,255,255,1);
+}
+
+/* Impede scroll da pagina quando modal esta aberto */
+.modal-aberto {
+  position: fixed;
+  width: 100%;
+  overflow-y: scroll;
 }

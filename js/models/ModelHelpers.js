@@ -93,7 +93,7 @@ export function getUserPreference(key, defaultValue = null) {
  * @example
  * import { setUserPreference } from './ModelHelpers.js';
  * setUserPreference('theme', 'dark');
- * Agora a preferência de tema do utilizador está guardada como 'dark' no localStorage. 
+ * Agora a preferência de tema do utilizador está guardada como 'dark' no localStorage.
  */
 export function setUserPreference(key, value) {
   localStorage.setItem(key, value);
@@ -143,12 +143,12 @@ export function getThemePreference() {
 //Função de combinação
 /**
  * Combina arrays de forma recursiva, gerando todas as combinações possíveis.
- * 
- * @param {Array} arrays 
+ *
+ * @param {Array} arrays
  * - Arrays a combinar, cada um representando uma dimensão
- * @param {Array} prefix 
+ * @param {Array} prefix
  * - Prefixo para as combinações, usado internamente na recursão
- * @returns 
+ * @returns
  * - Array com todas as combinações possíveis
  * @example
  * import { combinar } from './ModelHelpers.js';
@@ -156,15 +156,74 @@ export function getThemePreference() {
  * resultado [[1, 3], [1, 4], [2, 3], [2, 4]]
  * @description
  * Esta função é útil para gerar combinações de opções, como em formulários dinâmicos ou seleções múltiplas.
- * 
+ *
  * Ela utiliza recursão para explorar todas as possibilidades, começando com o primeiro array e combinando cada elemento com os resultados das chamadas subsequentes.
- * 
+ *
  * A função retorna um array contendo todas as combinações possíveis de elementos dos arrays fornecidos.
- * 
+ *
  * É importante notar que a função pode gerar um número exponencial de combinações dependendo do tamanho dos arrays de entrada, por isso deve ser usada com cautela em casos com muitos elementos.
  */
 export function combinar(arrays, prefix = []) {
-    if (!arrays.length) return [prefix];
-    const [first, ...rest] = arrays;
-    return first.flatMap(voo => combinar(rest, [...prefix, voo]));
+  if (!arrays.length) return [prefix];
+  const [first, ...rest] = arrays;
+  return first.flatMap((voo) => combinar(rest, [...prefix, voo]));
+}
+
+/**
+ * Pesquisa aeroportos por cidade ou país.
+ * @param {string} termo
+ * - Termo de pesquisa (cidade ou país)
+ * @returns {Array}
+ * - Array de aeroportos que correspondem ao termo de pesquisa
+ * @example
+ * pesquisarAeroportos("porto");
+ * Returns: [{ cidade: "Porto", pais: "Portugal", location: {...} }]
+ */
+export function pesquisarAeroportos(termo) {
+  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+  const termoLower = termo.toLowerCase();
+
+  return aeroportos.filter(
+    (aeroporto) =>
+      aeroporto.cidade.toLowerCase().includes(termoLower) ||
+      (aeroporto.pais && aeroporto.pais.toLowerCase().includes(termoLower))
+  );
+}
+
+/**
+ * Obtém aeroportos ordenados por proximidade à localização do utilizador.
+ * @param {Object} localizacaoUtilizador
+ * - Coordenadas do utilizador {latitude, longitude}
+ * @returns {Array}
+ * - Array de aeroportos ordenados por distância
+ */
+export function obterAeroportosProximos(localizacaoUtilizador) {
+  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+
+  if (!localizacaoUtilizador) {
+    return aeroportos;
+  }
+
+  /* Calcular distância para cada aeroporto */
+  const aeroportosComDistancia = aeroportos.map((aeroporto) => {
+    if (!aeroporto.location) {
+      return { ...aeroporto, distancia: Infinity };
+    }
+
+    const distancia = Math.sqrt(
+      Math.pow(
+        localizacaoUtilizador.latitude - aeroporto.location.latitude,
+        2
+      ) +
+        Math.pow(
+          localizacaoUtilizador.longitude - aeroporto.location.longitude,
+          2
+        )
+    );
+
+    return { ...aeroporto, distancia };
+  });
+
+  /* Ordenar por distância */
+  return aeroportosComDistancia.sort((a, b) => a.distancia - b.distancia);
 }
