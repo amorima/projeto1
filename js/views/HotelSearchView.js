@@ -1,20 +1,7 @@
 import {
   showCookieBanner,
-  getFormData,
-  showToast,
-  getUserLocation,
 } from "./ViewHelpers.js";
-
-// --- Função principal ---
-document.addEventListener("DOMContentLoaded", () => {
-  showCookieBanner();
-  renderHotelCards();
-  setupFilters();
-});
-
-function getHotels() {
-  return JSON.parse(localStorage.getItem("hoteis")) || [];
-}
+import HotelModel from "../models/HotelModel.js";
 
 // Mapeamento simples de acessibilidade para ícones Material Symbols
 const acessibilidadeIcons = {
@@ -46,12 +33,39 @@ const acessibilidadeIcons = {
   default: "accessibility_new",
 };
 
+/**
+ * Obtém o ícone de acessibilidade correspondente ao rótulo fornecido.
+ * @param {string} label - Rótulo de acessibilidade.
+ * @return {string} - Nome do ícone Material Symbols correspondente.
+ * @description
+ * Esta função retorna o nome do ícone Material Symbols associado ao rótulo de acessibilidade fornecido.
+ * Se o rótulo não for encontrado no mapeamento, retorna um ícone padrão de acessibilidade.
+ * @example
+ * getAcessibilidadeIcon("Elevadores Disponíveis");
+ * @see acessibilidadeIcons
+ */
 function getAcessibilidadeIcon(label) {
   return acessibilidadeIcons[label] || acessibilidadeIcons["default"];
 }
 
+/**
+ * Renderiza os cartões de hotéis na página.
+ * @param {Array} filteredHotels - Lista de hotéis filtrados. Se não for fornecida, renderiza todos os hotéis.
+ * @returns {void}
+ * @description
+ * Esta função itera sobre a lista de hotéis e cria cartões para cada um, exibindo informações como nome, localização, preço, acessibilidade e imagem.
+ * Inclui também a funcionalidade de favoritar/desfavoritar hotéis.
+ * Os cartões são renderizados dentro de um contêiner com a classe `.card-hoteis`.
+ * Se a lista de hotéis filtrados for fornecida, ela será usada; caso contrário, a função usará `HotelModel.getAll()` para obter todos os hotéis disponíveis. 
+ * A função também adiciona ícones de acessibilidade como "pills" sobre a imagem do hotel, e implementa a funcionalidade de favoritar/desfavoritar os hotéis clicando no ícone de coração.
+ * @example
+ * renderHotelCards();
+ * @see HotelModel.getAll
+ * @see getAcessibilidadeIcon
+ */
 function renderHotelCards(filteredHotels = null) {
-  const hotels = filteredHotels || getHotels();
+  // Usa HotelModel.getAll() se não houver filtro
+  const hotels = filteredHotels || HotelModel.getAll();
   const container = document.querySelector(".card-hoteis");
   if (!container) return;
   container.innerHTML = "";
@@ -152,7 +166,25 @@ function renderHotelCards(filteredHotels = null) {
   });
 }
 
-// --- Filtros e Ordenação ---
+/**
+ * Configura os filtros de pesquisa de hotéis.
+ * Inclui filtros por data, preço, nome, acessibilidade e capacidade.
+ * Também implementa a funcionalidade de limpar filtros.
+ * @returns {void}
+ * @example
+ * setupFilters();
+ * @description
+ * Esta função adiciona eventos aos elementos de filtro e aplica os filtros selecionados aos hotéis exibidos.
+ * Os filtros incluem:
+ * - Ordenação por data de check-in (mais recente ou mais antigo)
+ * - Ordenação por preço (crescente ou decrescente)
+ * - Filtro por preço mínimo e máximo
+ * - Filtro por nome do hotel ou quarto
+ * - Filtro por acessibilidade (como elevadores, acesso sem degraus, etc.)
+ * - Filtro por capacidade do quarto
+ * * A função também inclui um botão para limpar todos os filtros aplicados.
+ * @see renderHotelCards
+ */
 function setupFilters() {
   const sortDate = document.getElementById("sort-date");
   const sortPrice = document.getElementById("sort-price");
@@ -164,7 +196,8 @@ function setupFilters() {
   const clearBtn = document.getElementById("clear-filters-btn");
 
   function applyFilters() {
-    let hotels = getHotels();
+    // Usa HotelModel.getAll() ao invés de getHotels()
+    let hotels = HotelModel.getAll();
 
     // Filtro por nome (hotel ou quarto)
     const nameValue = (searchName?.value || "").toLowerCase();
@@ -271,3 +304,11 @@ function setupFilters() {
   // Inicializa com todos os hotéis
   applyFilters();
 }
+
+// --- Função principal ---
+document.addEventListener("DOMContentLoaded", () => {
+  HotelModel.init(); // Inicializa o modelo
+  showCookieBanner();
+  renderHotelCards();
+  setupFilters();
+});
