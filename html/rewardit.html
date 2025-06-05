@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RewardIt - Sistema de Pontos</title>
+    <link rel="icon" type="image/ico" href="../img/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+</head>
+<body class="font-sans dark:bg-gray-950 dark:text-gray-100">
+    <!-- Header -->
+    <header id="header-placeholder"></header>
+    <nav id="menu-placeholder"></nav>
+
+    <div class="max-w-[1270px] mx-auto px-4 sm:px-6 lg:px-8 pt-[120px] pb-12 space-y-8">
+        
+        <!-- Cartão do Nível Atual -->
+        <div id="userLevelCard" class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex-1">
+                    <h1 id="userGreeting" class="text-2xl md:text-4xl font-['Space_Mono'] text-cyan-600 dark:text-cyan-400">
+                        <span id="userName">Utilizador</span>, és um <span id="userLevel" class="font-bold">Explorador</span>!
+                    </h1>
+                    <p id="nextLevelInfo" class="text-lg md:text-xl font-['Space_Mono'] text-gray-600 dark:text-gray-300 mt-2">
+                        Acumula mais <span id="pointsNeeded" class="font-bold">200</span> pontos para seres <span id="nextLevel" class="font-bold">Viajante</span>.
+                    </p>
+                </div>
+                <div class="w-20 h-20 md:w-28 md:h-28 bg-cyan-600 dark:bg-cyan-500 rounded-lg flex items-center justify-center">
+                    <span id="userLevelIcon" class="material-symbols-outlined text-white text-4xl md:text-5xl">explore</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Níveis RewardIt -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <h2 class="text-3xl md:text-4xl font-bold font-['Space_Mono'] text-cyan-600 dark:text-cyan-400 text-center mb-8">
+                Vantagens <span class="font-normal">RewardIt</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                <!-- Explorador -->
+                <div class="level-card bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600 relative">
+                    <div class="absolute -top-3 -right-3 w-7 h-7 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+                        <span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-5xl mb-4 block">explore</span>
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200">Explorador</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase mt-2 font-['IBM_Plex_Sans']">0 - 249 Pontos</p>
+                        <div class="mt-4 text-xs text-gray-700 dark:text-gray-300 font-['IBM_Plex_Sans']">
+                            <p>Acesso ao Sistema de Recompensas</p>
+                            <p>Promoções Básicas</p>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mt-4 font-['IBM_Plex_Sans']">vantagens cumulativas</p>
+                    </div>
+                </div>
+
+                <!-- Viajante -->
+                <div class="level-card bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600 relative">
+                    <div class="absolute -top-3 -right-3 w-7 h-7 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+                        <span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-5xl mb-4 block">flight_takeoff</span>
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200">Viajante</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase mt-2 font-['IBM_Plex_Sans']">250 - 1499 Pontos</p>
+                        <div class="mt-4 text-xs text-gray-700 dark:text-gray-300 font-['IBM_Plex_Sans']">
+                            <p>Mínimo 10% extra de pontos em todas as compras</p>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mt-4 font-['IBM_Plex_Sans']">vantagens cumulativas</p>
+                    </div>
+                </div>
+
+                <!-- Aventureiro -->
+                <div class="level-card bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600 relative">
+                    <div class="absolute -top-3 -right-3 w-7 h-7 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+                        <span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-5xl mb-4 block">hiking</span>
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200">Aventureiro</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase mt-2 font-['IBM_Plex_Sans']">1500 - 2999 Pontos</p>
+                        <div class="mt-4 text-xs text-gray-700 dark:text-gray-300 font-['IBM_Plex_Sans']">
+                            <p>Acesso a promoções de nível Aventureiro</p>
+                            <p>Acesso antecipado a novos pacotes</p>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mt-4 font-['IBM_Plex_Sans']">vantagens cumulativas</p>
+                    </div>
+                </div>
+
+                <!-- Globetrotter -->
+                <div class="level-card bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600 relative">
+                    <div class="absolute -top-3 -right-3 w-7 h-7 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+                        <span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-5xl mb-4 block">public</span>
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200">Globetrotter</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 uppercase mt-2 font-['IBM_Plex_Sans']">3000 - 4999 Pontos</p>
+                        <div class="mt-4 text-xs text-gray-700 dark:text-gray-300 font-['IBM_Plex_Sans']">
+                            <p>Promoções de nível Globetrotter</p>
+                            <p>Upgrades gratuitos</p>
+                            <p>Seguro Incluído</p>
+                        </div>
+                        <p class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mt-4 font-['IBM_Plex_Sans']">vantagens cumulativas</p>
+                    </div>
+                </div>
+
+                <!-- Embaixador -->
+                <div class="level-card bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600 relative">
+                    <div class="absolute -top-3 -right-3 w-7 h-7 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-2 border-gray-200 dark:border-gray-600">
+                        <span class="material-symbols-outlined text-gray-400 text-lg">radio_button_unchecked</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-5xl mb-4 block">military_tech</span>
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-500 dark:text-gray-400">Embaixador</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase mt-2 font-['IBM_Plex_Sans']">5000+ Pontos</p>
+                        <div class="mt-4 text-xs text-gray-500 dark:text-gray-400 font-['IBM_Plex_Sans']">
+                            <p>Convites para Eventos</p>
+                            <p>Cash Back em Viagens</p>
+                            <p>Merchandise</p>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mt-4 font-['IBM_Plex_Sans']">vantagens cumulativas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Como Acumular Pontos -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <h2 class="text-3xl md:text-4xl font-bold font-['Space_Mono'] text-cyan-600 dark:text-cyan-400 text-center mb-12">
+                Como acumular pontos e subir de nível no <span class="font-normal">RewardIt</span>
+            </h2>
+
+            <div class="space-y-10">
+                <!-- Tipos de Viagem -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">
+                            Viagens<br/>Normais
+                        </h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            Por cada euro (€) gasto em reservas individuais (como só voo, só hotel, etc.), acumula 1 ponto RewardIt.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">
+                            Pacotes<br/>de Viagem
+                        </h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            Ao reservar os nossos Pacotes de Viagem, o seu gasto vale mais! Acumula 1.5 pontos por cada euro (€) gasto.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Bónus por Categoria -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">Alojamento</h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            <span class="font-bold">+10%</span> de pontos extra sobre o valor do <span class="font-bold">Alojamento</span> reservado.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">Transporte</h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            <span class="font-bold">+10%</span> de pontos extra sobre o valor do Transporte reservado.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">Seguro</h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            <span class="font-bold">+5%</span> de pontos extra sobre o valor do Seguro adquirido.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">
+                            Bónus<br/>Combinado
+                        </h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            Se reservar <span class="font-bold">Alojamento + Transporte</span> na mesma operação, recebe um bónus total de <span class="font-bold">+25%</span>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Convide Amigos -->
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-200 dark:border-gray-600">
+                        <h3 class="text-lg font-bold font-['Space_Mono'] text-gray-800 dark:text-gray-200 text-center mb-4">Convide Amigos</h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-center font-['IBM_Plex_Sans']">
+                            <span class="font-bold">Partilhe as vantagens do RewardIt!</span><br/>
+                            Quando um amigo se inscreve através do seu convite e completa a primeira ação, 
+                            <span class="font-bold">ambos recebem 100 pontos</span> RewardIt.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nota Informativa -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <p class="text-gray-600 dark:text-gray-400 text-center font-medium font-['IBM_Plex_Sans']">
+                São sempre contabilizados os pontos acumulados ao longo dos dois últimos anos. Para mais informações consulte as condições de serviço.
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer-placeholder"></footer>
+
+    <script type="module">
+        import { initRewarditPage } from '../js/views/RewarditView.js';
+        
+        /* Inicializar página */
+        document.addEventListener('DOMContentLoaded', initRewarditPage);
+    </script>
+</body>
+</html>
