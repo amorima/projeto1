@@ -72,6 +72,7 @@ function renderHotelCards(filteredHotels = null) {
     const localizacao = hotel.cidade || "Localização";
     const numeroNoites = quarto.numeroNoites || 1;
     const capacidade = quarto.capacidade || 1;
+    const id = quarto.id || hotel.id || 1;
 
     // Pills de acessibilidade (padding igual em toda a volta, alinhados à direita, pill ajusta à altura do conteúdo)
     let pillsHTML = "";
@@ -125,7 +126,7 @@ function renderHotelCards(filteredHotels = null) {
               <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco}</p>
               <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Preço por noite</p>
             </div>
-            <a href="#" class="h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
+            <a href="hotel.html?id=${id}" class="h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
           </div>
           <span 
             class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"

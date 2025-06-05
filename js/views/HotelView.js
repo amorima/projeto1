@@ -1,4 +1,4 @@
-import HotelModel from "../models/HotelModel.js";
+import * as HotelModel from "../models/HotelModel.js";
 import {
   getFormData,
   showToast,
@@ -15,8 +15,7 @@ export default class HotelView {
 
     /*  Verifica se existe id na url  */
     const urlParams = new URLSearchParams(window.location.search);
-    /* const hotelId = urlParams.get("id"); */
-    const hotelId = 1; /*  Para testes, sempre mostrar o hotel com ID 1  */
+    const hotelId = Number(urlParams.get("id")) || 1; // Se não houver id, usa 1 para testes
 
     if (hotelId) {
       this.renderHotelDetail(hotelId);
