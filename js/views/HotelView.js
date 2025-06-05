@@ -115,6 +115,7 @@ export default class HotelView {
 
     document.getElementById("hotel-camas").textContent = camas;
     document.getElementById("hotel-capacidade").textContent = capacidade;
+    document.getElementById("preco-desconto").textContent = preco * 0.9 + " €";
     document.getElementById("hotel-preco").textContent = preco + " €";
     document.getElementById("hotel-preco-noite").textContent = preco + " €";
 
