@@ -53,16 +53,16 @@ export function LoginNav() {
       }
     } else {
       openModal("profile-modal");
-      document.getElementById("").addEventListener("submit", (e) => {
+      document.getElementById("login-form").addEventListener("submit", (e) => {
         //TODO: When modal Ready add o id do form
         e.preventDefault();
-        data = getFormData(""); //TODO: When modal Ready add o id do form
+        data = getFormData("login-form"); //TODO: When modal Ready add o id do form
         username = data.username;
         email = data.email;
         password = data.password;
         User.add(username, password, email);
         User.login(username, password);
-        closeModal(""); //id modal
+        closeModal("profile-modal"); //id modal
         openModal("newletter-modal");
         document.getElementById("").addEventListener("click", () => {
           //add yes button id

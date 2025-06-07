@@ -39,4 +39,29 @@
     </div>
   </nav>
 
+  <!--! Modal de Login Teste Only-->
+  <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-xs flex flex-col gap-4">
+      <h2 class="text-xl font-bold text-center mb-2">Iniciar Sessão</h2>
+      <form id="login-form" class="flex flex-col gap-3">
+        <input type="text" name="username" placeholder="Utilizador" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" />
+        <input type="password" name="password" placeholder="Password" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-600" />
+        <button type="submit" class="bg-cyan-800 text-white rounded py-2 mt-2 hover:bg-cyan-700 transition">Entrar</button>
+      </form>
+      <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="text-sm text-gray-500 hover:underline mt-2">Cancelar</button>
+    </div>
+  </div>
+
+  <!--! Modal de Newsletter -->
+  <div id="newsletter-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-xs flex flex-col gap-4">
+      <h2 class="text-xl font-bold text-center mb-2">Subscrever Newsletter</h2>
+      <p class="text-center text-gray-700">Deseja receber novidades e promoções no seu email?</p>
+      <div class="flex gap-2 mt-2">
+        <button id="newsletter-yes" class="flex-1 bg-cyan-800 text-white rounded py-2 hover:bg-cyan-700 transition">Sim</button>
+        <button id="newsletter-no" class="flex-1 bg-gray-300 text-gray-700 rounded py-2 hover:bg-gray-400 transition">Não</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="../js/views/NavbarView.js"
