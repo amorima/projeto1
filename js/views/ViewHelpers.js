@@ -1,5 +1,4 @@
 // ViewHelpers.js – funções de UI para as Views
-
 import {
   getUserPreference,
   setUserPreference,
@@ -249,27 +248,15 @@ export function loadComponent(componentPath, elementId) {
     })
     .then((html) => {
       document.getElementById(elementId).innerHTML = html;
-      // Debug: confirmar carregamento
-      console.log(`[loadComponent] ${componentPath} carregado em #${elementId}`);
+
       if (componentPath.includes("_header.html")) {
         setTimeout(() => {
-          // Debug: confirmar existência dos elementos
-          console.log("[loadComponent] header DOM:", {
-            theme: document.getElementById("theme-toggle"),
-            profile: document.getElementById("profile"),
-            loginForm: document.getElementById("login-form"),
-            newsletterYes: document.getElementById("newsletter-yes"),
-            newsletterNo: document.getElementById("newsletter-no"),
-          });
           if (
             typeof window.navbarView !== "undefined" &&
             typeof window.navbarView.initThemeToggle === "function"
           ) {
             window.navbarView.initThemeToggle();
             window.navbarView.LoginNav();
-            console.log("[loadComponent] NavbarView handlers aplicados");
-          } else {
-            console.warn("[loadComponent] window.navbarView não está disponível");
           }
         }, 0);
       }
