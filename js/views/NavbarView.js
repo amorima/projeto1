@@ -21,7 +21,7 @@ export function LoginNav() {
   profileIcon.parentNode.replaceChild(newProfileIcon, profileIcon);
   newProfileIcon.addEventListener("click", () => {
     if (User.isLogged()) {
-      if (typeof isAdmin === "function" && isAdmin(User.getUserLogged())) {
+      if (isAdmin(User.getUserLogged())) {
         window.location.href = "dashboard_admin.html";
       } else {
         window.location.href = "profile.html";
