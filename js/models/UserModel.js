@@ -405,16 +405,16 @@ class User {
   mail = "";
   avatar = "";
   points = 0;
-  private = false
-  admin = false
+  isPrivate = false; // Renomeado de 'private'
+  admin = false;
 
-  constructor(username = '', password = '', mail, avatar = '', points = 50, private = false, admin = false) {
+  constructor(username = '', password = '', mail, avatar = '', points = 50, isPrivate = false, admin = false) {
     this.username = username;
     this.password = password;
     this.mail = mail;
-    this.avatar = avatar
+    this.avatar = avatar;
     this.points = points;
-    this.private = private;
+    this.isPrivate = isPrivate; // Renomeado de 'private'
     this.admin = admin;
   }
 

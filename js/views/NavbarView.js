@@ -11,81 +11,68 @@ import {
   openModal,
   toggleThemeIcon,
 } from "./ViewHelpers.js";
-// Função para carregar HTML de um ficheiro para um elemento
-const loadComponent = async (url, placeholderId) => {
-  const placeholder = document.getElementById(placeholderId);
-  if (!placeholder) {
-    console.error(`Placeholder element with ID "${placeholderId}" not found.`);
-    return;
-  }
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-    }
-    const html = await response.text();
-    placeholder.innerHTML = html;
-    console.log(`Component ${url} loaded into #${placeholderId}`);
-  } catch (error) {
-    console.error(`Error loading component ${url}:`, error);
-    placeholder.innerHTML = `<p class="text-red-500">Error loading component.</p>`;
-  }
-};
 
-// Carregar os componentes quando o DOM estiver pronto
-document.addEventListener("DOMContentLoaded", () => {
-  loadComponent("_header.html", "header-placeholder").then(() => {
-    LoginNav();
-  });
-  loadComponent("_footer.html", "footer-placeholder");
-  loadComponent("_menu.html", "menu-placeholder");
-});
-
+// Função para associar o evento de login ao ícone de perfil
 export function LoginNav() {
-  document.getElementById("profile").addEventListener("click", () => {
-    console.log("clicked");
+  const profileIcon = document.getElementById("profile");
+  if (!profileIcon) return;
+  // Remove todos os event listeners antigos
+  const newProfileIcon = profileIcon.cloneNode(true);
+  profileIcon.parentNode.replaceChild(newProfileIcon, profileIcon);
+  newProfileIcon.addEventListener("click", () => {
     if (User.isLogged()) {
-      //go to profile
-      if(isAdmin(User.getUserLogged())){
-        window.location.href = "dashboard_admin.html"
-      }else{
+      if (typeof isAdmin === "function" && isAdmin(User.getUserLogged())) {
+        window.location.href = "dashboard_admin.html";
+      } else {
         window.location.href = "profile.html";
       }
     } else {
       openModal("profile-modal");
-      document.getElementById("login-form").addEventListener("submit", (e) => {
-        //TODO: When modal Ready add o id do form
+      const loginForm = document.getElementById("login-form");
+      if (!loginForm) return;
+      const newLoginForm = loginForm.cloneNode(true);
+      loginForm.parentNode.replaceChild(newLoginForm, loginForm);
+      newLoginForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        data = getFormData("login-form"); //TODO: When modal Ready add o id do form
-        username = data.username;
-        email = data.email;
-        password = data.password;
+        const data = getFormData("login-form");
+        const username = data.username;
+        const email = data.email;
+        const password = data.password;
         User.add(username, password, email);
         User.login(username, password);
-        closeModal("profile-modal"); //id modal
-        openModal("newletter-modal");
-        document.getElementById("").addEventListener("click", () => {
-          //add yes button id
-          //sign for newletter
-          closeModal("newsletter-modal");
-        });
-        document.getElementById("").addEventListener("click", () => {
-          //add no button id
-          closeModal("newsletter-modal");
-        });
+        closeModal("profile-modal");
+        openModal("newsletter-modal");
+        // Newsletter buttons
+        const yesBtn = document.getElementById("newsletter-yes");
+        const noBtn = document.getElementById("newsletter-no");
+        if (yesBtn) {
+          const newYesBtn = yesBtn.cloneNode(true);
+          yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+          newYesBtn.addEventListener("click", () => {
+            closeModal("newsletter-modal");
+          });
+        }
+        if (noBtn) {
+          const newNoBtn = noBtn.cloneNode(true);
+          noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+          newNoBtn.addEventListener("click", () => {
+            closeModal("newsletter-modal");
+          });
+        }
       });
     }
   });
 }
 
+// Função para associar o evento de alternância de tema
 export function initThemeToggle() {
   const themeToggle = document.getElementById("theme-toggle");
-  if (themeToggle) {
-    // Atualiza o ícone do tema de acordo com o tema atual
-    const isDark = document.documentElement.classList.contains("dark");
-    themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
-    themeToggle.addEventListener("click", () => toggleThemeIcon(themeToggle));
-  }
+  if (!themeToggle) return;
+  const newThemeToggle = themeToggle.cloneNode(true);
+  themeToggle.parentNode.replaceChild(newThemeToggle, themeToggle);
+  const isDark = document.documentElement.classList.contains("dark");
+  newThemeToggle.textContent = isDark ? "light_mode" : "dark_mode";
+  newThemeToggle.addEventListener("click", () => toggleThemeIcon(newThemeToggle));
 }
 
 window.navbarView = {

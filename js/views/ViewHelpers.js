@@ -6,6 +6,8 @@ import {
   isSystemDarkTheme,
   getThemePreference,
 } from "../models/ModelHelpers.js";
+// Importa explicitamente a NavbarView para garantir que window.navbarView está disponível
+import "./NavbarView.js";
 
 tailwind.config = {
   darkMode: "class",
@@ -247,59 +249,29 @@ export function loadComponent(componentPath, elementId) {
     })
     .then((html) => {
       document.getElementById(elementId).innerHTML = html;
-      // Se for o header, inicializar o botão de tema
+      // Debug: confirmar carregamento
+      console.log(`[loadComponent] ${componentPath} carregado em #${elementId}`);
       if (componentPath.includes("_header.html")) {
-        // Chamar função global para inicializar o botão de tema
-        if (
-          typeof window.navbarView !== "undefined" &&
-          typeof window.navbarView.initThemeToggle === "function"
-        ) {
-          window.navbarView.initThemeToggle();
-          window.navbarView.loginNav();
-        } else {
-          // Inicialização direta caso o módulo não esteja disponível
-          const themeToggle = document.getElementById("theme-toggle");
-          const profileIcon = document.getElementById("profile")
-          if (themeToggle) {
-            const isDark = document.documentElement.classList.contains("dark");
-            themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
-            themeToggle.addEventListener("click", () =>
-              toggleThemeIcon(themeToggle)
-            );
-          if(profileIcon){
-            profileIcon.addEventListener("click", () => {
-                console.log("clicked");
-                if (User.isLogged()) {
-                  //go to profile
-                  window.location.href = "profile.html";
-                } else {
-                  openModal("profile-modal");
-                  document.getElementById("").addEventListener("submit", (e) => {
-                    //TODO: When modal Ready add o id do form
-                    e.preventDefault();
-                    data = getFormData(""); //TODO: When modal Ready add o id do form
-                    username = data.username;
-                    email = data.email;
-                    password = data.password;
-                    User.add(username, password, email);
-                    User.login(username, password);
-                    closeModal(""); //id modal
-                    openModal("newletter-modal");
-                    document.getElementById("").addEventListener("click", () => {
-                      //add yes button id
-                      //sign for newletter
-                      closeModal("newsletter-modal");
-                    });
-                    document.getElementById("").addEventListener("click", () => {
-                      //add no button id
-                      closeModal("newsletter-modal");
-                    });
-                  });
-                }
-              });
-            }
+        setTimeout(() => {
+          // Debug: confirmar existência dos elementos
+          console.log("[loadComponent] header DOM:", {
+            theme: document.getElementById("theme-toggle"),
+            profile: document.getElementById("profile"),
+            loginForm: document.getElementById("login-form"),
+            newsletterYes: document.getElementById("newsletter-yes"),
+            newsletterNo: document.getElementById("newsletter-no"),
+          });
+          if (
+            typeof window.navbarView !== "undefined" &&
+            typeof window.navbarView.initThemeToggle === "function"
+          ) {
+            window.navbarView.initThemeToggle();
+            window.navbarView.LoginNav();
+            console.log("[loadComponent] NavbarView handlers aplicados");
+          } else {
+            console.warn("[loadComponent] window.navbarView não está disponível");
           }
-        }
+        }, 0);
       }
     })
     .catch((error) => {
