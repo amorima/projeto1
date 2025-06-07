@@ -363,6 +363,24 @@ export function editComment(user, place, comment) { //TODO: Associate with a pla
   }
 }
 
+/* Função para criar utilizador de teste */
+export function createTestUser(username, points = 50) {
+  const testUser = new User(username, 'password123', `${username}@test.com`, '', points, false, false);
+  return testUser;
+}
+
+/* Função para simular login de teste */
+export function loginTest(username, points = 50) {
+  const testUser = createTestUser(username, points);
+  sessionStorage.setItem('loggedUser', JSON.stringify(testUser));
+  return testUser;
+}
+
+/* Limpar sessão de teste */
+export function clearTestSession() {
+  sessionStorage.removeItem('loggedUser');
+}
+
 /**
  * CLASSE QUE MODELA UM UTILIZADOR NA APLICAÇÃO
  * @class User
