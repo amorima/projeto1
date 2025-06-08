@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Newsletter - Planeador de Viagens</title>
+    <link rel="icon" href="../img/favicon.ico" type="image/x-icon">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../css/main.css">
+    <script src="../js/views/NavbarView.js" defer></script>
+</head>
+
+<body class="min-h-full bg-gray-50 dark:bg-gray-900 font-['IBM_Plex_Sans'] transition-colors duration-200">
+    <header id="header-placeholder"></header>
+    
+    <!-- Dashboard Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6 mt-20">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white font-['Space_Mono']">Gestão de Newsletter</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Administre os emails subscritos na newsletter</p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            placeholder="Pesquisar emails..." 
+                            class="w-full sm:w-80 pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                        >
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 text-xl">search</span>
+                    </div>
+                    
+                    <button 
+                        onclick="exportEmails()" 
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors duration-200 min-h-[46px]"
+                    >
+                        <span class="material-symbols-outlined text-xl">download</span>
+                        <span>Exportar CSV</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                        <tr>
+                            <th onclick="sortTableBy('email', newsletterTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                                <div class="flex items-center gap-2">
+                                    <span>Email</span>
+                                    <span id="sort-icon-email" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
+                                </div>
+                            </th>
+                            <th onclick="sortTableBy('subscribed_at', newsletterTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                                <div class="flex items-center gap-2">
+                                    <span>Data de Subscrição</span>
+                                    <span id="sort-icon-subscribed_at" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
+                                </div>
+                            </th>
+                            <th onclick="sortTableBy('status', newsletterTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                                <div class="flex items-center gap-2">
+                                    <span>Status</span>
+                                    <span id="sort-icon-status" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
+                                </div>
+                            </th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableContent" class="divide-y divide-gray-200 dark:divide-gray-600">
+                        <!-- Exemplo de linha -->
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">utilizador@exemplo.com</td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">25/12/2024 14:30</td>
+                            <td class="px-6 py-4 text-sm">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    Ativo
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button class="p-1.5 text-amber-600 hover:text-amber-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150" title="Pausar subscrição">
+                                        <span class="material-symbols-outlined text-lg">pause</span>
+                                    </button>
+                                    <button class="p-1.5 text-red-600 hover:text-red-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150" title="Remover subscrição">
+                                        <span class="material-symbols-outlined text-lg">delete</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+                <div id="pagination-controls" class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">
+                        A mostrar <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">247</span> resultados
+                    </div>
+                    
+                    <div class="flex items-center gap-1">
+                        <button class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-white dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-150">
+                            <span class="material-symbols-outlined text-lg">chevron_left</span>
+                        </button>
+                        
+                        <button class="px-3 py-2 text-sm font-medium text-white bg-primary rounded-lg">1</button>
+                        <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">2</button>
+                        <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">3</button>
+                        <span class="px-3 py-2 text-sm text-gray-500">...</span>
+                        <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">25</button>
+                        
+                        <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-150">
+                            <span class="material-symbols-outlined text-lg">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                        <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-2xl">email</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Subscrições</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">247</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                        <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-2xl">trending_up</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Subscrições Ativas</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">234</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-amber-100 dark:bg-amber-900 rounded-lg">
+                        <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-2xl">pause_circle</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Subscrições Pausadas</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">13</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer-placeholder"></footer>
+    
+    <script type="module" src="../js/init.js" defer></script>
+    <script type="module" src="../js/views/ViewHelpers.js"></script>
+</body>
+</html>
