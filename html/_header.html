@@ -8,11 +8,11 @@
       </div>
   
       <div class="flex items-center gap-3.5">
-        <span id="theme-toggle" class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">dark_mode</span>
-        <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">favorite</span>
-        <div class="flex items-center gap-1 cursor-pointer" id="profile">
+        <span id="theme-toggle" class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer hover:text-cyan-200 transition-colors">dark_mode</span>
+        <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer hover:text-cyan-200 transition-colors">favorite</span>
+        <div class="flex items-center gap-1 cursor-pointer hover:text-cyan-200 transition-colors" id="profile">
           <span class="material-symbols-outlined text-white dark:text-gray-100">account_circle</span>
-          <span class="text-white dark:text-gray-100 text-base font-normal font-['IBM_Plex_Sans'] hidden md:block">Iniciar sessão</span>
+          <span class="text-white dark:text-gray-100 text-base font-normal font-['IBM_Plex_Sans'] hidden lg:block">Iniciar sessão</span>
         </div>
         <button id="menu-button" class="flex items-center">
           <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">menu</span>
@@ -20,23 +20,258 @@
       </div>
   
     </div>
-  
-    <div id="mobile-menu" class="hidden bg-Main-Primary dark:bg-gray-900 md:hidden">
-      <div class="px-4 py-3 space-y-2">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">dark_mode</span>
-          <span class="text-white dark:text-gray-100">Modo Escuro</span>
+
+    <!-- Menu Desktop - Caixa arredondada -->
+    <div id="desktop-menu" class="absolute top-28 right-4 xl:right-[max(1rem,calc((100vw-1270px)/2))] w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 scale-95 opacity-0 invisible transition-all duration-300 ease-out hidden md:block z-40">
+      <div class="p-6">
+        <!-- Header da caixa -->
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-600">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Menu</h2>
+          <button id="close-desktop-menu" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+            <span class="material-symbols-outlined">close</span>
+          </button>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-outlined text-white dark:text-gray-100 cursor-pointer">favorite</span>
-          <span class="text-white dark:text-gray-100">Favoritos</span>
+        
+        <!-- Conteúdo do menu -->
+        <div class="space-y-4">
+          
+          <!-- 1. Voos -->
+          <div class="space-y-2">
+            <a href="./html/flight_search.html" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
+              <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-lg">flight</span>
+              <span class="font-medium">Voos</span>
+            </a>
+          </div>
+
+          <!-- 2. Turismo -->
+          <div class="space-y-2 border-t border-gray-100 dark:border-gray-700 pt-3">
+            <a href="./html/turism.html" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
+              <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-lg">attractions</span>
+              <span class="font-medium">Turismo</span>
+            </a>
+          </div>
+
+          <!-- 3. Explorar -->
+          <div class="space-y-2 border-t border-gray-100 dark:border-gray-700 pt-3">
+            <a href="./html/explore.html" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
+              <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-lg">map</span>
+              <span class="font-medium">Explorar</span>
+            </a>
+          </div>
+
+          <!-- 4. Hotéis -->
+          <div class="space-y-2 border-t border-gray-100 dark:border-gray-700 pt-3">
+            <a href="./html/hotel_search.html" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
+              <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-lg">hotel</span>
+              <span class="font-medium">Hotéis</span>
+            </a>
+          </div>
+
+          <!-- 5. Carros -->
+          <div class="space-y-2 border-t border-gray-100 dark:border-gray-700 pt-3">
+            <a href="./html/cars.html" class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-cyan-50 dark:hover:bg-gray-700 rounded-lg transition-colors group">
+              <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400 text-lg">directions_car</span>
+              <span class="font-medium">Carros</span>
+            </a>
+          </div>
+
         </div>
-        <div class="flex items-center gap-2 cursor-pointer">
-          <span class="material-symbols-outlined text-white dark:text-gray-100">account_circle</span>
-          <span class="text-white dark:text-gray-100">Iniciar sessão</span>
+      </div>
+    </div>
+
+    <!-- Menu Mobile Fullscreen -->
+    <div id="mobile-menu" class="fixed inset-0 bg-Main-Primary dark:bg-gray-900 z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+      <div class="flex flex-col h-full">
+        <!-- Header do menu mobile -->
+        <div class="flex items-center justify-between p-6 border-b border-cyan-400 dark:border-gray-700">
+          <img class="h-8 w-auto" src="../img/logo.svg" alt="Logo">
+          <button id="close-menu" class="text-white dark:text-gray-100">
+            <span class="material-symbols-outlined text-3xl">close</span>
+          </button>
+        </div>
+
+        <!-- Conteúdo do menu -->
+        <div class="flex-1 overflow-y-auto p-6">
+          <nav class="space-y-4">
+            <!-- 1. Voos -->
+            <div class="border-b border-cyan-400/20 dark:border-gray-700 pb-4">
+              <a href="./html/flight_search.html" class="flex items-center gap-3 text-white dark:text-gray-100 py-3 text-xl font-semibold hover:text-cyan-200 transition-colors">
+                <span class="material-symbols-outlined text-cyan-200 dark:text-cyan-400 text-2xl">flight</span>
+                <span>Voos</span>
+              </a>
+            </div>
+
+            <!-- 2. Turismo -->
+            <div class="border-b border-cyan-400/20 dark:border-gray-700 pb-4">
+              <a href="./html/turism.html" class="flex items-center gap-3 text-white dark:text-gray-100 py-3 text-xl font-semibold hover:text-cyan-200 transition-colors">
+                <span class="material-symbols-outlined text-cyan-200 dark:text-cyan-400 text-2xl">attractions</span>
+                <span>Turismo</span>
+              </a>
+            </div>
+
+            <!-- 3. Explorar -->
+            <div class="border-b border-cyan-400/20 dark:border-gray-700 pb-4">
+              <a href="./html/explore.html" class="flex items-center gap-3 text-white dark:text-gray-100 py-3 text-xl font-semibold hover:text-cyan-200 transition-colors">
+                <span class="material-symbols-outlined text-cyan-200 dark:text-cyan-400 text-2xl">map</span>
+                <span>Explorar</span>
+              </a>
+            </div>
+
+            <!-- 4. Hotéis -->
+            <div class="border-b border-cyan-400/20 dark:border-gray-700 pb-4">
+              <a href="./html/hotel_search.html" class="flex items-center gap-3 text-white dark:text-gray-100 py-3 text-xl font-semibold hover:text-cyan-200 transition-colors">
+                <span class="material-symbols-outlined text-cyan-200 dark:text-cyan-400 text-2xl">hotel</span>
+                <span>Hotéis</span>
+              </a>
+            </div>
+
+            <!-- 5. Carros -->
+            <div>
+              <a href="./html/cars.html" class="flex items-center gap-3 text-white dark:text-gray-100 py-3 text-xl font-semibold hover:text-cyan-200 transition-colors">
+                <span class="material-symbols-outlined text-cyan-200 dark:text-cyan-400 text-2xl">directions_car</span>
+                <span>Carros</span>
+              </a>
+            </div>
+          </nav>
+        </div>
+
+        <!-- Footer do menu mobile -->
+        <div class="p-6 border-t border-cyan-400/20 dark:border-gray-700">
+          <div class="flex items-center justify-around">
+            <button id="mobile-theme-toggle" class="flex flex-col items-center gap-1">
+              <span class="material-symbols-outlined text-white dark:text-gray-100 text-2xl">dark_mode</span>
+              <span class="text-xs text-cyan-100 dark:text-gray-300">Tema</span>
+            </button>
+            <button class="flex flex-col items-center gap-1">
+              <span class="material-symbols-outlined text-white dark:text-gray-100 text-2xl">favorite</span>
+              <span class="text-xs text-cyan-100 dark:text-gray-300">Favoritos</span>
+            </button>
+            <button id="mobile-profile" class="flex flex-col items-center gap-1">
+              <span class="material-symbols-outlined text-white dark:text-gray-100 text-2xl">account_circle</span>
+              <span class="text-xs text-cyan-100 dark:text-gray-300">Perfil</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </nav>
 
-  <script type="module" src="../js/views/NavbarView.js"
+  <script>
+    /* Função para inicializar o menu */
+    window.setupMenu = function() {
+      const menuButton = document.getElementById('menu-button');
+      const desktopMenu = document.getElementById('desktop-menu');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const closeDesktopMenu = document.getElementById('close-desktop-menu');
+      const closeMenu = document.getElementById('close-menu');
+      const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+      
+      console.log('Setup menu iniciado');
+      console.log('Menu button:', menuButton);
+      
+      if (!menuButton || !desktopMenu || !mobileMenu) {
+        console.log('Elementos não encontrados, tentando novamente...');
+        setTimeout(window.setupMenu, 200);
+        return;
+      }
+
+      let menuAberto = false;
+
+      /* Clique no botão hambúrguer */
+      menuButton.onclick = function(e) {
+        e.preventDefault();
+        console.log('Menu clicado!');
+        menuAberto = !menuAberto;
+        
+        if (window.innerWidth >= 768) {
+          /* Desktop */
+          if (menuAberto) {
+            desktopMenu.style.transform = 'scale(1)';
+            desktopMenu.style.opacity = '1';
+            desktopMenu.style.visibility = 'visible';
+          } else {
+            desktopMenu.style.transform = 'scale(0.95)';
+            desktopMenu.style.opacity = '0';
+            desktopMenu.style.visibility = 'hidden';
+          }
+        } else {
+          /* Mobile */
+          if (menuAberto) {
+            mobileMenu.style.transform = 'translateX(0)';
+            document.body.style.overflow = 'hidden';
+          } else {
+            mobileMenu.style.transform = 'translateX(100%)';
+            document.body.style.overflow = '';
+          }
+        }
+      };
+
+      /* Botão fechar desktop menu */
+      if (closeDesktopMenu) {
+        closeDesktopMenu.onclick = function() {
+          menuAberto = false;
+          desktopMenu.style.transform = 'scale(0.95)';
+          desktopMenu.style.opacity = '0';
+          desktopMenu.style.visibility = 'hidden';
+        };
+      }
+
+      /* Botão fechar mobile menu */
+      if (closeMenu) {
+        closeMenu.onclick = function() {
+          menuAberto = false;
+          mobileMenu.style.transform = 'translateX(100%)';
+          document.body.style.overflow = '';
+        };
+      }
+
+      /* Botão tema mobile */
+      if (mobileThemeToggle) {
+        mobileThemeToggle.onclick = function() {
+          const themeToggle = document.getElementById('theme-toggle');
+          if (themeToggle) {
+            themeToggle.click();
+          }
+        };
+      }
+
+      /* Fechar menu ao clicar fora */
+      document.onclick = function(e) {
+        if (!e.target.closest('#menu-button') && 
+            !e.target.closest('#desktop-menu') && 
+            !e.target.closest('#mobile-menu') && 
+            menuAberto) {
+          menuAberto = false;
+          desktopMenu.style.transform = 'scale(0.95)';
+          desktopMenu.style.opacity = '0';
+          desktopMenu.style.visibility = 'hidden';
+          mobileMenu.style.transform = 'translateX(100%)';
+          document.body.style.overflow = '';
+        }
+      };
+
+      /* Fechar ao clicar nos links */
+      const links = document.querySelectorAll('#desktop-menu a, #mobile-menu a');
+      links.forEach(function(link) {
+        link.onclick = function() {
+          menuAberto = false;
+          desktopMenu.style.transform = 'scale(0.95)';
+          desktopMenu.style.opacity = '0';
+          desktopMenu.style.visibility = 'hidden';
+          mobileMenu.style.transform = 'translateX(100%)';
+          document.body.style.overflow = '';
+        };
+      });
+      
+      console.log('Menu configurado com sucesso!');
+    };
+
+    /* Executar imediatamente */
+    window.setupMenu();
+    
+    /* Backup */
+    setTimeout(window.setupMenu, 100);
+    setTimeout(window.setupMenu, 500);
+  </script>
+
+  <script type="module" src="../js/views/NavbarView.js"></script>

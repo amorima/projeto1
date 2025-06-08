@@ -247,59 +247,44 @@ export function loadComponent(componentPath, elementId) {
     })
     .then((html) => {
       document.getElementById(elementId).innerHTML = html;
-      // Se for o header, inicializar o botão de tema
+      /* Se for o header, inicializar */
       if (componentPath.includes("_header.html")) {
-        // Chamar função global para inicializar o botão de tema
-        if (
-          typeof window.navbarView !== "undefined" &&
-          typeof window.navbarView.initThemeToggle === "function"
-        ) {
-          window.navbarView.initThemeToggle();
-          window.navbarView.loginNav();
-        } else {
-          // Inicialização direta caso o módulo não esteja disponível
+        setTimeout(() => {
+          /* Inicializar tema */
           const themeToggle = document.getElementById("theme-toggle");
-          const profileIcon = document.getElementById("profile")
+          const profileIcon = document.getElementById("profile");
+
           if (themeToggle) {
             const isDark = document.documentElement.classList.contains("dark");
             themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
             themeToggle.addEventListener("click", () =>
               toggleThemeIcon(themeToggle)
             );
-          if(profileIcon){
-            profileIcon.addEventListener("click", () => {
-                console.log("clicked");
-                if (User.isLogged()) {
-                  //go to profile
-                  window.location.href = "profile.html";
-                } else {
-                  openModal("profile-modal");
-                  document.getElementById("").addEventListener("submit", (e) => {
-                    //TODO: When modal Ready add o id do form
-                    e.preventDefault();
-                    data = getFormData(""); //TODO: When modal Ready add o id do form
-                    username = data.username;
-                    email = data.email;
-                    password = data.password;
-                    User.add(username, password, email);
-                    User.login(username, password);
-                    closeModal(""); //id modal
-                    openModal("newletter-modal");
-                    document.getElementById("").addEventListener("click", () => {
-                      //add yes button id
-                      //sign for newletter
-                      closeModal("newsletter-modal");
-                    });
-                    document.getElementById("").addEventListener("click", () => {
-                      //add no button id
-                      closeModal("newsletter-modal");
-                    });
-                  });
-                }
-              });
-            }
           }
-        }
+
+          if (profileIcon) {
+            profileIcon.addEventListener("click", () => {
+              console.log("clicked");
+            });
+          }
+
+          /* Executar scripts do header */
+          const scripts = document.querySelectorAll(
+            "#header-placeholder script"
+          );
+          scripts.forEach((script) => {
+            try {
+              eval(script.innerHTML);
+            } catch (error) {
+              console.log("Erro ao executar script:", error);
+            }
+          });
+
+          /* Chamar setupMenu se existir */
+          if (typeof window.setupMenu === "function") {
+            setTimeout(window.setupMenu, 100);
+          }
+        }, 200);
       }
     })
     .catch((error) => {
