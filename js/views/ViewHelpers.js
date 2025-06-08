@@ -237,6 +237,35 @@ export function updateTable(config) {
   }
 }
 
+/* navegação dos links do footer */
+function initFooterNavigation() {
+  const footerLinks = document.querySelectorAll('.footer-link');
+  
+  footerLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const page = this.dataset.staticPage;
+      navigateToStatic(page);
+    });
+  });
+}
+
+/* determina o caminho correto baseado na localização atual */
+function navigateToStatic(page) {
+  const currentPath = window.location.pathname;
+  let basePath = '';
+  
+  /* se estivermos no index ou root */
+  if (currentPath.endsWith('/') || currentPath.endsWith('/index.html') || currentPath.split('/').pop() === 'index.html') {
+    basePath = './html/';
+  } else {
+    /* se estivermos numa página dentro da pasta html */
+    basePath = './';
+  }
+  
+  window.location.href = basePath + 'static_' + page + '.html';
+}
+
 // Função para carregar um componente HTML num elemento pelo seu ID
 export function loadComponent(componentPath, elementId) {
   fetch(componentPath)
@@ -300,6 +329,11 @@ export function loadComponent(componentPath, elementId) {
             }
           }
         }
+      }
+      
+      // Se for o footer, inicializar a navegação
+      if (componentPath.includes("_footer.html")) {
+        initFooterNavigation();
       }
     })
     .catch((error) => {
