@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre</title>
+    <link rel="icon" type="image/ico" href="../../img/favicon.ico">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../../css/main.css">
+
+</head>
+<body class="bg-white dark:bg-gray-900 min-h-screen">
+    <header id="header-placeholder"></header>
+
+    <!-- Conteúdo principal -->
+    <main class="w-full max-w-screen-lg mx-auto px-4 py-8 mt-24">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">Definições de Privacidade</h1>
+            
+            <div class="space-y-6">
+                <p class="text-gray-700 dark:text-gray-300">
+                    Controle como os seus dados pessoais são utilizados na plataforma Hoot.
+                </p>
+
+                <div class="space-y-4">
+                    <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Cookies Essenciais</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Necessários para o funcionamento do site</p>
+                            </div>
+                            <input type="checkbox" checked disabled class="w-5 h-5 text-cyan-600">
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Cookies de Marketing</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Para personalizar anúncios e conteúdo</p>
+                            </div>
+                            <input type="checkbox" class="w-5 h-5 text-cyan-600">
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Partilha de Dados</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Permitir partilha com parceiros de viagem</p>
+                            </div>
+                            <input type="checkbox" class="w-5 h-5 text-cyan-600">
+                        </div>
+                    </div>
+
+                    <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Emails Promocionais</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Receber ofertas especiais por email</p>
+                            </div>
+                            <input type="checkbox" checked class="w-5 h-5 text-cyan-600">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-6">
+                    <button class="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded-lg">
+                        Guardar Definições
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script type="module" src="../../js/views/ViewHelpers.js"></script>
+</body>
+</html>

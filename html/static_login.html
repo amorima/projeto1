@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre</title>
+    <link rel="icon" type="image/ico" href="../../img/favicon.ico">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../../css/main.css">
+
+</head>
+<body class="bg-white dark:bg-gray-900 min-h-screen">
+    <header id="header-placeholder"></header>
+
+    <!-- Conteúdo principal -->
+    <main class="w-full max-w-md mx-auto px-4 py-8 mt-24">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Iniciar Sessão</h1>
+            
+            <form class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Email
+                    </label>
+                    <input type="email" id="email" name="email" required
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Palavra-passe
+                    </label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" name="remember" class="w-4 h-4 text-cyan-600">
+                        <label for="remember" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                            Lembrar-me
+                        </label>
+                    </div>
+                    <a href="#" class="text-sm text-cyan-600 hover:text-cyan-700">
+                        Esqueceu-se da palavra-passe?
+                    </a>
+                </div>
+
+                <button type="submit" 
+                        class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded-lg">
+                    Entrar
+                </button>
+
+                <div class="text-center">
+                    <span class="text-sm text-gray-600 dark:text-gray-400">Não tem conta? </span>
+                    <a href="#" class="text-sm text-cyan-600 hover:text-cyan-700">Registe-se aqui</a>
+                </div>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                <p class="text-center text-xs text-gray-500 dark:text-gray-400">
+                    Projeto académico TSIW - ESMAD
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script>
+        /* Carregamento do header e footer */
+        fetch('../_header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+            });
+
+        fetch('../_footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-placeholder').innerHTML = data;
+            });
+    </script>
+    <script type="module" src="../../js/views/ViewHelpers.js"></script>
+</body>
+</html>

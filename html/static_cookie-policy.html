@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Cookies</title>
+    <link rel="icon" type="image/ico" href="../../img/favicon.ico">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <link rel="stylesheet" href="../../css/main.css">
+
+</head>
+<body class="bg-white dark:bg-gray-900 min-h-screen">
+    <header id="header-placeholder"></header>
+
+    <!-- Conteúdo principal -->
+    <main class="w-full max-w-screen-lg mx-auto px-4 py-8 mt-24">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">Política de Cookies</h1>
+            
+            <div class="prose prose-lg max-w-none dark:prose-invert space-y-6">
+                <p class="text-gray-700 dark:text-gray-300">
+                    Esta política explica como a Hoot utiliza cookies e tecnologias similares no nosso website.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">O que são Cookies?</h2>
+                <p class="text-gray-700 dark:text-gray-300">
+                    Cookies são pequenos ficheiros de texto armazenados no seu dispositivo quando visita o nosso website. 
+                    Permitem-nos reconhecê-lo e lembrar das suas preferências.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Tipos de Cookies Utilizados</h2>
+                
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Cookies Essenciais</h3>
+                <p class="text-gray-700 dark:text-gray-300">
+                    Necessários para o funcionamento básico do website. Incluem cookies de sessão e de segurança.
+                </p>
+
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Cookies de Desempenho</h3>
+                <p class="text-gray-700 dark:text-gray-300">
+                    Ajudam-nos a compreender como os visitantes interagem com o nosso website, fornecendo dados 
+                    anónimos sobre páginas visitadas.
+                </p>
+
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Cookies de Marketing</h3>
+                <p class="text-gray-700 dark:text-gray-300">
+                    Utilizados para fornecer anúncios relevantes e medir a eficácia das nossas campanhas publicitárias.
+                </p>
+
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Gestão de Cookies</h2>
+                <p class="text-gray-700 dark:text-gray-300">
+                    Pode gerir as suas preferências de cookies através das definições do seu navegador ou 
+                    através da nossa página de definições de privacidade.
+                </p>
+
+                <div class="bg-cyan-50 dark:bg-gray-700 p-6 rounded-lg">
+                    <p class="text-cyan-800 dark:text-cyan-200 text-sm">
+                        Última atualização: Janeiro 2025 | Desenvolvido como projeto académico na ESMAD - IPP
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-placeholder"></footer>
+
+    <script>
+        /* Carregamento do header e footer */
+        fetch('../_header.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+            });
+
+        fetch('../_footer.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('footer-placeholder').innerHTML = data;
+            });
+    </script>
+    <script type="module" src="../../js/views/ViewHelpers.js"></script>
+</body>
+</html>
