@@ -2788,4 +2788,91 @@ function initdata() {
     ];
     localStorage.setItem("viagens", JSON.stringify(viagens));
   }
+
+  // Companhias Aéreas
+  if (!localStorage.companhiasAereas) {
+    const companhiasAereas = [
+      {
+        nome: "TAP",
+        logo: "/img/icons/ca_tap.jpg",
+      },
+      {
+        nome: "British Airways",
+        logo: "/img/icons/ca_british_airways.jpg",
+      },
+      {
+        nome: "Air France",
+        logo: "/img/icons/ca_air_france.jpg",
+      },
+      {
+        nome: "KLM",
+        logo: "/img/icons/ca_klm.png",
+      },
+      {
+        nome: "Ryanair",
+        logo: "/img/icons/ca_ryanair.jpg",
+      },
+      {
+        nome: "EasyJet",
+        logo: "/img/icons/ca_easyjet.png",
+      },
+      {
+        nome: "Alitalia",
+        logo: "/img/icons/ca_alitalia.png",
+      },
+      {
+        nome: "Vueling",
+        logo: "/img/icons/ca_vueling.png",
+      },
+      {
+        nome: "Brussels Airlines",
+        logo: "/img/icons/ca_brussels.png",
+      },
+      {
+        nome: "Turkish Airlines",
+        logo: "/img/icons/ca_turkish.jpg",
+      },
+      {
+        nome: "SWISS",
+        logo: "/img/icons/ca_swiss.png",
+      },
+      {
+        nome: "Austrian Airlines",
+        logo: "/img/icons/ca_austrian.png",
+      },
+      {
+        nome: "Norwegian Air Shuttle",
+        logo: "/img/icons/ca_norwegian.png",
+      },
+      {
+        nome: "Aer Lingus",
+        logo: "/img/icons/ca_Aer.png",
+      },
+      {
+        nome: "ITA Airways",
+        logo: "/img/icons/ca_ITA.png",
+      },
+      {
+        nome: "LOT Polish Airlines",
+        logo: "/img/icons/ca_LOT.png",
+      },
+      {
+        nome: "TAROM",
+        logo: "/img/icons/ca-tarom.jpg",
+      },
+      {
+        nome: "Wizz Air",
+        logo: "/img/icons/ca_wizz.png",
+      },
+      {
+        nome: "Finnair",
+        logo: "/img/icons/ca_finnair.png",
+      },
+      {
+        nome: "SAS",
+        logo: "/img/icons/ca_sas.png",
+      },
+    ];
+    localStorage.setItem("companhiasAereas", JSON.stringify(companhiasAereas));
+  }
 }
