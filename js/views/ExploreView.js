@@ -108,11 +108,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <h3 class="text-lg font-semibold mb-3">Voos disponíveis</h3>
         <div class="space-y-4" id="voos-disponiveis"></div>
       </div>
-      
-      <!-- Seção de avaliações -->
+        <!-- Seção de avaliações -->
       <div class="p-4 border-b border-gray-200 dark:border-gray-700">
         <div class="flex justify-between items-center mb-3">
-          <h3 class="text-lg font-semibold">Avaliações</h3>
+          <h3 class="text-lg font-mono font-semibold"><span class="font-bold font-['Space_Mono']">Review</span><span class="font-['Space_Mono'] italic">It</span></h3>
           <button id="add-review" class="bg-Main-Primary hover:bg-Main-Dark text-white px-3 py-1 rounded-full text-sm">
             + Adicionar Avaliação
           </button>
