@@ -568,6 +568,41 @@ export function getTripsWithCoordinates() {
 }
 
 /**
+ * Obtém as avaliações de um destino específico
+ * @param {string} destino - Nome do destino (cidade)
+ * @returns {Array} - Array de reviews do destino
+ */
+export function getReviewsByDestino(destino) {
+  const reviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+  return reviews.filter(
+    (review) => review.destino.toLowerCase() === destino.toLowerCase()
+  );
+}
+
+/**
+ * Obtém informações sobre uma companhia aérea pelo nome
+ * @param {string} nomeCompanhia - Nome da companhia aérea
+ * @returns {Object|null} - Objeto com informações da companhia ou null se não encontrada
+ */
+export function getCompanhiaAereaByNome(nomeCompanhia) {
+  const companhias = JSON.parse(
+    localStorage.getItem("companhiasAereas") || "[]"
+  );
+  return companhias.find((comp) => comp.nome === nomeCompanhia) || null;
+}
+
+/**
+ * Obtém todos os voos disponíveis para um destino específico
+ * @param {string} destino - Nome do destino (cidade)
+ * @returns {Array} - Array de voos disponíveis para o destino
+ */
+export function getVoosByDestino(destino) {
+  return viagens.filter(
+    (viagem) => viagem.destino.toLowerCase() === destino.toLowerCase()
+  );
+}
+
+/**
  * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
  * @class Trip
  * @property {string} numeroVoo - Número do voo
