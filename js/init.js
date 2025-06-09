@@ -2874,699 +2874,699 @@ function initdata() {
     ];
     localStorage.setItem("companhiasAereas", JSON.stringify(companhiasAereas));
   }    
-    // Reviews
-    if (!localStorage.reviews) {
-      const reviews = [
-        {
-          id: 1,
-          destino: "Porto",
-          avaliacao: 5,
-          data: "2025-05-10",
-          nomePessoa: "Miguel Oliveira",
-          comentario: "A cidade do Porto é incrível! As pontes são magníficas e o vinho do Porto é divinal. Recomendo vivamente um passeio pela Ribeira e uma visita às caves.",
-          respostas: [
-            {
-              id: 101,
-              data: "2025-05-12",
-              nomePessoa: "Ana Ferreira",
-              comentario: "Concordo plenamente! Também fiz o cruzeiro das 6 pontes e foi uma experiência inesquecível."
-            }
-          ]
-        },
-        {
-          id: 2,
-          destino: "Porto",
-          avaliacao: 4,
-          data: "2025-04-23",
-          nomePessoa: "Sofia Martins",
-          comentario: "A gastronomia é excelente e as pessoas muito simpáticas. A única razão para não dar 5 estrelas foi o tempo chuvoso durante a minha visita.",
-          respostas: []
-        },
-        {
-          id: 3,
-          destino: "Lisboa",
-          avaliacao: 5,
-          data: "2025-05-15",
-          nomePessoa: "Ricardo Costa",
-          comentario: "Lisboa é uma cidade encantadora! Os elétricos, as colinas, os miradouros... cada canto tem algo para descobrir. A Baixa e o Chiado são imperdíveis!",
-          respostas: [
-            {
-              id: 102,
-              data: "2025-05-16",
-              nomePessoa: "Teresa Silva",
-              comentario: "Estive lá na semana passada e também adorei! Experimentaste os pastéis de Belém?"
-            },
-            {
-              id: 103,
-              data: "2025-05-17",
-              nomePessoa: "Ricardo Costa",
-              comentario: "Sim, são deliciosos! Tive de ir duas vezes à pastelaria, confesso."
-            }
-          ]
-        },
-        {
-          id: 4,
-          destino: "Lisboa",
-          avaliacao: 4,
-          data: "2025-04-18",
-          nomePessoa: "Marta Sousa",
-          comentario: "Adorei o bairro de Alfama e o Castelo de São Jorge. As vistas são fantásticas! Só não dei 5 estrelas porque achei algumas zonas bastante turísticas e cheias de gente.",
-          respostas: []
-        },
-        {
-          id: 5,
-          destino: "Londres",
-          avaliacao: 5,
-          data: "2025-05-03",
-          nomePessoa: "Daniel Santos",
-          comentario: "Londres tem uma energia única! Os museus gratuitos são uma mais-valia incrível. O British Museum e a National Gallery são obrigatórios para quem visita.",
-          respostas: [
-            {
-              id: 104,
-              data: "2025-05-05",
-              nomePessoa: "Luís Faria",
-              comentario: "E os parques? Hyde Park é o meu favorito, especialmente no verão!"
-            }
-          ]
-        },
-        {
-          id: 6,
-          destino: "Londres",
-          avaliacao: 3,
-          data: "2025-04-10",
-          nomePessoa: "Inês Almeida",
-          comentario: "A cidade tem muita história e cultura, mas achei tudo bastante caro. O metro é eficiente mas caro para turistas. O tempo também não ajudou muito.",
-          respostas: [
-            {
-              id: 105,
-              data: "2025-04-12",
-              nomePessoa: "João Ribeiro",
-              comentario: "Concordo com o preço, mas há muitas opções gratuitas para compensar. Tenta explorar mais os parques e museus."
-            }
-          ]
-        },
-        {
-          id: 7,
-          destino: "Paris",
-          avaliacao: 5,
-          data: "2025-05-12",
-          nomePessoa: "Catarina Mendes",
-          comentario: "Paris é realmente a cidade do amor! Ver a torre Eiffel a brilhar à noite é mágico. O Louvre poderia levar dias a explorar completamente. Adorei cada minuto!",
-          respostas: []
-        },
-        {
-          id: 8,
-          destino: "Paris",
-          avaliacao: 4,
-          data: "2025-04-05",
-          nomePessoa: "Pedro Nunes",
-          comentario: "A arquitetura e a história são impressionantes. O único problema foi a quantidade de turistas na zona central, mas os bairros mais afastados são autênticos e encantadores.",
-          respostas: [
-            {
-              id: 106,
-              data: "2025-04-07",
-              nomePessoa: "Mariana Pinto",
-              comentario: "Montmartre é o meu bairro favorito! Muito mais autêntico."
-            }
-          ]
-        },
-        {
-          id: 9,
-          destino: "Amesterdão",
-          avaliacao: 5,
-          data: "2025-05-18",
-          nomePessoa: "Bruno Ferreira",
-          comentario: "Uma cidade fascinante! Os canais, as bicicletas, a arquitetura... Tudo funciona em perfeita harmonia. O Museu Van Gogh e a casa de Anne Frank são experiências profundas.",
-          respostas: []
-        },
-        {
-          id: 10,
-          destino: "Amesterdão",
-          avaliacao: 4,
-          data: "2025-03-28",
-          nomePessoa: "Raquel Lopes",
-          comentario: "Adorei andar de bicicleta pela cidade e explorar os canais. É uma cidade muito liberal e aberta. Só não dei 5 estrelas porque choveu bastante durante a minha estadia.",
-          respostas: [
-            {
-              id: 107,
-              data: "2025-03-30",
-              nomePessoa: "Bruno Ferreira",
-              comentario: "A chuva faz parte do charme holandês! Sempre bom ter um impermeável à mão."
-            },
-            {
-              id: 108,
-              data: "2025-04-02",
-              nomePessoa: "Raquel Lopes",
-              comentario: "Tens razão! Da próxima vez estarei mais preparada."
-            }
-          ]
-        },
-        {
-          id: 11,
-          destino: "Madrid",
-          avaliacao: 5,
-          data: "2025-05-08",
-          nomePessoa: "António Pereira",
-          comentario: "Madrid surpreendeu-me pela positiva! O Museu do Prado é extraordinário, a comida é deliciosa e as pessoas são muito acolhedoras. A Plaza Mayor tem uma energia contagiante.",
-          respostas: []
-        },
-        {
-          id: 12,
-          destino: "Madrid",
-          avaliacao: 4,
-          data: "2025-04-15",
-          nomePessoa: "Carla Monteiro",
-          comentario: "Adoro o ritmo desta cidade. O Parque do Retiro é um oásis no meio da cidade agitada. Recomendo visitar durante a primavera, quando está tudo em flor!",
-          respostas: [
-            {
-              id: 109,
-              data: "2025-04-17",
-              nomePessoa: "Tiago Santos",
-              comentario: "O Mercado de San Miguel também é imperdível para os amantes de gastronomia!"
-            }
-          ]
-        },
-        {
-          id: 13,
-          destino: "Roma",
-          avaliacao: 5,
-          data: "2025-05-22",
-          nomePessoa: "Francisco Silva",
-          comentario: "Roma é um museu a céu aberto! O Coliseu, o Fórum Romano, o Vaticano... cada passo é uma lição de história. E a comida italiana é ainda melhor do que esperava!",
-          respostas: [
-            {
-              id: 110,
-              data: "2025-05-23",
-              nomePessoa: "Beatriz Costa",
-              comentario: "E os gelados? Acho que comi um por dia durante a minha estadia!"
-            },
-            {
-              id: 111,
-              data: "2025-05-24",
-              nomePessoa: "Francisco Silva",
-              comentario: "Nem me fales dos gelados! Experimentei tantos sabores diferentes... Imperdíveis!"
-            }
-          ]
-        },
-        {
-          id: 14,
-          destino: "Roma",
-          avaliacao: 3,
-          data: "2025-04-02",
-          nomePessoa: "Diana Fonseca",
-          comentario: "A cidade tem uma história rica e monumentos impressionantes, mas achei muito turística e por vezes caótica. As filas para as atrações principais são enormes mesmo fora da época alta.",
-          respostas: [
-            {
-              id: 112,
-              data: "2025-04-04",
-              nomePessoa: "André Matos",
-              comentario: "Recomendo comprar bilhetes online com antecedência para evitar as filas. Funcionou muito bem para mim!"
-            }
-          ]
-        },
-        {
-          id: 15,
-          destino: "Paris",
-          avaliacao: 2,
-          data: "2025-03-15",
-          nomePessoa: "Manuel Carvalho",
-          comentario: "Muito sobrevalorizada. Ruas sujas, muitos turistas e preços absurdos. A síndrome de Paris é real!",
-          respostas: [
-            {
-              id: 113,
-              data: "2025-03-17",
-              nomePessoa: "Sofia Rodrigues",
-              comentario: "Tive uma experiência completamente diferente! Talvez dependa da época do ano ou das zonas visitadas?"
-            },
-            {
-              id: 114,
-              data: "2025-03-18",
-              nomePessoa: "Manuel Carvalho",
-              comentario: "Pode ser. Fui no verão e talvez isso tenha afetado a experiência."
-            }
-          ]
-        },
-        {
-          id: 16,
-          destino: "Londres",
-          avaliacao: 5,
-          data: "2025-02-20",
-          nomePessoa: "Joana Vieira",
-          comentario: "Adoro Londres e a sua diversidade cultural! Os musicais do West End são fantásticos e os pubs tradicionais têm um ambiente único. Vale cada cêntimo!",
-          respostas: []
-        },
-        {
-          id: 17,
-          destino: "Amesterdão",
-          avaliacao: 5,
-          data: "2025-01-12",
-          nomePessoa: "Gonçalo Marques",
-          comentario: "Cidade simplesmente perfeita! Sustentável, inclusiva, organizada e cheia de cultura. Um exemplo para muitas capitais europeias.",
-          respostas: [
-            {
-              id: 115,
-              data: "2025-01-15",
-              nomePessoa: "Clara Figueiredo",
-              comentario: "Concordo! O sistema de transportes públicos é exemplar."
-            }
-          ]
-        },
-        {
-          id: 18,
-          destino: "Lisboa",
-          avaliacao: 5,
-          data: "2025-03-10",
-          nomePessoa: "Alexandre Moreira",
-          comentario: "Lisboa conquistou-me o coração! A luz da cidade é única, a comida é deliciosa e o fado emociona. Já estou a planear voltar!",
-          respostas: []
-        },
-        {
-          id: 19,
-          destino: "Madrid",
-          avaliacao: 4,
-          data: "2025-02-05",
-          nomePessoa: "Laura Torres",
-          comentario: "Cidade vibrante e cheia de vida! A vida noturna é incrível e as 'tapas' são uma delícia. Recomendo visitar também Toledo, que fica próximo.",
-          respostas: [
-            {
-              id: 116,
-              data: "2025-02-07",
-              nomePessoa: "José Machado",
-              comentario: "Também visitaste Segóvia? O aqueduto romano é impressionante!"
-            },
-            {
-              id: 117,
-              data: "2025-02-08",
-              nomePessoa: "Laura Torres",
-              comentario: "Não consegui ir a Segóvia, mas está na minha lista para a próxima visita!"
-            }
-          ]
-        },
-        {
-          id: 20,
-          destino: "Porto",
-          avaliacao: 5,
-          data: "2025-01-25",
-          nomePessoa: "Henrique Santos",
-          comentario: "O Porto é uma cidade autêntica e acolhedora. A comida é extraordinária, especialmente a famosa francesinha! Não percam o pôr do sol na ponte D. Luís I.",
-          respostas: [
-            {
-              id: 118,
-              data: "2025-01-27",
-              nomePessoa: "Matilde Costa",
-              comentario: "E os elétricos históricos? Adoro o percurso junto ao rio!"
-            }
-          ]
-        },
-        {
-          id: 21,
-          destino: "Roma",
-          avaliacao: 4,
-          data: "2024-12-10",
-          nomePessoa: "Eduardo Pinto",
-          comentario: "A cidade eterna não desilude! Cada rua tem história para contar. Recomendo visitar a Galleria Borghese, menos conhecida mas fascinante.",
-          respostas: []
-        },
-        {
-          id: 22,
-          destino: "Dublin",
-          avaliacao: 5,
-          data: "2025-04-14",
-          nomePessoa: "Margarida Teixeira",
-          comentario: "Dublin surpreendeu-me pela positiva! Os irlandeses são extremamente simpáticos e os pubs têm música ao vivo fantástica. Trinity College é lindíssimo!",
-          respostas: []
-        },
-        {
-          id: 23,
-          destino: "Berlim",
-          avaliacao: 5,
-          data: "2025-04-25",
-          nomePessoa: "Filipe Nogueira",
-          comentario: "Berlim é fascinante! Uma cidade com muita história recente, cultura alternativa e vida noturna incrível. A East Side Gallery é impressionante.",
-          respostas: [
-            {
-              id: 119,
-              data: "2025-04-27",
-              nomePessoa: "Carolina Maia",
-              comentario: "E os museus da Ilha dos Museus? Vale muito a pena visitar!"
-            }
-          ]
-        },
-        {
-          id: 24,
-          destino: "Barcelona",
-          avaliacao: 5,
-          data: "2025-03-05",
-          nomePessoa: "Rafael Dias",
-          comentario: "Barcelona tem o melhor de dois mundos: praia e cidade! A arquitetura de Gaudí é surreal, especialmente a Sagrada Família. As Ramblas têm uma energia contagiante!",
-          respostas: [
-            {
-              id: 120,
-              data: "2025-03-07",
-              nomePessoa: "Ângela Rocha",
-              comentario: "O Parque Güell também é imperdível! As vistas da cidade são fantásticas."
-            }
-          ]
-        },
-        {
-          id: 25,
-          destino: "Copenhaga",
-          avaliacao: 4,
-          data: "2025-05-01",
-          nomePessoa: "Guilherme Fernandes",
-          comentario: "Uma cidade muito limpa, organizada e sustentável! Nyhavn é um postal ilustrado. Recomendo alugar bicicleta para explorar a cidade como um local.",
-          respostas: []
-        },
-        {
-          id: 26,
-          destino: "Milão",
-          avaliacao: 3,
-          data: "2025-04-20",
-          nomePessoa: "Isabel Campos",
-          comentario: "A catedral é deslumbrante, mas achei o resto da cidade um pouco sobrevalorizado. Bom para compras, mas falta-lhe o charme de outras cidades italianas.",
-          respostas: [
-            {
-              id: 121,
-              data: "2025-04-22",
-              nomePessoa: "Paulo Ramos",
-              comentario: "Concordo! Vale a pena mais como uma paragem curta num roteiro maior por Itália."
-            }
-          ]
-        },
-        {
-          id: 27,
-          destino: "Istambul",
-          avaliacao: 5,
-          data: "2025-03-18",
-          nomePessoa: "Leonor Duarte",
-          comentario: "Istambul é fascinante! O encontro entre Europa e Ásia, entre tradição e modernidade. Santa Sofia e a Mesquita Azul são monumentos extraordinários.",
-          respostas: []
-        },
-        {
-          id: 28,
-          destino: "Zurique",
-          avaliacao: 4,
-          data: "2025-03-25",
-          nomePessoa: "Vasco Morais",
-          comentario: "Uma cidade lindíssima e muito limpa, à beira do lago. Cara, é verdade, mas a qualidade de vida sente-se. O chocolate suíço é divinal!",
-          respostas: []
-        },
-        {
-          id: 29,
-          destino: "Viena",
-          avaliacao: 5,
-          data: "2025-02-15",
-          nomePessoa: "Patrícia Barros",
-          comentario: "Viena é elegante e majestosa! Os palácios são magníficos, os cafés históricos são deliciosos e a música clássica está presente em toda a parte.",
-          respostas: [
-            {
-              id: 122,
-              data: "2025-02-17",
-              nomePessoa: "Nuno Antunes",
-              comentario: "Assististe a algum concerto ou ópera? São experiências inesquecíveis em Viena!"
-            },
-            {
-              id: 123,
-              data: "2025-02-18",
-              nomePessoa: "Patrícia Barros",
-              comentario: "Sim! Fui a um concerto na Musikverein. Acústica perfeita!"
-            }
-          ]
-        },
-        {
-          id: 30,
-          destino: "Oslo",
-          avaliacao: 4,
-          data: "2025-01-05",
-          nomePessoa: "Marco Henriques",
-          comentario: "Uma capital escandinava moderna e rodeada de natureza. O Museu Viking e o Parque Vigeland são imperdíveis. Só não dei 5 estrelas pelo preço elevado.",
-          respostas: []
-        },
-        {
-          id: 31,
-          destino: "Bucareste",
-          avaliacao: 4,
-          data: "2025-04-10",
-          nomePessoa: "Cristina Neves",
-          comentario: "Uma cidade surpreendente! O Palácio do Parlamento é colossal e o centro histórico é charmoso. Os preços são muito acessíveis comparados com outras capitais europeias.",
-          respostas: []
-        },
-        {
-          id: 32,
-          destino: "Budapeste",
-          avaliacao: 5,
-          data: "2024-12-05",
-          nomePessoa: "Renato Alves",
-          comentario: "Budapeste é uma jóia escondida! Os banhos termais são uma experiência única e a vista do Bastião dos Pescadores é deslumbrante. Cidade romântica e acessível.",
-          respostas: [
-            {
-              id: 124,
-              data: "2024-12-07",
-              nomePessoa: "Adriana Batista",
-              comentario: "O parlamento iluminado à noite, visto do outro lado do Danúbio, é uma imagem que nunca esquecerei!"
-            }
-          ]
-        },
-        {
-          id: 33,
-          destino: "Helsínquia",
-          avaliacao: 4,
-          data: "2025-01-20",
-          nomePessoa: "Tomás Cardoso",
-          comentario: "Uma cidade compacta e fácil de explorar. O design finlandês está presente em cada esquina. A fortaleza de Suomenlinna é um passeio obrigatório!",
-          respostas: []
-        },
-        {
-          id: 34,
-          destino: "Genebra",
-          avaliacao: 4,
-          data: "2025-02-10",
-          nomePessoa: "Mónica Guerreiro",
-          comentario: "Genebra tem uma localização privilegiada junto ao lago e com vista para os Alpes. O Jet d'Eau é impressionante! Cidade internacional e muito segura.",
-          respostas: [
-            {
-              id: 125,
-              data: "2025-02-12",
-              nomePessoa: "Ricardo Abreu",
-              comentario: "Também visitaste a sede da ONU? É uma visita guiada muito interessante!"
-            }
-          ]
-        },
-        {
-          id: 35,
-          destino: "Frankfurt",
-          avaliacao: 3,
-          data: "2025-03-01",
-          nomePessoa: "Helena Castro",
-          comentario: "Uma cidade mais focada em negócios, mas com alguns pontos interessantes como o Römerberg. Boa como ponto de passagem, mas não para uma estadia longa.",
-          respostas: []
-        },
-        {
-          id: 36,
-          destino: "Munique",
-          avaliacao: 5,
-          data: "2025-01-15",
-          nomePessoa: "Duarte Lima",
-          comentario: "Munique é encantadora! A combinação de tradição bávara com modernidade funciona na perfeição. O Englischer Garten é um dos maiores parques urbanos do mundo!",
-          respostas: [
-            {
-              id: 126,
-              data: "2025-01-18",
-              nomePessoa: "Vera Pacheco",
-              comentario: "E as cervejarias tradicionais? Hofbräuhaus é uma experiência autêntica!"
-            }
-          ]
-        },
-        {
-          id: 37,
-          destino: "Manchester",
-          avaliacao: 4,
-          data: "2024-12-20",
-          nomePessoa: "Diogo Xavier",
-          comentario: "Manchester tem uma energia contagiante! A cena musical é incrível e os museus gratuitos são excelentes. Northern Quarter é o melhor bairro para explorar.",
-          respostas: []
-        },
-        {
-          id: 38,
-          destino: "Edimburgo",
-          avaliacao: 5,
-          data: "2025-02-25",
-          nomePessoa: "Andreia Simões",
-          comentario: "Edimburgo parece saída de um conto de fadas! O castelo, a Royal Mile e as ruelas medievais são fascinantes. Visitem Arthur's Seat para uma vista panorâmica.",
-          respostas: [
-            {
-              id: 127,
-              data: "2025-02-27",
-              nomePessoa: "Rui Mota",
-              comentario: "Concordo! E para os fãs de Harry Potter, há muitos locais que inspiraram os livros."
-            }
-          ]
-        },
-        {
-          id: 39,
-          destino: "Hamburgo",
-          avaliacao: 4,
-          data: "2025-01-10",
-          nomePessoa: "Cátia Miranda",
-          comentario: "Uma cidade portuária fascinante, com muita história e cultura. Speicherstadt (cidade dos armazéns) é impressionante. Ótimas opções gastronómicas!",
-          respostas: []
-        },
-        {
-          id: 40,
-          destino: "Valência",
-          avaliacao: 5,
-          data: "2024-12-15",
-          nomePessoa: "Bernardo Correia",
-          comentario: "Valência é uma surpresa maravilhosa! A Cidade das Artes e Ciências é futurista e impressionante. Praias limpas e paella autêntica. Menos turística que Barcelona.",
-          respostas: [
-            {
-              id: 128,
-              data: "2024-12-17",
-              nomePessoa: "Lúcia Ferreira",
-              comentario: "O Mercado Central também é fantástico! Produtos fresquíssimos e uma atmosfera incrível."
-            }
-          ]
-        },
-        {
-          id: 41,
-          destino: "Roterdão",
-          avaliacao: 4,
-          data: "2025-03-22",
-          nomePessoa: "Alfredo Sousa",
-          comentario: "Roterdão é o oposto de Amesterdão - moderna, inovadora e com arquitetura arrojada. As casas cúbicas são únicas! O mercado interior Markthal é imperdível.",
-          respostas: []
-        },
-        {
-          id: 42,
-          destino: "Estocolmo",
-          avaliacao: 5,
-          data: "2025-02-01",
-          nomePessoa: "Sílvia Brito",
-          comentario: "Estocolmo é uma cidade elegante construída sobre ilhas. Gamla Stan (cidade velha) parece um cenário de filme. O Museu Vasa é fascinante! Cidade limpa e segura.",
-          respostas: [
-            {
-              id: 129,
-              data: "2025-02-03",
-              nomePessoa: "Gustavo Pinho",
-              comentario: "Também recomendo apanhar o barco para visitar o arquipélago nos meses de verão!"
-            }
-          ]
-        },
-        {
-          id: 43,
-          destino: "Marselha",
-          avaliacao: 4,
-          data: "2025-04-05",
-          nomePessoa: "Lucas Vieira",
-          comentario: "Marselha é autêntica e vibrante! O velho porto é encantador e a basílica Notre-Dame de la Garde oferece vistas incríveis. Bom ponto de partida para explorar a Provença.",
-          respostas: []
-        },
-        {
-          id: 44,
-          destino: "Sevilha",
-          avaliacao: 5,
-          data: "2025-04-15",
-          nomePessoa: "Débora Cunha",
-          comentario: "Sevilha conquistou-me! A Catedral, o Alcázar e a Plaza de España são obras-primas. O ambiente nas praças à noite é mágico. E que tapas deliciosas!",
-          respostas: [
-            {
-              id: 130,
-              data: "2025-04-17",
-              nomePessoa: "Rodrigo Esteves",
-              comentario: "Foste na primavera? O cheiro de laranjeiras em flor é indescritível!"
-            },
-            {
-              id: 131,
-              data: "2025-04-18",
-              nomePessoa: "Débora Cunha",
-              comentario: "Sim, fui em abril! As laranjeiras e o azahar tornavam cada passeio ainda mais especial."
-            }
-          ]
-        },
-        {
-          id: 45,
-          destino: "Ancara",
-          avaliacao: 4,
-          data: "2025-03-12",
-          nomePessoa: "Hugo Machado",
-          comentario: "Ancara é muitas vezes esquecida pelos turistas, mas tem muito para oferecer. O Mausoléu de Ataturk é imponente e o Museu das Civilizações da Anatólia é fascinante.",
-          respostas: []
-        },
-        {
-          id: 46,
-          destino: "Basileia",
-          avaliacao: 4,
-          data: "2025-02-20",
-          nomePessoa: "Júlia Campos",
-          comentario: "Basileia é uma pequena jóia na fronteira de três países. O Reno divide a cidade e os museus de arte são de classe mundial. A arquitetura moderna complementa a medieval.",
-          respostas: []
-        },
-        {
-          id: 47,
-          destino: "Salzburgo",
-          avaliacao: 5,
-          data: "2025-01-07",
-          nomePessoa: "Fernando Lopes",
-          comentario: "A cidade de Mozart é um sonho! O centro histórico barroco é Património Mundial. A fortaleza Hohensalzburg oferece vistas deslumbrantes. Imperdível para amantes de música.",
-          respostas: [
-            {
-              id: 132,
-              data: "2025-01-09",
-              nomePessoa: "Beatriz Lima",
-              comentario: "E os locais de filmagem de 'Música no Coração'? Fizeste o tour temático?"
-            }
-          ]
-        },
-        {
-          id: 48,
-          destino: "Bergen",
-          avaliacao: 5,
-          data: "2025-03-28",
-          nomePessoa: "Eva Rodrigues",
-          comentario: "Bergen é a porta de entrada para os fjords noruegueses! O bairro hanseático Bryggen é colorido e encantador. O funicular até o Monte Fløyen oferece vistas inesquecíveis.",
-          respostas: []
-        },
-        {
-          id: 49,
-          destino: "Florença",
-          avaliacao: 5,
-          data: "2024-12-28",
-          nomePessoa: "César Oliveira",
-          comentario: "Florença é o berço do Renascimento! A catedral com a cúpula do Brunelleschi, a Galeria Uffizi, o David de Michelangelo... Cada canto respira história e beleza.",
-          respostas: [
-            {
-              id: 133,
-              data: "2024-12-30",
-              nomePessoa: "Marta Reis",
-              comentario: "E a Ponte Vecchio ao pôr do sol? Um dos momentos mais bonitos da minha viagem!"
-            },
-            {
-              id: 134,
-              data: "2024-12-31",
-              nomePessoa: "César Oliveira",
-              comentario: "Sem dúvida! E recomendo subir até à Piazzale Michelangelo para ver toda a cidade."
-            }
-          ]
-        },
-        {
-          id: 50,
-          destino: "Bruxelas",
-          avaliacao: 4,
-          data: "2025-05-07",
-          nomePessoa: "Sandra Torres",
-          comentario: "Bruxelas é uma cidade surpreendente! Grand Place é uma das praças mais bonitas da Europa. O Atomium é futurista e os museus são excelentes. E claro, chocolate belga!",
-          respostas: []
-        },
-        {
-          id: 51,
-          destino: "Varsóvia",
-          avaliacao: 4,
-          data: "2025-04-28",
-          nomePessoa: "David Costa",
-          comentario: "Varsóvia renasceu das cinzas da Segunda Guerra Mundial. O centro histórico reconstruído é encantador e os parques são imensos. Cidade moderna com preços acessíveis.",
-          respostas: []
-        }
-      ];
-      localStorage.setItem("reviews", JSON.stringify(reviews));
-    }
+  // Reviews
+  if (!localStorage.reviews) {
+    const reviews = [
+      {
+        id: 1,
+        destino: "Porto",
+        avaliacao: 5,
+        data: "2025-05-10",
+        nomePessoa: "Miguel Oliveira",
+        comentario: "A cidade do Porto é incrível! As pontes são magníficas e o vinho do Porto é divinal. Recomendo vivamente um passeio pela Ribeira e uma visita às caves.",
+        respostas: [
+          {
+            id: 101,
+            data: "2025-05-12",
+            nomePessoa: "Ana Ferreira",
+            comentario: "Concordo plenamente! Também fiz o cruzeiro das 6 pontes e foi uma experiência inesquecível."
+          }
+        ]
+      },
+      {
+        id: 2,
+        destino: "Porto",
+        avaliacao: 4,
+        data: "2025-04-23",
+        nomePessoa: "Sofia Martins",
+        comentario: "A gastronomia é excelente e as pessoas muito simpáticas. A única razão para não dar 5 estrelas foi o tempo chuvoso durante a minha visita.",
+        respostas: []
+      },
+      {
+        id: 3,
+        destino: "Lisboa",
+        avaliacao: 5,
+        data: "2025-05-15",
+        nomePessoa: "Ricardo Costa",
+        comentario: "Lisboa é uma cidade encantadora! Os elétricos, as colinas, os miradouros... cada canto tem algo para descobrir. A Baixa e o Chiado são imperdíveis!",
+        respostas: [
+          {
+            id: 102,
+            data: "2025-05-16",
+            nomePessoa: "Teresa Silva",
+            comentario: "Estive lá na semana passada e também adorei! Experimentaste os pastéis de Belém?"
+          },
+          {
+            id: 103,
+            data: "2025-05-17",
+            nomePessoa: "Ricardo Costa",
+            comentario: "Sim, são deliciosos! Tive de ir duas vezes à pastelaria, confesso."
+          }
+        ]
+      },
+      {
+        id: 4,
+        destino: "Lisboa",
+        avaliacao: 4,
+        data: "2025-04-18",
+        nomePessoa: "Marta Sousa",
+        comentario: "Adorei o bairro de Alfama e o Castelo de São Jorge. As vistas são fantásticas! Só não dei 5 estrelas porque achei algumas zonas bastante turísticas e cheias de gente.",
+        respostas: []
+      },
+      {
+        id: 5,
+        destino: "Londres",
+        avaliacao: 5,
+        data: "2025-05-03",
+        nomePessoa: "Daniel Santos",
+        comentario: "Londres tem uma energia única! Os museus gratuitos são uma mais-valia incrível. O British Museum e a National Gallery são obrigatórios para quem visita.",
+        respostas: [
+          {
+            id: 104,
+            data: "2025-05-05",
+            nomePessoa: "Luís Faria",
+            comentario: "E os parques? Hyde Park é o meu favorito, especialmente no verão!"
+          }
+        ]
+      },
+      {
+        id: 6,
+        destino: "Londres",
+        avaliacao: 3,
+        data: "2025-04-10",
+        nomePessoa: "Inês Almeida",
+        comentario: "A cidade tem muita história e cultura, mas achei tudo bastante caro. O metro é eficiente mas caro para turistas. O tempo também não ajudou muito.",
+        respostas: [
+          {
+            id: 105,
+            data: "2025-04-12",
+            nomePessoa: "João Ribeiro",
+            comentario: "Concordo com o preço, mas há muitas opções gratuitas para compensar. Tenta explorar mais os parques e museus."
+          }
+        ]
+      },
+      {
+        id: 7,
+        destino: "Paris",
+        avaliacao: 5,
+        data: "2025-05-12",
+        nomePessoa: "Catarina Mendes",
+        comentario: "Paris é realmente a cidade do amor! Ver a torre Eiffel a brilhar à noite é mágico. O Louvre poderia levar dias a explorar completamente. Adorei cada minuto!",
+        respostas: []
+      },
+      {
+        id: 8,
+        destino: "Paris",
+        avaliacao: 4,
+        data: "2025-04-05",
+        nomePessoa: "Pedro Nunes",
+        comentario: "A arquitetura e a história são impressionantes. O único problema foi a quantidade de turistas na zona central, mas os bairros mais afastados são autênticos e encantadores.",
+        respostas: [
+          {
+            id: 106,
+            data: "2025-04-07",
+            nomePessoa: "Mariana Pinto",
+            comentario: "Montmartre é o meu bairro favorito! Muito mais autêntico."
+          }
+        ]
+      },
+      {
+        id: 9,
+        destino: "Amesterdão",
+        avaliacao: 5,
+        data: "2025-05-18",
+        nomePessoa: "Bruno Ferreira",
+        comentario: "Uma cidade fascinante! Os canais, as bicicletas, a arquitetura... Tudo funciona em perfeita harmonia. O Museu Van Gogh e a casa de Anne Frank são experiências profundas.",
+        respostas: []
+      },
+      {
+        id: 10,
+        destino: "Amesterdão",
+        avaliacao: 4,
+        data: "2025-03-28",
+        nomePessoa: "Raquel Lopes",
+        comentario: "Adorei andar de bicicleta pela cidade e explorar os canais. É uma cidade muito liberal e aberta. Só não dei 5 estrelas porque choveu bastante durante a minha estadia.",
+        respostas: [
+          {
+            id: 107,
+            data: "2025-03-30",
+            nomePessoa: "Bruno Ferreira",
+            comentario: "A chuva faz parte do charme holandês! Sempre bom ter um impermeável à mão."
+          },
+          {
+            id: 108,
+            data: "2025-04-02",
+            nomePessoa: "Raquel Lopes",
+            comentario: "Tens razão! Da próxima vez estarei mais preparada."
+          }
+        ]
+      },
+      {
+        id: 11,
+        destino: "Madrid",
+        avaliacao: 5,
+        data: "2025-05-08",
+        nomePessoa: "António Pereira",
+        comentario: "Madrid surpreendeu-me pela positiva! O Museu do Prado é extraordinário, a comida é deliciosa e as pessoas são muito acolhedoras. A Plaza Mayor tem uma energia contagiante.",
+        respostas: []
+      },
+      {
+        id: 12,
+        destino: "Madrid",
+        avaliacao: 4,
+        data: "2025-04-15",
+        nomePessoa: "Carla Monteiro",
+        comentario: "Adoro o ritmo desta cidade. O Parque do Retiro é um oásis no meio da cidade agitada. Recomendo visitar durante a primavera, quando está tudo em flor!",
+        respostas: [
+          {
+            id: 109,
+            data: "2025-04-17",
+            nomePessoa: "Tiago Santos",
+            comentario: "O Mercado de San Miguel também é imperdível para os amantes de gastronomia!"
+          }
+        ]
+      },
+      {
+        id: 13,
+        destino: "Roma",
+        avaliacao: 5,
+        data: "2025-05-22",
+        nomePessoa: "Francisco Silva",
+        comentario: "Roma é um museu a céu aberto! O Coliseu, o Fórum Romano, o Vaticano... cada passo é uma lição de história. E a comida italiana é ainda melhor do que esperava!",
+        respostas: [
+          {
+            id: 110,
+            data: "2025-05-23",
+            nomePessoa: "Beatriz Costa",
+            comentario: "E os gelados? Acho que comi um por dia durante a minha estadia!"
+          },
+          {
+            id: 111,
+            data: "2025-05-24",
+            nomePessoa: "Francisco Silva",
+            comentario: "Nem me fales dos gelados! Experimentei tantos sabores diferentes... Imperdíveis!"
+          }
+        ]
+      },
+      {
+        id: 14,
+        destino: "Roma",
+        avaliacao: 3,
+        data: "2025-04-02",
+        nomePessoa: "Diana Fonseca",
+        comentario: "A cidade tem uma história rica e monumentos impressionantes, mas achei muito turística e por vezes caótica. As filas para as atrações principais são enormes mesmo fora da época alta.",
+        respostas: [
+          {
+            id: 112,
+            data: "2025-04-04",
+            nomePessoa: "André Matos",
+            comentario: "Recomendo comprar bilhetes online com antecedência para evitar as filas. Funcionou muito bem para mim!"
+          }
+        ]
+      },
+      {
+        id: 15,
+        destino: "Paris",
+        avaliacao: 2,
+        data: "2025-03-15",
+        nomePessoa: "Manuel Carvalho",
+        comentario: "Muito sobrevalorizada. Ruas sujas, muitos turistas e preços absurdos. A síndrome de Paris é real!",
+        respostas: [
+          {
+            id: 113,
+            data: "2025-03-17",
+            nomePessoa: "Sofia Rodrigues",
+            comentario: "Tive uma experiência completamente diferente! Talvez dependa da época do ano ou das zonas visitadas?"
+          },
+          {
+            id: 114,
+            data: "2025-03-18",
+            nomePessoa: "Manuel Carvalho",
+            comentario: "Pode ser. Fui no verão e talvez isso tenha afetado a experiência."
+          }
+        ]
+      },
+      {
+        id: 16,
+        destino: "Londres",
+        avaliacao: 5,
+        data: "2025-02-20",
+        nomePessoa: "Joana Vieira",
+        comentario: "Adoro Londres e a sua diversidade cultural! Os musicais do West End são fantásticos e os pubs tradicionais têm um ambiente único. Vale cada cêntimo!",
+        respostas: []
+      },
+      {
+        id: 17,
+        destino: "Amesterdão",
+        avaliacao: 5,
+        data: "2025-01-12",
+        nomePessoa: "Gonçalo Marques",
+        comentario: "Cidade simplesmente perfeita! Sustentável, inclusiva, organizada e cheia de cultura. Um exemplo para muitas capitais europeias.",
+        respostas: [
+          {
+            id: 115,
+            data: "2025-01-15",
+            nomePessoa: "Clara Figueiredo",
+            comentario: "Concordo! O sistema de transportes públicos é exemplar."
+          }
+        ]
+      },
+      {
+        id: 18,
+        destino: "Lisboa",
+        avaliacao: 5,
+        data: "2025-03-10",
+        nomePessoa: "Alexandre Moreira",
+        comentario: "Lisboa conquistou-me o coração! A luz da cidade é única, a comida é deliciosa e o fado emociona. Já estou a planear voltar!",
+        respostas: []
+      },
+      {
+        id: 19,
+        destino: "Madrid",
+        avaliacao: 4,
+        data: "2025-02-05",
+        nomePessoa: "Laura Torres",
+        comentario: "Cidade vibrante e cheia de vida! A vida noturna é incrível e as 'tapas' são uma delícia. Recomendo visitar também Toledo, que fica próximo.",
+        respostas: [
+          {
+            id: 116,
+            data: "2025-02-07",
+            nomePessoa: "José Machado",
+            comentario: "Também visitaste Segóvia? O aqueduto romano é impressionante!"
+          },
+          {
+            id: 117,
+            data: "2025-02-08",
+            nomePessoa: "Laura Torres",
+            comentario: "Não consegui ir a Segóvia, mas está na minha lista para a próxima visita!"
+          }
+        ]
+      },
+      {
+        id: 20,
+        destino: "Porto",
+        avaliacao: 5,
+        data: "2025-01-25",
+        nomePessoa: "Henrique Santos",
+        comentario: "O Porto é uma cidade autêntica e acolhedora. A comida é extraordinária, especialmente a famosa francesinha! Não percam o pôr do sol na ponte D. Luís I.",
+        respostas: [
+          {
+            id: 118,
+            data: "2025-01-27",
+            nomePessoa: "Matilde Costa",
+            comentario: "E os elétricos históricos? Adoro o percurso junto ao rio!"
+          }
+        ]
+      },
+      {
+        id: 21,
+        destino: "Roma",
+        avaliacao: 4,
+        data: "2024-12-10",
+        nomePessoa: "Eduardo Pinto",
+        comentario: "A cidade eterna não desilude! Cada rua tem história para contar. Recomendo visitar a Galleria Borghese, menos conhecida mas fascinante.",
+        respostas: []
+      },
+      {
+        id: 22,
+        destino: "Dublin",
+        avaliacao: 5,
+        data: "2025-04-14",
+        nomePessoa: "Margarida Teixeira",
+        comentario: "Dublin surpreendeu-me pela positiva! Os irlandeses são extremamente simpáticos e os pubs têm música ao vivo fantástica. Trinity College é lindíssimo!",
+        respostas: []
+      },
+      {
+        id: 23,
+        destino: "Berlim",
+        avaliacao: 5,
+        data: "2025-04-25",
+        nomePessoa: "Filipe Nogueira",
+        comentario: "Berlim é fascinante! Uma cidade com muita história recente, cultura alternativa e vida noturna incrível. A East Side Gallery é impressionante.",
+        respostas: [
+          {
+            id: 119,
+            data: "2025-04-27",
+            nomePessoa: "Carolina Maia",
+            comentario: "E os museus da Ilha dos Museus? Vale muito a pena visitar!"
+          }
+        ]
+      },
+      {
+        id: 24,
+        destino: "Barcelona",
+        avaliacao: 5,
+        data: "2025-03-05",
+        nomePessoa: "Rafael Dias",
+        comentario: "Barcelona tem o melhor de dois mundos: praia e cidade! A arquitetura de Gaudí é surreal, especialmente a Sagrada Família. As Ramblas têm uma energia contagiante!",
+        respostas: [
+          {
+            id: 120,
+            data: "2025-03-07",
+            nomePessoa: "Ângela Rocha",
+            comentario: "O Parque Güell também é imperdível! As vistas da cidade são fantásticas."
+          }
+        ]
+      },
+      {
+        id: 25,
+        destino: "Copenhaga",
+        avaliacao: 4,
+        data: "2025-05-01",
+        nomePessoa: "Guilherme Fernandes",
+        comentario: "Uma cidade muito limpa, organizada e sustentável! Nyhavn é um postal ilustrado. Recomendo alugar bicicleta para explorar a cidade como um local.",
+        respostas: []
+      },
+      {
+        id: 26,
+        destino: "Milão",
+        avaliacao: 3,
+        data: "2025-04-20",
+        nomePessoa: "Isabel Campos",
+        comentario: "A catedral é deslumbrante, mas achei o resto da cidade um pouco sobrevalorizado. Bom para compras, mas falta-lhe o charme de outras cidades italianas.",
+        respostas: [
+          {
+            id: 121,
+            data: "2025-04-22",
+            nomePessoa: "Paulo Ramos",
+            comentario: "Concordo! Vale a pena mais como uma paragem curta num roteiro maior por Itália."
+          }
+        ]
+      },
+      {
+        id: 27,
+        destino: "Istambul",
+        avaliacao: 5,
+        data: "2025-03-18",
+        nomePessoa: "Leonor Duarte",
+        comentario: "Istambul é fascinante! O encontro entre Europa e Ásia, entre tradição e modernidade. Santa Sofia e a Mesquita Azul são monumentos extraordinários.",
+        respostas: []
+      },
+      {
+        id: 28,
+        destino: "Zurique",
+        avaliacao: 4,
+        data: "2025-03-25",
+        nomePessoa: "Vasco Morais",
+        comentario: "Uma cidade lindíssima e muito limpa, à beira do lago. Cara, é verdade, mas a qualidade de vida sente-se. O chocolate suíço é divinal!",
+        respostas: []
+      },
+      {
+        id: 29,
+        destino: "Viena",
+        avaliacao: 5,
+        data: "2025-02-15",
+        nomePessoa: "Patrícia Barros",
+        comentario: "Viena é elegante e majestosa! Os palácios são magníficos, os cafés históricos são deliciosos e a música clássica está presente em toda a parte.",
+        respostas: [
+          {
+            id: 122,
+            data: "2025-02-17",
+            nomePessoa: "Nuno Antunes",
+            comentario: "Assististe a algum concerto ou ópera? São experiências inesquecíveis em Viena!"
+          },
+          {
+            id: 123,
+            data: "2025-02-18",
+            nomePessoa: "Patrícia Barros",
+            comentario: "Sim! Fui a um concerto na Musikverein. Acústica perfeita!"
+          }
+        ]
+      },
+      {
+        id: 30,
+        destino: "Oslo",
+        avaliacao: 4,
+        data: "2025-01-05",
+        nomePessoa: "Marco Henriques",
+        comentario: "Uma capital escandinava moderna e rodeada de natureza. O Museu Viking e o Parque Vigeland são imperdíveis. Só não dei 5 estrelas pelo preço elevado.",
+        respostas: []
+      },
+      {
+        id: 31,
+        destino: "Bucareste",
+        avaliacao: 4,
+        data: "2025-04-10",
+        nomePessoa: "Cristina Neves",
+        comentario: "Uma cidade surpreendente! O Palácio do Parlamento é colossal e o centro histórico é charmoso. Os preços são muito acessíveis comparados com outras capitais europeias.",
+        respostas: []
+      },
+      {
+        id: 32,
+        destino: "Budapeste",
+        avaliacao: 5,
+        data: "2024-12-05",
+        nomePessoa: "Renato Alves",
+        comentario: "Budapeste é uma jóia escondida! Os banhos termais são uma experiência única e a vista do Bastião dos Pescadores é deslumbrante. Cidade romântica e acessível.",
+        respostas: [
+          {
+            id: 124,
+            data: "2024-12-07",
+            nomePessoa: "Adriana Batista",
+            comentario: "O parlamento iluminado à noite, visto do outro lado do Danúbio, é uma imagem que nunca esquecerei!"
+          }
+        ]
+      },
+      {
+        id: 33,
+        destino: "Helsínquia",
+        avaliacao: 4,
+        data: "2025-01-20",
+        nomePessoa: "Tomás Cardoso",
+        comentario: "Uma cidade compacta e fácil de explorar. O design finlandês está presente em cada esquina. A fortaleza de Suomenlinna é um passeio obrigatório!",
+        respostas: []
+      },
+      {
+        id: 34,
+        destino: "Genebra",
+        avaliacao: 4,
+        data: "2025-02-10",
+        nomePessoa: "Mónica Guerreiro",
+        comentario: "Genebra tem uma localização privilegiada junto ao lago e com vista para os Alpes. O Jet d'Eau é impressionante! Cidade internacional e muito segura.",
+        respostas: [
+          {
+            id: 125,
+            data: "2025-02-12",
+            nomePessoa: "Ricardo Abreu",
+            comentario: "Também visitaste a sede da ONU? É uma visita guiada muito interessante!"
+          }
+        ]
+      },
+      {
+        id: 35,
+        destino: "Frankfurt",
+        avaliacao: 3,
+        data: "2025-03-01",
+        nomePessoa: "Helena Castro",
+        comentario: "Uma cidade mais focada em negócios, mas com alguns pontos interessantes como o Römerberg. Boa como ponto de passagem, mas não para uma estadia longa.",
+        respostas: []
+      },
+      {
+        id: 36,
+        destino: "Munique",
+        avaliacao: 5,
+        data: "2025-01-15",
+        nomePessoa: "Duarte Lima",
+        comentario: "Munique é encantadora! A combinação de tradição bávara com modernidade funciona na perfeição. O Englischer Garten é um dos maiores parques urbanos do mundo!",
+        respostas: [
+          {
+            id: 126,
+            data: "2025-01-18",
+            nomePessoa: "Vera Pacheco",
+            comentario: "E as cervejarias tradicionais? Hofbräuhaus é uma experiência autêntica!"
+          }
+        ]
+      },
+      {
+        id: 37,
+        destino: "Manchester",
+        avaliacao: 4,
+        data: "2024-12-20",
+        nomePessoa: "Diogo Xavier",
+        comentario: "Manchester tem uma energia contagiante! A cena musical é incrível e os museus gratuitos são excelentes. Northern Quarter é o melhor bairro para explorar.",
+        respostas: []
+      },
+      {
+        id: 38,
+        destino: "Edimburgo",
+        avaliacao: 5,
+        data: "2025-02-25",
+        nomePessoa: "Andreia Simões",
+        comentario: "Edimburgo parece saída de um conto de fadas! O castelo, a Royal Mile e as ruelas medievais são fascinantes. Visitem Arthur's Seat para uma vista panorâmica.",
+        respostas: [
+          {
+            id: 127,
+            data: "2025-02-27",
+            nomePessoa: "Rui Mota",
+            comentario: "Concordo! E para os fãs de Harry Potter, há muitos locais que inspiraram os livros."
+          }
+        ]
+      },
+      {
+        id: 39,
+        destino: "Hamburgo",
+        avaliacao: 4,
+        data: "2025-01-10",
+        nomePessoa: "Cátia Miranda",
+        comentario: "Uma cidade portuária fascinante, com muita história e cultura. Speicherstadt (cidade dos armazéns) é impressionante. Ótimas opções gastronómicas!",
+        respostas: []
+      },
+      {
+        id: 40,
+        destino: "Valência",
+        avaliacao: 5,
+        data: "2024-12-15",
+        nomePessoa: "Bernardo Correia",
+        comentario: "Valência é uma surpresa maravilhosa! A Cidade das Artes e Ciências é futurista e impressionante. Praias limpas e paella autêntica. Menos turística que Barcelona.",
+        respostas: [
+          {
+            id: 128,
+            data: "2024-12-17",
+            nomePessoa: "Lúcia Ferreira",
+            comentario: "O Mercado Central também é fantástico! Produtos fresquíssimos e uma atmosfera incrível."
+          }
+        ]
+      },
+      {
+        id: 41,
+        destino: "Roterdão",
+        avaliacao: 4,
+        data: "2025-03-22",
+        nomePessoa: "Alfredo Sousa",
+        comentario: "Roterdão é o oposto de Amesterdão - moderna, inovadora e com arquitetura arrojada. As casas cúbicas são únicas! O mercado interior Markthal é imperdível.",
+        respostas: []
+      },
+      {
+        id: 42,
+        destino: "Estocolmo",
+        avaliacao: 5,
+        data: "2025-02-01",
+        nomePessoa: "Sílvia Brito",
+        comentario: "Estocolmo é uma cidade elegante construída sobre ilhas. Gamla Stan (cidade velha) parece um cenário de filme. O Museu Vasa é fascinante! Cidade limpa e segura.",
+        respostas: [
+          {
+            id: 129,
+            data: "2025-02-03",
+            nomePessoa: "Gustavo Pinho",
+            comentario: "Também recomendo apanhar o barco para visitar o arquipélago nos meses de verão!"
+          }
+        ]
+      },
+      {
+        id: 43,
+        destino: "Marselha",
+        avaliacao: 4,
+        data: "2025-04-05",
+        nomePessoa: "Lucas Vieira",
+        comentario: "Marselha é autêntica e vibrante! O velho porto é encantador e a basílica Notre-Dame de la Garde oferece vistas incríveis. Bom ponto de partida para explorar a Provença.",
+        respostas: []
+      },
+      {
+        id: 44,
+        destino: "Sevilha",
+        avaliacao: 5,
+        data: "2025-04-15",
+        nomePessoa: "Débora Cunha",
+        comentario: "Sevilha conquistou-me! A Catedral, o Alcázar e a Plaza de España são obras-primas. O ambiente nas praças à noite é mágico. E que tapas deliciosas!",
+        respostas: [
+          {
+            id: 130,
+            data: "2025-04-17",
+            nomePessoa: "Rodrigo Esteves",
+            comentario: "Foste na primavera? O cheiro de laranjeiras em flor é indescritível!"
+          },
+          {
+            id: 131,
+            data: "2025-04-18",
+            nomePessoa: "Débora Cunha",
+            comentario: "Sim, fui em abril! As laranjeiras e o azahar tornavam cada passeio ainda mais especial."
+          }
+        ]
+      },
+      {
+        id: 45,
+        destino: "Ancara",
+        avaliacao: 4,
+        data: "2025-03-12",
+        nomePessoa: "Hugo Machado",
+        comentario: "Ancara é muitas vezes esquecida pelos turistas, mas tem muito para oferecer. O Mausoléu de Ataturk é imponente e o Museu das Civilizações da Anatólia é fascinante.",
+        respostas: []
+      },
+      {
+        id: 46,
+        destino: "Basileia",
+        avaliacao: 4,
+        data: "2025-02-20",
+        nomePessoa: "Júlia Campos",
+        comentario: "Basileia é uma pequena jóia na fronteira de três países. O Reno divide a cidade e os museus de arte são de classe mundial. A arquitetura moderna complementa a medieval.",
+        respostas: []
+      },
+      {
+        id: 47,
+        destino: "Salzburgo",
+        avaliacao: 5,
+        data: "2025-01-07",
+        nomePessoa: "Fernando Lopes",
+        comentario: "A cidade de Mozart é um sonho! O centro histórico barroco é Património Mundial. A fortaleza Hohensalzburg oferece vistas deslumbrantes. Imperdível para amantes de música.",
+        respostas: [
+          {
+            id: 132,
+            data: "2025-01-09",
+            nomePessoa: "Beatriz Lima",
+            comentario: "E os locais de filmagem de 'Música no Coração'? Fizeste o tour temático?"
+          }
+        ]
+      },
+      {
+        id: 48,
+        destino: "Bergen",
+        avaliacao: 5,
+        data: "2025-03-28",
+        nomePessoa: "Eva Rodrigues",
+        comentario: "Bergen é a porta de entrada para os fjords noruegueses! O bairro hanseático Bryggen é colorido e encantador. O funicular até o Monte Fløyen oferece vistas inesquecíveis.",
+        respostas: []
+      },
+      {
+        id: 49,
+        destino: "Florença",
+        avaliacao: 5,
+        data: "2024-12-28",
+        nomePessoa: "César Oliveira",
+        comentario: "Florença é o berço do Renascimento! A catedral com a cúpula do Brunelleschi, a Galeria Uffizi, o David de Michelangelo... Cada canto respira história e beleza.",
+        respostas: [
+          {
+            id: 133,
+            data: "2024-12-30",
+            nomePessoa: "Marta Reis",
+            comentario: "E a Ponte Vecchio ao pôr do sol? Um dos momentos mais bonitos da minha viagem!"
+          },
+          {
+            id: 134,
+            data: "2024-12-31",
+            nomePessoa: "César Oliveira",
+            comentario: "Sem dúvida! E recomendo subir até à Piazzale Michelangelo para ver toda a cidade."
+          }
+        ]
+      },
+      {
+        id: 50,
+        destino: "Bruxelas",
+        avaliacao: 4,
+        data: "2025-05-07",
+        nomePessoa: "Sandra Torres",
+        comentario: "Bruxelas é uma cidade surpreendente! Grand Place é uma das praças mais bonitas da Europa. O Atomium é futurista e os museus são excelentes. E claro, chocolate belga!",
+        respostas: []
+      },
+      {
+        id: 51,
+        destino: "Varsóvia",
+        avaliacao: 4,
+        data: "2025-04-28",
+        nomePessoa: "David Costa",
+        comentario: "Varsóvia renasceu das cinzas da Segunda Guerra Mundial. O centro histórico reconstruído é encantador e os parques são imensos. Cidade moderna com preços acessíveis.",
+        respostas: []
+      }
+    ];
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+  }
 }
