@@ -120,30 +120,35 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `; // Geração de estrelas da avaliação média
     const ratingDiv = panel.querySelector("#rating");
-    const mediaEstrelas = parseFloat(mediaAvaliacoes);
-    /* Corrigido para exibir as estrelas corretamente */
+    const mediaEstrelas =
+      parseFloat(
+        mediaAvaliacoes
+      ); /* Lógica revista para exibir as estrelas corretamente */
     for (let i = 1; i <= 5; i++) {
       const star = document.createElement("span");
       star.className = "material-symbols-outlined text-yellow-400";
-      // Configurar FILL para 1 para garantir que as estrelas apareçam preenchidas
-      star.style.fontVariationSettings = "'FILL' 1";
 
-      if (i <= Math.floor(mediaEstrelas)) {
-        // Estrela cheia se a posição for menor ou igual à parte inteira
+      // Configurar FILL para estrelas cheias e metade
+      if (
+        i <= Math.floor(mediaEstrelas) ||
+        (i === Math.ceil(mediaEstrelas) && mediaEstrelas % 1 >= 0.8)
+      ) {
+        // Estrela cheia: posição menor ou igual à parte inteira OU
+        // próxima posição com decimal >= 0.8
         star.textContent = "star";
+        star.style.fontVariationSettings = "'FILL' 1";
       } else if (
         i === Math.ceil(mediaEstrelas) &&
         mediaEstrelas % 1 >= 0.3 &&
         mediaEstrelas % 1 < 0.8
       ) {
-        // Meia estrela se for a próxima posição e a parte decimal for entre 0.3 e 0.8
+        // Meia estrela: próxima posição com decimal entre 0.3 e 0.8 (exclusive)
         star.textContent = "star_half";
-      } else if (i === Math.ceil(mediaEstrelas) && mediaEstrelas % 1 >= 0.8) {
-        // Estrela cheia se for a próxima posição e a parte decimal for 0.8 ou mais
-        star.textContent = "star";
+        star.style.fontVariationSettings = "'FILL' 1";
       } else {
-        // Estrela vazia para os demais casos
+        // Estrela vazia: todos os outros casos
         star.textContent = "star_border";
+        // Não aplicamos FILL em estrelas vazias
       }
 
       ratingDiv.appendChild(star);
@@ -344,24 +349,23 @@ document.addEventListener("DOMContentLoaded", () => {
    * @returns {string} HTML com as estrelas
    */ function generateStars(rating) {
     let starsHTML = "";
-    const fullStars = Math.floor(rating);
-
-    /* Lógica para exibir estrelas corretamente */
+    const fullStars =
+      Math.floor(rating); /* Lógica revista para exibir estrelas corretamente */
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
-        // Estrela cheia se a posição for menor ou igual à parte inteira
+        // Estrela cheia: posição menor ou igual à parte inteira
         starsHTML +=
           '<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: \'FILL\' 1">star</span>';
       } else if (i === fullStars + 1 && rating % 1 >= 0.3 && rating % 1 < 0.8) {
-        // Meia estrela se for a próxima posição e a parte decimal for entre 0.3 e 0.8
+        // Meia estrela: próxima posição com decimal entre 0.3 e 0.8 (exclusive)
         starsHTML +=
           '<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: \'FILL\' 1">star_half</span>';
       } else if (i === fullStars + 1 && rating % 1 >= 0.8) {
-        // Estrela cheia se for a próxima posição e a parte decimal for 0.8 ou mais
+        // Estrela cheia: próxima posição com decimal >= 0.8
         starsHTML +=
           '<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: \'FILL\' 1">star</span>';
       } else {
-        // Estrela vazia para os demais casos
+        // Estrela vazia: todos os outros casos
         starsHTML +=
           '<span class="material-symbols-outlined text-yellow-400 text-sm">star_border</span>';
       }
