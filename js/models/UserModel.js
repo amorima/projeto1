@@ -1,13 +1,15 @@
-import { loadFromLocalStorage, saveToLocalStorage } from './ModelHelpers.js';
+import { loadFromLocalStorage, saveToLocalStorage } from "./ModelHelpers.js";
 
 // ARRAY USERS
 let users;
-let newsletter
+let newsletter;
 
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
-  users = localStorage.users ? loadFromLocalStorage('users', users) : [];
-  newsletter = localStorage.newsletter ? loadFromLocalStorage('newsletter', newsletter) : []
+  users = localStorage.users ? loadFromLocalStorage("users", users) : [];
+  newsletter = localStorage.newsletter
+    ? loadFromLocalStorage("newsletter", newsletter)
+    : [];
 }
 
 // ADICIONAR UTILIZADOR
@@ -16,30 +18,30 @@ export function add(username, password, mail) {
     throw Error(`User with email "${mail}" already exists!`);
   } else {
     users.push(new User(username, password, mail));
-    saveToLocalStorage('users', users);
+    saveToLocalStorage("users", users);
   }
 }
 
 // ALTERAR DADOS DO UTILIZADOR
-export function update(username, newUser){
-  const index = users.findIndex(u.username == username)
-  if (index !== -1){
-    users[index] = newUser
-    saveToLocalStorage('users', users)
-    return true
+export function update(username, newUser) {
+  const index = users.findIndex((u) => u.username == username);
+  if (index !== -1) {
+    users[index] = newUser;
+    saveToLocalStorage("users", users);
+    return true;
   }
-  throw Error ('No User Found')
+  throw Error("No User Found");
 }
 
 // APAGAR UTILIZADOR
-export function deleteUser (username) {
-  const index = users.findIndex(u => u.username == username)
-  if(index !== -1){
-    users.splice(index,1)
-    saveToLocalStorage('users',users)
-    return true
+export function deleteUser(username) {
+  const index = users.findIndex((u) => u.username == username);
+  if (index !== -1) {
+    users.splice(index, 1);
+    saveToLocalStorage("users", users);
+    return true;
   }
-  throw Error ('No User Found')
+  throw Error("No User Found");
 }
 
 // LOGIN E MANIPULAÇÃO DE SESSÃO
@@ -152,7 +154,7 @@ export function getUserLogged() {
  * const result = isAdmin(user);
  * console.log(result); // true
  */
-export function isAdmin(user){
+export function isAdmin(user) {
   user.admin ? true : false;
 }
 
@@ -170,9 +172,9 @@ export function isAdmin(user){
  * Agora o utilizador com o email 'user@example.com' está subscrito à newsletter.
  */
 export function addNewsletterUser(mail) {
-  const newsletterUser = new User('','',mail)
-  newsletter.push(newsletterUser)
-  saveToLocalStorage('newsletter',newsletter)
+  const newsletterUser = new User("", "", mail);
+  newsletter.push(newsletterUser);
+  saveToLocalStorage("newsletter", newsletter);
 }
 
 /**
@@ -186,17 +188,17 @@ export function addNewsletterUser(mail) {
  * import { removeNewsletterUser } from './UserModel.js';
  * removeNewsletterUser('user@gmail.com');
  * Agora o utilizador com o email 'user@gmail.com' foi removido da subscrição da newsletter.
- * 
+ *
  * @throws {Error} Se não houver subscrição encontrada com o email fornecido.
  */
 export function removeNewsletterUser(mail) {
-  const index = newsletter.findIndex(n => n.mail == mail)
-  if(index !== -1){
-    newsletter.splice(index,1)
-    saveToLocalStorage('newsletter',newsletter)
-    return true
+  const index = newsletter.findIndex((n) => n.mail == mail);
+  if (index !== -1) {
+    newsletter.splice(index, 1);
+    saveToLocalStorage("newsletter", newsletter);
+    return true;
   }
-  throw Error ('No Subscription Found')
+  throw Error("No Subscription Found");
 }
 
 /**
@@ -212,9 +214,10 @@ export function removeNewsletterUser(mail) {
  * newsletterToUser('newUser', 'password123', 'user@gmail.com');
  * Agora o utilizador com o email 'user@gmail.com' foi removido da newsletter e adicionado como um utilizador normal com o nome de utilizador 'newUser' e senha 'password123'.
  */
-export function newsletterToUser(username, password, mail){ //! May not be needed
-  removeNewsletterUser(mail)
-  add(username, password, mail)
+export function newsletterToUser(username, password, mail) {
+  //! May not be needed
+  removeNewsletterUser(mail);
+  add(username, password, mail);
 }
 
 // USER AVATAR
@@ -234,7 +237,8 @@ export function newsletterToUser(username, password, mail){ //! May not be neede
  * @see update - Para atualizar o utilizador após a alteração do avatar.
  * @see User - Para a classe que representa um utilizador na aplicação.
  */
-export function changeAvater(user, avatar) { //! May not be needed
+export function changeAvater(user, avatar) {
+  //! May not be needed
   if (!user || !avatar) {
     throw Error("User and avatar must be provided");
   }
@@ -264,11 +268,12 @@ export function changeAvater(user, avatar) { //! May not be needed
  * @see editComment - Para editar um comentário de um lugar.
  * @throws {Error} Se o utilizador, o lugar ou o comentário não forem fornecidos.
  */
-export function addComment(user, place, comment) { //TODO: Add replies to comments
+export function addComment(user, place, comment) {
+  //TODO: Add replies to comments
   if (!user || !place || !comment) {
     throw Error("User, place, and comment must be provided");
   }
-  
+
   //* FallBack to ensure place has a comments array
   if (!place.comments) {
     place.comments = [];
@@ -277,7 +282,7 @@ export function addComment(user, place, comment) { //TODO: Add replies to commen
   const newComment = {
     user: user.username,
     text: comment,
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
   };
 
   return place.comments.push(newComment);
@@ -305,7 +310,8 @@ export function addComment(user, place, comment) { //TODO: Add replies to commen
  * @see addComment - Para adicionar um comentário a um lugar.
  * @see editComment - Para editar um comentário de um lugar.
  */
-export function removeComment(user, place, comment) { //TODO: Associate with a place
+export function removeComment(user, place, comment) {
+  //TODO: Associate with a place
   if (!user || !place || !comment) {
     throw Error("User, place, and comment must be provided");
   }
@@ -314,7 +320,9 @@ export function removeComment(user, place, comment) { //TODO: Associate with a p
     throw Error("Place does not have comments to remove");
   }
 
-  const index = place.comments.findIndex(c => c.text === comment && c.user === user.username);
+  const index = place.comments.findIndex(
+    (c) => c.text === comment && c.user === user.username
+  );
   if (index !== -1) {
     place.comments.splice(index, 1);
     return true;
@@ -345,7 +353,8 @@ export function removeComment(user, place, comment) { //TODO: Associate with a p
  * @see addComment - Para adicionar um comentário a um lugar.
  * @see removeComment - Para remover um comentário de um lugar.
  */
-export function editComment(user, place, comment) { //TODO: Associate with a place
+export function editComment(user, place, comment) {
+  //TODO: Associate with a place
   if (!user || !place || !comment) {
     throw Error("User, place, and comment must be provided");
   }
@@ -354,7 +363,9 @@ export function editComment(user, place, comment) { //TODO: Associate with a pla
     throw Error("Place does not have comments to edit");
   }
 
-  const index = place.comments.findIndex(c => c.text === comment && c.user === user.username);
+  const index = place.comments.findIndex(
+    (c) => c.text === comment && c.user === user.username
+  );
   if (index !== -1) {
     place.comments[index].text = comment;
     return true;
@@ -365,20 +376,28 @@ export function editComment(user, place, comment) { //TODO: Associate with a pla
 
 /* Função para criar utilizador de teste */
 export function createTestUser(username, points = 50) {
-  const testUser = new User(username, 'password123', `${username}@test.com`, '', points, false, false);
+  const testUser = new User(
+    username,
+    "password123",
+    `${username}@test.com`,
+    "",
+    points,
+    false,
+    false
+  );
   return testUser;
 }
 
 /* Função para simular login de teste */
 export function loginTest(username, points = 50) {
   const testUser = createTestUser(username, points);
-  sessionStorage.setItem('loggedUser', JSON.stringify(testUser));
+  sessionStorage.setItem("loggedUser", JSON.stringify(testUser));
   return testUser;
 }
 
 /* Limpar sessão de teste */
 export function clearTestSession() {
-  sessionStorage.removeItem('loggedUser');
+  sessionStorage.removeItem("loggedUser");
 }
 
 /**
@@ -405,30 +424,38 @@ class User {
   mail = "";
   avatar = "";
   points = 0;
-  private = false
-  admin = false
+  private = false;
+  admin = false;
 
-  constructor(username = '', password = '', mail, avatar = '', points = 50, private = false, admin = false) {
+  constructor(
+    username = "",
+    password = "",
+    mail,
+    avatar = "",
+    points = 50,
+    private = false,
+    admin = false
+  ) {
     this.username = username;
     this.password = password;
     this.mail = mail;
-    this.avatar = avatar
+    this.avatar = avatar;
     this.points = points;
     this.private = private;
     this.admin = admin;
   }
 
   get level() {
-    if(this.points>=5000){
-      return "Embaixador"
-    }else if (this.points>=3000){
-      return "Globetrotter"
-    }else if (this.points>=1500){
-      return "Aventureiro"
-    }else if (this.points>=250){
-      return "Viajante"
-    }else {
-      return "Explorador"
+    if (this.points >= 5000) {
+      return "Embaixador";
+    } else if (this.points >= 3000) {
+      return "Globetrotter";
+    } else if (this.points >= 1500) {
+      return "Aventureiro";
+    } else if (this.points >= 250) {
+      return "Viajante";
+    } else {
+      return "Explorador";
     }
   }
 }

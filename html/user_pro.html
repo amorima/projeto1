@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <title>Perfil do Utilizador - PlanIt</title>
+    <link rel="icon" href="../img/favicon.svg" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+</head>
+<body class="font-sans dark:bg-gray-950 dark:text-gray-100">
+    <!-- Header -->
+    <header id="header-placeholder"></header>
+
+    <!-- Banner de Perfil -->
+    <div class="w-full bg-Main-Primary dark:bg-gray-800 pt-24 pb-8">
+        <div class="max-w-[1270px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <!-- Avatar e Informações Básicas -->
+                <div class="flex items-center gap-6">                <div class="relative">
+                        <img id="user-avatar" class="w-20 h-20 rounded-full object-cover border-2 border-white dark:border-gray-700" src="../img/users/40240119.jpg" alt="Avatar do utilizador">
+                        <div class="absolute bottom-0 right-0 bg-white dark:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center border-2 border-Main-Primary dark:border-gray-800">
+                            <span class="material-symbols-outlined text-Button-Main dark:text-cyan-400 text-lg">public</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 id="user-name" class="text-white dark:text-gray-100 text-4xl font-bold font-['Space_Mono']">António Amorim</h1>
+                        <p id="user-level" class="text-white dark:text-gray-300 text-xl font-bold font-['IBM_Plex_Sans'] mt-2">Globetrotter</p>
+                    </div>
+                </div>                
+                <!-- Barra de Progresso -->                
+                <div class="w-full md:w-auto flex-1 md:pl-4">
+                    <div class="w-full relative">
+                        <!-- Barra de Progresso -->
+                        <div class="relative flex items-center justify-between py-10">
+                            <!-- Barra de fundo -->
+                            <div class="absolute top-1/2 left-0 right-0 h-3 bg-white dark:bg-gray-700 transform -translate-y-1/2 rounded-full"></div>
+                            
+                            <!-- Barra de progresso -->
+                            <div id="progress-bar" class="absolute top-1/2 left-0 h-3 bg-Button-Main dark:bg-cyan-600 transform -translate-y-1/2 rounded-full" style="width: calc(64%);"></div>
+                            
+                            <!-- Marcadores de Níveis -->
+                            <div class="relative w-full flex justify-between items-center">
+                                <!-- Nível 1: Explorador (0 pontos) -->
+                                <div class="relative">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-green-600 dark:border-green-500 z-10">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-sm">explore</span>
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full items-center justify-center border border-green-600 dark:border-green-500 z-20 completed-check" style="display: flex;">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-xs">check</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nível 2: Viajante (250 pontos) -->
+                                <div class="relative">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-green-600 dark:border-green-500 z-10">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-sm">flight_takeoff</span>
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full items-center justify-center border border-green-600 dark:border-green-500 z-20 completed-check" style="display: flex;">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-xs">check</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nível 3: Aventureiro (1500 pontos) -->
+                                <div class="relative">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-green-600 dark:border-green-500 z-10">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-sm">hiking</span>
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full items-center justify-center border border-green-600 dark:border-green-500 z-20 completed-check" style="display: flex;">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-xs">check</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nível 4: Globetrotter (3000 pontos) - Nível Atual -->
+                                <div class="relative">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-Main-Primary dark:border-Main-Primary z-10 animate-pulse">
+                                        <span class="material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm">public</span>
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full items-center justify-center border border-green-600 dark:border-green-500 z-20 completed-check" style="display: none;">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-xs">check</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nível 5: Embaixador (5000 pontos) -->
+                                <div class="relative">
+                                    <div class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-gray-300 dark:border-gray-600 z-10">
+                                        <span class="material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm">military_tech</span>
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-white dark:bg-gray-800 rounded-full items-center justify-center border border-green-600 dark:border-green-500 z-20 completed-check" style="display: none;">
+                                        <span class="material-symbols-outlined text-green-600 dark:text-green-500 text-xs">check</span>
+                                    </div>                                </div>
+                            </div>
+                        </div>
+                          <!-- Pontos Necessários -->
+                        <p class="text-white dark:text-gray-300 text-left text-base font-normal font-['IBM_Plex_Sans'] mt-3">
+                            Faltam <span id="points-needed" class="font-bold">1800</span> pontos para ser <span id="next-level" class="font-bold">Embaixador</span>!
+                        </p>
+
+                        <!-- Banner de Convite -->
+                        <div class="w-full mt-6 py-2 px-4 bg-Text-Titles dark:bg-gray-700 rounded-full border border-Components-Limit-Color dark:border-gray-600">
+                            <p class="text-white dark:text-gray-200 text-xs font-normal font-['Space_Mono']">
+                                Convida os teus amigos a juntarem-se à <span class="font-bold">Plan</span>It e recebe 100 pontos por cada novo membro!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="max-w-[1270px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Seções do perfil serão adicionadas aqui -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Coluna da Esquerda: Informações Pessoais -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold font-['Space_Mono'] text-Text-Titles dark:text-gray-100 mb-6">Informações Pessoais</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Nome de Utilizador</label>
+                            <p id="info-username" class="text-Text-Body dark:text-gray-300">antonio_amorim</p>
+                        </div>
+                        <div>
+                            <label class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Email</label>
+                            <p id="info-email" class="text-Text-Body dark:text-gray-300">antonio.amorim@planit.com</p>
+                        </div>
+                        <div>
+                            <label class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Pontos RewardIt</label>
+                            <p id="info-points" class="text-Text-Body dark:text-gray-300">3200</p>
+                        </div>
+                        <div>
+                            <label class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Membro desde</label>
+                            <p id="info-member-since" class="text-Text-Body dark:text-gray-300">12/03/2024</p>
+                        </div>
+
+                        <button class="mt-4 w-full py-2 px-4 bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300">
+                            Editar Perfil
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna da Direita: Histórico e Atividade -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
+                    <h2 class="text-2xl font-bold font-['Space_Mono'] text-Text-Titles dark:text-gray-100 mb-6">Histórico de Viagens</h2>
+                    <div id="travel-history" class="space-y-4">
+                        <!-- Será preenchido via JavaScript -->
+                        <p class="text-Text-Subtitles dark:text-gray-400">Nenhuma viagem registada.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold font-['Space_Mono'] text-Text-Titles dark:text-gray-100 mb-6">Preferências de Viagem</h2>
+                    <div id="travel-preferences" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Será preenchido via JavaScript -->
+                        <p class="text-Text-Subtitles dark:text-gray-400">Nenhuma preferência definida.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer-placeholder"></footer>
+
+    <script type="module" src="../js/views/UserProView.js"></script>
+</body>
+</html>
