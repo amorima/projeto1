@@ -1,12 +1,13 @@
 import { loadComponent } from "./ViewHelpers.js";
 import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
-
+import * as FlightModel from "../models/FlightModel.js";
 
 /* Carregar componentes na página */
 window.onload = function () {
   /* Inicializar o modelo */
   UserModel.init();
+  FlightModel.init();
 
   /* Carregar componentes de header e footer */
   loadComponent("../_header.html", "header-placeholder");
@@ -17,6 +18,9 @@ window.onload = function () {
 
   /* Adicionar eventos aos botões */
   setupEventListeners();
+
+  /* Inicializar funcionalidades das abas a partir do Model */
+  UserModel.initTabEvents();
 };
 
 /* Configurar listeners de eventos para interações do utilizador */
@@ -26,6 +30,73 @@ function setupEventListeners() {
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", openEditProfileModal);
   }
+
+  /* Botão para movimentos de pontos */
+  const btnMovimentos = document.getElementById("btn-movimentos");
+  const modalPontos = document.getElementById("pontos-modal");
+  const closeModalBtn = document.getElementById("close-pontos-modal");
+
+  if (btnMovimentos && modalPontos && closeModalBtn) {
+    btnMovimentos.addEventListener("click", function () {
+      modalPontos.classList.remove("hidden");
+    });
+
+    closeModalBtn.addEventListener("click", function () {
+      modalPontos.classList.add("hidden");
+    });
+
+    window.addEventListener("click", function (e) {
+      if (e.target === modalPontos) {
+        modalPontos.classList.add("hidden");
+      }
+    });
+  }
+
+  /* Botão de copiar link de convite */
+  const btnCopy = document.querySelector("button.bg-Button-Main.rounded-r-lg");
+  if (btnCopy) {
+    btnCopy.addEventListener("click", function () {
+      const linkInput = document.querySelector("input[readonly]");
+      if (linkInput) {
+        linkInput.select();
+        document.execCommand("copy");
+
+        /* Feedback visual */
+        const originalText = btnCopy.innerHTML;
+        btnCopy.innerHTML =
+          '<span class="material-symbols-outlined text-sm">check</span>';
+        setTimeout(() => {
+          btnCopy.innerHTML = originalText;
+        }, 2000);
+      }
+    });
+  }
+
+  /* Botões de exclusão de reservas */
+  const deleteButtons = document.querySelectorAll("#reservas-container button");
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      const reservaCard = this.closest(".bg-white.dark\\:bg-gray-900");
+      if (reservaCard) {
+        /* Animação de fade-out antes de remover */
+        reservaCard.style.transition = "opacity 0.3s ease";
+        reservaCard.style.opacity = "0";
+
+        setTimeout(() => {
+          reservaCard.remove();
+
+          /* Verificar se ainda existem reservas */
+          const reservasContainer =
+            document.getElementById("reservas-container");
+          if (reservasContainer && reservasContainer.children.length <= 1) {
+            document
+              .getElementById("reservas-empty")
+              .classList.remove("hidden");
+          }
+        }, 300);
+      }
+    });
+  });
 }
 
 /* Carregar informações do utilizador */
@@ -569,3 +640,9 @@ function saveProfileChanges(event) {
     alert(`Erro ao atualizar perfil: ${error.message}`);
   }
 }
+
+/* Inicializar o sistema de abas */
+/* A lógica de controle das abas foi movida para o Model (UserModel.js) */
+/* Quando uma função precisar chamar funções do Model, deve usar as funções exportadas */
+
+/* As funções de carregamento de conteúdo para as abas foram movidas para o Model (UserModel.js) */

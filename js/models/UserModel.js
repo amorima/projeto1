@@ -459,3 +459,194 @@ class User {
     }
   }
 }
+
+// FUNÇÕES PARA CONTROLO DE ABAS DO PERFIL DE UTILIZADOR
+
+/* Função para alternar entre as abas */
+export function switchTab(tabId) {
+  const tabButtons = document.querySelectorAll('[role="tab"]');
+  const tabPanes = document.querySelectorAll(".tab-pane");
+
+  /* Desativar todas as abas */
+  tabButtons.forEach((button) => {
+    button.classList.remove(
+      "text-Button-Main",
+      "dark:text-cyan-400",
+      "border-Button-Main",
+      "dark:border-cyan-400"
+    );
+    button.classList.add("border-transparent");
+    button.setAttribute("aria-selected", "false");
+  });
+
+  tabPanes.forEach((pane) => {
+    pane.classList.add("hidden");
+  });
+
+  /* Ativar a aba selecionada */
+  const selectedButton = document.getElementById(`tab-${tabId}-btn`);
+  const selectedPane = document.getElementById(`tab-${tabId}`);
+  if (selectedButton && selectedPane) {
+    selectedButton.classList.add(
+      "text-Button-Main",
+      "dark:text-cyan-400",
+      "border-Button-Main",
+      "dark:border-cyan-400"
+    );
+    selectedButton.classList.remove("border-transparent");
+    selectedButton.setAttribute("aria-selected", "true");
+
+    selectedPane.classList.remove("hidden");
+
+    /* Carregar conteúdo específico baseado na aba */
+    if (tabId === "recompensas") {
+      loadRewarditContent();
+    } else if (tabId === "reservas") {
+      loadReservasContent();
+    } else if (tabId === "perfil") {
+      loadBookmarks();
+    } else if (tabId === "definicoes") {
+      /* Não é necessária nenhuma ação especial para a aba de definições */
+      console.log("Aba de definições carregada");
+    }
+  }
+}
+
+/* Inicializar os eventos dos botões das abas */
+export function initTabEvents() {
+  const tabButtons = document.querySelectorAll('[role="tab"]');
+  console.log(`Inicializando eventos para ${tabButtons.length} botões de abas`);
+
+  tabButtons.forEach((button) => {
+    const tabId = button.id.replace("-btn", "").replace("tab-", "");
+    console.log(`Adicionando evento para a aba "${tabId}"`);
+
+    button.addEventListener("click", () => {
+      console.log(`Clique na aba "${tabId}"`);
+      switchTab(tabId);
+    });
+  });
+
+  /* Iniciar na aba Perfil */
+  console.log('Iniciando na aba "perfil"');
+  switchTab("perfil");
+}
+
+/* Carregar conteúdo da aba Recompensas */
+function loadRewarditContent() {
+  const rewarditContent = document.getElementById("rewardit-content");
+  if (rewarditContent && rewarditContent.classList.contains("animate-pulse")) {
+    console.log("Tentando carregar conteúdo de recompensas");
+    /* Usa o caminho correto para rewardit.html */
+    const pathname = window.location.pathname;
+    const htmlFolder = pathname.substring(0, pathname.lastIndexOf("/") + 1);
+    console.log(`Caminho da pasta: ${htmlFolder}`);
+    fetch(`${htmlFolder}rewardit.html`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erro na resposta: ${response.status}`);
+        }
+        return response.text();
+      })
+      .then((html) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const content = doc.querySelector(".max-w-[1270px]");
+
+        if (content) {
+          rewarditContent.innerHTML = content.innerHTML;
+          rewarditContent.classList.remove(
+            "animate-pulse",
+            "flex",
+            "justify-center",
+            "items-center",
+            "h-64"
+          );
+        } else {
+          throw new Error("Conteúdo não encontrado em rewardit.html");
+        }
+      })
+      .catch((err) => {
+        console.error("Erro ao carregar conteúdo RewardIt:", err);
+        rewarditContent.innerHTML = `<div class="text-center py-8">
+          <p class="text-red-500 mb-4">Erro ao carregar conteúdo</p>
+          <p class="text-Text-Subtitles dark:text-gray-400">${err.message}</p>
+          <button class="mt-4 bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300 py-2 px-4" onclick="location.reload()">Tentar novamente</button>
+        </div>`;
+      });
+
+    /* Adicionar mensagem para indicar que o carregamento foi iniciado */
+    rewarditContent.innerHTML = `<div class="text-center py-8">
+      <p class="text-Text-Body dark:text-gray-300 mb-4">A carregar conteúdo...</p>
+      <div class="animate-spin inline-block w-10 h-10 border-4 border-Main-Primary border-t-transparent dark:border-cyan-500 dark:border-t-transparent rounded-full"></div>
+    </div>`;
+  } else {
+    console.log(
+      "Elemento rewardit-content não encontrado ou não tem a classe animate-pulse"
+    );
+  }
+}
+
+/* Carregar conteúdo da aba Reservas */
+function loadReservasContent() {
+  /* Aqui futuramente seriam carregadas as reservas do utilizador */
+  const reservasContainer = document.getElementById("reservas-container");
+  const reservasEmpty = document.getElementById("reservas-empty");
+
+  console.log("Tentando carregar conteúdo da aba Reservas");
+
+  if (reservasContainer && reservasEmpty) {
+    /* Verificar se existem reservas */
+    if (reservasContainer.children.length <= 1) {
+      console.log("Nenhuma reserva encontrada");
+      if (reservasEmpty) {
+        reservasEmpty.classList.remove("hidden");
+      }
+    } else {
+      console.log(
+        `${reservasContainer.children.length - 1} reservas encontradas`
+      );
+      if (reservasEmpty) {
+        reservasEmpty.classList.add("hidden");
+      }
+    }
+  } else {
+    console.log(
+      "Elementos reservas-container ou reservas-empty não encontrados",
+      {
+        container: !!reservasContainer,
+        empty: !!reservasEmpty,
+      }
+    );
+  }
+}
+
+/* Carregar bookmarks do utilizador */
+function loadBookmarks() {
+  /* Aqui futuramente seriam carregados os favoritos do utilizador */
+  const bookmarksContainer = document.getElementById("bookmarks-container");
+  const bookmarksEmpty = document.getElementById("bookmarks-empty");
+
+  console.log("Tentando carregar bookmarks do utilizador");
+
+  if (bookmarksContainer && bookmarksEmpty) {
+    /* Verificar se há bookmarks */
+    if (bookmarksContainer.children.length <= 1) {
+      console.log("Nenhum bookmark encontrado");
+      bookmarksEmpty.classList.remove("hidden");
+    } else {
+      console.log(
+        `${bookmarksContainer.children.length - 1} bookmarks encontrados`
+      );
+      bookmarksEmpty.classList.add("hidden");
+    }
+  } else {
+    console.log(
+      "Elementos bookmarks-container ou bookmarks-empty não encontrados",
+      {
+        container: !!bookmarksContainer,
+        empty: !!bookmarksEmpty,
+      }
+    );
+  }
+}
