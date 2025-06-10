@@ -2,6 +2,7 @@ import { loadComponent } from "./ViewHelpers.js";
 import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
 
+
 /* Carregar componentes na página */
 window.onload = function () {
   /* Inicializar o modelo */
@@ -169,7 +170,7 @@ function updateLevelIcons(currentLevel) {
     "Embaixador",
   ];
   const levelMarkers = document.querySelectorAll(
-    ".relative.w-full.flex.justify-between.items-center .relative"
+    ".absolute.top-\\[6\\.5px\\].left-0.right-0.flex.justify-between.items-center .relative"
   );
 
   if (levelMarkers.length === levels.length) {
