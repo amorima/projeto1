@@ -11,6 +11,7 @@ import {
 } from "./ViewHelpers.js";
 
 /* Inicializar a aplicacao */
+let filters = {}
 Flight.init();
 initView();
 
@@ -201,6 +202,7 @@ function abrirModalOrigem() {
 
       li.addEventListener("click", () => {
         Flight.setOrigin(aeroporto);
+        filters.origem = aeroporto.cidade; // Corrigido: salva a cidade do aeroporto
         updateOriginButton(aeroporto);
         fecharModalOrigem();
       });
@@ -276,6 +278,7 @@ function abrirModalDestino() {
 
       li.addEventListener("click", () => {
         Flight.setDestination(aeroporto);
+        filters.destino = aeroporto.cidade; // Corrigido: salva a cidade do aeroporto
         updateDestinationButton(aeroporto);
         fecharModalDestino();
       });
@@ -375,6 +378,11 @@ function abrirModalDatas() {
         bebes
       );
       updateDatesButton(dataPartida, dataRegresso, adultos, criancas, bebes);
+      filters.dataPartida = dataPartida;
+      filters.dataRegresso = dataRegresso;
+      filters.adultos = adultos;
+      filters.criancas = criancas;
+      filters.bebes = bebes;
       fecharModalDatas();
     }
   });
@@ -527,6 +535,8 @@ function abrirModalAcessibilidade() {
     .addEventListener("click", () => {
       Flight.confirmAccessibilities();
       updateAccessibilityButton();
+
+      filters.acessibilidade = Flight.getSelectedAccessibilities();
       fecharModalAcessibilidade();
     });
 
@@ -582,6 +592,7 @@ function abrirModalTipoTurismo() {
 
       card.addEventListener("click", () => {
         Flight.setTourismType(tipo);
+        filters.tipoTurismo = tipo;
         updateTourismButton(tipo);
         fecharModalTipoTurismo();
       });
@@ -759,6 +770,7 @@ function renderRandomOPOCards(containerClass) {
 function handlePlanItFormSubmit(e) {
   e.preventDefault();
 
+  sessionStorage.setItem('planit_search', filters); // Limpar sessionStorage antes de guardar novos dados
   // Obter valores dos botões/inputs principais
   const origem = document.querySelector('#btn-open p').textContent.trim();
   const destino = document.querySelector('#btn-destino p').textContent.trim();
