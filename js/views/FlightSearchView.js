@@ -35,9 +35,37 @@ function preencherCamposPesquisa() {
   if (acessibilidadeP && dados.acessibilidade) acessibilidadeP.textContent = dados.acessibilidade;
 }
 
-// --- Renderização dos cards de viagens ---
-function renderFlightCards(filteredFlights = null) {
-  const flights = filteredFlights || Flight.getAll();
+/**
+ * Renderiza cards de voos.
+ * @param {Array} filteredFlights - Lista de voos filtrados (opcional).
+ * @param {Object} planitFilter - Filtros vindos do formulário PlanIt (opcional, pode ser null).
+ * @param {number} maxCards - Número máximo de cards a renderizar (default: 18).
+ */
+function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards = 18) {
+  let flights = filteredFlights || Flight.getAll();
+
+  if (planitFilter) {
+    flights = flights.filter(flight => {
+      let match = true;
+      if (planitFilter.origem && flight.origem) {
+        match = match && flight.origem.toLowerCase().includes(planitFilter.origem.toLowerCase());
+      }
+      if (planitFilter.destino && flight.destino) {
+        match = match && flight.destino.toLowerCase().includes(planitFilter.destino.toLowerCase());
+      }
+      if (planitFilter.dataPartida && flight.partida) {
+        match = match && flight.partida.includes(planitFilter.dataPartida);
+      }
+      if (planitFilter.dataRegresso && flight.dataVolta) {
+        match = match && flight.dataVolta.includes(planitFilter.dataRegresso);
+      }
+      return match;
+    });
+  }
+
+  // Limitar o número de cards
+  flights = flights.slice(0, maxCards);
+
   const container = document.querySelector(".card-viagens");
   if (!container) return;
   container.innerHTML = "";
@@ -91,11 +119,22 @@ function renderFlightCards(filteredFlights = null) {
         </div>
         <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
         <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-        <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
+        <a href="#" class="ver-oferta absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
         <span class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
       </div>
     `;
     container.appendChild(card);
+
+    // Adiciona evento ao botão "Ver oferta" para redirecionar
+    const btnOferta = card.querySelector('.ver-oferta');
+    if (btnOferta) {
+      btnOferta.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Guardar o número do voo na window
+        window.selectedFlightNumber = flight.numeroVoo;
+        window.location.href = '/html/flight_itinerary.html';
+      });
+    }
   });
 
   // Ativar toggle de favorito
