@@ -740,3 +740,54 @@ export function renderRandomOPOCards(containerClass) {
     });
   });
 }
+
+// Formulário PlanIt - captura e redireciona os dados para a página de pesquisa de voos
+function handlePlanItFormSubmit(e) {
+  e.preventDefault();
+
+  // Obter valores dos botões/inputs principais
+  const origem = document.querySelector('#btn-open p').textContent.trim();
+  const destino = document.querySelector('#btn-destino p').textContent.trim();
+  const tipoTurismo = document.getElementById('texto-tipo-turismo').textContent.trim();
+  const acessibilidade = document.getElementById('texto-acessibilidade').textContent.trim();
+
+  // Datas e viajantes
+  const dataPartida = document.getElementById('data-partida')?.value || '';
+  const dataRegresso = document.getElementById('data-regresso')?.value || '';
+  const adultos = document.getElementById('contador-adultos')?.textContent.trim() || '1';
+  const criancas = document.getElementById('contador-criancas')?.textContent.trim() || '0';
+  const bebes = document.getElementById('contador-bebes')?.textContent.trim() || '0';
+
+  // Montar objeto para passar
+  const params = {
+    origem,
+    destino,
+    tipoTurismo,
+    acessibilidade,
+    dataPartida,
+    dataRegresso,
+    adultos,
+    criancas,
+    bebes
+  };
+
+  // Guardar no sessionStorage
+  sessionStorage.setItem('planit_search', JSON.stringify(params));
+  // Redirecionar
+  window.location.href = 'html/flight_search.html';
+}
+
+// Adiciona listeners aos botões PlanIt (mobile e desktop)
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('section form');
+  if (!form) return;
+  // Seleciona ambos os botões PlanIt
+  const planItButtons = form.querySelectorAll('button');
+  planItButtons.forEach(btn => {
+    // Só adiciona ao botão que tem "PlanIt" (evita botões de origem/destino)
+    if (btn.textContent.includes('PlanIt') || btn.textContent.includes('Plan It') || btn.textContent.includes('Plan') && btn.textContent.includes('It')) {
+      btn.type = 'button';
+      btn.addEventListener('click', handlePlanItFormSubmit);
+    }
+  });
+});
