@@ -666,7 +666,7 @@ function createFlight(config) {
 }
 
 /* Renderizar cards na homepage */
-export function renderRandomOPOCards(containerClass) {
+function renderRandomOPOCards(containerClass) {
   const shuffled = Flight.getTripsFrom();
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
