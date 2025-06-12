@@ -112,169 +112,158 @@ if (favItinerary) {
   });
 }
 
-function carregarHoteis() {
+function carregarHoteis(destino) {
   try {
-    const hoteis = HotelModel.init();
-    const primeirosHoteis = HotelModel.getFirst(5);
-
+    HotelModel.init();
+    let hoteis = [];
+    if (destino) {
+      hoteis = HotelModel.getHoteisByCidade(destino);
+      // fallback: tentar por destinoId se não encontrar por cidade
+      if (!hoteis.length) {
+        // procurar destinoId pelo nome da cidade
+        const destinos = JSON.parse(localStorage.getItem('destinos') || '[]');
+        const destinoObj = destinos.find(d => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase());
+        if (destinoObj && destinoObj.id) {
+          hoteis = HotelModel.getHotelsFrom(destinoObj.id);
+        }
+      }
+    } else {
+      hoteis = HotelModel.getFirst(5);
+    }
     const containerHoteis = document.getElementById("container-hoteis");
-
-    if (containerHoteis && primeirosHoteis.length > 0) {
+    if (containerHoteis && hoteis && hoteis.length > 0) {
       containerHoteis.innerHTML = "";
-
-      primeirosHoteis.forEach((hotel) => {
+      hoteis.forEach((hotel) => {
         const divHotel = document.createElement("div");
         divHotel.className =
           "flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700";
-
         const divInfo = document.createElement("div");
         divInfo.className = "flex items-center gap-3";
-
         const imgHotel = document.createElement("img");
         imgHotel.src = hotel.foto || "https://placehold.co/60x40";
         imgHotel.alt = hotel.nome;
         imgHotel.className = "w-16 h-10 object-cover rounded-lg";
-
         const divNomeInfo = document.createElement("div");
         divNomeInfo.className = "flex flex-col";
-
         const spanNome = document.createElement("span");
         spanNome.className = "font-semibold";
         spanNome.textContent = hotel.nome;
-
         const divDetalhes = document.createElement("div");
         divDetalhes.className =
           "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300";
-
         if (hotel.quartos && hotel.quartos.length > 0) {
           const quarto = hotel.quartos[0];
-
           const spanCama = document.createElement("span");
           spanCama.className = "flex items-center gap-1";
           spanCama.innerHTML = `<span class="material-symbols-outlined text-sm">bed</span>${quarto.camas}`;
-
           const spanPessoa = document.createElement("span");
           spanPessoa.className = "flex items-center gap-1";
           spanPessoa.innerHTML = `<span class="material-symbols-outlined text-sm">person</span>${quarto.capacidade}`;
-
           divDetalhes.appendChild(spanCama);
           divDetalhes.appendChild(spanPessoa);
         }
-
         divNomeInfo.appendChild(spanNome);
         divNomeInfo.appendChild(divDetalhes);
-
         divInfo.appendChild(imgHotel);
         divInfo.appendChild(divNomeInfo);
-
         const divPreco = document.createElement("div");
         divPreco.className = "flex items-center gap-3";
-
         if (hotel.quartos && hotel.quartos.length > 0) {
           const spanPreco = document.createElement("span");
           spanPreco.className = "font-bold text-cyan-700 dark:text-cyan-400";
           spanPreco.textContent = `${hotel.quartos[0].precoNoite}€/noite`;
           divPreco.appendChild(spanPreco);
         }
-
         const spanAdicionar = document.createElement("span");
         spanAdicionar.className =
           "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
         spanAdicionar.textContent = "add_circle";
-
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
           showToast("Hotel adicionado!", "success");
         };
-
         divPreco.appendChild(spanAdicionar);
-
         divHotel.appendChild(divInfo);
         divHotel.appendChild(divPreco);
-
         containerHoteis.appendChild(divHotel);
       });
+    } else if (containerHoteis) {
+      containerHoteis.innerHTML = '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhum hotel disponível para este destino.</div>';
     }
   } catch (erro) {
     console.error("Erro ao carregar hoteis:", erro);
   }
 }
 
-function carregarActividades() {
+function carregarActividades(destino) {
   try {
-    const atividades = ActivityModel.init();
-    const primeirasAtividades = ActivityModel.getFirst(5);
-
+    ActivityModel.init();
+    let todasAtividades = ActivityModel.getAll();
+    let atividadesDestino = [];
+    if (destino) {
+      // Tentar filtrar por cidade OU por destinoId
+      const destinos = JSON.parse(localStorage.getItem('destinos') || '[]');
+      const destinoObj = destinos.find(d => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase());
+      atividadesDestino = todasAtividades.filter(a => {
+        // Match por nome da cidade (caso antigo)
+        if (typeof a.destino === 'string' && a.destino.toLowerCase() === destino.toLowerCase()) return true;
+        // Match por destinoId (caso novo)
+        if ((a.destinoId || a.destino) && destinoObj && (a.destinoId === destinoObj.id || a.destino === destinoObj.id)) return true;
+        return false;
+      });
+    } else {
+      atividadesDestino = ActivityModel.getFirst(5);
+    }
     const containerAtividades = document.getElementById("container-atividades");
-
-    if (containerAtividades && primeirasAtividades.length > 0) {
+    if (containerAtividades && atividadesDestino.length > 0) {
       containerAtividades.innerHTML = "";
-
-      primeirasAtividades.forEach((atividade) => {
+      atividadesDestino.forEach((atividade) => {
         const divAtividade = document.createElement("div");
         divAtividade.className =
           "flex items-center justify-between py-3 px-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-700";
-
         const divInfo = document.createElement("div");
         divInfo.className = "flex items-center gap-3";
-
         const imgAtividade = document.createElement("img");
         imgAtividade.src = atividade.foto || "https://placehold.co/60x40";
         imgAtividade.alt = atividade.nome;
         imgAtividade.className = "w-16 h-10 object-cover rounded-lg";
-
         const divNomeInfo = document.createElement("div");
         divNomeInfo.className = "flex flex-col";
-
         const spanNome = document.createElement("span");
         spanNome.className = "font-semibold";
         spanNome.textContent = atividade.nome;
-
         const divDetalhes = document.createElement("div");
         divDetalhes.className =
           "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300";
-
         let icone = "tour";
-        if (atividade.tipoTurismo.includes("Gastronomic")) {
-          icone = "restaurant";
-        } else if (atividade.tipoTurismo.includes("Cultural")) {
-          icone = "museum";
-        } else if (atividade.tipoTurismo.includes("Urbano")) {
-          icone = "location_city";
-        } else if (atividade.tipoTurismo.includes("Religioso")) {
-          icone = "church";
-        }
-
+        if (atividade.tipoTurismo && atividade.tipoTurismo.includes("Gastronomic")) icone = "restaurant";
+        else if (atividade.tipoTurismo && atividade.tipoTurismo.includes("Cultural")) icone = "museum";
+        else if (atividade.tipoTurismo && atividade.tipoTurismo.includes("Nature")) icone = "park";
         const spanTipo = document.createElement("span");
         spanTipo.className = "flex items-center gap-1";
         spanTipo.innerHTML = `<span class="material-symbols-outlined text-sm">${icone}</span>${atividade.tipoTurismo}`;
-
         divDetalhes.appendChild(spanTipo);
         divNomeInfo.appendChild(spanNome);
         divNomeInfo.appendChild(divDetalhes);
         divInfo.appendChild(imgAtividade);
         divInfo.appendChild(divNomeInfo);
-
         const divBotoes = document.createElement("div");
         divBotoes.className = "flex items-center gap-3";
-
         const spanAdicionar = document.createElement("span");
         spanAdicionar.className =
           "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
         spanAdicionar.textContent = "add_circle";
-
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
           showToast("Atividade adicionada!", "success");
         };
-
         divBotoes.appendChild(spanAdicionar);
-
         divAtividade.appendChild(divInfo);
         divAtividade.appendChild(divBotoes);
-
         containerAtividades.appendChild(divAtividade);
       });
+    } else if (containerAtividades) {
+      containerAtividades.innerHTML = '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhuma atividade disponível para este destino.</div>';
     }
   } catch (erro) {
     console.error("Erro ao carregar atividades:", erro);
@@ -465,17 +454,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Buscar o numeroVoo da query string
   const params = new URLSearchParams(window.location.search);
   const numeroVoo = params.get("id");
+  let destinoVoo = null;
   if (numeroVoo) {
     FlightModel.init();
     const voo = FlightModel.getByNumeroVoo(numeroVoo);
     if (voo) {
+      destinoVoo = voo.destino;
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
       atualizarSidebarVoo(voo);
     }
   }
-  carregarHoteis();
-  carregarActividades();
+  carregarHoteis(destinoVoo);
+  carregarActividades(destinoVoo);
   setTimeout(function () {
     adicionarEventosCarros();
     adicionarEventoSeguro();
