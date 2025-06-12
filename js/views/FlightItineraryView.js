@@ -9,6 +9,7 @@ import * as HotelModel from "../models/HotelModel.js";
 import * as ActivityModel from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 
+let vooShallow = {}
 const btnMais = document.getElementById("btn-mais");
 const btnMenos = document.getElementById("btn-menos");
 const inputPessoas = document.getElementById("input-pessoas");
@@ -180,6 +181,8 @@ function carregarHoteis(destino) {
         spanAdicionar.textContent = "add_circle";
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
+          vooShallow.hotel = hotel
+          atualizarSidebarVoo(vooShallow)
           showToast("Hotel adicionado!", "success");
         };
         divPreco.appendChild(spanAdicionar);
@@ -255,6 +258,10 @@ function carregarActividades(destino) {
         spanAdicionar.textContent = "add_circle";
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
+          if (!Array.isArray(vooShallow.atividade)) {
+            vooShallow.atividade = [];
+          }
+          vooShallow.atividade.push(atividade);
           showToast("Atividade adicionada!", "success");
         };
         divBotoes.appendChild(spanAdicionar);
@@ -286,6 +293,8 @@ function adicionarEventosCarros() {
         elementoPai.querySelector("h2").textContent.includes("Aluguer de Carro")
       ) {
         botao.onclick = function () {
+          vooShallow.car = true
+          atualizarSidebarVoo(vooShallow)
           showToast("Carro adicionado!", "success");
         };
       }
@@ -333,6 +342,8 @@ function adicionarEventoSeguro() {
   const btnAddSeguro = document.getElementById("btn-add-seguro");
   if (btnAddSeguro) {
     btnAddSeguro.onclick = function () {
+      vooShallow.seguro = true
+      atualizarSidebarVoo(vooShallow)
       showToast("Seguro SecureIt adicionado!", "success");
     };
   }
@@ -363,7 +374,12 @@ function atualizarSidebarVoo(voo) {
   } catch { /* fallback para anónimo */ }
 
   // Preço e pontos
-  const precoBase = voo.custo ? Math.round(parseFloat(voo.custo)) : 0;
+  let precoBase = voo.custo ? Math.round(parseFloat(voo.custo)) : 0;
+  if (voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0) {
+    precoBase += voo.hotel.quartos[0].precoNoite;
+  }
+  if (voo.car) precoBase += 1 //!Read car price
+  if (voo.seguro) precoBase = precoBase * 1.2
   const precoComDesconto = desconto ? Math.round(precoBase * (1 - desconto / 100)) : precoBase;
   const pontosAcumular = precoComDesconto;
   const tipoVoo = voo.tipo ? (voo.tipo === 'ida' ? 'Só ida' : voo.tipo === 'ida e volta' ? 'Ida e volta' : 'Multitryp') : 'Só ida';
@@ -459,6 +475,7 @@ document.addEventListener("DOMContentLoaded", () => {
     FlightModel.init();
     const voo = FlightModel.getByNumeroVoo(numeroVoo);
     if (voo) {
+      vooShallow = {...voo}
       destinoVoo = voo.destino;
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
