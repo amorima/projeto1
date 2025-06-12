@@ -1,7 +1,6 @@
 /* Importação de helpers e modelos necessários para a renderização dos componentes e manipulação dos dados das viagens */
 import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
-import { getTripsByTurismo } from "../models/FlightModel.js";
 
 /* Importa apenas a função de renderização dos cards do FlightView */
 import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
@@ -70,7 +69,7 @@ const TURISMO_CARDS = [
 
 // Função para obter todas as viagens de um tipo de turismo
 function getAllTripsForTipoTurismo(tipoTurismo) {
-  return getTripsByTurismo(tipoTurismo);
+  return Flight.getTripsByTurismo(tipoTurismo);
 }
 
 // Função para filtrar e ordenar viagens
