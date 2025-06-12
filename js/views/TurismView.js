@@ -152,6 +152,7 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
       dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
     const preco = viagem.custo || "-";
     const imagem = viagem.imagem || "https://placehold.co/413x327";
+    const nVoo = viagem.numeroVoo || "AF151";
     const turismoPills = Array.isArray(viagem.turismo)
       ? viagem.turismo
           .map((tipo) => {
@@ -181,7 +182,7 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
           </div>
           <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-          <a href="#" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
+          <a href="flight_itinerary.html?id=${nVoo}" class="absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
           <span 
             class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"
             data-favorito="false" 

@@ -714,6 +714,7 @@ export function renderRandomOPOCards(containerClass) {
 
     const preco = viagem.custo || "-";
     const imagem = viagem.imagem || "https://placehold.co/413x327";
+    const nVoo = viagem.numeroVoo || "AF151";
 
     const cardHTML = `
       <div class="bg-white dark:bg-gray-800 w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 overflow-hidden">
@@ -726,7 +727,7 @@ export function renderRandomOPOCards(containerClass) {
           </div>
           <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-          <a href="#" class="ver-oferta absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
+          <a href="../html/flight_itinerary.html?id=${nVoo}" class="ver-oferta absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
           <span class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
         </div>
       </div>
@@ -736,15 +737,6 @@ export function renderRandomOPOCards(containerClass) {
     const card = tempDiv.firstElementChild;
     container.appendChild(card);
 
-    // Adiciona evento ao botão "Ver oferta" para redirecionar
-    const btnOferta = card.querySelector('.ver-oferta');
-    if (btnOferta) {
-      btnOferta.addEventListener('click', function(e) {
-        e.preventDefault();
-        window.selectedFlightNumber = viagem.numeroVoo;
-        window.location.href = 'html/flight_itinerary.html';
-      });
-    }
   });
 
   /* Ativar toggle de favorito */
