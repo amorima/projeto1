@@ -349,6 +349,118 @@ function adicionarEventoSeguro() {
   }
 }
 
+function atualizarSidebarVoo(voo) {
+  const sidebar = document.querySelector(
+    ".bg-Background-Background.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline"
+  ) || document.querySelector(".bg-Background-Background.dark\\:bg-gray-900.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline");
+  if (!sidebar) return;
+
+  // User info
+  let user = null;
+  let nivel = 'Explorador';
+  let pontos = 0;
+  let desconto = 0;
+  try {
+    const users = JSON.parse(localStorage.getItem('user'));
+    if (Array.isArray(users) && users.length > 0) {
+      user = users.find(u => u.private === false) || users[0];
+      pontos = parseInt(user.pontos, 10) || 0;
+      if (pontos >= 5000) nivel = 'Embaixador', desconto = 20;
+      else if (pontos >= 3000) nivel = 'Globetrotter', desconto = 15;
+      else if (pontos >= 1500) nivel = 'Aventureiro', desconto = 10;
+      else if (pontos >= 250) nivel = 'Viajante', desconto = 5;
+      else nivel = 'Explorador', desconto = 0;
+    }
+  } catch { /* fallback para anónimo */ }
+
+  // Preço e pontos
+  const precoBase = voo.custo ? Math.round(parseFloat(voo.custo)) : 0;
+  const precoComDesconto = desconto ? Math.round(precoBase * (1 - desconto / 100)) : precoBase;
+  const pontosAcumular = precoComDesconto;
+  const tipoVoo = voo.tipo ? (voo.tipo === 'ida' ? 'Só ida' : voo.tipo === 'ida e volta' ? 'Ida e volta' : 'Multitryp') : 'Só ida';
+  const dataFormatada = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);
+  const descontoBadge = desconto ? `<span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded ml-2">${desconto}% desconto</span>` : '';
+
+  sidebar.innerHTML = `
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-baseline gap-2">
+        <div class="text-3xl font-bold text-Button-Main dark:text-cyan-400">${precoComDesconto} €</div>
+        <div class="text-base font-bold text-Text-Subtitles line-through dark:text-gray-400">${precoBase} €</div>
+      </div>
+      <div class="flex items-center gap-1">
+        <span class="material-symbols-outlined text-Button-Main dark:text-cyan-400">globe</span>
+        ${descontoBadge}
+      </div>
+    </div>
+    <ul class="space-y-3 text-sm text-Text-Body font-medium dark:text-gray-200 mt-2">
+      <li class="flex items-center gap-2">
+        <span class="material-symbols-outlined">flight</span>
+        ${tipoVoo}
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="material-symbols-outlined">calendar_month</span>
+        ${dataFormatada}
+      </li>
+      <li class="flex items-center gap-2">
+        <span class="material-symbols-outlined">star</span>
+        Acumula <b>${pontosAcumular}</b> pontos
+      </li>
+    </ul>
+    <div class="flex items-center justify-between gap-2 mt-6">
+      <button id="btn-menos" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700"><span class="material-symbols-outlined">remove</span></button>
+      <input id="input-pessoas" class="appearance-none w-32 sm:w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700" value="1" />
+      <button id="btn-mais" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700"><span class="material-symbols-outlined">add</span></button>
+    </div>
+    <button class="w-full bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 font-bold py-3 rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-500 transition outline outline-1 outline-gray-200 dark:outline-gray-700 mt-2">Reservar</button>
+  `;
+  // Reativar eventos dos botões
+  const btnMais = document.getElementById("btn-mais");
+  const btnMenos = document.getElementById("btn-menos");
+  const inputPessoas = document.getElementById("input-pessoas");
+  const btnReservar = sidebar.querySelector("button.w-full.bg-Button-Main, button.w-full.bg-Button-Main.dark\\:bg-cyan-400");
+  if (btnMais && btnMenos && inputPessoas) {
+    btnMais.onclick = function () {
+      let valor = parseInt(inputPessoas.value, 10);
+      if (valor < 15) {
+        inputPessoas.value = valor + 1;
+      } else {
+        showToast("O máximo de pessoas é 15.", "error");
+      }
+    };
+    btnMenos.onclick = function () {
+      let valor = parseInt(inputPessoas.value, 10);
+      if (valor > 1) {
+        inputPessoas.value = valor - 1;
+      }
+    };
+    inputPessoas.oninput = function () {
+      let valor = parseInt(inputPessoas.value, 10);
+      if (isNaN(valor) || valor < 1) {
+        inputPessoas.value = 1;
+      }
+      if (valor > 15) {
+        showToast("O máximo de pessoas é 15.", "error");
+        inputPessoas.value = 15;
+      }
+    };
+  }
+  if (btnReservar) {
+    btnReservar.onclick = function () {
+      showToast("Viagem reservada!", "success");
+      if (!window.customElements || !window.customElements.get("dotlottie-player")) {
+        let script = document.createElement("script");
+        script.type = "module";
+        script.src = "https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs";
+        script.onload = function () { };
+        document.body.appendChild(script);
+        setTimeout(mostrarConfettiNoToast, 500);
+      } else {
+        mostrarConfettiNoToast();
+      }
+    };
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Buscar o numeroVoo da query string
   const params = new URLSearchParams(window.location.search);
@@ -359,6 +471,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (voo) {
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
+      atualizarSidebarVoo(voo);
     }
   }
   carregarHoteis();
