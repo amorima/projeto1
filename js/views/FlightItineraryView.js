@@ -369,9 +369,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 500);
 });
 
+function parseDatePt(dateStr) {
+  // Aceita formatos 'dd/mm/yyyy' ou 'dd/mm/yyyy hh:mm'
+  if (!dateStr) return null;
+  const [datePart, timePart] = dateStr.split(' ');
+  const [day, month, year] = datePart.split('/').map(Number);
+  let hours = 0, minutes = 0;
+  if (timePart) {
+    [hours, minutes] = timePart.split(':').map(Number);
+  }
+  // JS: mês começa em 0
+  return new Date(year, month - 1, day, hours, minutes);
+}
+
+function formatDatesForDisplayPt(dataPartida, dataRegresso) {
+  const meses = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+  ];
+  const partida = parseDatePt(dataPartida);
+  const regresso = parseDatePt(dataRegresso);
+  if (!partida || !regresso || isNaN(partida) || isNaN(regresso)) return '';
+  const dataPartidaFormatada = `${partida.getDate()} ${meses[partida.getMonth()]}`;
+  const dataRegressoFormatada = `${regresso.getDate()} ${meses[regresso.getMonth()]}`;
+  return `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
+}
+
 function atualizarHeroVoo(voo) {
   // Hero: cidade destino, datas, imagem
-  // Seleciona o destino no hero (ajustado para o HTML real)
   const heroCidade = document.querySelector(
     ".flex.items-center.gap-2 > div > .text-2xl.font-bold"
   );
@@ -380,7 +404,7 @@ function atualizarHeroVoo(voo) {
     ".flex.items-center.gap-2 > div > .inline-flex .text-base"
   );
   if (heroDatas) {
-    heroDatas.textContent = FlightModel.formatDatesForDisplay(voo.partida, voo.dataVolta || voo.chegada);
+    heroDatas.textContent = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);
   }
   const heroImg = document.querySelector(
     ".w-full.h-full.object-cover"
@@ -411,7 +435,7 @@ function atualizarItinerarioVoo(voo) {
   if (conteudo) {
     conteudo.innerHTML = `
       <span class='font-bold text-lg'>${voo.origem} → ${voo.destino}</span>
-      <span class='text-gray-500'>${FlightModel.formatDatesForDisplay(voo.partida, voo.dataVolta || voo.chegada)}</span>
+      <span class='text-gray-500'>${formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada)}</span>
       <span class='text-gray-700 dark:text-gray-300'>Companhia: <b>${voo.companhia}</b></span>
       <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${voo.numeroVoo}</b></span>
       <span class='text-gray-700 dark:text-gray-300'>${voo.direto === 'S' ? 'Direto' : 'Com escalas'}</span>
