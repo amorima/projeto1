@@ -282,8 +282,6 @@ function setupFilterListeners(tipoTurismo) {
 
 // Carrega componentes e inicializa dados ao carregar a página
 document.addEventListener("DOMContentLoaded", () => {
-  loadComponent("../html/_header.html", "header-placeholder");
-  loadComponent("../html/_footer.html", "footer-placeholder");
   loadComponent("../html/_slider.html", "slider-placeholder");
   Flight.init();
   const tipoTurismo = getTipoTurismoFromURL();
