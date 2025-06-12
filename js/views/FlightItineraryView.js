@@ -7,6 +7,7 @@ import {
 
 import * as HotelModel from "../models/HotelModel.js";
 import * as ActivityModel from "../models/ActivityModel.js";
+import * as FlightModel from "../models/FlightModel.js";
 
 const btnMais = document.getElementById("btn-mais");
 const btnMenos = document.getElementById("btn-menos");
@@ -349,14 +350,82 @@ function adicionarEventoSeguro() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Buscar o numeroVoo da query string
+  const params = new URLSearchParams(window.location.search);
+  const numeroVoo = params.get("id");
+  if (numeroVoo) {
+    FlightModel.init();
+    const voo = FlightModel.getByNumeroVoo(numeroVoo);
+    if (voo) {
+      atualizarHeroVoo(voo);
+      atualizarItinerarioVoo(voo);
+    }
+  }
   carregarHoteis();
   carregarActividades();
-
   setTimeout(function () {
     adicionarEventosCarros();
     adicionarEventoSeguro();
   }, 500);
 });
+
+function atualizarHeroVoo(voo) {
+  // Hero: cidade destino, datas, imagem
+  // Seleciona o destino no hero (ajustado para o HTML real)
+  const heroCidade = document.querySelector(
+    ".flex.items-center.gap-2 > div > .text-2xl.font-bold"
+  );
+  if (heroCidade) heroCidade.textContent = voo.destino?.split(" - ").pop() || voo.destino;
+  const heroDatas = document.querySelector(
+    ".flex.items-center.gap-2 > div > .inline-flex .text-base"
+  );
+  if (heroDatas) {
+    heroDatas.textContent = FlightModel.formatDatesForDisplay(voo.partida, voo.dataVolta || voo.chegada);
+  }
+  const heroImg = document.querySelector(
+    ".w-full.h-full.object-cover"
+  );
+  if (heroImg && voo.imagem) heroImg.src = voo.imagem;
+}
+
+function getLogoCompanhia(nome) {
+  try {
+    const companhias = JSON.parse(localStorage.getItem("companhiasAereas")) || [];
+    const comp = companhias.find(c => c.nome.toLowerCase() === nome.toLowerCase());
+    return comp ? comp.logo : null;
+  } catch {
+    return null;
+  }
+}
+
+function atualizarItinerarioVoo(voo) {
+  // Itinerário principal
+  const itinerarioDiv = document.querySelector(
+    ".bg-white.dark\\:bg-gray-900.rounded-xl.shadow-md.outline"
+  );
+  if (!itinerarioDiv) return;
+  const img = itinerarioDiv.querySelector("img");
+  if (img && voo.imagem) img.src = voo.imagem;
+  // Conteúdo à esquerda
+  const conteudo = itinerarioDiv.querySelector(".flex.flex-col.gap-2.text-left.flex-1");
+  if (conteudo) {
+    conteudo.innerHTML = `
+      <span class='font-bold text-lg'>${voo.origem} → ${voo.destino}</span>
+      <span class='text-gray-500'>${FlightModel.formatDatesForDisplay(voo.partida, voo.dataVolta || voo.chegada)}</span>
+      <span class='text-gray-700 dark:text-gray-300'>Companhia: <b>${voo.companhia}</b></span>
+      <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${voo.numeroVoo}</b></span>
+      <span class='text-gray-700 dark:text-gray-300'>${voo.direto === 'S' ? 'Direto' : 'Com escalas'}</span>
+    `;
+  }
+  // Imagem da companhia aérea à direita
+  const companhiaDiv = itinerarioDiv.querySelector(".pl-4.flex-shrink-0.flex.items-center");
+  if (companhiaDiv) {
+    const logo = getLogoCompanhia(voo.companhia);
+    companhiaDiv.innerHTML = logo
+      ? `<img src="${logo}" alt="${voo.companhia}" class="w-16 h-16 object-contain rounded-full bg-white">`
+      : `<span class='font-semibold'>${voo.companhia}</span>`;
+  }
+}
 
 window.onload = function () {
   adicionarEventosCarros();

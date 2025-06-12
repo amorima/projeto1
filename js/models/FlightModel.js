@@ -603,6 +603,15 @@ export function getVoosByDestino(destino) {
 }
 
 /**
+ * Obtém uma viagem pelo número do voo
+ * @param {string} numeroVoo - Número do voo
+ * @returns {Object|null} - Objeto da viagem correspondente ou null se não encontrado
+ */
+export function getByNumeroVoo(numeroVoo) {
+  return viagens.find((v) => String(v.numeroVoo) === String(numeroVoo)) || null;
+}
+
+/**
  * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
  * @class Trip
  * @property {string} numeroVoo - Número do voo
