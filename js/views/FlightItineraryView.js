@@ -176,14 +176,23 @@ function carregarHoteis(destino) {
           divPreco.appendChild(spanPreco);
         }
         const spanAdicionar = document.createElement("span");
+        // Icon style changes if selected
+        const isSelected = vooShallow.hotel && vooShallow.hotel.id === hotel.id;
         spanAdicionar.className =
-          "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
-        spanAdicionar.textContent = "add_circle";
+          `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400`;
+        spanAdicionar.textContent = isSelected ? "check_circle" : "add_circle";
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
-          vooShallow.hotel = hotel
-          atualizarSidebarVoo(vooShallow)
-          showToast("Hotel adicionado!", "success");
+          if (vooShallow.hotel && vooShallow.hotel.id === hotel.id) {
+            delete vooShallow.hotel;
+            atualizarSidebarVoo(vooShallow);
+            showToast("Hotel removido!", "info");
+          } else {
+            vooShallow.hotel = hotel;
+            atualizarSidebarVoo(vooShallow);
+            showToast("Hotel adicionado!", "success");
+          }
+          carregarHoteis(destino); // Refresh icons
         };
         divPreco.appendChild(spanAdicionar);
         divHotel.appendChild(divInfo);
@@ -253,16 +262,22 @@ function carregarActividades(destino) {
         const divBotoes = document.createElement("div");
         divBotoes.className = "flex items-center gap-3";
         const spanAdicionar = document.createElement("span");
-        spanAdicionar.className =
-          "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400";
-        spanAdicionar.textContent = "add_circle";
+        // Check if selected
+        let isSelected = Array.isArray(vooShallow.atividade) && vooShallow.atividade.some(a => a.id === atividade.id);
+        spanAdicionar.className = `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400`;
+        spanAdicionar.textContent = isSelected ? "check_circle" : "add_circle";
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
-          if (!Array.isArray(vooShallow.atividade)) {
-            vooShallow.atividade = [];
+          if (!Array.isArray(vooShallow.atividade)) vooShallow.atividade = [];
+          const idx = vooShallow.atividade.findIndex(a => a.id === atividade.id);
+          if (idx !== -1) {
+            vooShallow.atividade.splice(idx, 1);
+            showToast("Atividade removida!", "info");
+          } else {
+            vooShallow.atividade.push(atividade);
+            showToast("Atividade adicionada!", "success");
           }
-          vooShallow.atividade.push(atividade);
-          showToast("Atividade adicionada!", "success");
+          carregarActividades(destino); // Refresh icons
         };
         divBotoes.appendChild(spanAdicionar);
         divAtividade.appendChild(divInfo);
@@ -278,73 +293,66 @@ function carregarActividades(destino) {
 }
 
 function adicionarEventosCarros() {
-  const botoesCarro = document.querySelectorAll(".material-symbols-outlined");
-
-  botoesCarro.forEach(function (botao) {
-    if (botao.textContent === "add_circle") {
-      let elementoPai = botao.parentElement;
-      while (elementoPai && !elementoPai.querySelector("h2")) {
-        elementoPai = elementoPai.parentElement;
-      }
-
-      if (
-        elementoPai &&
-        elementoPai.querySelector("h2") &&
-        elementoPai.querySelector("h2").textContent.includes("Aluguer de Carro")
-      ) {
-        botao.onclick = function () {
-          vooShallow.car = true
-          atualizarSidebarVoo(vooShallow)
-          showToast("Carro adicionado!", "success");
-        };
-      }
-    }
-  });
-
-  const seccaoCarros = document.querySelectorAll(
-    "div.flex.items-center.justify-between"
+  // Seleciona todos os cartões de carro
+  const carOptions = document.querySelectorAll(
+    '.flex.items-center.justify-between.py-3.px-2.rounded-lg'
   );
-  seccaoCarros.forEach(function (carro) {
-    const botao = carro.querySelector(".material-symbols-outlined");
-    if (botao && botao.textContent === "add_circle") {
-      botao.onclick = function () {
-        showToast("Carro adicionado!", "success");
-      };
-    }
+  // Lista de nomes dos carros na ordem dos cartões
+  const carNames = [
+    'Ford Fiesta',
+    'Volkswagen Golf',
+    'Hyundai Tucson',
+    'Peugeot 5008',
+    'Mercedes Classe C'
+  ];
+  const carPrices = [24, 32, 45, 52, 68];
+  carOptions.forEach((option, idx) => {
+    const icon = option.querySelector('.material-symbols-outlined.text-2xl');
+    if (!icon) return;
+    // Verifica se este carro está selecionado
+    const isSelected = vooShallow.car && vooShallow.car.nome === carNames[idx];
+    icon.textContent = isSelected ? 'check_circle' : 'add_circle';
+    icon.className = `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400`;
+    option.onclick = function (e) {
+      // Evita conflito com outros botões internos
+      if (e.target.tagName === 'SPAN' && e.target !== icon) return;
+      if (isSelected) {
+        delete vooShallow.car;
+        atualizarSidebarVoo(vooShallow);
+        showToast('Carro removido!', 'info');
+      } else {
+        vooShallow.car = {
+          nome: carNames[idx],
+          preco: carPrices[idx],
+          // Adicione outros dados se necessário
+        };
+        atualizarSidebarVoo(vooShallow);
+        showToast('Carro adicionado!', 'success');
+      }
+      adicionarEventosCarros(); // Atualiza ícones
+    };
   });
 }
 
 function adicionarEventoSeguro() {
-  const h2Seguro = Array.from(document.querySelectorAll("h2")).find((h2) =>
-    h2.textContent.includes("Seguro")
-  );
-
-  if (h2Seguro) {
-    const secaoSeguro = h2Seguro.closest("div");
-
-    if (secaoSeguro) {
-      const botaoSeguro = secaoSeguro.querySelector(
-        ".material-symbols-outlined"
-      );
-      if (botaoSeguro && botaoSeguro.textContent === "arrow_circle_right") {
-        botaoSeguro.textContent = "add_circle";
-        botaoSeguro.id = "btn-add-seguro";
-        botaoSeguro.className =
-          "material-symbols-outlined text-2xl text-gray-400 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-cyan-400 cursor-pointer";
-
-        botaoSeguro.onclick = function () {
-          showToast("Seguro SecureIt adicionado!", "success");
-        };
-      }
-    }
-  }
-
+  // Seleciona o botão correto pelo id
   const btnAddSeguro = document.getElementById("btn-add-seguro");
   if (btnAddSeguro) {
+    const isSelected = !!vooShallow.seguro;
+    btnAddSeguro.textContent = isSelected ? "check_circle" : "add_circle";
+    btnAddSeguro.className =
+      `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400 cursor-pointer`;
     btnAddSeguro.onclick = function () {
-      vooShallow.seguro = true
-      atualizarSidebarVoo(vooShallow)
-      showToast("Seguro SecureIt adicionado!", "success");
+      if (vooShallow.seguro) {
+        delete vooShallow.seguro;
+        atualizarSidebarVoo(vooShallow);
+        showToast("Seguro SecureIt removido!", "info");
+      } else {
+        vooShallow.seguro = true;
+        atualizarSidebarVoo(vooShallow);
+        showToast("Seguro SecureIt adicionado!", "success");
+      }
+      adicionarEventoSeguro(); // Atualiza o ícone
     };
   }
 }
