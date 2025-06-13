@@ -650,3 +650,59 @@ function loadBookmarks() {
     );
   }
 }
+
+/* Funções de controlo do modal de gamificação */
+export function shouldShowGamificationModal() {
+  /* Verificar se modal foi ignorado permanentemente */
+  if (localStorage.getItem("gamificationModalIgnored") === "true") {
+    return false;
+  }
+
+  /* Verificar se foi adiado para mais tarde na sessão atual */
+  if (sessionStorage.getItem("gamificationModalDeferred") === "true") {
+    return false;
+  }
+  /* Apenas mostrar em desktop (768px+) */
+  return window.innerWidth >= 768;
+}
+
+export function deferGamificationModal() {
+  /* Guardar na session storage para não mostrar até à sessão acabar */
+  sessionStorage.setItem("gamificationModalDeferred", "true");
+}
+
+export function ignoreGamificationModal() {
+  /* Guardar na local storage para não mostrar mais */
+  localStorage.setItem("gamificationModalIgnored", "true");
+}
+
+export function forceShowGamificationModal() {
+  /* Forçar mostrar o modal independentemente das configurações */
+  return true;
+}
+
+/* Função para guardar código especial */
+export function saveSpecialCode(code) {
+  if (!code || code.trim() === "") {
+    throw new Error("Código inválido");
+  }
+
+  /* Guardar código na local storage */
+  const existingCodes = JSON.parse(
+    localStorage.getItem("specialCodes") || "[]"
+  );
+
+  /* Verificar se código já foi usado */
+  if (existingCodes.includes(code.trim())) {
+    throw new Error("Este código já foi utilizado");
+  }
+
+  existingCodes.push(code.trim());
+  localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
+
+  return true;
+}
+
+export function getSpecialCodes() {
+  return JSON.parse(localStorage.getItem("specialCodes") || "[]");
+}
