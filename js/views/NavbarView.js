@@ -63,6 +63,12 @@ export function updateNavbarUser() {
     ? mobileProfile.querySelector("span:not(.material-symbols-outlined)")
     : null;
 
+  /* Elementos de logout */
+  const desktopLogoutSection = document.getElementById(
+    "desktop-logout-section"
+  );
+  const mobileLogoutSection = document.getElementById("mobile-logout-section");
+
   if (User.isLogged()) {
     const user = User.getUserLogged();
 
@@ -95,6 +101,14 @@ export function updateNavbarUser() {
     if (mobileProfileText) {
       mobileProfileText.textContent = "Perfil";
     }
+
+    /* Mostrar logout */
+    if (desktopLogoutSection) {
+      desktopLogoutSection.classList.remove("hidden");
+    }
+    if (mobileLogoutSection) {
+      mobileLogoutSection.classList.remove("hidden");
+    }
   } else {
     /* Utilizador não logado - mostrar padrão */
     profileIcon.textContent = "account_circle";
@@ -114,12 +128,22 @@ export function updateNavbarUser() {
     if (mobileProfileText) {
       mobileProfileText.textContent = "Perfil";
     }
+
+    /* Esconder logout */
+    if (desktopLogoutSection) {
+      desktopLogoutSection.classList.add("hidden");
+    }
+    if (mobileLogoutSection) {
+      mobileLogoutSection.classList.add("hidden");
+    }
   }
 }
 
 export function LoginNav() {
   const profileElement = document.getElementById("profile");
   const mobileProfile = document.getElementById("mobile-profile");
+  const desktopLogoutBtn = document.getElementById("desktop-logout-btn");
+  const mobileLogoutBtn = document.getElementById("mobile-logout-btn");
 
   if (profileElement) {
     /* Remover listeners antigos */
@@ -133,6 +157,15 @@ export function LoginNav() {
     mobileProfile.replaceWith(mobileProfile.cloneNode(true));
     const newMobileProfile = document.getElementById("mobile-profile");
     newMobileProfile.addEventListener("click", handleProfileClick);
+  }
+
+  /* Configurar botões de logout */
+  if (desktopLogoutBtn) {
+    desktopLogoutBtn.addEventListener("click", handleLogout);
+  }
+
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener("click", handleLogout);
   }
 }
 
@@ -202,6 +235,35 @@ export function initThemeToggle() {
         themeToggle.click();
       }
     });
+  }
+}
+
+/* Processar logout */
+function handleLogout() {
+  User.logout();
+
+  /* Fechar menu mobile se estiver aberto */
+  const mobileMenu = document.getElementById("mobile-menu");
+  if (mobileMenu) {
+    mobileMenu.style.transform = "translateX(100%)";
+    document.body.style.overflow = "";
+  }
+
+  /* Atualizar navbar */
+  updateNavbarUser();
+
+  /* Redirecionar para a página principal */
+  const currentPath = window.location.pathname;
+  if (
+    currentPath.endsWith("/") ||
+    currentPath.endsWith("/index.html") ||
+    currentPath.split("/").pop() === "index.html"
+  ) {
+    /* Se estivermos no index, apenas recarregar */
+    window.location.reload();
+  } else {
+    /* Se estivermos numa página dentro da pasta html, voltar ao index */
+    window.location.href = "../index.html";
   }
 }
 
