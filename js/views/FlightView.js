@@ -26,6 +26,7 @@ function initView() {
   showCookieBanner();
   initSlider();
   setupModalButtons();
+  initGamificationModal(); /* Adicionar inicialização do modal */
 
   /* Renderizar cards na homepage se o container existir */
   if (document.querySelector(".card-viagens")) {
@@ -739,4 +740,101 @@ export function renderRandomOPOCards(containerClass) {
       setTimeout(() => this.classList.remove("scale-110"), 150);
     });
   });
+}
+
+/* Funções do modal de gamificação */
+function initGamificationModal() {
+  /* Configurar eventos dos botões */
+  setupGamificationModalEvents();
+
+  /* Verificar se deve mostrar o modal */
+  if (shouldShowModal()) {
+    /* Mostrar modal após página carregar */
+    setTimeout(() => {
+      showGamificationModal();
+    }, 1000);
+  }
+}
+
+function showGamificationModal() {
+  const modal = document.getElementById("modal-gamificacao");
+  const modalContent = document.getElementById("modal-content");
+
+  if (!modal || !modalContent) return;
+
+  /* Prevenir scroll da página */
+  document.body.style.overflow = "hidden";
+  document.body.style.paddingRight = "15px";
+
+  /* Mostrar modal */
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+
+  /* Animar entrada */
+  requestAnimationFrame(() => {
+    modalContent.classList.remove("scale-95", "opacity-0");
+    modalContent.classList.add("scale-100", "opacity-100");
+  });
+}
+
+function hideGamificationModal() {
+  const modal = document.getElementById("modal-gamificacao");
+  const modalContent = document.getElementById("modal-content");
+
+  if (!modal || !modalContent) return;
+
+  /* Animar saída */
+  modalContent.classList.remove("scale-100", "opacity-100");
+  modalContent.classList.add("scale-95", "opacity-0");
+  /* Esconder modal após animação */
+  setTimeout(() => {
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+    /* Restaurar scroll da página */
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+  }, 300);
+}
+
+function setupGamificationModalEvents() {
+  const btnLembrarMaisTarde = document.getElementById("btn-lembrar-mais-tarde");
+  const btnIgnorar = document.getElementById("btn-ignorar");
+  const btnFechar = document.getElementById("fechar-modal-gamificacao");
+
+  if (btnLembrarMaisTarde) {
+    btnLembrarMaisTarde.addEventListener("click", () => {
+      sessionStorage.setItem("gamificationModalDeferred", "true");
+      hideGamificationModal();
+    });
+  }
+
+  if (btnIgnorar) {
+    btnIgnorar.addEventListener("click", () => {
+      localStorage.setItem("gamificationModalIgnored", "true");
+      hideGamificationModal();
+    });
+  }
+
+  if (btnFechar) {
+    btnFechar.addEventListener("click", () => {
+      hideGamificationModal();
+    });
+  }
+}
+
+function shouldShowModal() {
+  /* Verificar se modal foi ignorado permanentemente */
+  if (localStorage.getItem("gamificationModalIgnored") === "true") {
+    return false;
+  }
+
+  /* Verificar se foi adiado para mais tarde na sessão atual */
+  if (sessionStorage.getItem("gamificationModalDeferred") === "true") {
+    return false;
+  }
+
+  /* Apenas mostrar em desktop */
+  return window.innerWidth >= 768;
 }

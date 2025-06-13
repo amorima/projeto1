@@ -152,8 +152,7 @@
                                         <p class="text-gray-600 dark:text-gray-300 text-sm mt-2">Encontra o código especial escondido na nossa página e ganha 200 pontos de recompensa.</p>
                                     </div>
                                     <span class="material-symbols-outlined text-yellow-500">stars</span>
-                                </div>
-                                <button class="mt-4 px-4 py-2 bg-Button-Main dark:bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-700 transition-colors">
+                                </div>                                <button id="btn-saber-mais-codigo" onclick="openGamificationModal()" class="mt-4 px-4 py-2 bg-Button-Main dark:bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-700 transition-colors">
                                     Saber mais
                                 </button>
                             </div>
@@ -175,8 +174,33 @@
                                             <span class="material-symbols-outlined text-sm">content_copy</span>
                                         </button>
                                     </div>
+                                </div>                            </div>                        </div>
+                        
+                        <!-- Componente de Redeem Código Especial -->
+                        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700 mt-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-200">Resgatar Código Especial</h3>
+                                    <p class="text-yellow-700 dark:text-yellow-300 text-sm mt-2">Introduz o código especial que encontraste para ganhar pontos de recompensa.</p>
                                 </div>
-                            </div>                        </div>
+                                <span class="material-symbols-outlined text-yellow-500">redeem</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    id="input-codigo-especial" 
+                                    placeholder="Inserir código especial..." 
+                                    class="flex-1 p-3 bg-white dark:bg-gray-700 border border-yellow-300 dark:border-yellow-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                />
+                                <button 
+                                    id="btn-resgatar-codigo" 
+                                    class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-800 text-white rounded-lg transition-colors font-medium"
+                                >
+                                    Resgatar
+                                </button>
+                            </div>
+                            <div id="mensagem-codigo" class="mt-3 text-sm hidden"></div>
+                        </div>
                         
                         <!-- Botão para recompensas -->
                         <button onclick="window.location.href='rewardit.html'" class="mt-6 w-full py-3 bg-Main-Primary dark:bg-cyan-700 text-white rounded-lg hover:bg-Main-Secondary dark:hover:bg-cyan-800 transition-colors flex items-center justify-center gap-2">
@@ -569,9 +593,38 @@
             document.getElementById('tab-definicoes-btn').addEventListener('click', () => showTab('tab-definicoes'));
             
             /* Mostrar a primeira aba por defeito */
-            showTab('tab-perfil');
-        });
+            showTab('tab-perfil');        });
     </script>
+
+    <!-- Modal de Gamificação -->
+    <div id="modal-gamificacao" class="hidden fixed inset-0 z-50 p-4" style="overflow-y: auto; overflow-x: hidden;">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out"></div>
+          <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-auto mt-20 transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modal-content" style="background-color: white !important;">            <!-- Close button -->
+            <button id="fechar-modal-gamificacao" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800 transition-colors duration-200 z-10" style="color: #4B5563 !important;">
+                <span class="material-symbols-outlined text-2xl">close</span>
+            </button>
+            
+            <!-- Modal body -->
+            <div class="p-8 text-center">
+                <!-- Image -->
+                <div class="mb-6">
+                    <img src="../img/gamification/find.png" alt="Código especial escondido" class="w-[500px] h-[500px] object-contain mx-auto">
+                </div>
+                
+                <!-- Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button id="btn-lembrar-mais-tarde" class="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg transition-colors duration-200 font-medium">
+                        Lembrar mais tarde
+                    </button>
+                    <button id="btn-ignorar" class="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200 font-medium">
+                        Ignorar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
   
 </body>
 </html>

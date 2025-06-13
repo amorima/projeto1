@@ -3,6 +3,30 @@ import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
 import * as FlightModel from "../models/FlightModel.js";
 
+/* Função global para abrir o modal de gamificação */
+window.openGamificationModal = function () {
+  const modal = document.getElementById("modal-gamificacao");
+  const modalContent = document.getElementById("modal-content");
+
+  if (!modal || !modalContent) return;
+
+  /* Prevenir scroll da página */
+  document.body.style.overflow = "hidden";
+  document.body.style.paddingRight = "15px";
+
+  /* Mostrar modal */
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+
+  /* Animar entrada */
+  requestAnimationFrame(() => {
+    modalContent.classList.remove("scale-95", "opacity-0");
+    modalContent.classList.add("scale-100", "opacity-100");
+  });
+};
+
 /* Carregar componentes na página */
 window.onload = function () {
   /* Inicializar o modelo */
@@ -15,9 +39,11 @@ window.onload = function () {
 
   /* Carregar informações do utilizador */
   loadUserInfo();
-
   /* Adicionar eventos aos botões */
   setupEventListeners();
+
+  /* Inicializar modal de gamificação */
+  initGamificationModal();
 
   /* Inicializar funcionalidades das abas a partir do Model */
   UserModel.initTabEvents();
@@ -646,3 +672,165 @@ function saveProfileChanges(event) {
 /* Quando uma função precisar chamar funções do Model, deve usar as funções exportadas */
 
 /* As funções de carregamento de conteúdo para as abas foram movidas para o Model (UserModel.js) */
+
+/* Funções do modal de gamificação */
+function initGamificationModal() {
+  /* Configurar eventos do modal primeiro */
+  setupGamificationModalEvents();
+
+  /* Configurar funcionalidade de redeem de código */
+  setupCodeRedeemEvents();
+
+  /* Usar event delegation para o botão "Saber mais" */
+  document.addEventListener("click", function (e) {
+    if (e.target && e.target.id === "btn-saber-mais-codigo") {
+      e.preventDefault();
+      e.stopPropagation();
+      showGamificationModal();
+    }
+  });
+}
+
+function showGamificationModal() {
+  const modal = document.getElementById("modal-gamificacao");
+  const modalContent = document.getElementById("modal-content");
+
+  if (!modal || !modalContent) return;
+
+  /* Prevenir scroll da página */
+  document.body.style.overflow = "hidden";
+  document.body.style.paddingRight = "15px";
+
+  /* Mostrar modal */
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+
+  /* Animar entrada */
+  requestAnimationFrame(() => {
+    modalContent.classList.remove("scale-95", "opacity-0");
+    modalContent.classList.add("scale-100", "opacity-100");
+  });
+}
+
+function hideGamificationModal() {
+  const modal = document.getElementById("modal-gamificacao");
+  const modalContent = document.getElementById("modal-content");
+
+  if (!modal || !modalContent) return;
+
+  /* Animar saída */
+  modalContent.classList.remove("scale-100", "opacity-100");
+  modalContent.classList.add("scale-95", "opacity-0");
+  /* Esconder modal após animação */
+  setTimeout(() => {
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+    /* Restaurar scroll da página */
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+  }, 300);
+}
+
+function setupGamificationModalEvents() {
+  const btnLembrarMaisTarde = document.getElementById("btn-lembrar-mais-tarde");
+  const btnIgnorar = document.getElementById("btn-ignorar");
+  const btnFechar = document.getElementById("fechar-modal-gamificacao");
+
+  if (btnLembrarMaisTarde) {
+    btnLembrarMaisTarde.addEventListener("click", () => {
+      sessionStorage.setItem("gamificationModalDeferred", "true");
+      hideGamificationModal();
+    });
+  }
+
+  if (btnIgnorar) {
+    btnIgnorar.addEventListener("click", () => {
+      localStorage.setItem("gamificationModalIgnored", "true");
+      hideGamificationModal();
+    });
+  }
+
+  if (btnFechar) {
+    btnFechar.addEventListener("click", () => {
+      hideGamificationModal();
+    });
+  }
+}
+
+function setupCodeRedeemEvents() {
+  const btnResgatar = document.getElementById("btn-resgatar-codigo");
+  const inputCodigo = document.getElementById("input-codigo-especial");
+  const mensagemDiv = document.getElementById("mensagem-codigo");
+
+  if (btnResgatar && inputCodigo && mensagemDiv) {
+    btnResgatar.addEventListener("click", () => {
+      const codigo = inputCodigo.value.trim();
+
+      if (!codigo) {
+        showCodeMessage("Por favor, insira um código válido.", "error");
+        return;
+      }
+      try {
+        saveSpecialCode(codigo);
+        showCodeMessage(
+          "Código resgatado com sucesso! Ganhaste 200 pontos.",
+          "success"
+        );
+        inputCodigo.value = "";
+
+        /* Limpar mensagem após 5 segundos */
+        setTimeout(() => {
+          showCodeMessage("", "hidden");
+        }, 5000);
+      } catch (error) {
+        showCodeMessage(error.message, "error");
+      }
+    });
+
+    /* Permitir resgatar com Enter */
+    inputCodigo.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        btnResgatar.click();
+      }
+    });
+  }
+}
+
+function showCodeMessage(message, type) {
+  const mensagemDiv = document.getElementById("mensagem-codigo");
+  if (!mensagemDiv) return;
+
+  mensagemDiv.textContent = message;
+  mensagemDiv.classList.remove("hidden", "text-red-600", "text-green-600");
+
+  if (type === "error") {
+    mensagemDiv.classList.add("text-red-600");
+  } else if (type === "success") {
+    mensagemDiv.classList.add("text-green-600");
+  } else if (type === "hidden") {
+    mensagemDiv.classList.add("hidden");
+  }
+}
+
+function saveSpecialCode(code) {
+  if (!code || code.trim() === "") {
+    throw new Error("Código inválido");
+  }
+
+  /* Guardar código na local storage */
+  const existingCodes = JSON.parse(
+    localStorage.getItem("specialCodes") || "[]"
+  );
+
+  /* Verificar se código já foi usado */
+  if (existingCodes.includes(code.trim())) {
+    throw new Error("Este código já foi utilizado");
+  }
+
+  existingCodes.push(code.trim());
+  localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
+
+  return true;
+}
