@@ -10,6 +10,33 @@ import {
   closestAirport,
 } from "./ViewHelpers.js";
 
+/* Funções globais para o modal de gamificação */
+window.openGamificationModal = function () {
+  const modal = document.getElementById("modal-gamificacao");
+  if (modal) {
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+};
+
+window.closeGamificationModal = function () {
+  const modal = document.getElementById("modal-gamificacao");
+  if (modal) {
+    modal.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+};
+
+window.deferGamificationModal = function () {
+  sessionStorage.setItem("gamificationModalDeferred", "true");
+  window.closeGamificationModal();
+};
+
+window.ignoreGamificationModal = function () {
+  localStorage.setItem("gamificationModalIgnored", "true");
+  window.closeGamificationModal();
+};
+
 /* Inicializar a aplicacao */
 Flight.init();
 initView();
@@ -26,7 +53,7 @@ function initView() {
   showCookieBanner();
   initSlider();
   setupModalButtons();
-  initGamificationModal(); /* Adicionar inicialização do modal */
+  initGamificationModal(); /* Mostrar modal se necessário */
 
   /* Renderizar cards na homepage se o container existir */
   if (document.querySelector(".card-viagens")) {
@@ -742,85 +769,14 @@ export function renderRandomOPOCards(containerClass) {
   });
 }
 
-/* Funções do modal de gamificação */
+/* Função para mostrar modal automaticamente no index */
 function initGamificationModal() {
-  /* Configurar eventos dos botões */
-  setupGamificationModalEvents();
-
   /* Verificar se deve mostrar o modal */
   if (shouldShowModal()) {
     /* Mostrar modal após página carregar */
     setTimeout(() => {
-      showGamificationModal();
-    }, 1000);
-  }
-}
-
-function showGamificationModal() {
-  const modal = document.getElementById("modal-gamificacao");
-  const modalContent = document.getElementById("modal-content");
-
-  if (!modal || !modalContent) return;
-
-  /* Prevenir scroll da página */
-  document.body.style.overflow = "hidden";
-  document.body.style.paddingRight = "15px";
-
-  /* Mostrar modal */
-  modal.classList.remove("hidden");
-  modal.style.display = "flex";
-  modal.style.alignItems = "center";
-  modal.style.justifyContent = "center";
-
-  /* Animar entrada */
-  requestAnimationFrame(() => {
-    modalContent.classList.remove("scale-95", "opacity-0");
-    modalContent.classList.add("scale-100", "opacity-100");
-  });
-}
-
-function hideGamificationModal() {
-  const modal = document.getElementById("modal-gamificacao");
-  const modalContent = document.getElementById("modal-content");
-
-  if (!modal || !modalContent) return;
-
-  /* Animar saída */
-  modalContent.classList.remove("scale-100", "opacity-100");
-  modalContent.classList.add("scale-95", "opacity-0");
-  /* Esconder modal após animação */
-  setTimeout(() => {
-    modal.classList.add("hidden");
-    modal.style.display = "none";
-    /* Restaurar scroll da página */
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
-  }, 300);
-}
-
-function setupGamificationModalEvents() {
-  const btnLembrarMaisTarde = document.getElementById("btn-lembrar-mais-tarde");
-  const btnIgnorar = document.getElementById("btn-ignorar");
-  const btnFechar = document.getElementById("fechar-modal-gamificacao");
-
-  if (btnLembrarMaisTarde) {
-    btnLembrarMaisTarde.addEventListener("click", () => {
-      sessionStorage.setItem("gamificationModalDeferred", "true");
-      hideGamificationModal();
-    });
-  }
-
-  if (btnIgnorar) {
-    btnIgnorar.addEventListener("click", () => {
-      localStorage.setItem("gamificationModalIgnored", "true");
-      hideGamificationModal();
-    });
-  }
-
-  if (btnFechar) {
-    btnFechar.addEventListener("click", () => {
-      hideGamificationModal();
-    });
+      window.openGamificationModal();
+    }, 2000);
   }
 }
 
@@ -830,7 +786,7 @@ function shouldShowModal() {
     return false;
   }
 
-  /* Verificar se foi adiado para mais tarde na sessão atual */
+  /* Verificar se foi adiado para mais tarde na sessão atual */ /* Verificar se foi adiado para mais tarde na sessão atual */
   if (sessionStorage.getItem("gamificationModalDeferred") === "true") {
     return false;
   }

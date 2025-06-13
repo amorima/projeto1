@@ -3,28 +3,31 @@ import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
 import * as FlightModel from "../models/FlightModel.js";
 
-/* Função global para abrir o modal de gamificação */
+/* Funções globais para o modal de gamificação */
 window.openGamificationModal = function () {
   const modal = document.getElementById("modal-gamificacao");
-  const modalContent = document.getElementById("modal-content");
+  if (modal) {
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+};
 
-  if (!modal || !modalContent) return;
+window.closeGamificationModal = function () {
+  const modal = document.getElementById("modal-gamificacao");
+  if (modal) {
+    modal.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+};
 
-  /* Prevenir scroll da página */
-  document.body.style.overflow = "hidden";
-  document.body.style.paddingRight = "15px";
+window.deferGamificationModal = function () {
+  sessionStorage.setItem("gamificationModalDeferred", "true");
+  window.closeGamificationModal();
+};
 
-  /* Mostrar modal */
-  modal.classList.remove("hidden");
-  modal.style.display = "flex";
-  modal.style.alignItems = "center";
-  modal.style.justifyContent = "center";
-
-  /* Animar entrada */
-  requestAnimationFrame(() => {
-    modalContent.classList.remove("scale-95", "opacity-0");
-    modalContent.classList.add("scale-100", "opacity-100");
-  });
+window.ignoreGamificationModal = function () {
+  localStorage.setItem("gamificationModalIgnored", "true");
+  window.closeGamificationModal();
 };
 
 /* Carregar componentes na página */
@@ -38,12 +41,8 @@ window.onload = function () {
   loadComponent("../_footer.html", "footer-placeholder");
 
   /* Carregar informações do utilizador */
-  loadUserInfo();
-  /* Adicionar eventos aos botões */
+  loadUserInfo(); /* Adicionar eventos aos botões */
   setupEventListeners();
-
-  /* Inicializar modal de gamificação */
-  initGamificationModal();
 
   /* Inicializar funcionalidades das abas a partir do Model */
   UserModel.initTabEvents();
