@@ -204,7 +204,7 @@
                         </div>
                         
                         <!-- Botão para recompensas -->
-                        <button onclick="window.location.href='rewardit.html'" class="mt-6 w-full py-3 bg-Main-Primary dark:bg-cyan-700 text-white rounded-lg hover:bg-Main-Secondary dark:hover:bg-cyan-800 transition-colors flex items-center justify-center gap-2">
+                        <button id="btn-scan-it" class="mt-6 w-full py-3 bg-Main-Primary dark:bg-cyan-700 text-white rounded-lg hover:bg-Main-Secondary dark:hover:bg-cyan-800 transition-colors flex items-center justify-center gap-2">
                             <span class="material-symbols-outlined">editor_choice</span>
                             <span>Sistema de Pontos Rewardit</span>
                         </button>
@@ -547,55 +547,10 @@
     </div>
    
     <!-- Footer -->
-    <footer id="footer-placeholder"></footer>    <script type="module" src="../js/views/UserProView.js"></script>
+    <footer id="footer-placeholder"></footer>    
+    <script type="module" src="../js/views/UserProView.js"></script>
     <script type="module" src="../js/views/ViewHelpers.js"></script>
-      <script>
-        /* Sistema de abas simples */
-        document.addEventListener('DOMContentLoaded', function() {
-            /* Elementos das abas */
-            const tabButtons = document.querySelectorAll('[role="tab"]');
-            const tabPanes = document.querySelectorAll('.tab-pane');
-            
-            /* Função para mostrar uma aba */
-            function showTab(targetId) {
-                /* Esconder todas as abas */
-                tabPanes.forEach(pane => {
-                    pane.classList.add('hidden');
-                    pane.classList.remove('active');
-                });
-                
-                /* Remover estilo ativo de todos os botões */
-                tabButtons.forEach(btn => {
-                    btn.classList.remove('border-Button-Main', 'text-Button-Main', 'active');
-                    btn.classList.remove('dark:border-cyan-400', 'dark:text-cyan-400');
-                    btn.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-                    btn.setAttribute('aria-selected', 'false');
-                });
-                
-                /* Mostrar a aba selecionada */
-                const targetPane = document.getElementById(targetId);
-                if (targetPane) {
-                    targetPane.classList.remove('hidden');
-                    targetPane.classList.add('active');
-                }
-                
-                /* Ativar o botão da aba */
-                const activeButton = document.getElementById(targetId + '-btn');
-                if (activeButton) {
-                    activeButton.classList.add('border-Button-Main', 'text-Button-Main', 'active');
-                    activeButton.classList.add('dark:border-cyan-400', 'dark:text-cyan-400');
-                    activeButton.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-                    activeButton.setAttribute('aria-selected', 'true');
-                }
-            }
-              /* Adicionar eventos aos botões das abas */
-            document.getElementById('tab-perfil-btn').addEventListener('click', () => showTab('tab-perfil'));
-            document.getElementById('tab-reservas-btn').addEventListener('click', () => showTab('tab-reservas'));
-            document.getElementById('tab-definicoes-btn').addEventListener('click', () => showTab('tab-definicoes'));
-            
-            /* Mostrar a primeira aba por defeito */
-            showTab('tab-perfil');        });
-    </script>    <!-- Modal de Gamificação -->
+    <!-- Modal de Gamificação -->
     <div id="modal-gamificacao" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <!-- Background overlay -->

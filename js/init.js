@@ -13,7 +13,7 @@ function initdata() {
         pontos: "3500",
         email: "40240119@esmad.ipp.pt",
         password: "40240119",
-        private: false,
+        isPrivate: false,
         admin: false,
       },
       {
@@ -23,7 +23,7 @@ function initdata() {
         pontos: "0",
         email: "40240137@esmad.ipp.pt",
         password: "40240137",
-        private: false,
+        isPrivate: false,
         admin: true,
       },
     ];

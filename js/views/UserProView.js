@@ -51,7 +51,7 @@ window.onload = function () {
 /* Configurar listeners de eventos para interações do utilizador */
 function setupEventListeners() {
   /* Botão de edição de perfil */
-  const editProfileBtn = document.querySelector("button.mt-4");
+  const editProfileBtn = document.getElementById("btn-editar-perfil");
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", openEditProfileModal);
   }
@@ -154,10 +154,10 @@ function loadUserInfo() {
   }
 
   /* Preencher informações pessoais */
-  document.getElementById("info-username").textContent = user.username;
-  document.getElementById("info-email").textContent = user.email;
-  document.getElementById("info-points").textContent = userPoints;
-  document.getElementById("info-member-since").textContent = formatDate(
+  if(document.getElementById("info-username")) document.getElementById("info-username").textContent = user.username;
+  if(document.getElementById("info-email")) document.getElementById("info-email").textContent = user.email;
+  if(document.getElementById("info-points")) document.getElementById("info-points").textContent = userPoints;
+  if(document.getElementById("info-member-since")) document.getElementById("info-member-since").textContent = formatDate(
     new Date()
   );
 
@@ -309,7 +309,7 @@ function updateLevelIcons(currentLevel) {
 /* Carregar histórico de viagens */
 function loadTravelHistory(user) {
   const travelHistoryContainer = document.getElementById("travel-history");
-  travelHistoryContainer.innerHTML = "";
+  if(travelHistoryContainer){travelHistoryContainer.innerHTML = "";
 
   /* Verificar se o utilizador tem histórico de viagens */
   if (!user.travelHistory || user.travelHistory.length === 0) {
@@ -328,10 +328,8 @@ function loadTravelHistory(user) {
 
     travelHistoryContainer.appendChild(emptyMessage);
     return;
-  }
-
-  /* Adicionar cada viagem ao histórico */
-  user.travelHistory.forEach((trip) => {
+    }
+      user.travelHistory.forEach((trip) => {
     const tripElement = document.createElement("div");
     tripElement.className =
       "bg-Main-Card-Bg-Gami dark:bg-gray-700 rounded-lg p-4 shadow-sm";
@@ -353,6 +351,7 @@ function loadTravelHistory(user) {
 
     travelHistoryContainer.appendChild(tripElement);
   });
+  }
 }
 
 /* Adicionar viagem de demonstração */
@@ -417,6 +416,7 @@ function addDemoTrip() {
 /* Carregar preferências de viagem */
 function loadTravelPreferences(user) {
   const preferencesContainer = document.getElementById("travel-preferences");
+  if(!preferencesContainer) return
   preferencesContainer.innerHTML = "";
 
   /* Verificar se o utilizador tem preferências de viagem */
@@ -833,3 +833,54 @@ function saveSpecialCode(code) {
 
   return true;
 }
+
+document.addEventListener('DOMContentLoaded', ()=> {
+  const tabButtons = document.querySelectorAll('[role="tab"]');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+  const btnScanit = document.getElementById("btn-scan-it")
+  
+  /* Função para mostrar uma aba */
+  function showTab(targetId) {
+      /* Esconder todas as abas */
+      tabPanes.forEach(pane => {
+          pane.classList.add('hidden');
+          pane.classList.remove('active');
+      });
+      
+      /* Remover estilo ativo de todos os botões */
+      tabButtons.forEach(btn => {
+          btn.classList.remove('border-Button-Main', 'text-Button-Main', 'active');
+          btn.classList.remove('dark:border-cyan-400', 'dark:text-cyan-400');
+          btn.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+          btn.setAttribute('aria-selected', 'false');
+      });
+      
+      /* Mostrar a aba selecionada */
+      const targetPane = document.getElementById(targetId);
+      if (targetPane) {
+          targetPane.classList.remove('hidden');
+          targetPane.classList.add('active');
+      }
+      
+      /* Ativar o botão da aba */
+      const activeButton = document.getElementById(targetId + '-btn');
+      if (activeButton) {
+          activeButton.classList.add('border-Button-Main', 'text-Button-Main', 'active');
+          activeButton.classList.add('dark:border-cyan-400', 'dark:text-cyan-400');
+          activeButton.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
+          activeButton.setAttribute('aria-selected', 'true');
+      }
+
+      if(btnScanit){
+        btnScanit.addEventListener('click',()=>{
+        window.location.href='rewardit.html'
+      })}
+  }
+    /* Adicionar eventos aos botões das abas */
+  document.getElementById('tab-perfil-btn').addEventListener('click', () => showTab('tab-perfil'));
+  document.getElementById('tab-reservas-btn').addEventListener('click', () => showTab('tab-reservas'));
+  document.getElementById('tab-definicoes-btn').addEventListener('click', () => showTab('tab-definicoes'));
+  
+  /* Mostrar a primeira aba por defeito */
+  showTab('tab-perfil');        
+});

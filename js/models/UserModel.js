@@ -408,7 +408,7 @@ export function clearTestSession() {
  * @property {string} mail - O email do utilizador.
  * @property {string} avatar - A URL do avatar do utilizador.
  * @property {number} points - Os pontos acumulados pelo utilizador.
- * @property {boolean} private - Indica se o perfil do utilizador é privado.
+ * @property {boolean} isPrivate - Indica se o perfil do utilizador é privado.
  * @property {boolean} admin - Indica se o utilizador é um administrador.
  * @description
  * Esta classe representa um utilizador na aplicação, contendo informações básicas como nome de utilizador, senha, email, avatar, pontos acumulados e se o perfil é privado ou se o utilizador é um administrador.
@@ -424,7 +424,7 @@ class User {
   mail = "";
   avatar = "";
   points = 0;
-  private = false;
+  isPrivate = false;
   admin = false;
 
   constructor(
@@ -433,7 +433,7 @@ class User {
     mail,
     avatar = "",
     points = 50,
-    private = false,
+    isPrivate = false,
     admin = false
   ) {
     this.username = username;
@@ -441,7 +441,7 @@ class User {
     this.mail = mail;
     this.avatar = avatar;
     this.points = points;
-    this.private = private;
+    this.isPrivate = isPrivate;
     this.admin = admin;
   }
 
