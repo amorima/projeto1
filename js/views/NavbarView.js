@@ -144,6 +144,8 @@ export function LoginNav() {
   const mobileProfile = document.getElementById("mobile-profile");
   const desktopLogoutBtn = document.getElementById("desktop-logout-btn");
   const mobileLogoutBtn = document.getElementById("mobile-logout-btn");
+  const favoritesBtn = document.getElementById("favorites-btn");
+  const mobileFavoritesBtn = document.getElementById("mobile-favorites-btn");
 
   if (profileElement) {
     /* Remover listeners antigos */
@@ -166,6 +168,15 @@ export function LoginNav() {
 
   if (mobileLogoutBtn) {
     mobileLogoutBtn.addEventListener("click", handleLogout);
+  }
+
+  /* Configurar botões de favoritos */
+  if (favoritesBtn) {
+    favoritesBtn.addEventListener("click", handleFavoritesClick);
+  }
+
+  if (mobileFavoritesBtn) {
+    mobileFavoritesBtn.addEventListener("click", handleFavoritesClick);
   }
 }
 
@@ -264,6 +275,48 @@ function handleLogout() {
   } else {
     /* Se estivermos numa página dentro da pasta html, voltar ao index */
     window.location.href = "../index.html";
+  }
+}
+
+/* Processar clique nos favoritos */
+function handleFavoritesClick() {
+  /* Fechar menu mobile se estiver aberto */
+  const mobileMenu = document.getElementById("mobile-menu");
+  if (mobileMenu) {
+    mobileMenu.style.transform = "translateX(100%)";
+    document.body.style.overflow = "";
+  }
+
+  if (User.isLogged()) {
+    /* Utilizador logado - ir para user_pro.html */
+    const currentPath = window.location.pathname;
+
+    if (
+      currentPath.endsWith("/") ||
+      currentPath.endsWith("/index.html") ||
+      currentPath.split("/").pop() === "index.html"
+    ) {
+      /* Se estivermos no index ou root */
+      window.location.href = "./html/user_pro.html";
+    } else {
+      /* Se estivermos numa página dentro da pasta html */
+      window.location.href = "user_pro.html";
+    }
+  } else {
+    /* Utilizador não logado - ir para login */
+    const currentPath = window.location.pathname;
+
+    if (
+      currentPath.endsWith("/") ||
+      currentPath.endsWith("/index.html") ||
+      currentPath.split("/").pop() === "index.html"
+    ) {
+      /* Se estivermos no index ou root */
+      window.location.href = "./html/_login.html";
+    } else {
+      /* Se estivermos numa página dentro da pasta html */
+      window.location.href = "_login.html";
+    }
   }
 }
 
