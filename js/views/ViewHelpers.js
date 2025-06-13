@@ -269,7 +269,12 @@ function navigateToStatic(page) {
     basePath = "./";
   }
 
-  window.location.href = basePath + "static_" + page + ".html";
+  /* Caso especial para login */
+  if (page === "login") {
+    window.location.href = basePath + "_login.html";
+  } else {
+    window.location.href = basePath + "static_" + page + ".html";
+  }
 }
 
 // Função para carregar um componente HTML num elemento pelo seu ID
@@ -281,26 +286,19 @@ export function loadComponent(componentPath, elementId) {
       return response.text();
     })
     .then((html) => {
-      document.getElementById(elementId).innerHTML = html;
-      /* Se for o header, inicializar */
+      document.getElementById(elementId).innerHTML =
+        html; /* Se for o header, inicializar */
       if (componentPath.includes("_header.html")) {
         setTimeout(() => {
           /* Inicializar tema */
           const themeToggle = document.getElementById("theme-toggle");
           const profileIcon = document.getElementById("profile");
-
           if (themeToggle) {
             const isDark = document.documentElement.classList.contains("dark");
             themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
             themeToggle.addEventListener("click", () =>
               toggleThemeIcon(themeToggle)
             );
-          }
-
-          if (profileIcon) {
-            profileIcon.addEventListener("click", () => {
-              console.log("clicked");
-            });
           }
 
           /* Executar scripts do header */
@@ -319,6 +317,9 @@ export function loadComponent(componentPath, elementId) {
           if (typeof window.setupMenu === "function") {
             setTimeout(window.setupMenu, 100);
           }
+
+          /* Inicializar navbar */
+          initNavbar();
         }, 200);
       }
 
@@ -433,4 +434,21 @@ export function closestAirport(userLocation, locationArray) {
   });
 
   return closest;
+}
+
+/* Função para inicializar a navbar com informações do utilizador */
+export function initNavbar() {
+  /* Importar NavbarView dinamicamente para evitar dependências circulares */
+  import("./NavbarView.js")
+    .then((NavbarView) => {
+      if (NavbarView.updateNavbarUser) {
+        NavbarView.updateNavbarUser();
+      }
+      if (NavbarView.LoginNav) {
+        NavbarView.LoginNav();
+      }
+    })
+    .catch((error) => {
+      console.log("NavbarView não encontrado:", error);
+    });
 }

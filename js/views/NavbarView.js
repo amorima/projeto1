@@ -11,7 +11,8 @@ import {
   openModal,
   toggleThemeIcon,
 } from "./ViewHelpers.js";
-// Função para carregar HTML de um ficheiro para um elemento
+
+/* Função para carregar HTML de um ficheiro para um elemento */
 const loadComponent = async (url, placeholderId) => {
   const placeholder = document.getElementById(placeholderId);
   if (!placeholder) {
@@ -32,63 +33,180 @@ const loadComponent = async (url, placeholderId) => {
   }
 };
 
-// Carregar os componentes quando o DOM estiver pronto
+/* Carregar os componentes quando o DOM estiver pronto - apenas se não existir header */
 document.addEventListener("DOMContentLoaded", () => {
-  loadComponent("_header.html", "header-placeholder").then(() => {
-    LoginNav();
-  });
-  loadComponent("_footer.html", "footer-placeholder");
-  loadComponent("_menu.html", "menu-placeholder");
+  if (!document.getElementById("header-placeholder")) {
+    loadComponent("_header.html", "header-placeholder").then(() => {
+      User.init();
+      updateNavbarUser();
+      LoginNav();
+      initThemeToggle();
+    });
+    loadComponent("_footer.html", "footer-placeholder");
+  }
 });
 
-export function LoginNav() {
-  document.getElementById("profile").addEventListener("click", () => {
-    console.log("clicked");
-    if (User.isLogged()) {
-      //go to profile
-      if(isAdmin(User.getUserLogged())){
-        window.location.href = "dashboard_admin.html"
-      }else{
-        window.location.href = "profile.html";
-      }
+/* Atualizar informações do utilizador no navbar */
+export function updateNavbarUser() {
+  const profileElement = document.getElementById("profile");
+  const profileIcon = profileElement.querySelector(
+    "span.material-symbols-outlined"
+  );
+  const profileText = profileElement.querySelector(
+    "span:not(.material-symbols-outlined)"
+  );
+  const mobileProfile = document.getElementById("mobile-profile");
+  const mobileProfileIcon = mobileProfile
+    ? mobileProfile.querySelector("span.material-symbols-outlined")
+    : null;
+  const mobileProfileText = mobileProfile
+    ? mobileProfile.querySelector("span:not(.material-symbols-outlined)")
+    : null;
+
+  if (User.isLogged()) {
+    const user = User.getUserLogged();
+
+    /* Atualizar perfil desktop */
+    if (user.avatar && user.avatar !== "") {
+      profileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
+      profileIcon.className = "flex items-center justify-center";
     } else {
-      openModal("profile-modal");
-      document.getElementById("").addEventListener("submit", (e) => {
-        //TODO: When modal Ready add o id do form
-        e.preventDefault();
-        data = getFormData(""); //TODO: When modal Ready add o id do form
-        username = data.username;
-        email = data.email;
-        password = data.password;
-        User.add(username, password, email);
-        User.login(username, password);
-        closeModal(""); //id modal
-        openModal("newletter-modal");
-        document.getElementById("").addEventListener("click", () => {
-          //add yes button id
-          //sign for newletter
-          closeModal("newsletter-modal");
-        });
-        document.getElementById("").addEventListener("click", () => {
-          //add no button id
-          closeModal("newsletter-modal");
-        });
-      });
+      profileIcon.textContent = "account_circle";
+      profileIcon.className =
+        "material-symbols-outlined text-white dark:text-gray-100";
     }
-  });
+
+    if (profileText) {
+      profileText.textContent = user.username;
+    }
+
+    /* Atualizar perfil mobile */
+    if (mobileProfileIcon) {
+      if (user.avatar && user.avatar !== "") {
+        mobileProfileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-6 h-6 rounded-full object-cover">`;
+        mobileProfileIcon.className = "flex items-center justify-center";
+      } else {
+        mobileProfileIcon.textContent = "account_circle";
+        mobileProfileIcon.className =
+          "material-symbols-outlined text-white dark:text-gray-100 text-2xl";
+      }
+    }
+
+    if (mobileProfileText) {
+      mobileProfileText.textContent = "Perfil";
+    }
+  } else {
+    /* Utilizador não logado - mostrar padrão */
+    profileIcon.textContent = "account_circle";
+    profileIcon.className =
+      "material-symbols-outlined text-white dark:text-gray-100";
+
+    if (profileText) {
+      profileText.textContent = "Iniciar sessão";
+    }
+
+    if (mobileProfileIcon) {
+      mobileProfileIcon.textContent = "account_circle";
+      mobileProfileIcon.className =
+        "material-symbols-outlined text-white dark:text-gray-100 text-2xl";
+    }
+
+    if (mobileProfileText) {
+      mobileProfileText.textContent = "Perfil";
+    }
+  }
+}
+
+export function LoginNav() {
+  const profileElement = document.getElementById("profile");
+  const mobileProfile = document.getElementById("mobile-profile");
+
+  if (profileElement) {
+    /* Remover listeners antigos */
+    profileElement.replaceWith(profileElement.cloneNode(true));
+    const newProfileElement = document.getElementById("profile");
+    newProfileElement.addEventListener("click", handleProfileClick);
+  }
+
+  if (mobileProfile) {
+    /* Remover listeners antigos */
+    mobileProfile.replaceWith(mobileProfile.cloneNode(true));
+    const newMobileProfile = document.getElementById("mobile-profile");
+    newMobileProfile.addEventListener("click", handleProfileClick);
+  }
+}
+
+function handleProfileClick() {
+  if (User.isLogged()) {
+    const user = User.getUserLogged();
+
+    /* Determinar o caminho correto baseado na localização atual */
+    const currentPath = window.location.pathname;
+    let basePath = "";
+
+    if (
+      currentPath.endsWith("/") ||
+      currentPath.endsWith("/index.html") ||
+      currentPath.split("/").pop() === "index.html"
+    ) {
+      /* Se estivermos no index ou root */
+      basePath = "./html/";
+    } else {
+      /* Se estivermos numa página dentro da pasta html */
+      basePath = "./";
+    }
+
+    if (user.admin) {
+      window.location.href = basePath + "dashboard_admin.html";
+    } else {
+      window.location.href = basePath + "user_pro.html";
+    }
+  } else {
+    /* Determinar o caminho correto baseado na localização atual */
+    const currentPath = window.location.pathname;
+    if (
+      currentPath.endsWith("/") ||
+      currentPath.endsWith("/index.html") ||
+      currentPath.split("/").pop() === "index.html"
+    ) {
+      /* Se estivermos no index ou root */
+      window.location.href = "./html/_login.html";
+    } else {
+      /* Se estivermos numa página dentro da pasta html */
+      window.location.href = "_login.html";
+    }
+  }
 }
 
 export function initThemeToggle() {
   const themeToggle = document.getElementById("theme-toggle");
+  const mobileThemeToggle = document.getElementById("mobile-theme-toggle");
+
   if (themeToggle) {
-    // Atualiza o ícone do tema de acordo com o tema atual
+    /* Atualizar o ícone do tema de acordo com o tema atual */
     const isDark = document.documentElement.classList.contains("dark");
     themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
     themeToggle.addEventListener("click", () => toggleThemeIcon(themeToggle));
+  }
+
+  if (mobileThemeToggle) {
+    const isDark = document.documentElement.classList.contains("dark");
+    const mobileIcon = mobileThemeToggle.querySelector(
+      "span.material-symbols-outlined"
+    );
+    if (mobileIcon) {
+      mobileIcon.textContent = isDark ? "light_mode" : "dark_mode";
+    }
+    mobileThemeToggle.addEventListener("click", () => {
+      if (themeToggle) {
+        themeToggle.click();
+      }
+    });
   }
 }
 
 window.navbarView = {
   initThemeToggle,
   LoginNav,
+  updateNavbarUser,
 };
