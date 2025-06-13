@@ -10,6 +10,7 @@ import * as ActivityModel from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 
 let vooShallow = {}
+let valor = 1
 const btnMais = document.getElementById("btn-mais");
 const btnMenos = document.getElementById("btn-menos");
 const inputPessoas = document.getElementById("input-pessoas");
@@ -382,9 +383,33 @@ function atualizarSidebarVoo(voo) {
   } catch { /* fallback para anónimo */ }
 
   // Preço e pontos
-  let precoBase = voo.custo ? Math.round(parseFloat(voo.custo)) : 0;
+  let numPessoas = voo.nPessoas || 1;
+  let precoBase = voo.custo ? Math.round(parseFloat(voo.custo) * numPessoas) : 0;
+
+  function parseDatePt(dateStr) {
+    if (!dateStr) return null;
+    const [datePart, timePart] = dateStr.split(' ');
+    const [day, month, year] = datePart.split('/').map(Number);
+    let hours = 0, minutes = 0;
+    if (timePart) {
+      [hours, minutes] = timePart.split(':').map(Number);
+    }
+    return new Date(year, month - 1, day, hours, minutes);
+  }
+
+  let numNoites = 1;
+  if (voo.partida && (voo.dataVolta || voo.chegada)) {
+    const dataInicio = parseDatePt(voo.partida);
+    const dataFim = parseDatePt(voo.dataVolta || voo.chegada);
+    if (dataInicio && dataFim && !isNaN(dataInicio) && !isNaN(dataFim)) {
+      numNoites = Math.max(1, Math.round((dataFim - dataInicio) / (1000 * 60 * 60 * 24)));
+    } else {
+      numNoites = 1;
+    }
+  }
+
   if (voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0) {
-    precoBase += voo.hotel.quartos[0].precoNoite;
+    precoBase += voo.hotel.quartos[0].precoNoite * numNoites;
   }
   if (voo.car) precoBase += 1 //!Read car price
   if (voo.seguro) precoBase = precoBase * 1.2
@@ -421,7 +446,7 @@ function atualizarSidebarVoo(voo) {
     </ul>
     <div class="flex items-center justify-between gap-2 mt-6">
       <button id="btn-menos" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700"><span class="material-symbols-outlined">remove</span></button>
-      <input id="input-pessoas" class="appearance-none w-32 sm:w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700" value="1" />
+      <input id="input-pessoas" class="appearance-none w-32 sm:w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700" value="${voo.nPessoas ? voo.nPessoas : 1}" />
       <button id="btn-mais" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700"><span class="material-symbols-outlined">add</span></button>
     </div>
     <button class="w-full bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 font-bold py-3 rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-500 transition outline outline-1 outline-gray-200 dark:outline-gray-700 mt-2">Reservar</button>
@@ -435,7 +460,8 @@ function atualizarSidebarVoo(voo) {
     btnMais.onclick = function () {
       let valor = parseInt(inputPessoas.value, 10);
       if (valor < 15) {
-        inputPessoas.value = valor + 1;
+        vooShallow.nPessoas = valor + 1;
+        atualizarSidebarVoo(vooShallow);
       } else {
         showToast("O máximo de pessoas é 15.", "error");
       }
@@ -443,18 +469,21 @@ function atualizarSidebarVoo(voo) {
     btnMenos.onclick = function () {
       let valor = parseInt(inputPessoas.value, 10);
       if (valor > 1) {
-        inputPessoas.value = valor - 1;
+        vooShallow.nPessoas = valor - 1;
+        atualizarSidebarVoo(vooShallow);
       }
     };
     inputPessoas.oninput = function () {
       let valor = parseInt(inputPessoas.value, 10);
       if (isNaN(valor) || valor < 1) {
-        inputPessoas.value = 1;
+        valor = 1;
       }
       if (valor > 15) {
         showToast("O máximo de pessoas é 15.", "error");
-        inputPessoas.value = 15;
+        valor = 15;
       }
+      vooShallow.nPessoas = valor;
+      atualizarSidebarVoo(vooShallow);
     };
   }
   if (btnReservar) {
