@@ -10,6 +10,33 @@ import {
   closestAirport,
 } from "./ViewHelpers.js";
 
+/* Funções globais para o modal de gamificação */
+window.openGamificationModal = function () {
+  const modal = document.getElementById("modal-gamificacao");
+  if (modal) {
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+};
+
+window.closeGamificationModal = function () {
+  const modal = document.getElementById("modal-gamificacao");
+  if (modal) {
+    modal.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+};
+
+window.deferGamificationModal = function () {
+  sessionStorage.setItem("gamificationModalDeferred", "true");
+  window.closeGamificationModal();
+};
+
+window.ignoreGamificationModal = function () {
+  localStorage.setItem("gamificationModalIgnored", "true");
+  window.closeGamificationModal();
+};
+
 /* Inicializar a aplicacao */
 let filters = {}
 Flight.init();
@@ -27,6 +54,7 @@ function initView() {
   showCookieBanner();
   initSlider();
   setupModalButtons();
+  initGamificationModal(); /* Mostrar modal se necessário */
 
   /* Renderizar cards na homepage se o container existir */
   if (document.querySelector(".card-viagens")) {
@@ -756,6 +784,32 @@ export function renderRandomOPOCards(containerClass) {
       setTimeout(() => this.classList.remove("scale-110"), 150);
     });
   });
+}
+
+/* Função para mostrar modal automaticamente no index */
+function initGamificationModal() {
+  /* Verificar se deve mostrar o modal */
+  if (shouldShowModal()) {
+    /* Mostrar modal após página carregar */
+    setTimeout(() => {
+      window.openGamificationModal();
+    }, 2000);
+  }
+}
+
+function shouldShowModal() {
+  /* Verificar se modal foi ignorado permanentemente */
+  if (localStorage.getItem("gamificationModalIgnored") === "true") {
+    return false;
+  }
+
+  /* Verificar se foi adiado para mais tarde na sessão atual */ /* Verificar se foi adiado para mais tarde na sessão atual */
+  if (sessionStorage.getItem("gamificationModalDeferred") === "true") {
+    return false;
+  }
+
+  /* Apenas mostrar em desktop */
+  return window.innerWidth >= 768;
 }
 
 // Formulário PlanIt - captura e redireciona os dados para a página de pesquisa de voos
