@@ -1,5 +1,3 @@
-console.log("init.js carregado");
-
 initdata();
 
 function initdata() {

@@ -166,12 +166,8 @@
       const closeMenu = document.getElementById('close-menu');
       const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
       
-      console.log('Setup menu iniciado');
-      console.log('Menu button:', menuButton);
-      
       if (!menuButton || !desktopMenu || !mobileMenu) {
-        console.log('Elementos não encontrados, tentando novamente...');
-        setTimeout(window.setupMenu, 200);
+        setTimeout(window.setupMenu, 200); /* Manter este timeout para elementos não encontrados */
         return;
       }
 
@@ -180,7 +176,6 @@
       /* Clique no botão hambúrguer */
       menuButton.onclick = function(e) {
         e.preventDefault();
-        console.log('Menu clicado!');
         menuAberto = !menuAberto;
         
         if (window.innerWidth >= 768) {
@@ -263,15 +258,11 @@
         };
       });
       
-      console.log('Menu configurado com sucesso!');
     };
 
     /* Executar imediatamente */
     window.setupMenu();
     
-    /* Backup */
-    setTimeout(window.setupMenu, 100);
-    setTimeout(window.setupMenu, 500);
   </script>
 
   <script type="module" src="../js/views/NavbarView.js"></script>
