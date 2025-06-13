@@ -409,7 +409,12 @@ function atualizarSidebarVoo(voo) {
   }
 
   if (voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0) {
-    precoBase += voo.hotel.quartos[0].precoNoite * numNoites;
+    const quarto = voo.hotel.quartos[0];
+    let multiplicadorQuartos = 1;
+    if (numPessoas > quarto.capacidade) {
+      multiplicadorQuartos = Math.ceil(numPessoas / quarto.capacidade);
+    }
+    precoBase += quarto.precoNoite * numNoites * multiplicadorQuartos;
   }
   if (voo.car) precoBase += 1 //!Read car price
   if (voo.seguro) precoBase = precoBase * 1.2
