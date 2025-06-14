@@ -16,122 +16,122 @@
     <link rel="stylesheet" href="../css/main.css">
 
 </head>
-<body class="bg-Background-Background dark:bg-gray-900 min-h-screen">
-    <header id="header-placeholder"></header>
+<body class="bg-Main-Background dark:bg-gray-900 min-h-screen flex flex-col">
+    <header id="header-placeholder" class="sticky top-0 z-50"></header>
 
     <!-- Conteúdo principal -->
-    <main class="flex items-center justify-center min-h-screen px-4 mt-24">
-        <div class="w-full max-w-lg">
+    <main class="flex-grow flex items-center justify-center px-4 py-8 pt-20 sm:pt-24">
+        <div class="w-full max-w-md">
             <!-- Container de Login/Registo -->
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 
                 <!-- Cabeçalho com abas -->
-                <div class="bg-gradient-to-r from-cyan-600 to-cyan-700 dark:from-gray-700 dark:to-gray-800 p-6">
-                    <div class="flex rounded-lg bg-white/10 dark:bg-gray-600/30 p-1">
-                        <button id="tab-login" class="flex-1 py-2 px-4 text-white text-sm font-medium rounded-md bg-white/20 dark:bg-gray-500/50 transition-all">
+                <div class="bg-gradient-to-r from-Main-Primary to-Main-Secondary dark:from-gray-700 dark:to-gray-800 p-6">
+                    <div class="flex rounded-lg bg-white/20 dark:bg-gray-600/40 p-1 backdrop-blur-sm space-x-1">
+                        <button id="tab-login" class="flex-1 py-2.5 px-4 text-white text-sm font-semibold rounded-md bg-white/30 dark:bg-gray-500/60 shadow-md transition-all duration-300 ease-in-out">
                             Iniciar Sessão
                         </button>
-                        <button id="tab-registo" class="flex-1 py-2 px-4 text-white/70 text-sm font-medium rounded-md transition-all hover:bg-white/10">
+                        <button id="tab-registo" class="flex-1 py-2.5 px-4 text-white/80 hover:text-white text-sm font-medium rounded-md transition-all duration-300 ease-in-out hover:bg-white/10 dark:hover:bg-gray-500/30">
                             Registar
                         </button>
                     </div>
                 </div>
 
                 <!-- Formulário de Login -->
-                <div id="form-login" class="p-8">
+                <div id="form-login" class="p-6 sm:p-8">
                     <form id="login-form" class="space-y-6">
-                        <div id="login-error" class="hidden p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
-                            <p class="text-red-700 dark:text-red-300 text-sm"></p>
+                        <div id="login-error" class="hidden p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/50 rounded-lg">
+                            <p class="text-red-600 dark:text-red-300 text-sm font-medium"></p>
                         </div>
 
                         <div>
-                            <label for="login-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label for="login-email" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
                                 Email
                             </label>
                             <input type="email" id="login-email" name="email" required
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                         </div>
 
                         <div>
-                            <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label for="login-password" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
                                 Palavra-passe
                             </label>
                             <input type="password" id="login-password" name="password" required
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                         </div>
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
                             <div class="flex items-center">
-                                <input type="checkbox" id="remember" name="remember" class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
-                                <label for="remember" class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                                <input type="checkbox" id="remember" name="remember" class="w-4 h-4 text-Main-Primary border-gray-300 dark:border-gray-600 rounded focus:ring-Main-Primary dark:focus:ring-offset-gray-800">
+                                <label for="remember" class="ml-2 text-sm text-Text-Subtitles dark:text-gray-400">
                                     Lembrar-me
                                 </label>
                             </div>
-                            <button type="button" id="forgot-password" class="text-sm text-cyan-600 hover:text-cyan-700 dark:text-cyan-400 dark:hover:text-cyan-300 transition-colors">
+                            <button type="button" id="forgot-password" class="text-sm text-Main-Primary hover:text-Main-Secondary dark:text-cyan-400 dark:hover:text-cyan-300 font-medium transition-colors duration-200 ease-in-out">
                                 Esqueceu-se da palavra-passe?
                             </button>
                         </div>
 
                         <button type="submit" 
-                                class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] shadow-lg">
+                                class="w-full bg-gradient-to-r from-Main-Primary to-Main-Secondary hover:from-Main-Secondary hover:to-Main-Primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-Main-Primary dark:focus:ring-offset-gray-800 shadow-lg hover:shadow-xl">
                             Entrar
                         </button>
                     </form>
                 </div>
 
                 <!-- Formulário de Registo -->
-                <div id="form-registo" class="p-8 hidden">
+                <div id="form-registo" class="p-6 sm:p-8 hidden">
                     <form id="registo-form" class="space-y-6">
-                        <div id="registo-error" class="hidden p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
-                            <p class="text-red-700 dark:text-red-300 text-sm"></p>
+                        <div id="registo-error" class="hidden p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/50 rounded-lg">
+                            <p class="text-red-600 dark:text-red-300 text-sm font-medium"></p>
                         </div>
 
-                        <div id="registo-success" class="hidden p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
-                            <p class="text-green-700 dark:text-green-300 text-sm"></p>
+                        <div id="registo-success" class="hidden p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 rounded-lg">
+                            <p class="text-green-600 dark:text-green-300 text-sm font-medium"></p>
                         </div>
 
                         <div>
-                            <label for="registo-nome" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Nome completo
+                            <label for="registo-nome" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
+                                Primeiro e último nome
                             </label>
                             <input type="text" id="registo-nome" name="nome" required
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                         </div>
 
                         <div>
-                            <label for="registo-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label for="registo-email" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
                                 Email
                             </label>
                             <input type="email" id="registo-email" name="email" required
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                         </div>
 
                         <div>
-                            <label for="registo-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label for="registo-password" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
                                 Palavra-passe
                             </label>
                             <input type="password" id="registo-password" name="password" required
-                                   class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                                   class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                         </div>
 
                         <div class="flex items-center">
-                            <input type="checkbox" id="newsletter" name="newsletter" class="w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500">
-                            <label for="newsletter" class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                            <input type="checkbox" id="newsletter" name="newsletter" class="w-4 h-4 text-Main-Primary border-gray-300 dark:border-gray-600 rounded focus:ring-Main-Primary dark:focus:ring-offset-gray-800">
+                            <label for="newsletter" class="ml-2 text-sm text-Text-Subtitles dark:text-gray-400">
                                 Aceito receber a newsletter
                             </label>
                         </div>
 
                         <button type="submit" 
-                                class="w-full bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white font-medium py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] shadow-lg">
+                                class="w-full bg-gradient-to-r from-Main-Primary to-Main-Secondary hover:from-Main-Secondary hover:to-Main-Primary text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-Main-Primary dark:focus:ring-offset-gray-800 shadow-lg hover:shadow-xl">
                             Registar
                         </button>
                     </form>
                 </div>
 
-                <!-- Footer do modal -->
-                <div class="bg-gray-50 dark:bg-gray-800/50 px-8 py-4 border-t border-gray-200 dark:border-gray-700">
-                    <p class="text-center text-xs text-gray-500 dark:text-gray-400">
-                        Projeto académico TSIW - ESMAD
+                <!-- Footer do card -->
+                <div class="bg-gray-50 dark:bg-gray-800/60 px-6 sm:px-8 py-4 border-t border-gray-200 dark:border-gray-700/50">
+                    <p class="text-center text-xs text-Text-Subtitles dark:text-gray-400">
+                        Ao continuar, concorda com os nossos <a href="static_terms-of-service.html" class="font-medium text-Main-Primary hover:underline">Termos de Serviço</a>.
                     </p>
                 </div>
             </div>
@@ -139,51 +139,51 @@
     </main>
 
     <!-- Modal de Recuperação de Palavra-passe -->
-    <div id="forgot-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 dark:border-gray-700">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div id="forgot-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-700">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700/50">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recuperar Palavra-passe</h3>
-                    <button id="close-forgot-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-                        <span class="material-symbols-outlined">close</span>
+                    <h3 class="text-lg font-semibold text-Text-Titles dark:text-white">Recuperar Palavra-passe</h3>
+                    <button id="close-forgot-modal" class="text-gray-400 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200 ease-in-out">
+                        <span class="material-symbols-outlined text-2xl">close</span>
                     </button>
                 </div>
             </div>
             
             <form id="forgot-form" class="p-6">
-                <div id="forgot-error" class="hidden mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
-                    <p class="text-red-700 dark:text-red-300 text-sm"></p>
+                <div id="forgot-error" class="hidden mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700/50 rounded-lg">
+                    <p class="text-red-600 dark:text-red-300 text-sm font-medium"></p>
                 </div>
 
-                <div id="forgot-success" class="hidden mb-4 p-3 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
-                    <p class="text-green-700 dark:text-green-300 text-sm"></p>
+                <div id="forgot-success" class="hidden mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 rounded-lg">
+                    <p class="text-green-600 dark:text-green-300 text-sm font-medium"></p>
                 </div>
 
                 <div class="space-y-4">
                     <div>
-                        <label for="forgot-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="forgot-email" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
                             Email da conta
                         </label>
                         <input type="email" id="forgot-email" name="email" required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                               class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                     </div>
 
                     <div>
-                        <label for="forgot-new-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="forgot-new-password" class="block text-sm font-medium text-Text-Body dark:text-gray-300 mb-1.5">
                             Nova palavra-passe
                         </label>
                         <input type="password" id="forgot-new-password" name="newPassword" required
-                               class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:bg-gray-700 dark:text-white transition-colors">
+                               class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:focus:ring-Main-Primary dark:bg-gray-700 dark:text-white transition-colors duration-200 ease-in-out shadow-sm focus:shadow-md">
                     </div>
                 </div>
 
-                <div class="flex gap-3 mt-6">
+                <div class="flex flex-col sm:flex-row gap-3 mt-6">
                     <button type="button" id="cancel-forgot" 
-                            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            class="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-Text-Body dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/70 font-medium transition-colors duration-200 ease-in-out shadow-sm hover:shadow">
                         Cancelar
                     </button>
                     <button type="submit" 
-                            class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-lg transition-colors">
+                            class="flex-1 bg-Main-Primary hover:bg-Main-Secondary text-white py-2.5 px-4 rounded-lg font-medium transition-colors duration-200 ease-in-out shadow-md hover:shadow-lg">
                         Alterar
                     </button>
                 </div>
@@ -191,9 +191,8 @@
         </div>
     </div>
 
-    <footer id="footer-placeholder"></footer>
-
     <script type="module" src="../js/views/ViewHelpers.js"></script>
+    <script type="module" src="../js/models/UserModel.js"></script>
     <script type="module" src="../js/views/UserView.js"></script>
 </body>
 </html>
