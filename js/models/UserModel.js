@@ -469,8 +469,14 @@ class User {
 
 /* Função para alternar entre as abas */
 export function switchTab(tabId) {
+  console.log(`Tentando alternar para a aba: ${tabId}`);
+
   const tabButtons = document.querySelectorAll('[role="tab"]');
   const tabPanes = document.querySelectorAll(".tab-pane");
+
+  console.log(
+    `Encontrados ${tabButtons.length} botões de tabs e ${tabPanes.length} painéis`
+  );
 
   /* Desativar todas as abas */
   tabButtons.forEach((button) => {
@@ -483,14 +489,21 @@ export function switchTab(tabId) {
     button.classList.add("border-transparent");
     button.setAttribute("aria-selected", "false");
   });
-
   tabPanes.forEach((pane) => {
     pane.classList.add("hidden");
+    pane.classList.remove("active");
   });
-
   /* Ativar a aba selecionada */
   const selectedButton = document.getElementById(`tab-${tabId}-btn`);
   const selectedPane = document.getElementById(`tab-${tabId}`);
+
+  console.log(
+    `Botão selecionado: ${selectedButton ? "encontrado" : "não encontrado"}`
+  );
+  console.log(
+    `Painel selecionado: ${selectedPane ? "encontrado" : "não encontrado"}`
+  );
+
   if (selectedButton && selectedPane) {
     selectedButton.classList.add(
       "text-Button-Main",
@@ -500,8 +513,10 @@ export function switchTab(tabId) {
     );
     selectedButton.classList.remove("border-transparent");
     selectedButton.setAttribute("aria-selected", "true");
-
     selectedPane.classList.remove("hidden");
+    selectedPane.classList.add("active");
+
+    console.log(`Aba ${tabId} ativada com sucesso`);
 
     /* Carregar conteúdo específico baseado na aba */
     if (tabId === "recompensas") {
@@ -514,6 +529,10 @@ export function switchTab(tabId) {
       /* Não é necessária nenhuma ação especial para a aba de definições */
       console.log("Aba de definições carregada");
     }
+  } else {
+    console.error(
+      `Erro: Não foi possível encontrar elementos para a aba ${tabId}`
+    );
   }
 }
 

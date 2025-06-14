@@ -8,7 +8,7 @@ function initdata() {
         id: 1,
         username: "António Amorim",
         avatar: "/img/users/40240119.jpg",
-        pontos: "3500",
+        pontos: "2000",
         email: "40240119@esmad.ipp.pt",
         password: "40240119",
         isPrivate: false,

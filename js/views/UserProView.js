@@ -41,11 +41,14 @@ window.onload = function () {
   loadComponent("../_footer.html", "footer-placeholder");
 
   /* Carregar informações do utilizador */
-  loadUserInfo(); /* Adicionar eventos aos botões */
-  setupEventListeners();
+  loadUserInfo();
 
-  /* Inicializar funcionalidades das abas a partir do Model */
-  UserModel.initTabEvents();
+  /* Adicionar eventos aos botões */
+  setupEventListeners(); /* Inicializar funcionalidades das abas após um pequeno delay */
+  setTimeout(() => {
+    console.log("Iniciando tabs...");
+    UserModel.initTabEvents();
+  }, 1000);
 };
 
 /* Configurar listeners de eventos para interações do utilizador */
@@ -122,16 +125,33 @@ function setupEventListeners() {
       }
     });
   });
+
+  /* Formulário de definições do perfil */
+  const profileForm = document.getElementById("profile-settings-form");
+  if (profileForm) {
+    profileForm.addEventListener("submit", handleProfileUpdate);
+  }
+
+  /* Upload de avatar */
+  const avatarUpload = document.getElementById("avatar-upload");
+  if (avatarUpload) {
+    avatarUpload.addEventListener("change", handleAvatarUpload);
+  }
 }
 
 /* Carregar informações do utilizador */
 function loadUserInfo() {
-  /* Obter dados do utilizador "António Amorim" da localStorage */
-  const users = JSON.parse(localStorage.getItem("user"));
-  const user = users.find((u) => u.username === "António Amorim");
+  /* Verificar se utilizador está logado */
+  if (!UserModel.isLogged()) {
+    window.location.href = "_login.html";
+    return;
+  }
+
+  /* Obter dados do utilizador logado */
+  const user = UserModel.getUserLogged();
 
   if (!user) {
-    alert("Utilizador não encontrado!");
+    alert("Erro ao carregar dados do utilizador!");
     return;
   }
 
@@ -152,14 +172,20 @@ function loadUserInfo() {
   if (user.avatar) {
     document.getElementById("user-avatar").src = `..${user.avatar}`;
   }
-
   /* Preencher informações pessoais */
-  if(document.getElementById("info-username")) document.getElementById("info-username").textContent = user.username;
-  if(document.getElementById("info-email")) document.getElementById("info-email").textContent = user.email;
-  if(document.getElementById("info-points")) document.getElementById("info-points").textContent = userPoints;
-  if(document.getElementById("info-member-since")) document.getElementById("info-member-since").textContent = formatDate(
-    new Date()
-  );
+  if (document.getElementById("info-username"))
+    document.getElementById("info-username").textContent = user.username;
+  if (document.getElementById("info-email"))
+    document.getElementById("info-email").textContent = user.email;
+  if (document.getElementById("info-points"))
+    document.getElementById("info-points").textContent = userPoints;
+  if (document.getElementById("info-member-since"))
+    document.getElementById("info-member-since").textContent = formatDate(
+      new Date()
+    );
+
+  /* Popular campos do formulário de definições */
+  populateSettingsForm(user);
 
   /* Atualizar barra de progresso */
   updateProgressBar(userPoints);
@@ -169,6 +195,55 @@ function loadUserInfo() {
 
   /* Carregar preferências de viagem */
   loadTravelPreferences(user);
+}
+
+/* Popular campos do formulário de definições */
+function populateSettingsForm(user) {
+  /* Avatar nas definições */
+  const settingsAvatar = document.getElementById("settings-avatar");
+  if (settingsAvatar && user.avatar) {
+    settingsAvatar.src = `..${user.avatar}`;
+  }
+
+  /* Campos de dados pessoais */
+  const nameInput = document.getElementById("user-name-input");
+  if (nameInput) {
+    nameInput.value = user.username || "";
+  }
+
+  const emailInput = document.getElementById("user-email-input");
+  if (emailInput) {
+    emailInput.value = user.email || "";
+  }
+
+  const phoneInput = document.getElementById("user-phone-input");
+  if (phoneInput) {
+    phoneInput.value = user.telefone || "";
+  }
+
+  const birthInput = document.getElementById("user-birth-input");
+  if (birthInput && user.dataNascimento) {
+    birthInput.value = user.dataNascimento;
+  }
+
+  /* Configurações de preferências */
+  const preferences = user.preferences || {};
+
+  /* Notificações por email */
+  const emailNotifications = document.querySelector(
+    '#tab-definicoes input[type="checkbox"]:first-of-type'
+  );
+  if (emailNotifications) {
+    emailNotifications.checked = preferences.emailNotifications !== false;
+  }
+
+  /* Newsletter */
+  const newsletter = document.querySelector(
+    '#tab-definicoes input[type="checkbox"]:last-of-type'
+  );
+  if (newsletter) {
+    newsletter.checked = preferences.newsletter !== false;
+  }
 }
 
 /* Obter nível do utilizador baseado nos pontos */
@@ -188,6 +263,8 @@ function getUserLevel(points) {
 
 /* Atualizar barra de progresso */
 function updateProgressBar(points) {
+  console.log(`Atualizando barra de progresso para ${points} pontos`);
+
   /* Definir pontos para cada nível */
   const levelPoints = {
     Explorador: 0,
@@ -199,58 +276,107 @@ function updateProgressBar(points) {
 
   /* Determinar nível atual e próximo nível */
   const currentLevel = getUserLevel(points);
+  console.log(`Nível atual: ${currentLevel}`);
+
   let nextLevel;
   let pointsNeeded;
+  let progressPercentage = 0;
+
   /* Calcular pontos necessários para o próximo nível */
-  switch (currentLevel) {
-    case "Explorador":
-      nextLevel = "Viajante";
-      pointsNeeded = levelPoints.Viajante - points;
-      break;
-    case "Viajante":
-      nextLevel = "Aventureiro";
-      pointsNeeded = levelPoints.Aventureiro - points;
-      break;
-    case "Aventureiro":
-      nextLevel = "Globetrotter";
-      pointsNeeded = levelPoints.Globetrotter - points;
-      break;
-    case "Globetrotter":
-      nextLevel = "Embaixador";
-      pointsNeeded = levelPoints.Embaixador - points;
-      break;
-    default:
-      nextLevel = "Máximo";
-      pointsNeeded = 0;
+  if (currentLevel === "Embaixador") {
+    nextLevel = "Máximo";
+    pointsNeeded = 0;
+  } else {
+    /* Determinar próximo nível */
+    const levelOrder = [
+      "Explorador",
+      "Viajante",
+      "Aventureiro",
+      "Globetrotter",
+      "Embaixador",
+    ];
+    const currentIndex = levelOrder.indexOf(currentLevel);
+    nextLevel = levelOrder[currentIndex + 1];
+
+    const nextLevelPoints = levelPoints[nextLevel];
+    pointsNeeded = nextLevelPoints - points;
   }
+  /* Lógica da barra por segmentos progressivos */
+  /* Cada segmento entre níveis representa 25% da barra total */
+  const segmentPercentage = 25; /* Cada segmento vale 25% */
+
+  if (points < 250) {
+    /* Até 249 pontos: barra não aparece */
+    progressPercentage = 0;
+  } else if (points >= 5000) {
+    /* Embaixador: barra completa */
+    progressPercentage = 100;
+  } else if (points >= 3000) {
+    /* Entre Globetrotter e Embaixador */
+    const progressInSegment = points - 3000;
+    const totalPointsInSegment = 2000; /* 5000 - 3000 */
+    const segmentProgress =
+      (progressInSegment / totalPointsInSegment) * segmentPercentage;
+    progressPercentage =
+      75 + segmentProgress; /* 3 segmentos completos + progresso no 4º */
+  } else if (points >= 1500) {
+    /* Entre Aventureiro e Globetrotter */
+    const progressInSegment = points - 1500;
+    const totalPointsInSegment = 1500; /* 3000 - 1500 */
+    const segmentProgress =
+      (progressInSegment / totalPointsInSegment) * segmentPercentage;
+    progressPercentage =
+      50 + segmentProgress; /* 2 segmentos completos + progresso no 3º */
+  } else if (points >= 250) {
+    /* Entre Viajante e Aventureiro */
+    const progressInSegment = points - 250;
+    const totalPointsInSegment = 1250; /* 1500 - 250 */
+    const segmentProgress =
+      (progressInSegment / totalPointsInSegment) * segmentPercentage;
+    progressPercentage =
+      25 + segmentProgress; /* 1 segmento completo + progresso no 2º */
+  }
+
+  /* Garantir que não excede 100% */
+  progressPercentage = Math.min(100, progressPercentage);
+
+  console.log(
+    `Progresso na barra: ${points} pontos = ${progressPercentage.toFixed(1)}%`
+  );
+
   /* Atualizar texto com pontos necessários */
   const pointsInfoElement = document.querySelector(
     ".text-white.dark\\:text-gray-300.text-left.text-base"
   );
-  if (currentLevel === "Embaixador") {
-    pointsInfoElement.innerHTML =
-      "Parabéns! Alcançaste o nível máximo: <span class='font-bold'>Embaixador</span>!";
-  } else {
-    document.getElementById("points-needed").textContent = pointsNeeded;
-    document.getElementById("next-level").textContent = nextLevel;
+  if (pointsInfoElement) {
+    if (currentLevel === "Embaixador") {
+      pointsInfoElement.innerHTML =
+        "Parabéns! Alcançaste o nível máximo: <span class='font-bold'>Embaixador</span>!";
+    } else {
+      const pointsNeededEl = document.getElementById("points-needed");
+      const nextLevelEl = document.getElementById("next-level");
+      if (pointsNeededEl) pointsNeededEl.textContent = pointsNeeded;
+      if (nextLevelEl) nextLevelEl.textContent = nextLevel;
+    }
   }
+  /* Atualizar barra de progresso */
+  const progressBar = document.getElementById("progress-bar");
+  if (progressBar) {
+    /* Remover qualquer estilo inline anterior */
+    progressBar.removeAttribute("style");
 
-  /* Calcular percentagem de progresso para o próximo nível */
-  let progressPercentage;
+    /* Aplicar nova largura */
+    progressBar.style.width = `${progressPercentage}%`;
 
-  if (currentLevel === "Embaixador") {
-    progressPercentage = 100;
+    /* Garantir que a barra é visível se houver progresso */
+    if (progressPercentage > 0) {
+      progressBar.style.display = "block";
+    }
+
+    console.log(`Barra de progresso atualizada para ${progressPercentage}%`);
   } else {
-    const currentLevelPoints = levelPoints[currentLevel];
-    const nextLevelPoints = levelPoints[nextLevel];
-    const totalPointsForLevel = nextLevelPoints - currentLevelPoints;
-    const userProgressInLevel = points - currentLevelPoints;
-
-    progressPercentage = (userProgressInLevel / totalPointsForLevel) * 100;
-  } /* Atualizar barra de progresso */
-  document.getElementById(
-    "progress-bar"
-  ).style.width = `${progressPercentage}%`;
+    console.error("Elemento progress-bar não encontrado!");
+  }
 
   /* Atualizar ícones de nível na barra de progresso */
   updateLevelIcons(currentLevel);
@@ -265,75 +391,131 @@ function updateLevelIcons(currentLevel) {
     "Globetrotter",
     "Embaixador",
   ];
-  const levelMarkers = document.querySelectorAll(
-    ".absolute.top-\\[6\\.5px\\].left-0.right-0.flex.justify-between.items-center .relative"
+
+  /* Selecionar todos os marcadores na barra de progresso */
+  const levelMarkersContainer = document.querySelector(
+    ".absolute.top-2.left-0.right-0.flex.justify-between.items-center"
   );
+
+  if (!levelMarkersContainer) {
+    console.error("Contentor dos marcadores de nível não encontrado");
+    return;
+  }
+
+  const levelMarkers = levelMarkersContainer.querySelectorAll(".relative");
+  console.log(`Encontrados ${levelMarkers.length} marcadores de nível`);
 
   if (levelMarkers.length === levels.length) {
     levels.forEach((level, index) => {
       const marker = levelMarkers[index];
       const iconContainer = marker.querySelector("div:first-child");
-      const icon = marker.querySelector(
-        "div:first-child span.material-symbols-outlined"
+      const icon = iconContainer.querySelector(
+        "span.material-symbols-outlined"
       );
       const checkmark = marker.querySelector(".completed-check");
 
+      /* Atualizar ícone com símbolo correto */
       icon.textContent = getLevelSymbol(level);
+      const currentLevelIndex = levels.indexOf(currentLevel);
+      console.log(
+        `Atualizando ícone ${index}: ${level} (atual: ${currentLevel}, índice atual: ${currentLevelIndex})`
+      );
 
-      if (levels.indexOf(currentLevel) > index) {
-        // Níveis já alcançados
+      /* Obter pontos do utilizador para verificação precisa */
+      const user = UserModel.getUserLogged();
+      const userPoints = parseInt(user.pontos) || 0;
+
+      const levelPoints = {
+        Explorador: 0,
+        Viajante: 250,
+        Aventureiro: 1500,
+        Globetrotter: 3000,
+        Embaixador: 5000,
+      };
+      if (userPoints >= levelPoints[level]) {
+        /* Utilizador já alcançou este nível */
         iconContainer.className =
           "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-green-600 dark:border-green-500 z-10";
         icon.className =
           "material-symbols-outlined text-green-600 dark:text-green-500 text-sm";
-        checkmark.style.display = "flex";
-      } else if (levels.indexOf(currentLevel) === index) {
-        // Nível atual
-        iconContainer.className =
-          "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-Main-Primary dark:border-Main-Primary z-10 animate-pulse";
-        icon.className =
-          "material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm";
-        checkmark.style.display = "none";
+        if (checkmark) checkmark.style.display = "flex";
+        console.log(`Nível ${level} marcado como alcançado`);
       } else {
-        // Níveis futuros
-        iconContainer.className =
-          "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-gray-300 dark:border-gray-600 z-10";
-        icon.className =
-          "material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm";
-        checkmark.style.display = "none";
+        /* Determinar se é o próximo nível */
+        const levelOrder = [
+          "Explorador",
+          "Viajante",
+          "Aventureiro",
+          "Globetrotter",
+          "Embaixador",
+        ];
+        let nextLevelIndex = -1;
+
+        /* Encontrar o índice do próximo nível */
+        for (let i = 0; i < levelOrder.length; i++) {
+          if (userPoints < levelPoints[levelOrder[i]]) {
+            nextLevelIndex = i;
+            break;
+          }
+        }
+
+        if (index === nextLevelIndex) {
+          /* Este é o próximo nível - piscar azul */
+          iconContainer.className =
+            "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-Main-Primary dark:border-Main-Primary z-10 animate-pulse";
+          icon.className =
+            "material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm";
+          if (checkmark) checkmark.style.display = "none";
+          console.log(
+            `Nível ${level} marcado como próximo objetivo (a piscar)`
+          );
+        } else {
+          /* Nível futuro */
+          iconContainer.className =
+            "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-gray-300 dark:border-gray-600 z-10";
+          icon.className =
+            "material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm";
+          if (checkmark) checkmark.style.display = "none";
+          console.log(`Nível ${level} marcado como futuro`);
+        }
       }
     });
+  } else {
+    console.error(
+      `Número de marcadores (${levelMarkers.length}) não corresponde ao número de níveis (${levels.length})`
+    );
   }
 }
 
 /* Carregar histórico de viagens */
 function loadTravelHistory(user) {
   const travelHistoryContainer = document.getElementById("travel-history");
-  if(travelHistoryContainer){travelHistoryContainer.innerHTML = "";
+  if (travelHistoryContainer) {
+    travelHistoryContainer.innerHTML = "";
 
-  /* Verificar se o utilizador tem histórico de viagens */
-  if (!user.travelHistory || user.travelHistory.length === 0) {
-    /* Mostrar botão para criar viagem de demonstração */
-    const demoButton = document.createElement("button");
-    demoButton.className =
-      "bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300 py-2 px-4 mb-4";
-    demoButton.textContent = "Adicionar Viagem de Demonstração";
-    demoButton.addEventListener("click", addDemoTrip);
+    /* Verificar se o utilizador tem histórico de viagens */
+    if (!user.travelHistory || user.travelHistory.length === 0) {
+      /* Mostrar botão para criar viagem de demonstração */
+      const demoButton = document.createElement("button");
+      demoButton.className =
+        "bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300 py-2 px-4 mb-4";
+      demoButton.textContent = "Adicionar Viagem de Demonstração";
+      demoButton.addEventListener("click", addDemoTrip);
 
-    travelHistoryContainer.appendChild(demoButton);
+      travelHistoryContainer.appendChild(demoButton);
 
-    const emptyMessage = document.createElement("p");
-    emptyMessage.className = "text-Text-Subtitles dark:text-gray-400";
-    emptyMessage.textContent = "Nenhuma viagem registada.";
+      const emptyMessage = document.createElement("p");
+      emptyMessage.className = "text-Text-Subtitles dark:text-gray-400";
+      emptyMessage.textContent = "Nenhuma viagem registada.";
 
-    travelHistoryContainer.appendChild(emptyMessage);
-    return;
+      travelHistoryContainer.appendChild(emptyMessage);
+      return;
     }
-      user.travelHistory.forEach((trip) => {
-    const tripElement = document.createElement("div");
-    tripElement.className =
-      "bg-Main-Card-Bg-Gami dark:bg-gray-700 rounded-lg p-4 shadow-sm";
-    tripElement.innerHTML = `
+    user.travelHistory.forEach((trip) => {
+      const tripElement = document.createElement("div");
+      tripElement.className =
+        "bg-Main-Card-Bg-Gami dark:bg-gray-700 rounded-lg p-4 shadow-sm";
+      tripElement.innerHTML = `
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
         <div>
           <h3 class="text-Text-Titles dark:text-gray-200 font-semibold">${
@@ -349,23 +531,21 @@ function loadTravelHistory(user) {
       </div>
     `;
 
-    travelHistoryContainer.appendChild(tripElement);
-  });
+      travelHistoryContainer.appendChild(tripElement);
+    });
   }
 }
 
 /* Adicionar viagem de demonstração */
 function addDemoTrip() {
-  /* Obter utilizador atual da localStorage */
-  const users = JSON.parse(localStorage.getItem("user"));
-  const userIndex = users.findIndex((u) => u.username === "António Amorim");
-
-  if (userIndex === -1) {
-    alert("Utilizador não encontrado!");
+  /* Verificar se utilizador está logado */
+  if (!UserModel.isLogged()) {
+    alert("Deve fazer login primeiro!");
     return;
   }
 
-  const currentUser = users[userIndex];
+  /* Obter utilizador logado */
+  const currentUser = UserModel.getUserLogged();
 
   /* Destinos possíveis */
   const destinations = [
@@ -392,14 +572,12 @@ function addDemoTrip() {
   }
 
   currentUser.travelHistory.push(newTrip);
-
   /* Adicionar pontos */
   currentUser.pontos = parseInt(currentUser.pontos || 0) + newTrip.points;
 
   try {
-    /* Atualizar utilizador na localStorage */
-    users[userIndex] = currentUser;
-    localStorage.setItem("user", JSON.stringify(users));
+    /* Atualizar utilizador usando o modelo */
+    UserModel.update(currentUser.id, currentUser);
 
     /* Recarregar informações */
     loadUserInfo();
@@ -416,7 +594,7 @@ function addDemoTrip() {
 /* Carregar preferências de viagem */
 function loadTravelPreferences(user) {
   const preferencesContainer = document.getElementById("travel-preferences");
-  if(!preferencesContainer) return
+  if (!preferencesContainer) return;
   preferencesContainer.innerHTML = "";
 
   /* Verificar se o utilizador tem preferências de viagem */
@@ -461,7 +639,6 @@ function loadTravelPreferences(user) {
           Array.isArray(value) ? value.join(", ") : value
         }</p>
       `;
-
       preferencesContainer.appendChild(prefElement);
     }
   }
@@ -469,16 +646,14 @@ function loadTravelPreferences(user) {
 
 /* Adicionar preferências de demonstração */
 function addDemoPreferences() {
-  /* Obter utilizador atual da localStorage */
-  const users = JSON.parse(localStorage.getItem("user"));
-  const userIndex = users.findIndex((u) => u.username === "António Amorim");
-
-  if (userIndex === -1) {
-    alert("Utilizador não encontrado!");
+  /* Verificar se utilizador está logado */
+  if (!UserModel.isLogged()) {
+    alert("Deve fazer login primeiro!");
     return;
   }
 
-  const currentUser = users[userIndex];
+  /* Obter utilizador logado */
+  const currentUser = UserModel.getUserLogged();
 
   /* Criar preferências de demonstração */
   const demoPreferences = {
@@ -491,11 +666,9 @@ function addDemoPreferences() {
 
   /* Adicionar preferências ao utilizador */
   currentUser.preferences = demoPreferences;
-
   try {
-    /* Atualizar utilizador na localStorage */
-    users[userIndex] = currentUser;
-    localStorage.setItem("user", JSON.stringify(users));
+    /* Atualizar utilizador usando o modelo */
+    UserModel.update(currentUser.id, currentUser);
 
     /* Recarregar informações */
     loadUserInfo();
@@ -528,10 +701,13 @@ function openEditProfileModal() {
   const modalContent = document.createElement("div");
   modalContent.className =
     "bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 max-h-[80vh] overflow-y-auto";
+  /* Obter dados do utilizador logado */
+  if (!UserModel.isLogged()) {
+    alert("Deve fazer login primeiro!");
+    return;
+  }
 
-  /* Obter dados do utilizador atual da localStorage */
-  const users = JSON.parse(localStorage.getItem("user"));
-  const user = users.find((u) => u.username === "António Amorim");
+  const user = UserModel.getUserLogged();
   modalContent.innerHTML = `
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold font-['Space_Mono'] text-Text-Titles dark:text-gray-100">Editar Perfil</h2>
@@ -624,17 +800,13 @@ function saveProfileChanges(event) {
     alert("Nome de utilizador e email são obrigatórios.");
     return;
   }
-
-  /* Obter utilizador atual da localStorage */
-  const users = JSON.parse(localStorage.getItem("user"));
-  const userIndex = users.findIndex((u) => u.username === "António Amorim");
-
-  if (userIndex === -1) {
-    alert("Utilizador não encontrado!");
+  /* Verificar se utilizador está logado */
+  if (!UserModel.isLogged()) {
+    alert("Deve fazer login primeiro!");
     return;
   }
-
-  const currentUser = users[userIndex];
+  /* Obter utilizador logado */
+  const currentUser = UserModel.getUserLogged();
 
   /* Criar objeto com novos dados */
   const updatedUser = {
@@ -649,11 +821,9 @@ function saveProfileChanges(event) {
   if (password) {
     updatedUser.password = password;
   }
-
   try {
-    /* Atualizar utilizador na localStorage */
-    users[userIndex] = updatedUser;
-    localStorage.setItem("user", JSON.stringify(users));
+    /* Atualizar utilizador usando o modelo */
+    UserModel.update(currentUser.id, updatedUser);
 
     /* Fechar modal e recarregar informações */
     closeEditProfileModal();
@@ -827,60 +997,8 @@ function saveSpecialCode(code) {
   if (existingCodes.includes(code.trim())) {
     throw new Error("Este código já foi utilizado");
   }
-
   existingCodes.push(code.trim());
   localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
 
   return true;
 }
-
-document.addEventListener('DOMContentLoaded', ()=> {
-  const tabButtons = document.querySelectorAll('[role="tab"]');
-  const tabPanes = document.querySelectorAll('.tab-pane');
-  const btnScanit = document.getElementById("btn-scan-it")
-  
-  /* Função para mostrar uma aba */
-  function showTab(targetId) {
-      /* Esconder todas as abas */
-      tabPanes.forEach(pane => {
-          pane.classList.add('hidden');
-          pane.classList.remove('active');
-      });
-      
-      /* Remover estilo ativo de todos os botões */
-      tabButtons.forEach(btn => {
-          btn.classList.remove('border-Button-Main', 'text-Button-Main', 'active');
-          btn.classList.remove('dark:border-cyan-400', 'dark:text-cyan-400');
-          btn.classList.add('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-          btn.setAttribute('aria-selected', 'false');
-      });
-      
-      /* Mostrar a aba selecionada */
-      const targetPane = document.getElementById(targetId);
-      if (targetPane) {
-          targetPane.classList.remove('hidden');
-          targetPane.classList.add('active');
-      }
-      
-      /* Ativar o botão da aba */
-      const activeButton = document.getElementById(targetId + '-btn');
-      if (activeButton) {
-          activeButton.classList.add('border-Button-Main', 'text-Button-Main', 'active');
-          activeButton.classList.add('dark:border-cyan-400', 'dark:text-cyan-400');
-          activeButton.classList.remove('border-transparent', 'text-gray-500', 'dark:text-gray-400');
-          activeButton.setAttribute('aria-selected', 'true');
-      }
-
-      if(btnScanit){
-        btnScanit.addEventListener('click',()=>{
-        window.location.href='rewardit.html'
-      })}
-  }
-    /* Adicionar eventos aos botões das abas */
-  document.getElementById('tab-perfil-btn').addEventListener('click', () => showTab('tab-perfil'));
-  document.getElementById('tab-reservas-btn').addEventListener('click', () => showTab('tab-reservas'));
-  document.getElementById('tab-definicoes-btn').addEventListener('click', () => showTab('tab-definicoes'));
-  
-  /* Mostrar a primeira aba por defeito */
-  showTab('tab-perfil');        
-});
