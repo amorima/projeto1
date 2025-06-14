@@ -309,7 +309,7 @@ export function loadComponent(componentPath, elementId) {
             try {
               eval(script.innerHTML);
             } catch (error) {
-              console.log("Erro ao executar script:", error);
+              console.error("Erro ao executar script:", error);
             }
           });
 
@@ -449,6 +449,6 @@ export function initNavbar() {
       }
     })
     .catch((error) => {
-      console.log("NavbarView não encontrado:", error);
+      /* NavbarView não carregado */
     });
 }

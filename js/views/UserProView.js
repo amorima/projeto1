@@ -1,7 +1,8 @@
-import { loadComponent } from "./ViewHelpers.js";
+import { loadComponent, showToast } from "./ViewHelpers.js";
 import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
 import * as FlightModel from "../models/FlightModel.js";
+import { updateNavbarUser } from "./NavbarView.js";
 
 /* Funções globais para o modal de gamificação */
 window.openGamificationModal = function () {
@@ -43,7 +44,7 @@ window.onload = function () {
   loadUserInfo();
 
   /* Adicionar eventos aos botões */
-  setupEventListeners();  /* Inicializar funcionalidades das abas após um pequeno delay */
+  setupEventListeners(); /* Inicializar funcionalidades das abas após um pequeno delay */
   setTimeout(() => {
     UserModel.initTabEvents();
   }, 1000);
@@ -165,11 +166,20 @@ function loadUserInfo() {
   const levelIcon = getLevelSymbol(userLevel);
   document.querySelector(
     ".absolute.bottom-0.right-0 .material-symbols-outlined"
-  ).textContent = levelIcon;
-  /* Atualizar avatar se disponível */
-  if (user.avatar) {
-    document.getElementById("user-avatar").src = `..${user.avatar}`;
+  ).textContent = levelIcon; /* Atualizar avatar se disponível */
+  if (user.avatar && user.avatar !== "") {
+    const avatarElement = document.getElementById("user-avatar");
+    if (avatarElement) {
+      /* Corrigir caminho do avatar se necessário */
+      const avatarPath = user.avatar.startsWith("data:")
+        ? user.avatar
+        : `..${user.avatar}`;
+      avatarElement.src = avatarPath;
+    }
   }
+
+  /* Atualizar navbar após carregar os dados */
+  updateNavbarUser();
   /* Preencher informações pessoais */
   if (document.getElementById("info-username"))
     document.getElementById("info-username").textContent = user.username;
@@ -331,7 +341,10 @@ function updateProgressBar(points) {
       25 + segmentProgress; /* 1 segmento completo + progresso no 2º */
   }
 
-  /* Garantir que não excede 100% */  progressPercentage = Math.min(100, progressPercentage);
+  /* Garantir que não excede 100% */ progressPercentage = Math.min(
+    100,
+    progressPercentage
+  );
 
   /* Atualizar texto com pontos necessários */
   const pointsInfoElement = document.querySelector(
@@ -355,7 +368,7 @@ function updateProgressBar(points) {
     progressBar.removeAttribute("style");
 
     /* Aplicar nova largura */
-    progressBar.style.width = `${progressPercentage}%`;    /* Garantir que a barra é visível se houver progresso */
+    progressBar.style.width = `${progressPercentage}%`; /* Garantir que a barra é visível se houver progresso */
     if (progressPercentage > 0) {
       progressBar.style.display = "block";
     }
@@ -382,7 +395,8 @@ function updateLevelIcons(currentLevel) {
 
   if (!levelMarkersContainer) {
     console.error("Contentor dos marcadores de nível não encontrado");
-    return;  }
+    return;
+  }
 
   const levelMarkers = levelMarkersContainer.querySelectorAll(".relative");
 
@@ -393,7 +407,10 @@ function updateLevelIcons(currentLevel) {
       const icon = iconContainer.querySelector(
         "span.material-symbols-outlined"
       );
-      const checkmark = marker.querySelector(".completed-check");      /* Atualizar ícone com símbolo correto */
+      const checkmark =
+        marker.querySelector(
+          ".completed-check"
+        ); /* Atualizar ícone com símbolo correto */
       icon.textContent = getLevelSymbol(level);
       const currentLevelIndex = levels.indexOf(currentLevel);
 
@@ -413,7 +430,8 @@ function updateLevelIcons(currentLevel) {
         iconContainer.className =
           "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-green-600 dark:border-green-500 z-10";
         icon.className =
-          "material-symbols-outlined text-green-600 dark:text-green-500 text-sm";        if (checkmark) checkmark.style.display = "flex";
+          "material-symbols-outlined text-green-600 dark:text-green-500 text-sm";
+        if (checkmark) checkmark.style.display = "flex";
       } else {
         /* Determinar se é o próximo nível */
         const levelOrder = [
@@ -438,13 +456,15 @@ function updateLevelIcons(currentLevel) {
           iconContainer.className =
             "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-Main-Primary dark:border-Main-Primary z-10 animate-pulse";
           icon.className =
-            "material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm";          if (checkmark) checkmark.style.display = "none";
+            "material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm";
+          if (checkmark) checkmark.style.display = "none";
         } else {
           /* Nível futuro */
           iconContainer.className =
             "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-gray-300 dark:border-gray-600 z-10";
           icon.className =
-            "material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm";          if (checkmark) checkmark.style.display = "none";
+            "material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm";
+          if (checkmark) checkmark.style.display = "none";
         }
       }
     });
@@ -803,32 +823,95 @@ function saveProfileChanges(event) {
 /* Processar atualização do perfil */
 function handleProfileUpdate(event) {
   event.preventDefault();
-  
+
+  const user = UserModel.getUserLogged();
+  if (!user) {
+    showToast("Erro: Utilizador não encontrado", "error");
+    return;
+  }
+
   /* Obter dados do formulário */
   const formData = new FormData(event.target);
   const userData = {
-    username: formData.get('username'),
-    email: formData.get('email'),
-    telefone: formData.get('telefone'),
-    dataNascimento: formData.get('birth')
+    username: formData.get("user-name-input") || formData.get("username"),
+    email: formData.get("user-email-input") || formData.get("email"),
+    telefone: formData.get("user-phone-input") || formData.get("telefone"),
+    dataNascimento: formData.get("user-birth-input") || formData.get("birth"),
   };
-  
-  /* Simular atualização bem-sucedida */
-  alert('Perfil atualizado com sucesso!');
+
+  try {
+    /* Atualizar dados do utilizador */
+    UserModel.update(user.id, userData);
+
+    /* Atualizar informações na página */
+    if (userData.username) {
+      document.getElementById("user-name").textContent = userData.username;
+      const infoUsername = document.getElementById("info-username");
+      if (infoUsername) infoUsername.textContent = userData.username;
+    }
+
+    if (userData.email) {
+      const infoEmail = document.getElementById("info-email");
+      if (infoEmail) infoEmail.textContent = userData.email;
+    }
+
+    /* Atualizar navbar */
+    updateNavbarUser();
+
+    /* Mostrar sucesso */
+    showToast("Perfil atualizado com sucesso!", "success");
+  } catch (error) {
+    showToast("Erro ao atualizar perfil: " + error.message, "error");
+  }
 }
 
 /* Processar upload de avatar */
 function handleAvatarUpload(event) {
   const file = event.target.files[0];
   if (file) {
+    /* Validar tipo de ficheiro */
+    if (!file.type.startsWith("image/")) {
+      showToast("Por favor, seleciona apenas ficheiros de imagem", "error");
+      return;
+    }
+
     const reader = new FileReader();
-    reader.onload = function(e) {
-      /* Atualizar preview do avatar */
-      const avatarImg = document.getElementById("settings-avatar");
-      if (avatarImg) {
-        avatarImg.src = e.target.result;
+    reader.onload = function (e) {
+      const newAvatarUrl = e.target.result;
+
+      try {
+        /* Atualizar preview do avatar */
+        const avatarImg = document.getElementById("settings-avatar");
+        if (avatarImg) {
+          avatarImg.src = newAvatarUrl;
+        }
+
+        /* Atualizar avatar no utilizador logado */
+        const user = UserModel.getUserLogged();
+        if (user) {
+          UserModel.changeAvater(user, newAvatarUrl);
+          UserModel.update(user.id, user);
+
+          /* Atualizar avatar principal do perfil */
+          const mainAvatar = document.getElementById("user-avatar");
+          if (mainAvatar) {
+            mainAvatar.src = newAvatarUrl;
+          }
+
+          /* Atualizar navbar */
+          updateNavbarUser();
+
+          showToast("Avatar atualizado com sucesso!", "success");
+        }
+      } catch (error) {
+        showToast("Erro ao atualizar avatar: " + error.message, "error");
       }
     };
+
+    reader.onerror = function () {
+      showToast("Erro ao ler o ficheiro", "error");
+    };
+
     reader.readAsDataURL(file);
   }
 }

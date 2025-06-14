@@ -26,7 +26,6 @@ const loadComponent = async (url, placeholderId) => {
     }
     const html = await response.text();
     placeholder.innerHTML = html;
-    console.log(`Component ${url} loaded into #${placeholderId}`);
   } catch (error) {
     console.error(`Error loading component ${url}:`, error);
     placeholder.innerHTML = `<p class="text-red-500">Error loading component.</p>`;
@@ -70,14 +69,14 @@ export function updateNavbarUser() {
   const mobileLogoutSection = document.getElementById("mobile-logout-section");
 
   if (User.isLogged()) {
-    const user = User.getUserLogged();
-
-    /* Atualizar perfil desktop */
+    const user = User.getUserLogged(); /* Atualizar perfil desktop */
     if (profileIcon) {
       if (user.avatar && user.avatar !== "") {
+        /* Se tem avatar, mostrar imagem em vez do ícone */
         profileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
         profileIcon.className = "flex items-center justify-center";
       } else {
+        /* Se não tem avatar, mostrar ícone padrão */
         profileIcon.textContent = "account_circle";
         profileIcon.className =
           "material-symbols-outlined text-white dark:text-gray-100";
@@ -85,6 +84,7 @@ export function updateNavbarUser() {
     }
 
     if (profileText) {
+      /* Mostrar nome do utilizador */
       profileText.textContent = user.username;
     }
 
