@@ -88,10 +88,16 @@ export function updateNavbarUser() {
     if (profileText) {
       /* Mostrar nome do utilizador */
       profileText.textContent = user.username;
-      profileText.classList.remove(
-        "hidden"
-      ); /* Garantir que o nome é visível em lg */
-      profileText.classList.add("lg:block");
+      /* As classes 'hidden lg:block' no HTML controlam a visibilidade responsiva */
+      /* Certificar que lg:block está presente se foi removido por engano */
+      if (!profileText.classList.contains("lg:block")) {
+        profileText.classList.add("lg:block");
+      }
+      if (!profileText.classList.contains("hidden")) {
+        /* Adicionar hidden apenas se não for lg, mas o HTML já deve tratar disto */
+        /* Para segurança, podemos garantir que 'hidden' está lá se não for 'lg:block' */
+        /* No entanto, é melhor confiar nas classes originais do HTML */
+      }
     }
 
     /* Atualizar perfil mobile */
@@ -136,7 +142,7 @@ export function updateNavbarUser() {
 
     if (profileText) {
       profileText.textContent = "Iniciar sessão";
-      /* As classes hidden lg:block no HTML original tratam da visibilidade */
+      /* As classes 'hidden lg:block' no HTML controlam a visibilidade responsiva */
     }
 
     if (mobileProfileIcon) {
