@@ -438,17 +438,23 @@ export function closestAirport(userLocation, locationArray) {
 
 /* Função para inicializar a navbar com informações do utilizador */
 export function initNavbar() {
-  /* Importar NavbarView dinamicamente para evitar dependências circulares */
-  import("./NavbarView.js")
-    .then((NavbarView) => {
-      if (NavbarView.updateNavbarUser) {
-        NavbarView.updateNavbarUser();
-      }
-      if (NavbarView.LoginNav) {
-        NavbarView.LoginNav();
-      }
-    })
-    .catch((error) => {
-      /* NavbarView não carregado */
-    });
+  /* Pequeno delay para garantir que o UserModel foi inicializado */
+  setTimeout(() => {
+    /* Importar NavbarView dinamicamente para evitar dependências circulares */
+    import("./NavbarView.js")
+      .then((NavbarView) => {
+        if (NavbarView.LoginNav) {
+          NavbarView.LoginNav();
+        }
+        /* Chamar updateNavbarUser depois de LoginNav para preservar avatar */
+        if (NavbarView.updateNavbarUser) {
+          setTimeout(() => {
+            NavbarView.updateNavbarUser();
+          }, 100);
+        }
+      })
+      .catch((error) => {
+        /* NavbarView não carregado */
+      });
+  }, 300);
 }

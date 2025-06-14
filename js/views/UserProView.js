@@ -36,10 +36,10 @@ window.onload = function () {
   /* Inicializar o modelo */
   UserModel.init();
   FlightModel.init();
+
   /* Carregar componentes de header e footer */
   loadComponent("_header.html", "header-placeholder");
   loadComponent("_footer.html", "footer-placeholder");
-
   /* Carregar informações do utilizador */
   loadUserInfo();
 
@@ -166,19 +166,20 @@ function loadUserInfo() {
   const levelIcon = getLevelSymbol(userLevel);
   document.querySelector(
     ".absolute.bottom-0.right-0 .material-symbols-outlined"
-  ).textContent = levelIcon; /* Atualizar avatar se disponível */
-  if (user.avatar && user.avatar !== "") {
-    const avatarElement = document.getElementById("user-avatar");
-    if (avatarElement) {
+  ).textContent = levelIcon; /* Atualizar avatar */
+  const avatarElement = document.getElementById("user-avatar");
+  if (avatarElement) {
+    if (user.avatar && user.avatar !== "") {
       /* Corrigir caminho do avatar se necessário */
       const avatarPath = user.avatar.startsWith("data:")
         ? user.avatar
         : `..${user.avatar}`;
       avatarElement.src = avatarPath;
+    } else {
+      /* Se não tem avatar, usar uma imagem padrão */
+      avatarElement.src = "../img/users/40240119.jpg";
     }
-  }
-
-  /* Atualizar navbar após carregar os dados */
+  } /* Atualizar navbar após carregar os dados */
   updateNavbarUser();
   /* Preencher informações pessoais */
   if (document.getElementById("info-username"))

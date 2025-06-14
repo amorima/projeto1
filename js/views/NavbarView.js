@@ -67,13 +67,20 @@ export function updateNavbarUser() {
     "desktop-logout-section"
   );
   const mobileLogoutSection = document.getElementById("mobile-logout-section");
-
   if (User.isLogged()) {
-    const user = User.getUserLogged(); /* Atualizar perfil desktop */
+    const user = User.getUserLogged();
+    /* Atualizar perfil desktop */
     if (profileIcon) {
       if (user.avatar && user.avatar !== "") {
+        /* Corrigir caminho do avatar se necessário */
+        const avatarPath = user.avatar.startsWith("data:")
+          ? user.avatar
+          : user.avatar.startsWith("../")
+          ? user.avatar
+          : `..${user.avatar}`;
+
         /* Se tem avatar, mostrar imagem em vez do ícone */
-        profileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
+        profileIcon.innerHTML = `<img src="${avatarPath}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
         profileIcon.className = "flex items-center justify-center";
       } else {
         /* Se não tem avatar, mostrar ícone padrão */
@@ -86,12 +93,17 @@ export function updateNavbarUser() {
     if (profileText) {
       /* Mostrar nome do utilizador */
       profileText.textContent = user.username;
-    }
-
-    /* Atualizar perfil mobile */
+    } /* Atualizar perfil mobile */
     if (mobileProfileIcon) {
       if (user.avatar && user.avatar !== "") {
-        mobileProfileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-6 h-6 rounded-full object-cover">`;
+        /* Corrigir caminho do avatar se necessário */
+        const avatarPath = user.avatar.startsWith("data:")
+          ? user.avatar
+          : user.avatar.startsWith("../")
+          ? user.avatar
+          : `..${user.avatar}`;
+
+        mobileProfileIcon.innerHTML = `<img src="${avatarPath}" alt="Avatar" class="w-6 h-6 rounded-full object-cover">`;
         mobileProfileIcon.className = "flex items-center justify-center";
       } else {
         mobileProfileIcon.textContent = "account_circle";
