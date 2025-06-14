@@ -49,12 +49,12 @@ document.addEventListener("DOMContentLoaded", () => {
 /* Atualizar informações do utilizador no navbar */
 export function updateNavbarUser() {
   const profileElement = document.getElementById("profile");
-  const profileIcon = profileElement.querySelector(
-    "span.material-symbols-outlined"
-  );
-  const profileText = profileElement.querySelector(
-    "span:not(.material-symbols-outlined)"
-  );
+  const profileIcon = profileElement
+    ? profileElement.querySelector("span.material-symbols-outlined")
+    : null;
+  const profileText = profileElement
+    ? profileElement.querySelector("span:not(.material-symbols-outlined)")
+    : null;
   const mobileProfile = document.getElementById("mobile-profile");
   const mobileProfileIcon = mobileProfile
     ? mobileProfile.querySelector("span.material-symbols-outlined")
@@ -73,13 +73,15 @@ export function updateNavbarUser() {
     const user = User.getUserLogged();
 
     /* Atualizar perfil desktop */
-    if (user.avatar && user.avatar !== "") {
-      profileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
-      profileIcon.className = "flex items-center justify-center";
-    } else {
-      profileIcon.textContent = "account_circle";
-      profileIcon.className =
-        "material-symbols-outlined text-white dark:text-gray-100";
+    if (profileIcon) {
+      if (user.avatar && user.avatar !== "") {
+        profileIcon.innerHTML = `<img src="${user.avatar}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
+        profileIcon.className = "flex items-center justify-center";
+      } else {
+        profileIcon.textContent = "account_circle";
+        profileIcon.className =
+          "material-symbols-outlined text-white dark:text-gray-100";
+      }
     }
 
     if (profileText) {
@@ -111,9 +113,11 @@ export function updateNavbarUser() {
     }
   } else {
     /* Utilizador não logado - mostrar padrão */
-    profileIcon.textContent = "account_circle";
-    profileIcon.className =
-      "material-symbols-outlined text-white dark:text-gray-100";
+    if (profileIcon) {
+      profileIcon.textContent = "account_circle";
+      profileIcon.className =
+        "material-symbols-outlined text-white dark:text-gray-100";
+    }
 
     if (profileText) {
       profileText.textContent = "Iniciar sessão";
@@ -261,20 +265,18 @@ function handleLogout() {
   }
 
   /* Atualizar navbar */
-  updateNavbarUser();
-
-  /* Redirecionar para a página principal */
+  updateNavbarUser(); /* Redirecionar para a página de login */
   const currentPath = window.location.pathname;
   if (
     currentPath.endsWith("/") ||
     currentPath.endsWith("/index.html") ||
     currentPath.split("/").pop() === "index.html"
   ) {
-    /* Se estivermos no index, apenas recarregar */
-    window.location.reload();
+    /* Se estivermos no index, ir para login */
+    window.location.href = "html/_login.html";
   } else {
-    /* Se estivermos numa página dentro da pasta html, voltar ao index */
-    window.location.href = "../index.html";
+    /* Se estivermos numa página dentro da pasta html, ir para login */
+    window.location.href = "_login.html";
   }
 }
 

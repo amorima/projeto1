@@ -4,8 +4,8 @@ import { loadComponent } from "./ViewHelpers.js";
 /* Inicializar quando a página carrega */
 window.onload = function () {
   UserModel.init();
-  loadComponent("../_header.html", "header-placeholder");
-  loadComponent("../_footer.html", "footer-placeholder");
+  loadComponent("_header.html", "header-placeholder");
+  loadComponent("_footer.html", "footer-placeholder");
   setupLoginPage();
 };
 
