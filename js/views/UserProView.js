@@ -32,22 +32,28 @@ window.ignoreGamificationModal = function () {
 };
 
 /* Carregar componentes na página */
-window.onload = function () {
+window.onload = async function () {
   /* Inicializar o modelo */
   UserModel.init();
   FlightModel.init();
 
-  /* Carregar componentes de header e footer */
-  loadComponent("_header.html", "header-placeholder");
-  loadComponent("_footer.html", "footer-placeholder");
-  /* Carregar informações do utilizador */
-  loadUserInfo();
+  try {
+    /* Carregar componentes de header e footer e aguardar a sua conclusão */
+    await loadComponent("_header.html", "header-placeholder");
+    await loadComponent("_footer.html", "footer-placeholder");
 
-  /* Adicionar eventos aos botões */
-  setupEventListeners(); /* Inicializar funcionalidades das abas após um pequeno delay */
-  setTimeout(() => {
-    UserModel.initTabEvents();
-  }, 1000);
+    /* Agora que os componentes estão carregados, carregar informações do utilizador e configurar eventos */
+    loadUserInfo(); /* Esta função chama updateNavbarUser */
+    setupEventListeners();
+
+    /* Inicializar funcionalidades das abas após um pequeno delay */
+    /* Considerar se este timeout ainda é necessário ou se pode ser chamado diretamente */
+    setTimeout(() => {
+      UserModel.initTabEvents();
+    }, 100); /* Reduzido o delay, ajustar conforme necessário */
+  } catch (error) {
+    console.error("Erro ao carregar componentes na UserProView:", error);
+  }
 };
 
 /* Configurar listeners de eventos para interações do utilizador */

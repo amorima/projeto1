@@ -47,20 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* Atualizar informações do utilizador no navbar */
 export function updateNavbarUser() {
-  const profileElement = document.getElementById("profile");
-  const profileIcon = profileElement
-    ? profileElement.querySelector("span.material-symbols-outlined")
-    : null;
-  const profileText = profileElement
-    ? profileElement.querySelector("span:not(.material-symbols-outlined)")
-    : null;
-  const mobileProfile = document.getElementById("mobile-profile");
-  const mobileProfileIcon = mobileProfile
-    ? mobileProfile.querySelector("span.material-symbols-outlined")
-    : null;
-  const mobileProfileText = mobileProfile
-    ? mobileProfile.querySelector("span:not(.material-symbols-outlined)")
-    : null;
+  const profileIcon = document.getElementById("profile-icon-placeholder");
+  const profileText = document.getElementById("profile-text-placeholder");
+  const mobileProfileIcon = document.getElementById(
+    "mobile-profile-icon-placeholder"
+  );
+  const mobileProfileText = document.getElementById(
+    "mobile-profile-text-placeholder"
+  );
 
   /* Elementos de logout */
   const desktopLogoutSection = document.getElementById(
@@ -81,7 +75,8 @@ export function updateNavbarUser() {
 
         /* Se tem avatar, mostrar imagem em vez do ícone */
         profileIcon.innerHTML = `<img src="${avatarPath}" alt="Avatar" class="w-8 h-8 rounded-full object-cover">`;
-        profileIcon.className = "flex items-center justify-center";
+        profileIcon.className =
+          "flex items-center justify-center"; /* Manter para alinhamento */
       } else {
         /* Se não tem avatar, mostrar ícone padrão */
         profileIcon.textContent = "account_circle";
@@ -93,7 +88,13 @@ export function updateNavbarUser() {
     if (profileText) {
       /* Mostrar nome do utilizador */
       profileText.textContent = user.username;
-    } /* Atualizar perfil mobile */
+      profileText.classList.remove(
+        "hidden"
+      ); /* Garantir que o nome é visível em lg */
+      profileText.classList.add("lg:block");
+    }
+
+    /* Atualizar perfil mobile */
     if (mobileProfileIcon) {
       if (user.avatar && user.avatar !== "") {
         /* Corrigir caminho do avatar se necessário */
@@ -104,7 +105,8 @@ export function updateNavbarUser() {
           : `..${user.avatar}`;
 
         mobileProfileIcon.innerHTML = `<img src="${avatarPath}" alt="Avatar" class="w-6 h-6 rounded-full object-cover">`;
-        mobileProfileIcon.className = "flex items-center justify-center";
+        mobileProfileIcon.className =
+          "flex items-center justify-center"; /* Manter para alinhamento */
       } else {
         mobileProfileIcon.textContent = "account_circle";
         mobileProfileIcon.className =
@@ -113,7 +115,8 @@ export function updateNavbarUser() {
     }
 
     if (mobileProfileText) {
-      mobileProfileText.textContent = "Perfil";
+      mobileProfileText.textContent =
+        "Perfil"; /* Texto no mobile é sempre "Perfil" */
     }
 
     /* Mostrar logout */
@@ -133,6 +136,7 @@ export function updateNavbarUser() {
 
     if (profileText) {
       profileText.textContent = "Iniciar sessão";
+      /* As classes hidden lg:block no HTML original tratam da visibilidade */
     }
 
     if (mobileProfileIcon) {
