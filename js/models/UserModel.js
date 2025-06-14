@@ -1,4 +1,8 @@
-import { loadFromLocalStorage, saveToLocalStorage } from "./ModelHelpers.js";
+import {
+  loadFromLocalStorage,
+  saveToLocalStorage,
+  getNextId,
+} from "./ModelHelpers.js";
 
 // ARRAY USERS
 let users;
@@ -6,79 +10,89 @@ let newsletter;
 
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
-  users = localStorage.users ? loadFromLocalStorage("users", users) : [];
+  users = localStorage.user ? JSON.parse(localStorage.user) : [];
   newsletter = localStorage.newsletter
     ? loadFromLocalStorage("newsletter", newsletter)
     : [];
 }
 
 // ADICIONAR UTILIZADOR
-export function add(username, password, mail) {
-  if (users.some((user) => user.mail === mail)) {
-    throw Error(`User with email "${mail}" already exists!`);
+export function add(username, email, password, acceptNewsletter = false) {
+  if (users.some((user) => user.email === email)) {
+    throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
-    users.push(new User(username, password, mail));
-    saveToLocalStorage("users", users);
+    const newUser = {
+      id: getNextId(users),
+      username: username,
+      avatar: "",
+      pontos: "0",
+      email: email,
+      password: password,
+      isPrivate: false,
+      admin: false,
+      newsletter: acceptNewsletter,
+    };
+    users.push(newUser);
+    localStorage.setItem("user", JSON.stringify(users));
+
+    /* Adicionar à newsletter se aceitar */
+    if (acceptNewsletter) {
+      newsletter.push({ email: email, date: new Date().toISOString() });
+      saveToLocalStorage("newsletter", newsletter);
+    }
   }
 }
 
 // ALTERAR DADOS DO UTILIZADOR
-export function update(username, newUser) {
-  const index = users.findIndex((u) => u.username == username);
+export function update(id, newUser) {
+  const index = users.findIndex((u) => u.id == id);
   if (index !== -1) {
-    users[index] = newUser;
-    saveToLocalStorage("users", users);
+    users[index] = { ...users[index], ...newUser };
+    localStorage.setItem("user", JSON.stringify(users));
     return true;
   }
-  throw Error("No User Found");
+  throw Error("Utilizador não encontrado");
 }
 
 // APAGAR UTILIZADOR
-export function deleteUser(username) {
-  const index = users.findIndex((u) => u.username == username);
+export function deleteUser(id) {
+  const index = users.findIndex((u) => u.id == id);
   if (index !== -1) {
     users.splice(index, 1);
-    saveToLocalStorage("users", users);
+    localStorage.setItem("user", JSON.stringify(users));
     return true;
   }
-  throw Error("No User Found");
+  throw Error("Utilizador não encontrado");
+}
+
+// ALTERAR PALAVRA-PASSE
+export function changePassword(email, newPassword) {
+  const user = users.find((u) => u.email === email);
+  if (user) {
+    user.password = newPassword;
+    localStorage.setItem("user", JSON.stringify(users));
+    return true;
+  }
+  throw Error("Email não encontrado");
 }
 
 // LOGIN E MANIPULAÇÃO DE SESSÃO
 /**
  * Autentica um utilizador e armazena suas informações na sessão.
- * @param {string} username - O nome de utilizador a ser autenticado.
+ * @param {string} email - O email do utilizador a ser autenticado.
  * @param {string} password - A senha do utilizador a ser autenticado.
  * @return {boolean} Retorna true se o login for bem-sucedido, caso contrário, lança um erro.
- * @throws {Error} Se o nome de utilizador ou a senha estiverem incorretos.
- * @description
- * Esta função verifica se o nome de utilizador e a senha fornecidos correspondem a um utilizador existente.
- * Se a autenticação for bem-sucedida, o utilizador é armazenado no sessionStorage sob a chave "loggedUser".
- * Caso contrário, lança um erro indicando que o login é inválido.
- * @example
- * import { login } from './UserModel.js';
- * try {
- *   const success = login('username', 'password');
- *   if (success) {
- *    console.log('Login bem-sucedido!');
- *   }
- * }
- * catch (error) {
- *   console.error(error.message); // "Invalid login!" se as credenciais estiverem incorretas
- * }
- * @see isLogged - Para verificar se um utilizador está autenticado antes de chamar esta função.
- * @see getUserLogged - Para obter o utilizador autenticado após o login.
- * @see logout - Para desconectar o utilizador e remover suas informações da sessão.
+ * @throws {Error} Se o email ou a senha estiverem incorretos.
  */
-export function login(username, password) {
+export function login(email, password) {
   const user = users.find(
-    (user) => user.username === username && user.password === password
+    (user) => user.email === email && user.password === password
   );
   if (user) {
     sessionStorage.setItem("loggedUser", JSON.stringify(user));
     return true;
   } else {
-    throw Error("Invalid login!");
+    throw Error("Email ou palavra-passe incorretos!");
   }
 }
 
@@ -144,18 +158,9 @@ export function getUserLogged() {
  * Verifica se um utilizador é administrador.
  * @param {Object} user - O utilizador a ser verificado.
  * @return {boolean} Retorna true se o utilizador for administrador, caso contrário, retorna false.
- * @description
- * Esta função verifica a propriedade 'admin' do objeto utilizador fornecido.
- * Se a propriedade 'admin' for verdadeira, a função retorna true, indicando que o utilizador é um administrador.
- * Caso contrário, retorna false.
- * @example
- * import { isAdmin } from './UserModel.js';
- * const user = { username: 'adminUser', admin: true };
- * const result = isAdmin(user);
- * console.log(result); // true
  */
 export function isAdmin(user) {
-  user.admin ? true : false;
+  return user && user.admin === true;
 }
 
 // USER NEWSLETTER
@@ -478,14 +483,13 @@ export function switchTab(tabId) {
     button.classList.add("border-transparent");
     button.setAttribute("aria-selected", "false");
   });
-
   tabPanes.forEach((pane) => {
     pane.classList.add("hidden");
-  });
-
-  /* Ativar a aba selecionada */
+    pane.classList.remove("active");
+  }); /* Ativar a aba selecionada */
   const selectedButton = document.getElementById(`tab-${tabId}-btn`);
   const selectedPane = document.getElementById(`tab-${tabId}`);
+
   if (selectedButton && selectedPane) {
     selectedButton.classList.add(
       "text-Button-Main",
@@ -495,8 +499,8 @@ export function switchTab(tabId) {
     );
     selectedButton.classList.remove("border-transparent");
     selectedButton.setAttribute("aria-selected", "true");
-
     selectedPane.classList.remove("hidden");
+    selectedPane.classList.add("active");
 
     /* Carregar conteúdo específico baseado na aba */
     if (tabId === "recompensas") {
@@ -505,9 +509,6 @@ export function switchTab(tabId) {
       loadReservasContent();
     } else if (tabId === "perfil") {
       loadBookmarks();
-    } else if (tabId === "definicoes") {
-      /* Não é necessária nenhuma ação especial para a aba de definições */
-      console.log("Aba de definições carregada");
     }
   }
 }
@@ -515,20 +516,15 @@ export function switchTab(tabId) {
 /* Inicializar os eventos dos botões das abas */
 export function initTabEvents() {
   const tabButtons = document.querySelectorAll('[role="tab"]');
-  console.log(`Inicializando eventos para ${tabButtons.length} botões de abas`);
 
   tabButtons.forEach((button) => {
     const tabId = button.id.replace("-btn", "").replace("tab-", "");
-    console.log(`Adicionando evento para a aba "${tabId}"`);
 
     button.addEventListener("click", () => {
-      console.log(`Clique na aba "${tabId}"`);
       switchTab(tabId);
     });
   });
-
   /* Iniciar na aba Perfil */
-  console.log('Iniciando na aba "perfil"');
   switchTab("perfil");
 }
 
@@ -536,11 +532,9 @@ export function initTabEvents() {
 function loadRewarditContent() {
   const rewarditContent = document.getElementById("rewardit-content");
   if (rewarditContent && rewarditContent.classList.contains("animate-pulse")) {
-    console.log("Tentando carregar conteúdo de recompensas");
     /* Usa o caminho correto para rewardit.html */
     const pathname = window.location.pathname;
     const htmlFolder = pathname.substring(0, pathname.lastIndexOf("/") + 1);
-    console.log(`Caminho da pasta: ${htmlFolder}`);
     fetch(`${htmlFolder}rewardit.html`)
       .then((response) => {
         if (!response.ok) {
@@ -580,10 +574,6 @@ function loadRewarditContent() {
       <p class="text-Text-Body dark:text-gray-300 mb-4">A carregar conteúdo...</p>
       <div class="animate-spin inline-block w-10 h-10 border-4 border-Main-Primary border-t-transparent dark:border-cyan-500 dark:border-t-transparent rounded-full"></div>
     </div>`;
-  } else {
-    console.log(
-      "Elemento rewardit-content não encontrado ou não tem a classe animate-pulse"
-    );
   }
 }
 
@@ -592,32 +582,17 @@ function loadReservasContent() {
   /* Aqui futuramente seriam carregadas as reservas do utilizador */
   const reservasContainer = document.getElementById("reservas-container");
   const reservasEmpty = document.getElementById("reservas-empty");
-
-  console.log("Tentando carregar conteúdo da aba Reservas");
-
   if (reservasContainer && reservasEmpty) {
     /* Verificar se existem reservas */
     if (reservasContainer.children.length <= 1) {
-      console.log("Nenhuma reserva encontrada");
       if (reservasEmpty) {
         reservasEmpty.classList.remove("hidden");
       }
     } else {
-      console.log(
-        `${reservasContainer.children.length - 1} reservas encontradas`
-      );
       if (reservasEmpty) {
         reservasEmpty.classList.add("hidden");
       }
     }
-  } else {
-    console.log(
-      "Elementos reservas-container ou reservas-empty não encontrados",
-      {
-        container: !!reservasContainer,
-        empty: !!reservasEmpty,
-      }
-    );
   }
 }
 
@@ -626,28 +601,13 @@ function loadBookmarks() {
   /* Aqui futuramente seriam carregados os favoritos do utilizador */
   const bookmarksContainer = document.getElementById("bookmarks-container");
   const bookmarksEmpty = document.getElementById("bookmarks-empty");
-
-  console.log("Tentando carregar bookmarks do utilizador");
-
   if (bookmarksContainer && bookmarksEmpty) {
     /* Verificar se há bookmarks */
     if (bookmarksContainer.children.length <= 1) {
-      console.log("Nenhum bookmark encontrado");
       bookmarksEmpty.classList.remove("hidden");
     } else {
-      console.log(
-        `${bookmarksContainer.children.length - 1} bookmarks encontrados`
-      );
       bookmarksEmpty.classList.add("hidden");
     }
-  } else {
-    console.log(
-      "Elementos bookmarks-container ou bookmarks-empty não encontrados",
-      {
-        container: !!bookmarksContainer,
-        empty: !!bookmarksEmpty,
-      }
-    );
   }
 }
 

@@ -140,7 +140,7 @@ async function loadUserInfo() {
           "Parabéns! Alcançaste o nível máximo!";
     }
   } catch (error) {
-    console.log("Erro ao carregar informações do utilizador:", error);
+    console.error("Erro ao carregar informações do utilizador:", error);
   }
 }
 
@@ -194,7 +194,7 @@ async function markAchievedLevels() {
       }
     });
   } catch (error) {
-    console.log("Erro ao marcar níveis atingidos:", error);
+    console.error("Erro ao marcar níveis atingidos:", error);
   }
 }
 
