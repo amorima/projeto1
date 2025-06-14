@@ -35,18 +35,16 @@ window.onload = function () {
   /* Inicializar o modelo */
   UserModel.init();
   FlightModel.init();
-
   /* Carregar componentes de header e footer */
-  loadComponent("../_header.html", "header-placeholder");
-  loadComponent("../_footer.html", "footer-placeholder");
+  loadComponent("_header.html", "header-placeholder");
+  loadComponent("_footer.html", "footer-placeholder");
 
   /* Carregar informações do utilizador */
   loadUserInfo();
 
   /* Adicionar eventos aos botões */
-  setupEventListeners(); /* Inicializar funcionalidades das abas após um pequeno delay */
+  setupEventListeners();  /* Inicializar funcionalidades das abas após um pequeno delay */
   setTimeout(() => {
-    console.log("Iniciando tabs...");
     UserModel.initTabEvents();
   }, 1000);
 };
@@ -263,8 +261,6 @@ function getUserLevel(points) {
 
 /* Atualizar barra de progresso */
 function updateProgressBar(points) {
-  console.log(`Atualizando barra de progresso para ${points} pontos`);
-
   /* Definir pontos para cada nível */
   const levelPoints = {
     Explorador: 0,
@@ -273,10 +269,8 @@ function updateProgressBar(points) {
     Globetrotter: 3000,
     Embaixador: 5000,
   };
-
   /* Determinar nível atual e próximo nível */
   const currentLevel = getUserLevel(points);
-  console.log(`Nível atual: ${currentLevel}`);
 
   let nextLevel;
   let pointsNeeded;
@@ -337,12 +331,7 @@ function updateProgressBar(points) {
       25 + segmentProgress; /* 1 segmento completo + progresso no 2º */
   }
 
-  /* Garantir que não excede 100% */
-  progressPercentage = Math.min(100, progressPercentage);
-
-  console.log(
-    `Progresso na barra: ${points} pontos = ${progressPercentage.toFixed(1)}%`
-  );
+  /* Garantir que não excede 100% */  progressPercentage = Math.min(100, progressPercentage);
 
   /* Atualizar texto com pontos necessários */
   const pointsInfoElement = document.querySelector(
@@ -366,16 +355,10 @@ function updateProgressBar(points) {
     progressBar.removeAttribute("style");
 
     /* Aplicar nova largura */
-    progressBar.style.width = `${progressPercentage}%`;
-
-    /* Garantir que a barra é visível se houver progresso */
+    progressBar.style.width = `${progressPercentage}%`;    /* Garantir que a barra é visível se houver progresso */
     if (progressPercentage > 0) {
       progressBar.style.display = "block";
     }
-
-    console.log(`Barra de progresso atualizada para ${progressPercentage}%`);
-  } else {
-    console.error("Elemento progress-bar não encontrado!");
   }
 
   /* Atualizar ícones de nível na barra de progresso */
@@ -399,11 +382,9 @@ function updateLevelIcons(currentLevel) {
 
   if (!levelMarkersContainer) {
     console.error("Contentor dos marcadores de nível não encontrado");
-    return;
-  }
+    return;  }
 
   const levelMarkers = levelMarkersContainer.querySelectorAll(".relative");
-  console.log(`Encontrados ${levelMarkers.length} marcadores de nível`);
 
   if (levelMarkers.length === levels.length) {
     levels.forEach((level, index) => {
@@ -412,14 +393,9 @@ function updateLevelIcons(currentLevel) {
       const icon = iconContainer.querySelector(
         "span.material-symbols-outlined"
       );
-      const checkmark = marker.querySelector(".completed-check");
-
-      /* Atualizar ícone com símbolo correto */
+      const checkmark = marker.querySelector(".completed-check");      /* Atualizar ícone com símbolo correto */
       icon.textContent = getLevelSymbol(level);
       const currentLevelIndex = levels.indexOf(currentLevel);
-      console.log(
-        `Atualizando ícone ${index}: ${level} (atual: ${currentLevel}, índice atual: ${currentLevelIndex})`
-      );
 
       /* Obter pontos do utilizador para verificação precisa */
       const user = UserModel.getUserLogged();
@@ -437,9 +413,7 @@ function updateLevelIcons(currentLevel) {
         iconContainer.className =
           "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-green-600 dark:border-green-500 z-10";
         icon.className =
-          "material-symbols-outlined text-green-600 dark:text-green-500 text-sm";
-        if (checkmark) checkmark.style.display = "flex";
-        console.log(`Nível ${level} marcado como alcançado`);
+          "material-symbols-outlined text-green-600 dark:text-green-500 text-sm";        if (checkmark) checkmark.style.display = "flex";
       } else {
         /* Determinar se é o próximo nível */
         const levelOrder = [
@@ -464,26 +438,16 @@ function updateLevelIcons(currentLevel) {
           iconContainer.className =
             "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-Main-Primary dark:border-Main-Primary z-10 animate-pulse";
           icon.className =
-            "material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm";
-          if (checkmark) checkmark.style.display = "none";
-          console.log(
-            `Nível ${level} marcado como próximo objetivo (a piscar)`
-          );
+            "material-symbols-outlined text-Main-Primary dark:text-Main-Primary text-sm";          if (checkmark) checkmark.style.display = "none";
         } else {
           /* Nível futuro */
           iconContainer.className =
             "w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-full border-2 border-gray-300 dark:border-gray-600 z-10";
           icon.className =
-            "material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm";
-          if (checkmark) checkmark.style.display = "none";
-          console.log(`Nível ${level} marcado como futuro`);
+            "material-symbols-outlined text-gray-300 dark:text-gray-500 text-sm";          if (checkmark) checkmark.style.display = "none";
         }
       }
     });
-  } else {
-    console.error(
-      `Número de marcadores (${levelMarkers.length}) não corresponde ao número de níveis (${levels.length})`
-    );
   }
 }
 
@@ -833,6 +797,39 @@ function saveProfileChanges(event) {
     alert("Perfil atualizado com sucesso!");
   } catch (error) {
     alert(`Erro ao atualizar perfil: ${error.message}`);
+  }
+}
+
+/* Processar atualização do perfil */
+function handleProfileUpdate(event) {
+  event.preventDefault();
+  
+  /* Obter dados do formulário */
+  const formData = new FormData(event.target);
+  const userData = {
+    username: formData.get('username'),
+    email: formData.get('email'),
+    telefone: formData.get('telefone'),
+    dataNascimento: formData.get('birth')
+  };
+  
+  /* Simular atualização bem-sucedida */
+  alert('Perfil atualizado com sucesso!');
+}
+
+/* Processar upload de avatar */
+function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      /* Atualizar preview do avatar */
+      const avatarImg = document.getElementById("settings-avatar");
+      if (avatarImg) {
+        avatarImg.src = e.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
   }
 }
 
