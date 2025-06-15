@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const logoUrl = companhia?.logo || "../img/icons/ca_tap.jpg"; // Imagem padrão caso não encontre
         const vooElement = document.createElement("div");
         vooElement.className =
-          "bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex flex-col";
+          "bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex flex-col cursor-pointer hover:shadow-lg transition-shadow";
         vooElement.innerHTML = `
           <div class="flex items-center mb-2">
             <div class="h-8 w-12 flex items-center justify-center mr-3">
@@ -183,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <p class="text-sm font-medium">${
+              <p class="text-sm font-medium">$${
                 voo.direto === "S" ? "Voo direto" : "Voo com escala"
               }</p>
               <p class="text-xs text-gray-500 dark:text-gray-400">${
@@ -206,6 +206,10 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
         `;
+        // Adiciona evento de clique para redirecionar
+        vooElement.addEventListener("click", () => {
+          window.location.href = `flight_itinerary.html?id=${encodeURIComponent(voo.numeroVoo)}`;
+        });
         voosContainer.appendChild(vooElement);
       });
     }
