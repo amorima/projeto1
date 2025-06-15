@@ -251,6 +251,13 @@ function deixarScroll() {
 document.addEventListener("DOMContentLoaded", () => {
   Flight.init();
   const planitFilter = preencherCamposPesquisa();
+  // Atualiza o botão de datas/viajantes se vier do index
+  if (planitFilter && planitFilter.dataPartida && planitFilter.dataRegresso) {
+    const adultos = planitFilter.adultos || 1;
+    const criancas = planitFilter.criancas || 0;
+    const bebes = planitFilter.bebes || 0;
+    updateDatesButton(planitFilter.dataPartida, planitFilter.dataRegresso, adultos, criancas, bebes);
+  }
   renderFlightCards(); // Não aplica filtro PlanIt automaticamente
   setupFlightFilters();
   setupModalButtons()
