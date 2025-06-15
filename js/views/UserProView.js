@@ -829,6 +829,32 @@ function handleProfileUpdate(event) {
   }
   // Obter dados do formulário
   const formData = new FormData(event.target);
+
+  // Password change logic (acesso direto aos inputs pelo id)
+  const currentPassword = document.getElementById("current-password")?.value || "";
+  const newPassword = document.getElementById("new-password")?.value || "";
+  const confirmPassword = document.getElementById("confirm-password")?.value || "";
+  if (currentPassword || newPassword || confirmPassword) {
+    // Só tenta alterar se algum campo de password foi preenchido
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showToast("Preencha todos os campos de password.", "error");
+      return;
+    }
+    if (currentPassword !== user.password) {
+      showToast("Password atual incorreta.", "error");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showToast("A nova password e a confirmação não coincidem.", "error");
+      return;
+    }
+    if (newPassword.length < 6) {
+      showToast("A nova password deve ter pelo menos 6 caracteres.", "error");
+      return;
+    }
+    user.password = newPassword;
+  }
+
   // Atualizar todos os campos relevantes do utilizador
   const updatedUser = {
     ...user,
@@ -836,24 +862,21 @@ function handleProfileUpdate(event) {
     email: formData.get("user-email-input") || formData.get("email") || user.email,
     telefone: formData.get("user-phone-input") || formData.get("telefone") || user.telefone,
     dataNascimento: formData.get("user-birth-input") || formData.get("birth") || user.dataNascimento,
-    avatar: formData.get("user-avatar-input") || user.avatar,
+    avatar: formData.get("settings-avatar") || user.avatar,
     isPrivate: formData.get("user-private-input") === "on" || user.isPrivate,
   };
-  console.log('[DEBUG] Dados do utilizador antes do update:', user);
-  console.log('[DEBUG] Dados do utilizador a atualizar:', updatedUser);
+  // Preferências (notificações/newsletter) - manter compatibilidade
+  updatedUser.preferences = {
+    ...user.preferences,
+    emailNotifications: document.querySelector('#settings-email-notifications')?.checked ?? user.preferences?.emailNotifications,
+    newsletter: document.querySelector('#settings-newsletter')?.checked ?? user.preferences?.newsletter,
+  };
   try {
     const result = UserModel.update(user.id, updatedUser);
-    console.log('[DEBUG] Resultado do update:', result);
-    // Atualizar sessionStorage manualmente para garantir que o utilizador logado reflete as alterações
     sessionStorage.setItem("loggedUser", JSON.stringify(updatedUser));
-    // Garantir que localStorage também está atualizado (UserModel.update já faz isto, mas logar para garantir)
-    const allUsers = JSON.parse(localStorage.getItem("user"));
-    console.log('[DEBUG] Utilizadores no localStorage após update:', allUsers);
-    // Recarregar info
     loadUserInfo();
     showToast("Perfil atualizado com sucesso!", "success");
   } catch (error) {
-    console.error('[DEBUG] Erro ao atualizar perfil:', error);
     showToast("Erro ao atualizar perfil: " + error.message, "error");
   }
 }
