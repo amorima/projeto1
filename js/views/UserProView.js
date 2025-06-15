@@ -723,41 +723,31 @@ function openEditProfileModal() {
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    
     <form id="edit-profile-form" class="space-y-4">
       <div>
         <label for="edit-username" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Nome de Utilizador</label>
-        <input type="text" id="edit-username" value="${
-          user.username
-        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-username" value="${user.username}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
       <div>
         <label for="edit-email" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Email</label>
-        <input type="email" id="edit-email" value="${
-          user.email
-        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="email" id="edit-email" value="${user.email}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
       <div>
-        <label for="edit-password" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Nova Senha (deixe em branco para manter)</label>
-        <input type="password" id="edit-password" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <label for="edit-phone" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Telefone</label>
+        <input type="text" id="edit-phone" value="${user.telefone || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
+      <div>
+        <label for="edit-birth" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Data de Nascimento</label>
+        <input type="date" id="edit-birth" value="${user.dataNascimento || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+      </div>
       <div>
         <label for="edit-avatar" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">URL do Avatar</label>
-        <input type="text" id="edit-avatar" value="${
-          user.avatar || ""
-        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-avatar" value="${user.avatar || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
       <div class="flex items-center mt-4">
-        <input type="checkbox" id="edit-private" ${
-          user.private ? "checked" : ""
-        } class="h-4 w-4 text-Main-Primary dark:text-cyan-600 border-gray-300 rounded">
+        <input type="checkbox" id="edit-private" ${user.isPrivate ? "checked" : ""} class="h-4 w-4 text-Main-Primary dark:text-cyan-600 border-gray-300 rounded">
         <label for="edit-private" class="ml-2 block text-Text-Subtitles dark:text-gray-400 text-sm font-medium">Perfil Privado</label>
       </div>
-      
       <div class="flex justify-end gap-4 mt-6">
         <button type="button" id="cancel-edit" class="py-2 px-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-medium rounded-md transition duration-300">
           Cancelar
@@ -795,49 +785,34 @@ function closeEditProfileModal() {
 /* Guardar alterações do perfil */
 function saveProfileChanges(event) {
   event.preventDefault();
-
-  /* Obter dados do formulário */
   const username = document.getElementById("edit-username").value.trim();
   const email = document.getElementById("edit-email").value.trim();
-  const password = document.getElementById("edit-password").value;
+  const telefone = document.getElementById("edit-phone").value.trim();
+  const dataNascimento = document.getElementById("edit-birth").value;
   const avatar = document.getElementById("edit-avatar").value.trim();
   const isPrivate = document.getElementById("edit-private").checked;
-
-  /* Validar dados */
   if (!username || !email) {
     alert("Nome de utilizador e email são obrigatórios.");
     return;
   }
-  /* Verificar se utilizador está logado */
   if (!UserModel.isLogged()) {
     alert("Deve fazer login primeiro!");
     return;
   }
-  /* Obter utilizador logado */
   const currentUser = UserModel.getUserLogged();
-
-  /* Criar objeto com novos dados */
   const updatedUser = {
     ...currentUser,
-    username: username,
-    email: email,
-    avatar: avatar,
-    private: isPrivate,
+    username,
+    email,
+    telefone,
+    dataNascimento,
+    avatar,
+    isPrivate,
   };
-
-  /* Atualizar senha apenas se foi fornecida */
-  if (password) {
-    updatedUser.password = password;
-  }
   try {
-    /* Atualizar utilizador usando o modelo */
     UserModel.update(currentUser.id, updatedUser);
-
-    /* Fechar modal e recarregar informações */
     closeEditProfileModal();
     loadUserInfo();
-
-    /* Mostrar mensagem de sucesso */
     alert("Perfil atualizado com sucesso!");
   } catch (error) {
     alert(`Erro ao atualizar perfil: ${error.message}`);
@@ -847,44 +822,38 @@ function saveProfileChanges(event) {
 /* Processar atualização do perfil */
 function handleProfileUpdate(event) {
   event.preventDefault();
-
   const user = UserModel.getUserLogged();
   if (!user) {
     showToast("Erro: Utilizador não encontrado", "error");
     return;
   }
-
-  /* Obter dados do formulário */
+  // Obter dados do formulário
   const formData = new FormData(event.target);
-  const userData = {
-    username: formData.get("user-name-input") || formData.get("username"),
-    email: formData.get("user-email-input") || formData.get("email"),
-    telefone: formData.get("user-phone-input") || formData.get("telefone"),
-    dataNascimento: formData.get("user-birth-input") || formData.get("birth"),
+  // Atualizar todos os campos relevantes do utilizador
+  const updatedUser = {
+    ...user,
+    username: formData.get("user-name-input") || formData.get("username") || user.username,
+    email: formData.get("user-email-input") || formData.get("email") || user.email,
+    telefone: formData.get("user-phone-input") || formData.get("telefone") || user.telefone,
+    dataNascimento: formData.get("user-birth-input") || formData.get("birth") || user.dataNascimento,
+    avatar: formData.get("user-avatar-input") || user.avatar,
+    isPrivate: formData.get("user-private-input") === "on" || user.isPrivate,
   };
-
+  console.log('[DEBUG] Dados do utilizador antes do update:', user);
+  console.log('[DEBUG] Dados do utilizador a atualizar:', updatedUser);
   try {
-    /* Atualizar dados do utilizador */
-    UserModel.update(user.id, userData);
-
-    /* Atualizar informações na página */
-    if (userData.username) {
-      document.getElementById("user-name").textContent = userData.username;
-      const infoUsername = document.getElementById("info-username");
-      if (infoUsername) infoUsername.textContent = userData.username;
-    }
-
-    if (userData.email) {
-      const infoEmail = document.getElementById("info-email");
-      if (infoEmail) infoEmail.textContent = userData.email;
-    }
-
-    /* Atualizar navbar */
-    updateNavbarUser();
-
-    /* Mostrar sucesso */
+    const result = UserModel.update(user.id, updatedUser);
+    console.log('[DEBUG] Resultado do update:', result);
+    // Atualizar sessionStorage manualmente para garantir que o utilizador logado reflete as alterações
+    sessionStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+    // Garantir que localStorage também está atualizado (UserModel.update já faz isto, mas logar para garantir)
+    const allUsers = JSON.parse(localStorage.getItem("user"));
+    console.log('[DEBUG] Utilizadores no localStorage após update:', allUsers);
+    // Recarregar info
+    loadUserInfo();
     showToast("Perfil atualizado com sucesso!", "success");
   } catch (error) {
+    console.error('[DEBUG] Erro ao atualizar perfil:', error);
     showToast("Erro ao atualizar perfil: " + error.message, "error");
   }
 }

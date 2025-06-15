@@ -39,12 +39,17 @@ export function add(username, email, password, acceptNewsletter = false) {
 
 // ALTERAR DADOS DO UTILIZADOR
 export function update(id, newUser) {
-  const index = users.findIndex((u) => u.id == id);
+  // Garantir que o id é sempre número
+  const userId = parseInt(id, 10);
+  console.log('[DEBUG][UserModel] Utilizadores antes do update:', users);
+  const index = users.findIndex((u) => parseInt(u.id, 10) === userId);
   if (index !== -1) {
-    users[index] = { ...users[index], ...newUser };
+    users[index] = { ...users[index], ...newUser, id: userId };
     localStorage.setItem("user", JSON.stringify(users));
+    console.log('[DEBUG][UserModel] Utilizadores após o update:', users);
     return true;
   }
+  console.error('[DEBUG][UserModel] Utilizador não encontrado para update. id:', id, 'users:', users);
   throw Error("Utilizador não encontrado");
 }
 
