@@ -355,9 +355,9 @@ function abrirModalDatas() {
 
   /* Obter dados salvos */
   const savedData = Flight.getDatesTravelers();
-  let adultos = savedData.adultos;
-  let criancas = savedData.criancas;
-  let bebes = savedData.bebes;
+  let adultos = Number(savedData.adultos) || 1;
+  let criancas = Number(savedData.criancas) || 0;
+  let bebes = Number(savedData.bebes) || 0;
 
   /* Elementos dos contadores */
   const contadorAdultos = document.getElementById("contador-adultos");
@@ -393,7 +393,11 @@ function abrirModalDatas() {
   });
 
   /* Botao confirmar */
-  document.getElementById("confirmar-datas").addEventListener("click", () => {
+  document.getElementById("confirmar-datas").onclick = function () {
+    // Atualiza os valores dos contadores antes de salvar
+    adultos = Number(contadorAdultos.textContent) || 1;
+    criancas = Number(contadorCriancas.textContent) || 0;
+    bebes = Number(contadorBebes.textContent) || 0;
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
 
@@ -413,7 +417,7 @@ function abrirModalDatas() {
       filters.bebes = bebes;
       fecharModalDatas();
     }
-  });
+  };
 
   document
     .getElementById("fechar-modal-datas")
@@ -484,7 +488,7 @@ function updateDatesButton(
     dataPartida,
     dataRegresso
   );
-  const totalTravelers = adultos + criancas + bebes;
+  const totalTravelers = Number(adultos) + Number(criancas) + Number(bebes);
   const travelersText =
     totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
 
@@ -816,22 +820,31 @@ function shouldShowModal() {
 function handlePlanItFormSubmit(e) {
   e.preventDefault();
 
-  sessionStorage.setItem('planit_search', filters); // Limpar sessionStorage antes de guardar novos dados
   // Obter valores dos botões/inputs principais
-  const origem = document.querySelector('#btn-open p').textContent.trim();
-  const destino = document.querySelector('#btn-destino p').textContent.trim();
-  const tipoTurismo = document.getElementById('texto-tipo-turismo').textContent.trim();
-  const acessibilidade = document.getElementById('texto-acessibilidade').textContent.trim();
+  const origem = document.querySelector('#btn-open p')?.textContent.trim() || '';
+  const destino = document.querySelector('#btn-destino p')?.textContent.trim() || '';
+  const tipoTurismo = document.getElementById('texto-tipo-turismo')?.textContent.trim() || '';
+  const acessibilidade = document.getElementById('texto-acessibilidade')?.textContent.trim() || '';
 
-  // Datas e viajantes
-  const dataPartida = document.getElementById('data-partida')?.value || '';
-  const dataRegresso = document.getElementById('data-regresso')?.value || '';
-  const adultos = document.getElementById('contador-adultos')?.textContent.trim() || '1';
-  const criancas = document.getElementById('contador-criancas')?.textContent.trim() || '0';
-  const bebes = document.getElementById('contador-bebes')?.textContent.trim() || '0';
+  // Datas e viajantes (preferir o modelo se disponível)
+  let dataPartida = '', dataRegresso = '', adultos = 1, criancas = 0, bebes = 0;
+  if (typeof Flight !== 'undefined' && Flight.getDatesTravelers) {
+    const savedData = Flight.getDatesTravelers();
+    dataPartida = savedData.dataPartida || '';
+    dataRegresso = savedData.dataRegresso || '';
+    adultos = savedData.adultos || 1;
+    criancas = savedData.criancas || 0;
+    bebes = savedData.bebes || 0;
+  } else {
+    dataPartida = document.getElementById('data-partida')?.value || '';
+    dataRegresso = document.getElementById('data-regresso')?.value || '';
+    adultos = document.getElementById('contador-adultos')?.textContent.trim() || '1';
+    criancas = document.getElementById('contador-criancas')?.textContent.trim() || '0';
+    bebes = document.getElementById('contador-bebes')?.textContent.trim() || '0';
+  }
 
-  // Montar objeto para passar
-  const params = {
+  // Montar objeto para sessionStorage
+  const planitData = {
     origem,
     destino,
     tipoTurismo,
@@ -843,23 +856,15 @@ function handlePlanItFormSubmit(e) {
     bebes
   };
 
-  // Guardar no sessionStorage
-  sessionStorage.setItem('planit_search', JSON.stringify(params));
-  // Redirecionar
+  sessionStorage.setItem('planit_search', JSON.stringify(planitData));
   window.location.href = 'html/flight_search.html';
 }
 
-// Adiciona listeners aos botões PlanIt (mobile e desktop)
+// Adiciona listener ao submit do formulário principal
+// (garante que funciona para submit por enter ou botão)
 document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('section form');
-  if (!form) return;
-  // Seleciona ambos os botões PlanIt
-  const planItButtons = form.querySelectorAll('button');
-  planItButtons.forEach(btn => {
-    // Só adiciona ao botão que tem "PlanIt" (evita botões de origem/destino)
-    if (btn.textContent.includes('PlanIt') || btn.textContent.includes('Plan It') || btn.textContent.includes('Plan') && btn.textContent.includes('It')) {
-      btn.type = 'button';
-      btn.addEventListener('click', handlePlanItFormSubmit);
-    }
-  });
+  if (form) {
+    form.addEventListener('submit', handlePlanItFormSubmit);
+  }
 });
