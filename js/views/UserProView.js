@@ -1127,9 +1127,13 @@ function loadReservas(user) {
     btnDelete.innerHTML =
       '<span class="material-symbols-outlined text-red-500 text-sm">delete</span>';
     btnDelete.onclick = function () {
-      user.reservas.splice(idx, 1);
-      UserModel.update(user.id, user);
-      loadReservas(user);
+      // Remove do array e atualiza no Model
+      if (UserModel.removeReservaByNumeroVoo(user, reserva.numeroVoo)) {
+        showToast("Reserva eliminada com sucesso!", "success");
+        loadReservas(user);
+      } else {
+        showToast("Erro ao eliminar reserva.", "error");
+      }
     };
     card.appendChild(btnDelete);
 

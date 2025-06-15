@@ -407,6 +407,10 @@ export function clearTestSession() {
 
 export function addReservation(userAdd, reservation){
   if (!userAdd.reservas) userAdd.reservas = [];
+  // Verifica se já existe reserva com o mesmo numeroVoo
+  if (reservation && reservation.numeroVoo && userAdd.reservas.some(r => r.numeroVoo == reservation.numeroVoo)) {
+    return false; // Já existe
+  }
   userAdd.reservas.push(reservation);
   update(userAdd.id, userAdd);
   return true; 
@@ -677,4 +681,27 @@ export function saveSpecialCode(code) {
 
 export function getSpecialCodes() {
   return JSON.parse(localStorage.getItem("specialCodes") || "[]");
+}
+
+/**
+ * Remove uma reserva do utilizador pelo número do voo (nVoo).
+ * @param {Object} user - O utilizador autenticado.
+ * @param {string|number} numeroVoo - O número do voo da reserva a remover.
+ * @returns {boolean} True se a reserva foi removida, false caso contrário.
+ */
+export function removeReservaByNumeroVoo(user, numeroVoo) {
+  if (!user || !numeroVoo) return false;
+  if (!user.reservas || !Array.isArray(user.reservas)) return false;
+  const idx = user.reservas.findIndex(r => r.numeroVoo == numeroVoo);
+  if (idx !== -1) {
+    user.reservas.splice(idx, 1);
+    update(user.id, user);
+    // Atualizar sessão se for o user logado
+    const loggedUser = getUserLogged();
+    if (loggedUser && loggedUser.id == user.id) {
+      sessionStorage.setItem("loggedUser", JSON.stringify(user));
+    }
+    return true;
+  }
+  return false;
 }
