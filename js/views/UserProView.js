@@ -142,6 +142,14 @@ function setupEventListeners() {
   if (avatarUpload) {
     avatarUpload.addEventListener("change", handleAvatarUpload);
   }
+
+  /* Botão para scan de gamificação */
+  const btnScanIt = document.getElementById("btn-scan-it");
+  if (btnScanIt) {
+    btnScanIt.addEventListener("click", function () {
+      window.location.href = "rewardit.html";
+    });
+  }
 }
 
 /* Carregar informações do utilizador */
