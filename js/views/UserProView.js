@@ -869,8 +869,10 @@ function handleProfileUpdate(event) {
   updatedUser.preferences = {
     ...user.preferences,
     emailNotifications: document.querySelector('#settings-email-notifications')?.checked ?? user.preferences?.emailNotifications,
-    newsletter: document.querySelector('#settings-newsletter')?.checked ?? user.preferences?.newsletter,
+    newsletter: document.querySelector('#newsletter-check')?.checked ?? user.preferences?.newsletter,
   };
+  // Atualizar também user.newsletter diretamente
+  updatedUser.newsletter = document.querySelector('#newsletter-check')?.checked ?? user.newsletter;
   try {
     const result = UserModel.update(user.id, updatedUser);
     sessionStorage.setItem("loggedUser", JSON.stringify(updatedUser));
