@@ -221,6 +221,9 @@ function loadUserInfo() {
 
   /* Carregar reservas */
   loadReservas(user);
+
+  /* Carregar favoritos */
+  loadFavoritos(user);
 }
 
 /* Popular campos do formulário de definições */
@@ -1218,4 +1221,59 @@ function formatDateTime(dateStr) {
     minute: '2-digit',
     hour12: false
   });
+}
+
+/* Carregar favoritos */
+function loadFavoritos(user) {
+  // Find the bookmarks container in the Perfil tab
+  const bookmarksContainer = document.getElementById("bookmarks-container");
+  const bookmarksEmpty = document.getElementById("bookmarks-empty");
+
+  if (!bookmarksContainer) {
+    console.error("[Favoritos] bookmarks-container not found in DOM");
+    return;
+  }
+
+  // Limpa o container
+  bookmarksContainer.innerHTML = "";
+
+  // Debug: log the favoritos array
+  console.log("[Favoritos] user.favoritos:", user.favoritos);
+
+  if (!user.favoritos || user.favoritos.length === 0) {
+    if (bookmarksEmpty) {
+      bookmarksEmpty.classList.remove("hidden");
+    }
+    return;
+  } else {
+    if (bookmarksEmpty) bookmarksEmpty.classList.add("hidden");
+  }
+
+  user.favoritos.forEach((fav, idx) => {
+    console.log(`[Favoritos] Rendering favorite #${idx}:`, fav);
+    // Render a card matching the provided HTML
+    const card = document.createElement("div");
+    card.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
+    card.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-rose-500">favorite</span>
+        <div>
+          <h3 class="font-medium">${fav.destino || fav.nome || fav.title || "Favorito"}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">
+            ${fav.origem ? `${fav.origem} → ${fav.destino}` : ""}
+            ${fav.partida ? `| ${fav.partida.split(' ')[0]}` : ""}
+            ${fav.companhia ? `| ${fav.companhia}` : ""}
+          </p>
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
+    `;
+    card.onclick = function() {
+      window.location.href = `/html/flight_itinerary.html?id=${fav.numeroVoo || fav.nVoo || ""}`;
+    };
+    bookmarksContainer.appendChild(card);
+  });
+
+  // Final debug
+  console.log(`[Favoritos] Rendered ${user.favoritos.length} favorite(s).`);
 }
