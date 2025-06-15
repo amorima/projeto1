@@ -1,5 +1,21 @@
 import * as Flight from "../models/FlightModel.js";
-let filters = {}
+// Objeto global para todos os filtros e ordenação
+let filters = {
+  origem: '',
+  destino: '',
+  tipoTurismo: '',
+  acessibilidade: '',
+  dataPartida: '',
+  dataRegresso: '',
+  adultos: 1,
+  criancas: 0,
+  bebes: 0,
+  minPrice: 0,
+  maxPrice: Infinity,
+  sortDate: '',
+  sortPrice: ''
+};
+
 // Preenche os campos do topo da página de pesquisa com os dados vindos do sessionStorage
 function preencherCamposPesquisa() {
   const params = sessionStorage.getItem('planit_search');
@@ -44,89 +60,68 @@ function preencherCamposPesquisa() {
  * @param {Object} planitFilter - Filtros vindos do formulário PlanIt (opcional, pode ser null).
  * @param {number} maxCards - Número máximo de cards a renderizar (default: 18).
  */
-function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards = 18) {
-  // Helper to parse DD/MM/YYYY to YYYY-MM-DD
-  function parseFlightDate(dateStr) {
-    if (!dateStr) return "";
-    const [day, month, rest] = dateStr.split("/");
-    if (!rest) return dateStr;
-    const [year] = rest.split(" ");
-    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+function renderFlightCards(maxCards = 18) {
+  let flights = Flight.getAll();
+
+  // Filtro por tipo de turismo (se existir função e filtro)
+  let tipoTurismo = filters.tipoTurismo;
+  // Corrige: se for objeto, pega o nome e remove espaços
+  if (typeof tipoTurismo === 'object' && tipoTurismo !== null && tipoTurismo.nome) {
+    tipoTurismo = tipoTurismo.nome.replace(/\s+/g, '');
+  } else if (typeof tipoTurismo === 'string') {
+    tipoTurismo = tipoTurismo.replace(/\s+/g, '');
+  }
+  if (tipoTurismo && tipoTurismo !== 'Nenhum' && tipoTurismo !== 'Qualquer' && typeof Flight.getTripsByTurismo === 'function') {
+    flights = Flight.getTripsByTurismo(tipoTurismo);
   }
 
-  let flights = filteredFlights || Flight.getAll();
+  // Filtros principais
+  flights = flights.filter(flight => {
+    let match = true;
+    // Origem
+    if (filters.origem && filters.origem !== 'Qualquer' && filters.origem !== 'Nenhum' && filters.origem !== 'Origem' && flight.origem) {
+      const origemCidade = flight.origem.split('-').pop().trim().toLowerCase();
+      const origemCodigo = flight.origem.split('-')[0].trim().toLowerCase();
+      const filtroOrigem = filters.origem.trim().toLowerCase();
+      const origemMatch = origemCidade.includes(filtroOrigem) || origemCodigo.includes(filtroOrigem) || filtroOrigem.includes(origemCidade) || filtroOrigem.includes(origemCodigo);
+      match = match && origemMatch;
+    }
+    // Destino
+    if (filters.destino && filters.destino !== 'Qualquer' && filters.destino !== 'Nenhum' && filters.destino !== 'Destino' && flight.destino) {
+      const destinoCidade = flight.destino.split('-').pop().trim().toLowerCase();
+      const destinoCodigo = flight.destino.split('-')[0].trim().toLowerCase();
+      const filtroDestino = filters.destino.trim().toLowerCase();
+      const destinoMatch = destinoCidade.includes(filtroDestino) || destinoCodigo.includes(filtroDestino) || filtroDestino.includes(destinoCidade) || filtroDestino.includes(destinoCodigo);
+      match = match && destinoMatch;
+    }
+    // Datas
+    if (filters.dataPartida && flight.partida) {
+      const filtroData = new Date(filters.dataPartida);
+      const dataVoo = new Date(flight.partida.split(" ")[0].split("/").reverse().join("-"));
+      if (dataVoo < filtroData) match = false;
+    }
+    if (filters.dataRegresso && flight.dataVolta) {
+      const filtroData = new Date(filters.dataRegresso);
+      const dataVoo = new Date(flight.dataVolta.split(" ")[0].split("/").reverse().join("-"));
+      if (dataVoo > filtroData) match = false;
+    }
+    // Preço
+    const preco = parseFloat(flight.custo) || 0;
+    if (preco < (filters.minPrice || 0) || preco > (filters.maxPrice || Infinity)) match = false;
+    // NÃO filtrar por adultos, criancas, bebes
+    return match;
+  });
 
-  if (planitFilter) {
-    flights = flights.filter(flight => {
-      let match = true;
-      // Origem: só filtra se não for vazio, 'Qualquer', 'Nenhum' ou 'Origem'
-      if (planitFilter.origem && planitFilter.origem !== 'Qualquer' && planitFilter.origem !== 'Nenhum' && planitFilter.origem !== 'Origem' && flight.origem) {
-        const origemCidade = flight.origem.split('-').pop().trim().toLowerCase();
-        const origemCodigo = flight.origem.split('-')[0].trim().toLowerCase();
-        const filtroOrigem = planitFilter.origem.trim().toLowerCase();
-        // Permissivo: aceita se o filtro está contido no código OU cidade OU vice-versa
-        const origemMatch = origemCidade.includes(filtroOrigem) || origemCodigo.includes(filtroOrigem) || filtroOrigem.includes(origemCidade) || filtroOrigem.includes(origemCodigo);
-        match = match && origemMatch;
-      }
-      // Destino: só filtra se não for vazio, 'Qualquer', 'Nenhum' ou 'Destino'
-      if (planitFilter.destino && planitFilter.destino !== 'Qualquer' && planitFilter.destino !== 'Nenhum' && planitFilter.destino !== 'Destino' && flight.destino) {
-        const destinoCidade = flight.destino.split('-').pop().trim().toLowerCase();
-        const destinoCodigo = flight.destino.split('-')[0].trim().toLowerCase();
-        const filtroDestino = planitFilter.destino.trim().toLowerCase();
-        // Permissivo: aceita se o filtro está contido no código OU cidade OU vice-versa
-        const destinoMatch = destinoCidade.includes(filtroDestino) || destinoCodigo.includes(filtroDestino) || filtroDestino.includes(destinoCidade) || filtroDestino.includes(destinoCodigo);
-        match = match && destinoMatch;
-      }
-      // Tipo de turismo: só filtra se não for vazio, 'Nenhum' ou 'Qualquer'
-      if (planitFilter.tipoTurismo && planitFilter.tipoTurismo !== "Nenhum" && planitFilter.tipoTurismo !== "Qualquer") {
-        // Obter código do aeroporto do destino do voo
-        let destinoCodigo = null;
-        let destinoCidade = null;
-        if (flight.destino.includes("-")) {
-          destinoCodigo = flight.destino.split("-")[0].trim();
-          destinoCidade = flight.destino.split("-").pop().trim();
-        } else {
-          destinoCodigo = null;
-          destinoCidade = flight.destino.trim();
-        }
-        // Procurar destino no array de destinos
-        const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
-        let destinoObj = null;
-        if (destinoCodigo) {
-          destinoObj = destinos.find(d => d.aeroporto.toLowerCase() === destinoCodigo.toLowerCase());
-        }
-        if (!destinoObj && destinoCidade) {
-          destinoObj = destinos.find(d => d.cidade.toLowerCase() === destinoCidade.toLowerCase());
-        }
-        const tiposTurismo = destinoObj?.tiposTurismo || [];
-        // Permissivo: substring match
-        const turismoMatch = tiposTurismo.some(tipo =>
-          tipo.toLowerCase().includes(planitFilter.tipoTurismo.toLowerCase()) ||
-          planitFilter.tipoTurismo.toLowerCase().includes(tipo.toLowerCase())
-        );
-        match = match && turismoMatch;
-      }
-      // Datas: permissivo
-      // Data de partida: só filtra se preenchida, mostra voos com partida >= filtro
-      if (planitFilter.dataPartida && flight.partida) {
-        const flightDate = parseFlightDate(flight.partida);
-        if (flightDate < planitFilter.dataPartida) {
-          match = false;
-        }
-      }
-      // Data de regresso: só filtra se preenchida, mostra voos com dataVolta <= filtro
-      if (planitFilter.dataRegresso && flight.dataVolta) {
-        const flightReturnDate = parseFlightDate(flight.dataVolta);
-        if (flightReturnDate > planitFilter.dataRegresso) {
-          match = false;
-        }
-      }
-      // NÃO filtrar por adultos, criancas, bebes
-      return match;
-    });
-  } else {
-    // Se não houver filtro, mostrar todos os voos
-    flights = Flight.getAll().slice(0, maxCards);
+  // Ordenação
+  if (filters.sortDate === 'recent') {
+    flights.sort((a, b) => new Date(b.partida) - new Date(a.partida));
+  } else if (filters.sortDate === 'oldest') {
+    flights.sort((a, b) => new Date(a.partida) - new Date(b.partida));
+  }
+  if (filters.sortPrice === 'price-asc') {
+    flights.sort((a, b) => Number(a.custo) - Number(b.custo));
+  } else if (filters.sortPrice === 'price-desc') {
+    flights.sort((a, b) => Number(b.custo) - Number(a.custo));
   }
 
   // Limitar o número de cards
@@ -217,41 +212,20 @@ function setupFlightFilters() {
   const minPrice = document.getElementById("min-price");
   const maxPrice = document.getElementById("max-price");
 
-  function applyFilters() {
-    let flights = Flight.getAll();
-
-    // Filtro por preço
-    const min = parseFloat(minPrice?.value) || 0;
-    const max = parseFloat(maxPrice?.value) || Infinity;
-    flights = flights.filter((f) => {
-      const preco = parseFloat(f.custo) || 0;
-      return preco >= min && preco <= max;
-    });
-
-    // Ordenação por data de partida
-    if (sortDate && sortDate.value === "recent") {
-      flights.sort((a, b) => new Date(b.partida) - new Date(a.partida));
-    } else if (sortDate && sortDate.value === "oldest") {
-      flights.sort((a, b) => new Date(a.partida) - new Date(b.partida));
-    }
-
-    // Ordenação por preço
-    if (sortPrice && sortPrice.value === "price-asc") {
-      flights.sort((a, b) => Number(a.custo) - Number(b.custo));
-    } else if (sortPrice && sortPrice.value === "price-desc") {
-      flights.sort((a, b) => Number(b.custo) - Number(a.custo));
-    }
-
-    renderFlightCards(flights);
+  function updateAndRender() {
+    filters.minPrice = parseFloat(minPrice?.value) || 0;
+    filters.maxPrice = parseFloat(maxPrice?.value) || Infinity;
+    filters.sortDate = sortDate?.value || '';
+    filters.sortPrice = sortPrice?.value || '';
+    renderFlightCards();
   }
 
-  if (sortDate) sortDate.addEventListener("change", applyFilters);
-  if (sortPrice) sortPrice.addEventListener("change", applyFilters);
-  if (minPrice) minPrice.addEventListener("input", applyFilters);
-  if (maxPrice) maxPrice.addEventListener("input", applyFilters);
+  if (sortDate) sortDate.addEventListener("change", updateAndRender);
+  if (sortPrice) sortPrice.addEventListener("change", updateAndRender);
+  if (minPrice) minPrice.addEventListener("input", updateAndRender);
+  if (maxPrice) maxPrice.addEventListener("input", updateAndRender);
 
-  // Inicializa com todos os voos
-  applyFilters();
+  updateAndRender();
 }
 
 function setupModalButtons() {
@@ -313,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bebes = planitFilter.bebes || 0;
     updateDatesButton(planitFilter.dataPartida, planitFilter.dataRegresso, adultos, criancas, bebes);
   }
-  renderFlightCards(); // Não aplica filtro PlanIt automaticamente
+  renderFlightCards();
   setupFlightFilters();
   setupModalButtons();
 
@@ -323,45 +297,27 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       // Obter valores dos botões/inputs principais
-      const origem = document.querySelector('#btn-open p')?.textContent.trim() || '';
-      const destino = document.querySelector('#btn-destino p')?.textContent.trim() || '';
-      const tipoTurismo = document.getElementById('texto-tipo-turismo')?.textContent.trim() || '';
-      const acessibilidade = document.getElementById('texto-acessibilidade')?.textContent.trim() || '';
-      // Datas e viajantes (preferir o modelo se disponível)
+      filters.origem = document.querySelector('#btn-open p')?.textContent.trim() || '';
+      filters.destino = document.querySelector('#btn-destino p')?.textContent.trim() || '';
+      filters.tipoTurismo = (document.getElementById('texto-tipo-turismo')?.textContent.trim().replace(/\s+/g, '') || '');
+      filters.acessibilidade = document.getElementById('texto-acessibilidade')?.textContent.trim() || '';
+      // Datas e viajantes
       let dataPartida = '', dataRegresso = '', adultos = 1, criancas = 0, bebes = 0;
       if (typeof Flight !== 'undefined' && Flight.getDatesTravelers) {
         const dt = Flight.getDatesTravelers();
-        dataPartida = dt.dataPartida || '';
-        dataRegresso = dt.dataRegresso || '';
-        adultos = dt.adultos || 1;
-        criancas = dt.criancas || 0;
-        bebes = dt.bebes || 0;
+        dataPartida = dt.dataPartida;
+        dataRegresso = dt.dataRegresso;
+        adultos = dt.adultos;
+        criancas = dt.criancas;
+        bebes = dt.bebes;
       }
-      // Montar objeto para sessionStorage e filtro
-      const planitData = {
-        origem,
-        destino,
-        tipoTurismo,
-        acessibilidade,
-        dataPartida,
-        dataRegresso,
-        adultos,
-        criancas,
-        bebes
-      };
-      sessionStorage.setItem('planit_search', JSON.stringify(planitData));
-      renderFlightCards(null, planitData); // Usa o filtro atualizado
-    });
-  }
-
-  // Adiciona listener ao botão PlanIt para aplicar o filtro (opcional, caso não seja submit)
-  const planItBtn = document.querySelector('button, .planit-btn, .group [type="submit"]');
-  if (planItBtn) {
-    planItBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      // O submit do form já trata tudo
-      // Se quiser garantir, pode chamar form.requestSubmit() aqui
-      if (form) form.requestSubmit();
+      filters.dataPartida = dataPartida;
+      filters.dataRegresso = dataRegresso;
+      filters.adultos = adultos;
+      filters.criancas = criancas;
+      filters.bebes = bebes;
+      sessionStorage.setItem('planit_search', JSON.stringify(filters));
+      renderFlightCards();
     });
   }
 });
