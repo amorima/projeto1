@@ -435,15 +435,36 @@ export function addReservation(userAdd, reservation){
   update(userAdd.id, userAdd);
   return true; 
 }
-export function addFavorite(userAdd, fav){
-  if (!userAdd.favorite) userAdd.favorite = [];
-  // Verifica se já existe reserva com o mesmo numeroVoo
-  if (fav && fav.numeroVoo && userAdd.favorite.some(f => f.numeroVoo == fav.numeroVoo)) {
+export function addFavorite(user, trip) {
+  if (!user.favoritos) user.favoritos = [];
+  // Verifica se já existe favorito com o mesmo numeroVoo
+  if (trip && trip.numeroVoo && user.favoritos.some(f => f.numeroVoo == trip.numeroVoo)) {
     return false; // Já existe
   }
-  userAdd.favorite.push(fav);
-  update(userAdd.id, userAdd);
-  return true; 
+  user.favoritos.push(trip);
+  update(user.id, user);
+  // Atualizar sessão se for o user logado
+  const loggedUser = getUserLogged();
+  if (loggedUser && loggedUser.id == user.id) {
+    sessionStorage.setItem("loggedUser", JSON.stringify(user));
+  }
+  return true;
+}
+
+export function removeFavorite(user, trip) {
+  if (!user.favoritos) return false;
+  const idx = user.favoritos.findIndex(f => f.numeroVoo == trip.numeroVoo);
+  if (idx !== -1) {
+    user.favoritos.splice(idx, 1);
+    update(user.id, user);
+    // Atualizar sessão se for o user logado
+    const loggedUser = getUserLogged();
+    if (loggedUser && loggedUser.id == user.id) {
+      sessionStorage.setItem("loggedUser", JSON.stringify(user));
+    }
+    return true;
+  }
+  return false;
 }
 
 export function addPontos(user, pontos) {
@@ -818,3 +839,5 @@ export function addReplyToReview(reviewId, reply) {
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReply;
 }
+
+
