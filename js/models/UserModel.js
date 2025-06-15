@@ -405,6 +405,18 @@ export function clearTestSession() {
   sessionStorage.removeItem("loggedUser");
 }
 
+export function addReservation(userAdd, reservation){
+  if (!userAdd.reservas) userAdd.reservas = [];
+  userAdd.reservas.push(reservation);
+  update(userAdd.id, userAdd);
+  return true; 
+}
+
+export function addPontos(user, pontos) {
+  if (!user.pontos) user.pontos = 0;
+  user.pontos += pontos;
+}
+
 /**
  * CLASSE QUE MODELA UM UTILIZADOR NA APLICAÇÃO
  * @class User
