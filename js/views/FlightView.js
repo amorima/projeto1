@@ -765,33 +765,36 @@ export function renderRandomOPOCards(containerClass) {
         </div>
       </div>
     `;
-    const heart = document.getElementById(nVoo)
-    heart.addEventListener("click", ()=>{
-      if (heart.data-favorito=="true") {
-        heart.setAttribute("data-favorito", "false");
-        heart.style.fontVariationSettings = "'FILL' 0";
-        if(User.isLogged()) {
-          User.removeFavorite(User.getUserLogged(),viagem);
-        }else {
-          showToast("Faça login para remover dos favoritos");
-          window.location.href = "../html/login.html";
-        }
-      }else{
-        heart.setAttribute("data-favorito", "true");
-        heart.style.fontVariationSettings = "'FILL' 1";
-        if(User.isLogged()) {
-          User.addFavorite(User.getUserLogged(),viagem);
-        }else {
-          showToast("Faça login para adicionar aos favoritos");
-          window.location.href = "../html/login.html";
-        }
-      }
-    })
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = cardHTML;
     const card = tempDiv.firstElementChild;
     container.appendChild(card);
 
+    // Now add the event listener to the heart icon inside this card
+    const heart = card.querySelector('.favorite-icon');
+    if (heart) {
+      heart.addEventListener("click", () => {
+        if (heart.getAttribute("data-favorito") == "true") {
+          heart.setAttribute("data-favorito", "false");
+          heart.style.fontVariationSettings = "'FILL' 0";
+          if(User.isLogged()) {
+            User.removeFavorite(User.getUserLogged(),viagem);
+          }else {
+            showToast("Faça login para remover dos favoritos");
+            window.location.href = "../html/login.html";
+          }
+        }else{
+          heart.setAttribute("data-favorito", "true");
+          heart.style.fontVariationSettings = "'FILL' 1";
+          if(User.isLogged()) {
+            User.addFavorite(User.getUserLogged(),viagem);
+          }else {
+            showToast("Faça login para adicionar aos favoritos");
+            window.location.href = "../html/login.html";
+          }
+        }
+      });
+    }
   });
 
   /* Ativar toggle de favorito */
