@@ -77,8 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
       : "0.0";
 
     // Obter usuário atual (se logado)
-    const currentUser = localStorage.getItem("currentUser")
-      ? JSON.parse(localStorage.getItem("currentUser"))
+    const currentUser = localStorage.getItem("loggedUser")
+      ? JSON.parse(localStorage.getItem("loggedUser"))
       : null;
 
     // Montar o conteúdo do painel
@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!currentUser) {
         // Redirecionar para a página de login se não estiver logado
         alert("Por favor, faça login para deixar uma avaliação");
-        window.location.href = "static_login.html?redirect=explore.html";
+        window.location.href = "_login.html?redirect=explore.html";
       } else {
         // Aqui seria implementado um modal para adicionar uma avaliação
         alert(
@@ -317,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", () => {
         if (!currentUser) {
           alert("Por favor, faça login para responder a esta avaliação");
-          window.location.href = "static_login.html?redirect=explore.html";
+          window.location.href = "_login.html?redirect=explore.html";
         } else {
           const reviewId = btn.dataset.reviewId;
           // Aqui seria implementado um modal para responder

@@ -415,6 +415,16 @@ export function addReservation(userAdd, reservation){
   update(userAdd.id, userAdd);
   return true; 
 }
+export function addFavorite(userAdd, fav){
+  if (!userAdd.favorite) userAdd.favorite = [];
+  // Verifica se já existe reserva com o mesmo numeroVoo
+  if (fav && fav.numeroVoo && userAdd.favorite.some(f => f.numeroVoo == fav.numeroVoo)) {
+    return false; // Já existe
+  }
+  userAdd.favorite.push(fav);
+  update(userAdd.id, userAdd);
+  return true; 
+}
 
 export function addPontos(user, pontos) {
   if (!user.pontos) user.pontos = 0;
