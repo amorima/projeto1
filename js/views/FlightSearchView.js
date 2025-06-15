@@ -56,9 +56,6 @@ function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards
 
   let flights = filteredFlights || Flight.getAll();
 
-  console.log('Filtro recebido:', planitFilter);
-  console.log('Voos disponíveis:', flights);
-
   if (planitFilter) {
     flights = flights.filter(flight => {
       let match = true;
@@ -69,9 +66,6 @@ function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards
         const filtroOrigem = planitFilter.origem.trim().toLowerCase();
         // Permissivo: aceita se o filtro está contido no código OU cidade OU vice-versa
         const origemMatch = origemCidade.includes(filtroOrigem) || origemCodigo.includes(filtroOrigem) || filtroOrigem.includes(origemCidade) || filtroOrigem.includes(origemCodigo);
-        if (!origemMatch) {
-          console.log('Origem não bate:', flight.origem, '<->', planitFilter.origem);
-        }
         match = match && origemMatch;
       }
       // Destino: só filtra se não for vazio, 'Qualquer', 'Nenhum' ou 'Destino'
@@ -81,9 +75,6 @@ function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards
         const filtroDestino = planitFilter.destino.trim().toLowerCase();
         // Permissivo: aceita se o filtro está contido no código OU cidade OU vice-versa
         const destinoMatch = destinoCidade.includes(filtroDestino) || destinoCodigo.includes(filtroDestino) || filtroDestino.includes(destinoCidade) || filtroDestino.includes(destinoCodigo);
-        if (!destinoMatch) {
-          console.log('Destino não bate:', flight.destino, '<->', planitFilter.destino);
-        }
         match = match && destinoMatch;
       }
       // Tipo de turismo: só filtra se não for vazio, 'Nenhum' ou 'Qualquer'
@@ -113,9 +104,6 @@ function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards
           tipo.toLowerCase().includes(planitFilter.tipoTurismo.toLowerCase()) ||
           planitFilter.tipoTurismo.toLowerCase().includes(tipo.toLowerCase())
         );
-        if (!turismoMatch) {
-          console.log("Tipo de turismo não bate no destino:", tiposTurismo, "<->", planitFilter.tipoTurismo);
-        }
         match = match && turismoMatch;
       }
       // Datas: permissivo
@@ -123,7 +111,6 @@ function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards
       if (planitFilter.dataPartida && flight.partida) {
         const flightDate = parseFlightDate(flight.partida);
         if (flightDate < planitFilter.dataPartida) {
-          console.log('Data de partida não bate:', flightDate, '<', planitFilter.dataPartida);
           match = false;
         }
       }
@@ -131,21 +118,15 @@ function renderFlightCards(filteredFlights = null, planitFilter = null, maxCards
       if (planitFilter.dataRegresso && flight.dataVolta) {
         const flightReturnDate = parseFlightDate(flight.dataVolta);
         if (flightReturnDate > planitFilter.dataRegresso) {
-          console.log('Data de regresso não bate:', flightReturnDate, '>', planitFilter.dataRegresso);
           match = false;
         }
       }
       // NÃO filtrar por adultos, criancas, bebes
-      if (!match) {
-        console.log('Voo filtrado:', flight);
-      }
       return match;
     });
-    console.log('Voos após filtro:', flights);
   } else {
     // Se não houver filtro, mostrar todos os voos
     flights = Flight.getAll().slice(0, maxCards);
-    console.log('Sem filtro, mostrando todos:', flights);
   }
 
   // Limitar o número de cards
