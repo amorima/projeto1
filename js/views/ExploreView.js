@@ -392,10 +392,54 @@ document.addEventListener("DOMContentLoaded", () => {
           window.location.href = "_login.html?redirect=explore.html";
         } else {
           const reviewId = btn.dataset.reviewId;
-          // Aqui seria implementado um modal para responder
-          alert(
-            `Funcionalidade de responder à avaliação #${reviewId} será implementada em breve!`
-          );
+          // Modal para resposta
+          if (document.getElementById("reply-modal")) return;
+          const replyModal = document.createElement("div");
+          replyModal.id = "reply-modal";
+          replyModal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+          replyModal.innerHTML = `
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md relative">
+              <button id="close-reply-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl">&times;</button>
+              <h2 class="text-xl font-bold mb-4">Responder à Avaliação</h2>
+              <form id="reply-form" class="space-y-4">
+                <div>
+                  <label class="block mb-1 font-medium">Comentário</label>
+                  <textarea id="reply-comment" class="w-full rounded border border-gray-300 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-800" rows="3" required></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button type="button" id="cancel-reply" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">Cancelar</button>
+                  <button type="submit" class="px-4 py-2 rounded bg-Main-Primary text-white font-semibold">Submeter</button>
+                </div>
+              </form>
+            </div>
+          `;
+          document.body.appendChild(replyModal);
+
+          // Fechar modal
+          replyModal.querySelector('#close-reply-modal').onclick = () => replyModal.remove();
+          replyModal.querySelector('#cancel-reply').onclick = () => replyModal.remove();
+          replyModal.addEventListener('click', e => { if (e.target === replyModal) replyModal.remove(); });
+
+          // Submeter resposta
+          replyModal.querySelector('#reply-form').onsubmit = (e) => {
+            e.preventDefault();
+            const comment = replyModal.querySelector('#reply-comment').value.trim();
+            if (!comment) {
+              alert('Por favor, escreva a sua resposta.');
+              return;
+            }
+            try {
+              User.addReplyToReview(reviewId, {
+                nomePessoa: currentUser.username,
+                comentario: comment,
+                data: new Date().toISOString()
+              });
+              replyModal.remove();
+              showPanel(trip);
+            } catch (err) {
+              alert('Erro ao adicionar resposta: ' + err.message);
+            }
+          };
         }
       });
     }); // Fechar painel ao clicar no botão

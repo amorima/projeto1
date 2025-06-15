@@ -758,3 +758,46 @@ export function addReview(review) {
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReview;
 }
+
+/**
+ * Adiciona uma resposta a uma review existente.
+ * @param {number} reviewId - O ID da review à qual a resposta será adicionada.
+ * @param {Object} reply - O objeto da resposta a ser adicionada.
+ * @param {string} reply.data - A data da resposta (opcional).
+ * @param {string} reply.nomePessoa - O nome da pessoa que está respondendo (opcional).
+ * @param {string} reply.comentario - O comentário da resposta.
+ * @returns {Object} A nova resposta adicionada à review.
+ * @throws {Error} Se a review não for encontrada.
+ * @description
+ * Esta função adiciona uma resposta ao array de respostas de uma review existente.
+ * A resposta é um objeto que pode conter uma data, o nome da pessoa que está respondendo e o comentário da resposta.
+ * A função procura a review pelo ID, e se encontrada, adiciona a nova resposta ao seu array de respostas.
+ * O ID da resposta é gerado automaticamente com base no maior ID existente no array de respostas.
+ * @example
+ * import { addReplyToReview } from './UserModel.js';
+ * const reply = { comentario: 'Obrigado pelo feedback!' };
+ * addReplyToReview(1, reply);
+ * Agora a resposta 'Obrigado pelo feedback!' foi adicionada à review com ID 1.
+ */
+export function addReplyToReview(reviewId, reply) {
+  // Sempre recarrega o array mais recente do localStorage
+  reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
+  const idx = reviews.findIndex(r => r.id == reviewId);
+  if (idx === -1) throw new Error("Review não encontrada");
+  if (!reviews[idx].respostas) reviews[idx].respostas = [];
+  // Gera novo id incremental para resposta
+  let newReplyId = 1;
+  if (reviews[idx].respostas.length > 0) {
+    newReplyId = Math.max(...reviews[idx].respostas.map(r => r.id || 0)) + 1;
+  }
+  const newReply = {
+    id: newReplyId,
+    data: reply.data || new Date().toISOString().slice(0, 10),
+    nomePessoa: reply.nomePessoa || reply.user || '',
+    comentario: reply.comentario || reply.texto || reply.text || '',
+    ...reply
+  };
+  reviews[idx].respostas.push(newReply);
+  localStorage.setItem("reviews", JSON.stringify(reviews));
+  return newReply;
+}
