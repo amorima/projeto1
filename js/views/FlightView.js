@@ -355,9 +355,9 @@ function abrirModalDatas() {
 
   /* Obter dados salvos */
   const savedData = Flight.getDatesTravelers();
-  let adultos = savedData.adultos;
-  let criancas = savedData.criancas;
-  let bebes = savedData.bebes;
+  let adultos = Number(savedData.adultos) || 1;
+  let criancas = Number(savedData.criancas) || 0;
+  let bebes = Number(savedData.bebes) || 0;
 
   /* Elementos dos contadores */
   const contadorAdultos = document.getElementById("contador-adultos");
@@ -393,7 +393,11 @@ function abrirModalDatas() {
   });
 
   /* Botao confirmar */
-  document.getElementById("confirmar-datas").addEventListener("click", () => {
+  document.getElementById("confirmar-datas").onclick = function () {
+    // Atualiza os valores dos contadores antes de salvar
+    adultos = Number(contadorAdultos.textContent) || 1;
+    criancas = Number(contadorCriancas.textContent) || 0;
+    bebes = Number(contadorBebes.textContent) || 0;
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
 
@@ -413,7 +417,7 @@ function abrirModalDatas() {
       filters.bebes = bebes;
       fecharModalDatas();
     }
-  });
+  };
 
   document
     .getElementById("fechar-modal-datas")
@@ -484,7 +488,7 @@ function updateDatesButton(
     dataPartida,
     dataRegresso
   );
-  const totalTravelers = adultos + criancas + bebes;
+  const totalTravelers = Number(adultos) + Number(criancas) + Number(bebes);
   const travelersText =
     totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
 

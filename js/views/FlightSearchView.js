@@ -23,7 +23,8 @@ function preencherCamposPesquisa() {
     const datasP = datasDiv.querySelector('p');
     if (datasP) datasP.textContent = `${dados.dataPartida} - ${dados.dataRegresso}`;
     const viajantesP = datasDiv.querySelectorAll('p')[1];
-    if (viajantesP) viajantesP.textContent = `${dados.adultos} Adulto(s), ${dados.criancas} Criança(s), ${dados.bebes} Bebé(s)`;
+    const viajantes = dados.adultos + dados.criancas + dados.bebes;
+    if (viajantesP) viajantesP.textContent = `${viajantes} Viajante${viajantes > 1 ? 's' : ''}`;
   }
 
   // Tipo de turismo
@@ -567,6 +568,19 @@ function fecharModalDatas() {
   const modal = document.getElementById("modal-datas");
   modal.classList.add("hidden");
   modal.classList.remove("flex");
+
+  // Atualizar o número de viajantes ao fechar o modal
+  const contadorAdultos = document.getElementById("contador-adultos");
+  const contadorCriancas = document.getElementById("contador-criancas");
+  const contadorBebes = document.getElementById("contador-bebes");
+  const adultos = parseInt(contadorAdultos?.textContent) || 0;
+  const criancas = parseInt(contadorCriancas?.textContent) || 0;
+  const bebes = parseInt(contadorBebes?.textContent) || 0;
+  const totalTravelers = adultos + criancas + bebes;
+  const travelersText = totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
+  const btnDatas = document.getElementById("btn-datas");
+  const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
+  if (textoViajantesElemento) textoViajantesElemento.textContent = travelersText;
 }
 
 function abrirModalAcessibilidade() {
