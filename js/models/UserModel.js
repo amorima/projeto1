@@ -7,6 +7,7 @@ import {
 // ARRAY USERS
 let users;
 let newsletter;
+let reviews = [];
 
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
@@ -14,6 +15,7 @@ export function init() {
   newsletter = localStorage.newsletter
     ? loadFromLocalStorage("newsletter", newsletter)
     : [];
+  reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
 }
 
 // ADICIONAR UTILIZADOR
@@ -274,23 +276,29 @@ export function changeAvater(user, avatar) {
  * @throws {Error} Se o utilizador, o lugar ou o comentário não forem fornecidos.
  */
 export function addComment(user, place, comment) {
-  //TODO: Add replies to comments
+  // Sempre recarrega o array mais recente do localStorage
+  reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
   if (!user || !place || !comment) {
     throw Error("User, place, and comment must be provided");
   }
-
-  //* FallBack to ensure place has a comments array
-  if (!place.comments) {
-    place.comments = [];
+  const destino = place.destino || place.name || '';
+  let newId = 1;
+  if (reviews.length > 0) {
+    newId = Math.max(...reviews.map(r => r.id || 0)) + 1;
   }
-
   const newComment = {
-    user: user.username,
-    text: comment,
-    date: new Date().toISOString(),
+    id: newId,
+    destino: destino,
+    avaliacao: comment.avaliacao || null,
+    data: comment.data || new Date().toISOString().slice(0, 10),
+    nomePessoa: comment.nomePessoa || user.username,
+    comentario: comment.comentario || comment.texto || comment.text || '',
+    respostas: comment.respostas || [],
+    ...comment
   };
-
-  return place.comments.push(newComment);
+  reviews.push(newComment);
+  localStorage.setItem("reviews", JSON.stringify(reviews));
+  return newComment;
 }
 /**
  * Remove um comentário de um lugar associado a um utilizador.
@@ -403,6 +411,32 @@ export function loginTest(username, points = 50) {
 /* Limpar sessão de teste */
 export function clearTestSession() {
   sessionStorage.removeItem("loggedUser");
+}
+
+export function addReservation(userAdd, reservation){
+  if (!userAdd.reservas) userAdd.reservas = [];
+  // Verifica se já existe reserva com o mesmo numeroVoo
+  if (reservation && reservation.numeroVoo && userAdd.reservas.some(r => r.numeroVoo == reservation.numeroVoo)) {
+    return false; // Já existe
+  }
+  userAdd.reservas.push(reservation);
+  update(userAdd.id, userAdd);
+  return true; 
+}
+export function addFavorite(userAdd, fav){
+  if (!userAdd.favorite) userAdd.favorite = [];
+  // Verifica se já existe reserva com o mesmo numeroVoo
+  if (fav && fav.numeroVoo && userAdd.favorite.some(f => f.numeroVoo == fav.numeroVoo)) {
+    return false; // Já existe
+  }
+  userAdd.favorite.push(fav);
+  update(userAdd.id, userAdd);
+  return true; 
+}
+
+export function addPontos(user, pontos) {
+  if (!user.pontos) user.pontos = 0;
+  user.pontos += pontos;
 }
 
 /**
@@ -665,4 +699,105 @@ export function saveSpecialCode(code) {
 
 export function getSpecialCodes() {
   return JSON.parse(localStorage.getItem("specialCodes") || "[]");
+}
+
+/**
+ * Remove uma reserva do utilizador pelo número do voo (nVoo).
+ * @param {Object} user - O utilizador autenticado.
+ * @param {string|number} numeroVoo - O número do voo da reserva a remover.
+ * @returns {boolean} True se a reserva foi removida, false caso contrário.
+ */
+export function removeReservaByNumeroVoo(user, numeroVoo) {
+  if (!user || !numeroVoo) return false;
+  if (!user.reservas || !Array.isArray(user.reservas)) return false;
+  const idx = user.reservas.findIndex(r => r.numeroVoo == numeroVoo);
+  if (idx !== -1) {
+    user.reservas.splice(idx, 1);
+    update(user.id, user);
+    // Atualizar sessão se for o user logado
+    const loggedUser = getUserLogged();
+    if (loggedUser && loggedUser.id == user.id) {
+      sessionStorage.setItem("loggedUser", JSON.stringify(user));
+    }
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Obtém todas as reviews armazenadas.
+ * @return {Array} Um array de objetos de review.
+ */
+export function getReviews() {
+  return reviews;
+}
+
+/**
+ * Obtém as reviews de um destino específico.
+ * @param {string} destino - O destino para filtrar as reviews.
+ * @return {Array} Um array de objetos de review do destino especificado.
+ */
+export function getReviewsByDestino(destino) {
+  return reviews.filter(r => r.destino === destino);
+}
+
+/**
+ * Adiciona uma nova review.
+ * @param {Object} review - O objeto da review a ser adicionada.
+ * @return {Object} A nova review adicionada, incluindo seu ID.
+ */
+export function addReview(review) {
+  // Sempre recarrega o array mais recente do localStorage
+  reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
+  let newId = 1;
+  if (reviews.length > 0) {
+    newId = Math.max(...reviews.map(r => r.id || 0)) + 1;
+  }
+  const newReview = { ...review, id: newId };
+  reviews.push(newReview);
+  localStorage.setItem("reviews", JSON.stringify(reviews));
+  return newReview;
+}
+
+/**
+ * Adiciona uma resposta a uma review existente.
+ * @param {number} reviewId - O ID da review à qual a resposta será adicionada.
+ * @param {Object} reply - O objeto da resposta a ser adicionada.
+ * @param {string} reply.data - A data da resposta (opcional).
+ * @param {string} reply.nomePessoa - O nome da pessoa que está respondendo (opcional).
+ * @param {string} reply.comentario - O comentário da resposta.
+ * @returns {Object} A nova resposta adicionada à review.
+ * @throws {Error} Se a review não for encontrada.
+ * @description
+ * Esta função adiciona uma resposta ao array de respostas de uma review existente.
+ * A resposta é um objeto que pode conter uma data, o nome da pessoa que está respondendo e o comentário da resposta.
+ * A função procura a review pelo ID, e se encontrada, adiciona a nova resposta ao seu array de respostas.
+ * O ID da resposta é gerado automaticamente com base no maior ID existente no array de respostas.
+ * @example
+ * import { addReplyToReview } from './UserModel.js';
+ * const reply = { comentario: 'Obrigado pelo feedback!' };
+ * addReplyToReview(1, reply);
+ * Agora a resposta 'Obrigado pelo feedback!' foi adicionada à review com ID 1.
+ */
+export function addReplyToReview(reviewId, reply) {
+  // Sempre recarrega o array mais recente do localStorage
+  reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
+  const idx = reviews.findIndex(r => r.id == reviewId);
+  if (idx === -1) throw new Error("Review não encontrada");
+  if (!reviews[idx].respostas) reviews[idx].respostas = [];
+  // Gera novo id incremental para resposta
+  let newReplyId = 1;
+  if (reviews[idx].respostas.length > 0) {
+    newReplyId = Math.max(...reviews[idx].respostas.map(r => r.id || 0)) + 1;
+  }
+  const newReply = {
+    id: newReplyId,
+    data: reply.data || new Date().toISOString().slice(0, 10),
+    nomePessoa: reply.nomePessoa || reply.user || '',
+    comentario: reply.comentario || reply.texto || reply.text || '',
+    ...reply
+  };
+  reviews[idx].respostas.push(newReply);
+  localStorage.setItem("reviews", JSON.stringify(reviews));
+  return newReply;
 }

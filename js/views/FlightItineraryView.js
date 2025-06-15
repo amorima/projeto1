@@ -8,6 +8,7 @@ import {
 import * as HotelModel from "../models/HotelModel.js";
 import * as ActivityModel from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
+import * as User from "../models/UserModel.js";
 
 let vooShallow = {}
 let valor = 1
@@ -49,6 +50,18 @@ if (btnMais && btnMenos && inputPessoas) {
 
 if (btnReservar) {
   btnReservar.onclick = function () {
+    console.log("hello?")
+    if(User.isLogged()){
+      console.log("hello?")
+      const utilizador = User.getUserLogged();
+      const pontos = Number(document.getElementById("pontos-add").textContent);
+      User.addPontos(utilizador, pontos);
+      User.addReservation(utilizador, vooShallow);
+      // Persist the change in the main users array
+      User.update(utilizador.id, utilizador);
+      // Update session user
+      sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
+    }
     showToast("Viagem reservada!", "success");
 
     if (
@@ -446,7 +459,7 @@ function atualizarSidebarVoo(voo) {
       </li>
       <li class="flex items-center gap-2">
         <span class="material-symbols-outlined">star</span>
-        Acumula <b>${pontosAcumular}</b> pontos
+        Acumula <b id="pontos-add">${pontosAcumular}</b> pontos
       </li>
     </ul>
     <div class="flex items-center justify-between gap-2 mt-6">
@@ -493,16 +506,41 @@ function atualizarSidebarVoo(voo) {
   }
   if (btnReservar) {
     btnReservar.onclick = function () {
-      showToast("Viagem reservada!", "success");
-      if (!window.customElements || !window.customElements.get("dotlottie-player")) {
+      
+      User.init();
+      if(User.isLogged()){
+        const utilizador = User.getUserLogged();
+        const pontos = Number(document.getElementById("pontos-add").textContent)
+        User.addPontos(utilizador, pontos);
+        User.addReservation(utilizador, vooShallow);
+        // Persist the change in the main users array
+        User.update(utilizador.id, utilizador);
+        // Update session user
+        sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
+
+        showToast("Viagem reservada!", "success");
+        if (!window.customElements || !window.customElements.get("dotlottie-player")) {
         let script = document.createElement("script");
         script.type = "module";
         script.src = "https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs";
         script.onload = function () { };
         document.body.appendChild(script);
-        setTimeout(mostrarConfettiNoToast, 500);
+        setTimeout(mostrarConfettiNoToast, 3000);
+        setTimeout(() => {
+          window.location.href = "/index.html";
+        }, 3000);
       } else {
         mostrarConfettiNoToast();
+        setTimeout(() => {
+          window.location.href = "/index.html";
+        }, 3000);
+      }
+      }else{
+        // Se o utilizador não estiver logado, redirecionar para login
+        showToast("Por favor, faça login para reservar.", "warning");
+        setTimeout(() => {
+          window.location.href = "_login.html?redirect=flight_itinerary.html?id=" + voo.numeroVoo;
+        }, 3000);
       }
     };
   }

@@ -5,6 +5,7 @@ import {
   getCompanhiaAereaByNome,
   getVoosByDestino,
 } from "../models/FlightModel.js";
+import * as User from "../models/UserModel.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização do modelo de viagens
@@ -77,9 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       : "0.0";
 
     // Obter usuário atual (se logado)
-    const currentUser = localStorage.getItem("currentUser")
-      ? JSON.parse(localStorage.getItem("currentUser"))
-      : null;
+    const currentUser = User.getUserLogged();
 
     // Montar o conteúdo do painel
     panel.innerHTML = `
@@ -167,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const logoUrl = companhia?.logo || "../img/icons/ca_tap.jpg"; // Imagem padrão caso não encontre
         const vooElement = document.createElement("div");
         vooElement.className =
-          "bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex flex-col";
+          "bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex flex-col cursor-pointer hover:shadow-lg transition-shadow";
         vooElement.innerHTML = `
           <div class="flex items-center mb-2">
             <div class="h-8 w-12 flex items-center justify-center mr-3">
@@ -184,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <p class="text-sm font-medium">${
+              <p class="text-sm font-medium">$${
                 voo.direto === "S" ? "Voo direto" : "Voo com escala"
               }</p>
               <p class="text-xs text-gray-500 dark:text-gray-400">${
@@ -207,6 +206,10 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
         `;
+        // Adiciona evento de clique para redirecionar
+        vooElement.addEventListener("click", () => {
+          window.location.href = `flight_itinerary.html?id=${encodeURIComponent(voo.numeroVoo)}`;
+        });
         voosContainer.appendChild(vooElement);
       });
     }
@@ -300,14 +303,87 @@ document.addEventListener("DOMContentLoaded", () => {
     const addReviewBtn = panel.querySelector("#add-review");
     addReviewBtn.addEventListener("click", () => {
       if (!currentUser) {
-        // Redirecionar para a página de login se não estiver logado
-        alert("Por favor, faça login para deixar uma avaliação");
-        window.location.href = "static_login.html?redirect=explore.html";
+        window.location.href = "_login.html?redirect=explore.html";
       } else {
-        // Aqui seria implementado um modal para adicionar uma avaliação
-        alert(
-          "Funcionalidade de adicionar avaliação será implementada em breve!"
-        );
+        // Criar modal para adicionar avaliação
+        if (document.getElementById("review-modal")) return; // Evita múltiplos modais
+        const modal = document.createElement("div");
+        modal.id = "review-modal";
+        modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+        modal.innerHTML = `
+          <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md relative">
+            <button id="close-review-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl">&times;</button>
+            <h2 class="text-xl font-bold mb-4">Adicionar Avaliação</h2>
+            <form id="review-form" class="space-y-4">
+              <div>
+                <label class="block mb-1 font-medium">Classificação</label>
+                <div id="star-input" class="flex gap-1">
+                  ${[1,2,3,4,5].map(i => `<span data-value="${i}" class="material-symbols-outlined text-3xl text-gray-300 cursor-pointer">star</span>`).join("")}
+                </div>
+              </div>
+              <div>
+                <label class="block mb-1 font-medium">Comentário</label>
+                <textarea id="review-comment" class="w-full rounded border border-gray-300 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-800" rows="3" required></textarea>
+              </div>
+              <div class="flex justify-end gap-2">
+                <button type="button" id="cancel-review" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">Cancelar</button>
+                <button type="submit" class="px-4 py-2 rounded bg-Main-Primary text-white font-semibold">Submeter</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Star rating logic
+        let selectedRating = 0;
+        const stars = modal.querySelectorAll('#star-input span');
+        stars.forEach(star => {
+          star.addEventListener('mouseenter', () => {
+            const val = +star.dataset.value;
+            stars.forEach((s, i) => {
+              s.classList.toggle('text-yellow-400', i < val);
+              s.classList.toggle('text-gray-300', i >= val);
+            });
+          });
+          star.addEventListener('mouseleave', () => {
+            stars.forEach((s, i) => {
+              s.classList.toggle('text-yellow-400', i < selectedRating);
+              s.classList.toggle('text-gray-300', i >= selectedRating);
+            });
+          });
+          star.addEventListener('click', () => {
+            selectedRating = +star.dataset.value;
+            stars.forEach((s, i) => {
+              s.classList.toggle('text-yellow-400', i < selectedRating);
+              s.classList.toggle('text-gray-300', i >= selectedRating);
+            });
+          });
+        });
+
+        // Close modal logic
+        modal.querySelector('#close-review-modal').onclick = () => modal.remove();
+        modal.querySelector('#cancel-review').onclick = () => modal.remove();
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+        // Submit review
+        modal.querySelector('#review-form').onsubmit = (e) => {
+          e.preventDefault();
+          const comment = modal.querySelector('#review-comment').value.trim();
+          if (!selectedRating || !comment) {
+            alert('Por favor, preencha todos os campos e selecione uma classificação.');
+            return;
+          }
+          // Adiciona o comentário usando a função do UserModel
+          try {
+            // O addComment espera (user, place, comment). Vamos passar um objeto com rating e texto.
+            User.addComment(currentUser, trip, { texto: comment, avaliacao: selectedRating, data: new Date().toISOString() });
+            modal.remove();
+            // Atualiza painel para mostrar nova avaliação
+            showPanel(trip);
+          } catch (err) {
+            alert('Erro ao adicionar avaliação: ' + err.message);
+          }
+        };
       }
     });
 
@@ -317,13 +393,57 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.addEventListener("click", () => {
         if (!currentUser) {
           alert("Por favor, faça login para responder a esta avaliação");
-          window.location.href = "static_login.html?redirect=explore.html";
+          window.location.href = "_login.html?redirect=explore.html";
         } else {
           const reviewId = btn.dataset.reviewId;
-          // Aqui seria implementado um modal para responder
-          alert(
-            `Funcionalidade de responder à avaliação #${reviewId} será implementada em breve!`
-          );
+          // Modal para resposta
+          if (document.getElementById("reply-modal")) return;
+          const replyModal = document.createElement("div");
+          replyModal.id = "reply-modal";
+          replyModal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+          replyModal.innerHTML = `
+            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md relative">
+              <button id="close-reply-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl">&times;</button>
+              <h2 class="text-xl font-bold mb-4">Responder à Avaliação</h2>
+              <form id="reply-form" class="space-y-4">
+                <div>
+                  <label class="block mb-1 font-medium">Comentário</label>
+                  <textarea id="reply-comment" class="w-full rounded border border-gray-300 dark:border-gray-700 p-2 bg-gray-50 dark:bg-gray-800" rows="3" required></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button type="button" id="cancel-reply" class="px-4 py-2 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">Cancelar</button>
+                  <button type="submit" class="px-4 py-2 rounded bg-Main-Primary text-white font-semibold">Submeter</button>
+                </div>
+              </form>
+            </div>
+          `;
+          document.body.appendChild(replyModal);
+
+          // Fechar modal
+          replyModal.querySelector('#close-reply-modal').onclick = () => replyModal.remove();
+          replyModal.querySelector('#cancel-reply').onclick = () => replyModal.remove();
+          replyModal.addEventListener('click', e => { if (e.target === replyModal) replyModal.remove(); });
+
+          // Submeter resposta
+          replyModal.querySelector('#reply-form').onsubmit = (e) => {
+            e.preventDefault();
+            const comment = replyModal.querySelector('#reply-comment').value.trim();
+            if (!comment) {
+              alert('Por favor, escreva a sua resposta.');
+              return;
+            }
+            try {
+              User.addReplyToReview(reviewId, {
+                nomePessoa: currentUser.username,
+                comentario: comment,
+                data: new Date().toISOString()
+              });
+              replyModal.remove();
+              showPanel(trip);
+            } catch (err) {
+              alert('Erro ao adicionar resposta: ' + err.message);
+            }
+          };
         }
       });
     }); // Fechar painel ao clicar no botão

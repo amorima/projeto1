@@ -95,6 +95,12 @@ function switchTab(tab) {
   }
 }
 
+/* Helper to get redirect param from URL */
+function getRedirectParam() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("redirect");
+}
+
 /* Processar login */
 function handleLogin() {
   const email = document.getElementById("login-email").value;
@@ -107,7 +113,10 @@ function handleLogin() {
 
     /* Redirecionar para a página principal ou perfil */
     const user = UserModel.getUserLogged();
-    if (user.admin) {
+    const redirect = getRedirectParam();
+    if (redirect) {
+      window.location.href = redirect;
+    } else if (user.admin) {
       window.location.href = "dashboard_admin.html";
     } else {
       window.location.href = "user_pro.html";
@@ -145,7 +154,12 @@ function handleRegisto() {
     setTimeout(function () {
       try {
         UserModel.login(email, password);
-        window.location.href = "user_pro.html";
+        const redirect = getRedirectParam();
+        if (redirect) {
+          window.location.href = redirect;
+        } else {
+          window.location.href = "user_pro.html";
+        }
       } catch (loginError) {
         switchTab("login");
         document.getElementById("login-email").value = email;
