@@ -54,7 +54,7 @@ if (btnReservar) {
     if(User.isLogged()){
       console.log("hello?")
       const utilizador = User.getUserLogged();
-      const pontos = Number(document.getElementById("pontos-add").textContent)
+      const pontos = Number(document.getElementById("pontos-add").textContent);
       User.addPontos(utilizador, pontos);
       User.addReservation(utilizador, vooShallow);
       // Persist the change in the main users array
