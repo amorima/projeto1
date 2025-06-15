@@ -12,6 +12,8 @@ let reviews = [];
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
   users = localStorage.user ? JSON.parse(localStorage.user) : [];
+  // Garantir que todos os utilizadores têm user.pontos como inteiro
+  users = users.map(u => ({ ...u, pontos: parseInt(u.pontos || 0, 10) }));
   newsletter = localStorage.newsletter
     ? loadFromLocalStorage("newsletter", newsletter)
     : [];
@@ -23,7 +25,7 @@ export function add(username, email, password, acceptNewsletter = false) {
   if (users.some((user) => user.email === email)) {
     throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
-    const newUser = new User(username,password,email,acceptNewsletter,)
+    const newUser = new User(username, password, email, acceptNewsletter, "", 50, false, false);
     users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
 
@@ -176,8 +178,8 @@ export function isAdmin(user) {
  * addNewsletterUser('user@example.com');
  * Agora o utilizador com o email 'user@example.com' está subscrito à newsletter.
  */
-export function addNewsletterUser(mail) {
-  const newsletterUser = new User("", "", mail);
+export function addNewsletterUser(email) {
+  const newsletterUser = new User("", "", email);
   newsletter.push(newsletterUser);
   saveToLocalStorage("newsletter", newsletter);
 }
@@ -196,8 +198,8 @@ export function addNewsletterUser(mail) {
  *
  * @throws {Error} Se não houver subscrição encontrada com o email fornecido.
  */
-export function removeNewsletterUser(mail) {
-  const index = newsletter.findIndex((n) => n.mail == mail);
+export function removeNewsletterUser(email) {
+  const index = newsletter.findIndex((n) => n.email == email);
   if (index !== -1) {
     newsletter.splice(index, 1);
     saveToLocalStorage("newsletter", newsletter);
@@ -227,10 +229,9 @@ export function getUserByName(username) {
  * newsletterToUser('newUser', 'password123', 'user@gmail.com');
  * Agora o utilizador com o email 'user@gmail.com' foi removido da newsletter e adicionado como um utilizador normal com o nome de utilizador 'newUser' e senha 'password123'.
  */
-export function newsletterToUser(username, password, mail) {
-  //! May not be needed
-  removeNewsletterUser(mail);
-  add(username, password, mail);
+export function newsletterToUser(username, password, email) {
+  removeNewsletterUser(email);
+  add(username, email, password);
 }
 
 // USER AVATAR
@@ -442,7 +443,7 @@ export function addFavorite(userAdd, fav){
 
 export function addPontos(user, pontos) {
   if (!user.pontos) user.pontos = 0;
-  user.pontos += pontos;
+  user.pontos = parseInt(user.pontos, 10) + parseInt(pontos, 10);
 }
 
 /**
@@ -450,7 +451,7 @@ export function addPontos(user, pontos) {
  * @class User
  * @property {string} username - O nome de utilizador do utilizador.
  * @property {string} password - A senha do utilizador.
- * @property {string} mail - O email do utilizador.
+ * @property {string} email - O email do utilizador.
  * @property {string} avatar - A URL do avatar do utilizador.
  * @property {number} points - Os pontos acumulados pelo utilizador.
  * @property {boolean} isPrivate - Indica se o perfil do utilizador é privado.
@@ -464,23 +465,23 @@ export function addPontos(user, pontos) {
  * console.log(user.level); // 'Viajante'
  */
 class User {
-  id = 0
+  id = 0;
   username = "";
   password = "";
-  mail = "";
+  email = "";
   newsletter = false;
   avatar = "";
-  points = 0;
+  pontos = 0;
   isPrivate = false;
   admin = false;
 
   constructor(
     username = "",
     password = "",
-    mail,
+    email = "",
     newsletter = false,
     avatar = "",
-    points = 50,
+    pontos = 50,
     isPrivate = false,
     admin = false
   ) {
@@ -488,21 +489,21 @@ class User {
     this.newsletter = newsletter;
     this.username = username;
     this.password = password;
-    this.mail = mail;
+    this.email = email;
     this.avatar = avatar;
-    this.points = points;
+    this.pontos = parseInt(pontos || 0, 10); // Garante inteiro
     this.isPrivate = isPrivate;
     this.admin = admin;
   }
 
   get level() {
-    if (this.points >= 5000) {
+    if (this.pontos >= 5000) {
       return "Embaixador";
-    } else if (this.points >= 3000) {
+    } else if (this.pontos >= 3000) {
       return "Globetrotter";
-    } else if (this.points >= 1500) {
+    } else if (this.pontos >= 1500) {
       return "Aventureiro";
-    } else if (this.points >= 250) {
+    } else if (this.pontos >= 250) {
       return "Viajante";
     } else {
       return "Explorador";

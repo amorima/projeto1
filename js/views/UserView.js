@@ -145,6 +145,11 @@ function handleRegisto() {
 
   try {
     UserModel.add(nome, email, password, newsletter);
+    // Garantir que o utilizador criado tem pontos como inteiro
+    const user = UserModel.getUserLogged();
+    if (user && typeof user.pontos !== 'number') {
+      user.pontos = parseInt(user.pontos || 0, 10);
+    }
 
     /* Mostrar sucesso */
     successText.textContent = "Conta criada com sucesso! A fazer login...";
