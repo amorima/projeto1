@@ -225,10 +225,10 @@ function loadUserInfo() {
 
 /* Popular campos do formulário de definições */
 function populateSettingsForm(user) {
-  /* Avatar nas definições */
+  // Avatar nas definições
   const settingsAvatar = document.getElementById("settings-avatar");
   if (settingsAvatar && user.avatar) {
-    settingsAvatar.src = `..${user.avatar}`;
+    settingsAvatar.src = user.avatar;
   }
 
   /* Campos de dados pessoais */
@@ -887,49 +887,31 @@ function handleProfileUpdate(event) {
 function handleAvatarUpload(event) {
   const file = event.target.files[0];
   if (file) {
-    /* Validar tipo de ficheiro */
     if (!file.type.startsWith("image/")) {
-      showToast("Por favor, seleciona apenas ficheiros de imagem", "error");
+      showToast("Por favor, selecione um ficheiro de imagem.", "error");
       return;
     }
-
     const reader = new FileReader();
     reader.onload = function (e) {
-      const newAvatarUrl = e.target.result;
-
+      // Guardar o base64 no perfil do utilizador
+      const user = UserModel.getUserLogged();
+      if (!user) {
+        showToast("Utilizador não encontrado.", "error");
+        return;
+      }
+      user.avatar = e.target.result; // base64
       try {
-        /* Atualizar preview do avatar */
-        const avatarImg = document.getElementById("settings-avatar");
-        if (avatarImg) {
-          avatarImg.src = newAvatarUrl;
-        }
-
-        /* Atualizar avatar no utilizador logado */
-        const user = UserModel.getUserLogged();
-        if (user) {
-          UserModel.changeAvater(user, newAvatarUrl);
-          UserModel.update(user.id, user);
-
-          /* Atualizar avatar principal do perfil */
-          const mainAvatar = document.getElementById("user-avatar");
-          if (mainAvatar) {
-            mainAvatar.src = newAvatarUrl;
-          }
-
-          /* Atualizar navbar */
-          updateNavbarUser();
-
-          showToast("Avatar atualizado com sucesso!", "success");
-        }
+        UserModel.update(user.id, user);
+        sessionStorage.setItem("loggedUser", JSON.stringify(user));
+        loadUserInfo();
+        showToast("Avatar atualizado com sucesso!", "success");
       } catch (error) {
         showToast("Erro ao atualizar avatar: " + error.message, "error");
       }
     };
-
     reader.onerror = function () {
-      showToast("Erro ao ler o ficheiro", "error");
+      showToast("Erro ao ler o ficheiro de imagem.", "error");
     };
-
     reader.readAsDataURL(file);
   }
 }
