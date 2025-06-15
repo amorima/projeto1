@@ -23,17 +23,7 @@ export function add(username, email, password, acceptNewsletter = false) {
   if (users.some((user) => user.email === email)) {
     throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
-    const newUser = {
-      id: getNextId(users),
-      username: username,
-      avatar: "",
-      pontos: "0",
-      email: email,
-      password: password,
-      isPrivate: false,
-      admin: false,
-      newsletter: acceptNewsletter,
-    };
+    const newUser = new User(username,password,email,acceptNewsletter,)
     users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
 
@@ -156,6 +146,14 @@ export function getUserLogged() {
   return JSON.parse(sessionStorage.getItem("loggedUser"));
 }
 
+export function getUserById(id) {
+  const user = users.find((u) => u.id == id);
+  if (user) {
+    return user;
+  }
+  throw Error("Utilizador não encontrado");
+}
+
 /**
  * Verifica se um utilizador é administrador.
  * @param {Object} user - O utilizador a ser verificado.
@@ -206,6 +204,14 @@ export function removeNewsletterUser(mail) {
     return true;
   }
   throw Error("No Subscription Found");
+}
+
+export function getUserByName(username) {
+  const user = users.find((u) => u.username === username);
+  if (user) {
+    return user;
+  }
+  return false;
 }
 
 /**
@@ -458,9 +464,11 @@ export function addPontos(user, pontos) {
  * console.log(user.level); // 'Viajante'
  */
 class User {
+  id = 0
   username = "";
   password = "";
   mail = "";
+  newsletter = false;
   avatar = "";
   points = 0;
   isPrivate = false;
@@ -470,11 +478,14 @@ class User {
     username = "",
     password = "",
     mail,
+    newsletter = false,
     avatar = "",
     points = 50,
     isPrivate = false,
     admin = false
   ) {
+    this.id = getNextId(users);
+    this.newsletter = newsletter;
     this.username = username;
     this.password = password;
     this.mail = mail;

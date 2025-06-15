@@ -9,6 +9,7 @@ import * as User from "../models/UserModel.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização do modelo de viagens
+  User.init();
   init();
 
   const enriched = getTripsWithCoordinates();
@@ -227,14 +228,24 @@ document.addEventListener("DOMContentLoaded", () => {
         reviewElement.className = "bg-gray-50 dark:bg-gray-900 rounded-lg p-3";
 
         // Determinar tipo de usuário baseado na pontuação de avaliação
-        let userType = "Visitante";
-        if (review.avaliacao >= 4) {
-          userType = "Aventureiro";
-        } else if (review.avaliacao >= 3) {
-          userType = "Viajante";
+        let userType = "Aventureiro"
+        if(User.getUserByName(review.nomePessoa)){
+          const user = User.getUserByName(review.nomePessoa);
+          if (user.pontos >= 5000) {
+            userType = "Embaixador";
+          } else if (user.pontos >= 3000) {
+            userType = "Globetrotter";
+          } else if (user.pontos >= 1500) {
+            userType = "Aventureiro";
+          } else if (user.pontos >= 250) {
+            userType = "Viajante";
+          } else {
+            userType = "Explorador";
+          }
         } else {
           userType = "Explorador";
         }
+
 
         // Gerar HTML da revisão
         reviewElement.innerHTML = `
