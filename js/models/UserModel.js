@@ -12,11 +12,20 @@ let reviews = [];
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
   users = localStorage.user ? JSON.parse(localStorage.user) : [];
-  // Garantir que todos os utilizadores têm user.pontos como inteiro
-  users = users.map(u => ({ ...u, pontos: parseInt(u.pontos || 0, 10) }));
-  newsletter = localStorage.newsletter
-    ? loadFromLocalStorage("newsletter", newsletter)
-    : [];
+  // Garantir que todos os utilizadores têm user.pontos como inteiro e preferences object
+  users = users.map(u => ({ 
+    ...u, 
+    pontos: parseInt(u.pontos || 0, 10),
+    // Add preferences object if it doesn't exist (backward compatibility)
+    preferences: u.preferences || { newsletter: u.newsletter || false }
+  }));
+  
+  // Initialize newsletter array first, then load from localStorage
+  newsletter = [];
+  if (localStorage.newsletter) {
+    loadFromLocalStorage("newsletter", newsletter);
+  }
+  
   reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
 }
 
@@ -25,7 +34,9 @@ export function add(username, email, password, acceptNewsletter = false, referra
   if (users.some((user) => user.email === email)) {
     throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
+    console.log(`[DEBUG] Criando utilizador com newsletter: ${acceptNewsletter}`);
     const newUser = new User(username, password, email, acceptNewsletter, "", 50, false, false);
+    console.log(`[DEBUG] Utilizador criado:`, newUser);
     users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
 
@@ -523,6 +534,7 @@ class User {
   pontos = 0;
   isPrivate = false;
   admin = false;
+  preferences = {};
 
   constructor(
     username = "",
@@ -543,6 +555,10 @@ class User {
     this.pontos = parseInt(pontos || 0, 10); // Garante inteiro
     this.isPrivate = isPrivate;
     this.admin = admin;
+    // Set preferences object with newsletter preference
+    this.preferences = {
+      newsletter: newsletter
+    };
   }
 
   get level() {
