@@ -1249,28 +1249,41 @@ function removeFavorite(favoriteIndex) {
   }
 
   try {
-    // Remove the favorite from the array
-    currentUser.favoritos.splice(favoriteIndex, 1);
+    // Try to use the UserModel to remove the favorite first
+    let success = false;
     
-    // Update the user in the model
-    UserModel.update(currentUser.id, currentUser);
+    // Check if the favorite has flight number properties
+    if (favoriteToRemove.numeroVoo || favoriteToRemove.nVoo) {
+      success = UserModel.removeFavorite(currentUser, favoriteToRemove);
+    }
     
-    // Reload the favorites display
-    loadFavoritos(currentUser);
+    // If UserModel method failed or couldn't be used, remove manually by index
+    if (!success) {
+      currentUser.favoritos.splice(favoriteIndex, 1);
+      UserModel.update(currentUser.id, currentUser);
+      success = true;
+    }
     
-    console.log(`[Favoritos] Removed favorite: ${favoriteName}`);
-    
-    // Show success message
-    const toast = document.createElement("div");
-    toast.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300";
-    toast.textContent = `"${favoriteName}" removido dos favoritos!`;
-    document.body.appendChild(toast);
-    
-    // Remove toast after 3 seconds
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      setTimeout(() => document.body.removeChild(toast), 300);
-    }, 3000);
+    if (success) {
+      // Reload the favorites display
+      loadFavoritos(currentUser);
+      
+      console.log(`[Favoritos] Removed favorite: ${favoriteName}`);
+      
+      // Show success message
+      const toast = document.createElement("div");
+      toast.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300";
+      toast.textContent = `"${favoriteName}" removido dos favoritos!`;
+      document.body.appendChild(toast);
+      
+      // Remove toast after 3 seconds
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 3000);
+    } else {
+      throw new Error("Falha ao remover favorito");
+    }
     
   } catch (error) {
     console.error("[Favoritos] Error removing favorite:", error);
@@ -1322,12 +1335,11 @@ function loadFavoritos(user) {
         </div>
       </div>
       <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
-    `;
-      // Add click event to the heart icon for removing favorite
+    `;    // Add click event to the heart icon for removing favorite
     const heartIcon = card.querySelector('.favorite-heart');
     heartIcon.addEventListener('click', function(e) {
       e.stopPropagation(); // Prevent card click from triggering
-      UserModel.removeFavorite(UserModel.getUserLogged(),fav);
+      removeFavorite(idx);
     });
     
     // Add click event for navigation to the entire card

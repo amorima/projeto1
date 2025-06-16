@@ -462,7 +462,12 @@ export function addFavorite(user, trip) {
 
 export function removeFavorite(user, trip) {
   if (!user.favoritos) return false;
-  const idx = user.favoritos.findIndex(f => f.numeroVoo == trip.numeroVoo);
+  const idx = user.favoritos.findIndex(f => 
+    (f.numeroVoo && trip.numeroVoo && f.numeroVoo == trip.numeroVoo) ||
+    (f.nVoo && trip.nVoo && f.nVoo == trip.nVoo) ||
+    (f.numeroVoo && trip.nVoo && f.numeroVoo == trip.nVoo) ||
+    (f.nVoo && trip.numeroVoo && f.nVoo == trip.numeroVoo)
+  );
   if (idx !== -1) {
     user.favoritos.splice(idx, 1);
     update(user.id, user);
