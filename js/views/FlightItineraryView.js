@@ -459,6 +459,7 @@ function atualizarSidebarVoo(voo) {
   if (voo.car) precoBase += 1 //!Read car price
   if (voo.seguro) precoBase = precoBase * 1.2
   const precoComDesconto = desconto ? Math.round(precoBase * (1 - desconto / 100)) : precoBase;
+  vooShallow.pointsAR = precoComDesconto
   const pontosAcumular = precoComDesconto;
   const tipoVoo = voo.tipo ? (voo.tipo === 'ida' ? 'Só ida' : voo.tipo === 'ida e volta' ? 'Ida e volta' : 'Multitryp') : 'Só ida';
   const dataFormatada = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);

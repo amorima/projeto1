@@ -542,7 +542,8 @@ class User {
   isPrivate = false;
   admin = false;
   preferences = {};
-
+  reservas = [];
+  favoritos = [];
   constructor(
     username = "",
     password = "",
@@ -562,6 +563,9 @@ class User {
     this.pontos = parseInt(pontos || 0, 10); // Garante inteiro
     this.isPrivate = isPrivate;
     this.admin = admin;
+    // Initialize arrays for user data
+    this.reservas = [];
+    this.favoritos = [];
     // Set preferences object with newsletter preference
     this.preferences = {
       newsletter: newsletter
@@ -1038,6 +1042,74 @@ function rebuildNewsletterFromUsers() {
 export function getAllNewsletterSubscribers() {
   // Get current newsletter array (already contains both types)
   return newsletter;
+}
+
+/**
+ * Removes a reservation and subtracts points from user
+ * @param {number} userId - The user's ID
+ * @param {number} reservationIndex - The index of the reservation to remove
+ * @returns {Object} Result object with success status and message
+ */
+export function removeReservation(userId, reservationIndex) {
+  try {
+    // Find the user
+    const userIndex = users.findIndex(u => parseInt(u.id, 10) === parseInt(userId, 10));
+    if (userIndex === -1) {
+      throw new Error("Utilizador não encontrado");
+    }
+
+    const user = users[userIndex];
+      // Check if user has reservations
+    if (!user.reservas || !Array.isArray(user.reservas)) {
+      throw new Error("Utilizador não tem reservas");
+    }
+
+    // Check if reservation index is valid
+    if (reservationIndex < 0 || reservationIndex >= user.reservas.length) {
+      throw new Error("Reserva não encontrada");
+    }
+
+    // Get the reservation to remove
+    const reservationToRemove = user.reservas[reservationIndex];
+    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || 0;    // Remove the reservation
+    user.reservas.splice(reservationIndex, 1);
+
+    // Subtract points from user
+    user.pontos = parseInt(user.pontos || 0, 10) - pointsToSubtract;
+    
+    // Ensure points don't go below 0
+    if (user.pontos < 0) {
+      user.pontos = 0;
+    }
+
+    // Update user in users array
+    users[userIndex] = user;
+
+    // Save to localStorage
+    localStorage.setItem("user", JSON.stringify(users));
+
+    // Update sessionStorage if this is the logged user
+    const loggedUser = getUserLogged();
+    if (loggedUser && parseInt(loggedUser.id, 10) === parseInt(userId, 10)) {
+      sessionStorage.setItem("loggedUser", JSON.stringify(user));
+    }
+
+    console.log(`[DEBUG] Reserva removida. Pontos subtraídos: ${pointsToSubtract}`);
+
+    return {
+      success: true,
+      message: "Reserva removida com sucesso!",
+      pointsSubtracted: pointsToSubtract,
+      newPoints: user.pontos
+    };
+
+  } catch (error) {
+    console.error('[DEBUG] Erro ao remover reserva:', error.message);
+    return {
+      success: false,
+      message: error.message
+    };
+  }
 }
 
 
