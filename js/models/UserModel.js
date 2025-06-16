@@ -12,27 +12,46 @@ let reviews = [];
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
   users = localStorage.user ? JSON.parse(localStorage.user) : [];
-  // Garantir que todos os utilizadores têm user.pontos como inteiro
-  users = users.map(u => ({ ...u, pontos: parseInt(u.pontos || 0, 10) }));
-  newsletter = localStorage.newsletter
-    ? loadFromLocalStorage("newsletter", newsletter)
-    : [];
+  // Garantir que todos os utilizadores têm user.pontos como inteiro e preferences object
+  users = users.map(u => ({ 
+    ...u, 
+    pontos: parseInt(u.pontos || 0, 10),
+    // Add preferences object if it doesn't exist (backward compatibility)
+    preferences: u.preferences || { newsletter: u.newsletter || false }
+  }));
+  
+  // Initialize newsletter array first, then load from localStorage
+  newsletter = [];
+  if (localStorage.newsletter) {
+    loadFromLocalStorage("newsletter", newsletter);
+  }
+  
+  // Rebuild newsletter from users with newsletter preferences (avoid duplicates)
+  rebuildNewsletterFromUsers();
+  
   reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
 }
 
 // ADICIONAR UTILIZADOR
-export function add(username, email, password, acceptNewsletter = false) {
+export function add(username, email, password, acceptNewsletter = false, referralCode = null) {
   if (users.some((user) => user.email === email)) {
     throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
+    console.log(`[DEBUG] Criando utilizador com newsletter: ${acceptNewsletter}`);
     const newUser = new User(username, password, email, acceptNewsletter, "", 50, false, false);
-    users.push(newUser);
+    console.log(`[DEBUG] Utilizador criado:`, newUser);    users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
 
-    /* Adicionar à newsletter se aceitar */
-    if (acceptNewsletter) {
-      newsletter.push({ email: email, date: new Date().toISOString() });
-      saveToLocalStorage("newsletter", newsletter);
+    /* Update newsletter based on user preferences */
+    updateNewsletterFromUserPreferences(newUser);
+
+    /* Process referral if provided */
+    if (referralCode) {
+      console.log(`[DEBUG] Processando código de referência: ${referralCode}`);
+      const referralResult = processReferral(referralCode);
+      console.log(`[DEBUG] Resultado do processamento de referência: ${referralResult}`);
+    } else {
+      console.log(`[DEBUG] Nenhum código de referência fornecido`);
     }
   }
 }
@@ -44,7 +63,15 @@ export function update(id, newUser) {
   console.log('[DEBUG][UserModel] Utilizadores antes do update:', users);
   const index = users.findIndex((u) => parseInt(u.id, 10) === userId);
   if (index !== -1) {
+    const oldUser = users[index];
     users[index] = { ...users[index], ...newUser, id: userId };
+    
+    // Update newsletter if preferences changed
+    const updatedUser = users[index];
+    if (oldUser.preferences?.newsletter !== updatedUser.preferences?.newsletter) {
+      updateNewsletterFromUserPreferences(updatedUser);
+    }
+    
     localStorage.setItem("user", JSON.stringify(users));
     console.log('[DEBUG][UserModel] Utilizadores após o update:', users);
     return true;
@@ -514,7 +541,9 @@ class User {
   pontos = 0;
   isPrivate = false;
   admin = false;
-
+  preferences = {};
+  reservas = [];
+  favoritos = [];
   constructor(
     username = "",
     password = "",
@@ -534,6 +563,13 @@ class User {
     this.pontos = parseInt(pontos || 0, 10); // Garante inteiro
     this.isPrivate = isPrivate;
     this.admin = admin;
+    // Initialize arrays for user data
+    this.reservas = [];
+    this.favoritos = [];
+    // Set preferences object with newsletter preference
+    this.preferences = {
+      newsletter: newsletter
+    };
   }
 
   get level() {
@@ -852,6 +888,228 @@ export function addReplyToReview(reviewId, reply) {
   reviews[idx].respostas.push(newReply);
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReply;
+}
+
+// REFERRAL SYSTEM
+/**
+ * Generates a referral link for the given user
+ * @param {Object} user - The user to generate the referral link for
+ * @returns {string} The referral link
+ */
+export function getReferralLink(user) {
+  if (!user || !user.id) {
+    throw new Error('Utilizador inválido para gerar link de referência');
+  }
+  // Create the referral link pointing to the login page
+  return `${window.location.origin}/html/_login.html?ref=${user.id}`;
+}
+
+/**
+ * Processes a referral code and awards points to the referring user
+ * @param {string} referralCode - The referral code (user ID) from the URL
+ * @returns {boolean} True if the referral was processed successfully
+ */
+export function processReferral(referralCode) {
+  if (!referralCode) {
+    return false;
+  }
+
+  try {
+    // Find the referring user by ID
+    const referringUser = getUserById(parseInt(referralCode, 10));
+    
+    if (!referringUser) {
+      console.warn('Utilizador de referência não encontrado:', referralCode);
+      return false;
+    }
+
+    // Award 100 points to the referring user
+    const currentPoints = parseInt(referringUser.pontos) || 0;
+    const newPoints = currentPoints + 100;
+
+    // Update the user in the users array
+    const userIndex = users.findIndex(u => parseInt(u.id, 10) === parseInt(referralCode, 10));
+    if (userIndex !== -1) {
+      users[userIndex].pontos = newPoints;
+      localStorage.setItem("user", JSON.stringify(users));
+      console.log(`Referência processada: ${referringUser.username} recebeu 100 pontos (${currentPoints} -> ${newPoints})`);
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.warn('Erro ao processar referência:', error.message);
+    return false;
+  }
+}
+
+/**
+ * Handles newsletter subscription from the homepage form
+ * @param {string} email - The email to subscribe to newsletter
+ * @returns {Object} Result object with success status and message
+ * @description
+ * This function checks if the email belongs to a registered user.
+ * If it does, returns an error message.
+ * If it doesn't, adds the email as a newsletter subscriber.
+ */
+export function subscribeToNewsletter(email) {
+  // Check if email belongs to a registered user
+  const existingUser = users.find(user => user.email === email);
+  
+  if (existingUser) {
+    return {
+      success: false,
+      message: "User já existente"
+    };
+  }
+  
+  // Check if email is already in newsletter (avoid duplicates)
+  const existingNewsletterSub = newsletter.find(sub => sub.email === email);
+  
+  if (existingNewsletterSub) {
+    return {
+      success: false,
+      message: "Email já subscrito à newsletter"
+    };
+  }
+  
+  // Add email to newsletter (simple structure)
+  const newsletterSubscription = {
+    email: email
+  };
+  
+  newsletter.push(newsletterSubscription);
+  saveToLocalStorage("newsletter", newsletter);
+  
+  return {
+    success: true,
+    message: "Newsletter subscrita com sucesso!"
+  };
+}
+
+/**
+ * Updates newsletter array when user preferences change
+ * @param {Object} user - The user whose preferences changed
+ * @description
+ * This function adds/removes users from newsletter based on their preferences.
+ * Ensures no duplicates exist in the newsletter array.
+ */
+export function updateNewsletterFromUserPreferences(user) {
+  // Remove any existing entry for this user (avoid duplicates)
+  newsletter = newsletter.filter(sub => sub.email !== user.email);
+  
+  // If user wants newsletter, add them to the newsletter array
+  if (user.preferences && user.preferences.newsletter === true) {
+    const userNewsletterEntry = {
+      username: user.username,
+      email: user.email
+    };
+    newsletter.push(userNewsletterEntry);
+  }
+  
+  saveToLocalStorage("newsletter", newsletter);
+}
+
+/**
+ * Rebuilds newsletter array to include users with newsletter preferences
+ * Removes duplicates and ensures proper structure
+ */
+function rebuildNewsletterFromUsers() {
+  // Remove any user entries that might be duplicated (keep only standalone emails)
+  newsletter = newsletter.filter(sub => !sub.username);
+  
+  // Add users with newsletter preference enabled
+  users.forEach(user => {
+    if (user.preferences && user.preferences.newsletter === true) {
+      // Check if not already in newsletter (avoid duplicates)
+      const exists = newsletter.find(sub => sub.email === user.email);
+      if (!exists) {
+        newsletter.push({
+          username: user.username,
+          email: user.email
+        });
+      }
+    }
+  });
+  
+  saveToLocalStorage("newsletter", newsletter);
+}
+
+/**
+ * Gets all newsletter subscribers including users with newsletter preference
+ * @returns {Array} Array of all newsletter subscribers (no duplicates)
+ */
+export function getAllNewsletterSubscribers() {
+  // Get current newsletter array (already contains both types)
+  return newsletter;
+}
+
+/**
+ * Removes a reservation and subtracts points from user
+ * @param {number} userId - The user's ID
+ * @param {number} reservationIndex - The index of the reservation to remove
+ * @returns {Object} Result object with success status and message
+ */
+export function removeReservation(userId, reservationIndex) {
+  try {
+    // Find the user
+    const userIndex = users.findIndex(u => parseInt(u.id, 10) === parseInt(userId, 10));
+    if (userIndex === -1) {
+      throw new Error("Utilizador não encontrado");
+    }
+
+    const user = users[userIndex];
+      // Check if user has reservations
+    if (!user.reservas || !Array.isArray(user.reservas)) {
+      throw new Error("Utilizador não tem reservas");
+    }
+
+    // Check if reservation index is valid
+    if (reservationIndex < 0 || reservationIndex >= user.reservas.length) {
+      throw new Error("Reserva não encontrada");
+    }
+
+    // Get the reservation to remove
+    const reservationToRemove = user.reservas[reservationIndex];
+    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || 0;    // Remove the reservation
+    user.reservas.splice(reservationIndex, 1);
+
+    // Subtract points from user
+    user.pontos = parseInt(user.pontos || 0, 10) - pointsToSubtract;
+    
+    // Ensure points don't go below 0
+    if (user.pontos < 0) {
+      user.pontos = 0;
+    }
+
+    // Update user in users array
+    users[userIndex] = user;
+
+    // Save to localStorage
+    localStorage.setItem("user", JSON.stringify(users));
+
+    // Update sessionStorage if this is the logged user
+    const loggedUser = getUserLogged();
+    if (loggedUser && parseInt(loggedUser.id, 10) === parseInt(userId, 10)) {
+      sessionStorage.setItem("loggedUser", JSON.stringify(user));
+    }
+
+    console.log(`[DEBUG] Reserva removida. Pontos subtraídos: ${pointsToSubtract}`);
+
+    return {
+      success: true,
+      message: "Reserva removida com sucesso!",
+      pointsSubtracted: pointsToSubtract,
+      newPoints: user.pontos
+    };
+
+  } catch (error) {
+    console.error('[DEBUG] Erro ao remover reserva:', error.message);
+    return {
+      success: false,
+      message: error.message
+    };
+  }
 }
 
 

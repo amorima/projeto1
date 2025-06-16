@@ -142,9 +142,15 @@ function handleRegisto() {
   const successDiv = document.getElementById("registo-success");
   const errorText = errorDiv.querySelector("p");
   const successText = successDiv.querySelector("p");
+  // Extract referral code from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const referralCode = urlParams.get('ref');
+  console.log(`[DEBUG] URL atual: ${window.location.href}`);
+  console.log(`[DEBUG] Código de referência extraído: ${referralCode}`);
+  console.log(`[DEBUG] Newsletter selecionada: ${newsletter}`);
 
   try {
-    UserModel.add(nome, email, password, newsletter);
+    UserModel.add(nome, email, password, newsletter, referralCode);
     // Garantir que o utilizador criado tem pontos como inteiro
     const user = UserModel.getUserLogged();
     if (user && typeof user.pontos !== 'number') {

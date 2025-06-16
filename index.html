@@ -547,11 +547,10 @@
 
         <div class="w-full sm:flex-1 p-4 text-center text-white dark:text-gray-100 text-3xl font-bold font-['Space_Mono'] tracking-widest">
             Junta-te ao maior e melhor planeador de viagens inteligente da ESMAD!
-        </div>
-
-        <form action="#" method="post" class="w-full sm:flex-1 p-4 flex flex-col items-center gap-4 max-w-sm mx-auto sm:max-w-none sm:mx-0">
+        </div>        <form id="newsletter-form" action="#" method="post" class="w-full sm:flex-1 p-4 flex flex-col items-center gap-4 max-w-sm mx-auto sm:max-w-none sm:mx-0">
           <div class="w-full flex flex-col gap-2">
             <input
+              id="newsletter-email"
               type="email"
               name="email"
               placeholder="email@planit.com"
@@ -619,8 +618,10 @@
       </div>
     </div>
   </div>
-
   <footer id="footer-placeholder"></footer>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
   <!-- Carregamento dos scripts organizados -->
   <script type="module" src="./js/views/FlightView.js"></script>

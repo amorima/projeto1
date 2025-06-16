@@ -84,13 +84,12 @@ function setupEventListeners() {
       }
     });
   }
-
   /* Botão de copiar link de convite */
   const btnCopy = document.querySelector("button.bg-Button-Main.rounded-r-lg");
   if (btnCopy) {
     btnCopy.addEventListener("click", function () {
-      const linkInput = document.querySelector("input[readonly]");
-      if (linkInput) {
+      const linkInput = document.getElementById("referral-link");
+      if (linkInput && linkInput.value) {
         linkInput.select();
         document.execCommand("copy");
 
@@ -102,35 +101,8 @@ function setupEventListeners() {
           btnCopy.innerHTML = originalText;
         }, 2000);
       }
-    });
-  }
-
-  /* Botões de exclusão de reservas */
-  const deleteButtons = document.querySelectorAll("#reservas-container button");
-  deleteButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-      const reservaCard = this.closest(".bg-white.dark\\:bg-gray-900");
-      if (reservaCard) {
-        /* Animação de fade-out antes de remover */
-        reservaCard.style.transition = "opacity 0.3s ease";
-        reservaCard.style.opacity = "0";
-
-        setTimeout(() => {
-          reservaCard.remove();
-
-          /* Verificar se ainda existem reservas */
-          const reservasContainer =
-            document.getElementById("reservas-container");
-          if (reservasContainer && reservasContainer.children.length <= 1) {
-            document
-              .getElementById("reservas-empty")
-              .classList.remove("hidden");
-          }
-        }, 300);
-      }
-    });
-  });
-
+    });  }
+  
   /* Formulário de definições do perfil */
   const profileForm = document.getElementById("profile-settings-form");
   if (profileForm) {
@@ -218,12 +190,23 @@ function loadUserInfo() {
 
   /* Carregar preferências de viagem */
   loadTravelPreferences(user);
-
   /* Carregar reservas */
   loadReservas(user);
 
   /* Carregar favoritos */
   loadFavoritos(user);
+
+  /* Set referral link */
+  const referralLinkInput = document.getElementById("referral-link");
+  if (referralLinkInput) {
+    try {
+      const referralLink = UserModel.getReferralLink(user);
+      referralLinkInput.value = referralLink;
+    } catch (error) {
+      console.error('Erro ao gerar link de referência:', error);
+      referralLinkInput.value = '';
+    }
+  }
 }
 
 /* Popular campos do formulário de definições */
@@ -1101,27 +1084,28 @@ function loadReservas(user) {
   } else {
     if (emptyDiv) emptyDiv.classList.add("hidden");
   }
-
   user.reservas.forEach((reserva, idx) => {
     const card = document.createElement("div");
     card.className =
-      "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl w-full mb-6";
+      "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl w-full mb-6 cursor-pointer hover:shadow-lg transition-shadow";
+      // Add click event to navigate to flight itinerary
+    card.addEventListener("click", function(e) {
+      // Don't navigate if clicking the delete button
+      if (e.target.closest('.delete-reservation-btn')) {
+        return;
+      }
+      
+      // Navigate to flight itinerary with the reservation ID
+      window.location.href = `flight_itinerary.html?id=${(reserva.numeroVoo || '')}`;
+    });
 
     // Botão de apagar
     const btnDelete = document.createElement("button");
     btnDelete.className =
-      "absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-red-50 dark:hover:bg-gray-700 transition-colors z-10 flex items-center justify-center";
+      "absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-red-50 dark:hover:bg-gray-700 transition-colors z-10 flex items-center justify-center delete-reservation-btn";
     btnDelete.innerHTML =
       '<span class="material-symbols-outlined text-red-500 text-sm">delete</span>';
-    btnDelete.onclick = function () {
-      // Remove do array e atualiza no Model
-      if (UserModel.removeReservaByNumeroVoo(user, reserva.numeroVoo)) {
-        showToast("Reserva eliminada com sucesso!", "success");
-        loadReservas(user);
-      } else {
-        showToast("Erro ao eliminar reserva.", "error");
-      }
-    };
+    btnDelete.dataset.reservationIndex = idx;
     card.appendChild(btnDelete);
 
     // Imagem principal
@@ -1206,6 +1190,60 @@ function loadReservas(user) {
 
     card.appendChild(content);
     container.appendChild(card);
+  });
+
+  // After loading all reservations, setup the delete button listeners
+  setupReservationDeleteListeners();
+}
+
+/* Setup reservation delete listeners - should be called after loadReservas */
+function setupReservationDeleteListeners() {
+  const deleteButtons = document.querySelectorAll(".delete-reservation-btn");
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      // Get the logged user
+      const user = UserModel.getUserLogged();
+      if (!user) {
+        alert("Erro: Utilizador não está logado");
+        return;
+      }
+
+      // Get reservation index from data attribute
+      const reservationIndex = parseInt(this.dataset.reservationIndex, 10);
+
+
+      // Call model function to remove reservation and subtract points
+      const result = UserModel.removeReservation(user.id, reservationIndex);      if (result.success) {
+        // Find the parent card element
+        let reservaCard = this.parentElement;
+        while (reservaCard && !reservaCard.classList.contains('mb-6')) {
+          reservaCard = reservaCard.parentElement;
+        }
+        if (reservaCard) {
+          /* Animação de fade-out antes de remover */
+          reservaCard.style.transition = "opacity 0.3s ease";
+          reservaCard.style.opacity = "0";
+
+          setTimeout(() => {
+            reservaCard.remove();
+
+            /* Verificar se ainda existem reservas */
+            const reservasContainer = document.getElementById("reservas-container");
+            if (reservasContainer && reservasContainer.children.length === 0) {
+              document.getElementById("reservas-empty").classList.remove("hidden");
+            }
+          }, 300);
+        }
+
+        // Show success message with points info - use toast instead of alert
+        showToast(`Reserva removida! Pontos subtraídos: ${result.pointsSubtracted}. Pontos atuais: ${result.newPoints}`, "success");
+        
+        // Reload user info to update UI
+        loadUserInfo();
+      } else {
+        showToast(`Erro ao remover reserva: ${result.message}`, "error");
+      }
+    });
   });
 }
 
