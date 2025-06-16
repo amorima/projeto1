@@ -246,15 +246,37 @@ document.addEventListener("DOMContentLoaded", () => {
           userType = "Explorador";
         }
 
-
-        // Gerar HTML da revisão
-        reviewElement.innerHTML = `
-          <div class="flex items-start">
+        // Tentar obter a imagem do usuário, se disponível
+        const userImage = User.getUserImage(review.nomePessoa);
+        let htmlAdd = "";
+        // Corrigir caminho do avatar como no NavbarView.js
+        let avatarPath = null;
+        if (userImage) {
+          if (userImage.startsWith("data:")) {
+            avatarPath = userImage;
+          } else if (userImage.startsWith("../")) {
+            avatarPath = userImage;
+          } else {
+            avatarPath = `..${userImage}`;
+          }
+          htmlAdd = `
+            <div class="flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl">
+                <img src="${avatarPath}" alt="${review.nomePessoa}" class="w-10 h-10 rounded-full object-cover"></img>
+              </div>
+            </div>`
+        } else {
+          htmlAdd = `
             <div class="flex-shrink-0">
               <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl">
                 ${review.nomePessoa.charAt(0)}
               </div>
-            </div>
+            </div>`
+        }
+        // Gerar HTML da revisão
+        reviewElement.innerHTML = `
+          <div class="flex items-start">
+            ${htmlAdd}
             <div class="ml-3 flex-1">
               <div class="flex items-center">
                 <h4 class="font-semibold">${review.nomePessoa}</h4>

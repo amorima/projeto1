@@ -425,6 +425,15 @@ export function clearTestSession() {
   sessionStorage.removeItem("loggedUser");
 }
 
+export function getUserImage(username) {
+  const userAvatar = getUserByName(username);
+  if (userAvatar && userAvatar.avatar) {
+    return userAvatar.avatar;
+  }
+  // Retorna uma imagem padrão se o utilizador não tiver avatar
+  return false;
+}
+
 export function addReservation(userAdd, reservation){
   if (!userAdd.reservas) userAdd.reservas = [];
   // Verifica se já existe reserva com o mesmo numeroVoo
