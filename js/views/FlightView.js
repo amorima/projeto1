@@ -786,7 +786,7 @@ export function renderRandomOPOCards(containerClass) {
         e.stopPropagation();
         if (!User.isLogged()) {
           showToast("Faça login para adicionar aos favoritos");
-          window.location.href = "../html/login.html";
+          window.location.href = "../html/_login.html";
           return;
         }
         const user = User.getUserLogged();
