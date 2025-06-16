@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <p class="text-sm font-medium">$${
+              <p class="text-sm font-medium">${
                 voo.direto === "S" ? "Voo direto" : "Voo com escala"
               }</p>
               <p class="text-xs text-gray-500 dark:text-gray-400">${
@@ -246,15 +246,37 @@ document.addEventListener("DOMContentLoaded", () => {
           userType = "Explorador";
         }
 
-
-        // Gerar HTML da revisão
-        reviewElement.innerHTML = `
-          <div class="flex items-start">
+        // Tentar obter a imagem do usuário, se disponível
+        const userImage = User.getUserImage(review.nomePessoa);
+        let htmlAdd = "";
+        // Corrigir caminho do avatar como no NavbarView.js
+        let avatarPath = null;
+        if (userImage) {
+          if (userImage.startsWith("data:")) {
+            avatarPath = userImage;
+          } else if (userImage.startsWith("../")) {
+            avatarPath = userImage;
+          } else {
+            avatarPath = `..${userImage}`;
+          }
+          htmlAdd = `
+            <div class="flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl">
+                <img src="${avatarPath}" alt="${review.nomePessoa}" class="w-10 h-10 rounded-full object-cover"></img>
+              </div>
+            </div>`
+        } else {
+          htmlAdd = `
             <div class="flex-shrink-0">
               <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl">
                 ${review.nomePessoa.charAt(0)}
               </div>
-            </div>
+            </div>`
+        }
+        // Gerar HTML da revisão
+        reviewElement.innerHTML = `
+          <div class="flex items-start">
+            ${htmlAdd}
             <div class="ml-3 flex-1">
               <div class="flex items-center">
                 <h4 class="font-semibold">${review.nomePessoa}</h4>
@@ -343,30 +365,49 @@ document.addEventListener("DOMContentLoaded", () => {
             </form>
           </div>
         `;
-        document.body.appendChild(modal);
-
-        // Star rating logic
+        document.body.appendChild(modal);        // Star rating logic
         let selectedRating = 0;
         const stars = modal.querySelectorAll('#star-input span');
         stars.forEach(star => {
           star.addEventListener('mouseenter', () => {
             const val = +star.dataset.value;
             stars.forEach((s, i) => {
-              s.classList.toggle('text-yellow-400', i < val);
-              s.classList.toggle('text-gray-300', i >= val);
+              if (i < val) {
+                s.classList.add('text-yellow-400');
+                s.classList.remove('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 1";
+              } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 0";
+              }
             });
           });
           star.addEventListener('mouseleave', () => {
             stars.forEach((s, i) => {
-              s.classList.toggle('text-yellow-400', i < selectedRating);
-              s.classList.toggle('text-gray-300', i >= selectedRating);
+              if (i < selectedRating) {
+                s.classList.add('text-yellow-400');
+                s.classList.remove('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 1";
+              } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 0";
+              }
             });
           });
           star.addEventListener('click', () => {
             selectedRating = +star.dataset.value;
             stars.forEach((s, i) => {
-              s.classList.toggle('text-yellow-400', i < selectedRating);
-              s.classList.toggle('text-gray-300', i >= selectedRating);
+              if (i < selectedRating) {
+                s.classList.add('text-yellow-400');
+                s.classList.remove('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 1";
+              } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 0";
+              }
             });
           });
         });

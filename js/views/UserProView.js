@@ -221,14 +221,17 @@ function loadUserInfo() {
 
   /* Carregar reservas */
   loadReservas(user);
+
+  /* Carregar favoritos */
+  loadFavoritos(user);
 }
 
 /* Popular campos do formulário de definições */
 function populateSettingsForm(user) {
-  /* Avatar nas definições */
+  // Avatar nas definições
   const settingsAvatar = document.getElementById("settings-avatar");
   if (settingsAvatar && user.avatar) {
-    settingsAvatar.src = `..${user.avatar}`;
+    settingsAvatar.src = user.avatar;
   }
 
   /* Campos de dados pessoais */
@@ -723,41 +726,31 @@ function openEditProfileModal() {
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    
     <form id="edit-profile-form" class="space-y-4">
       <div>
         <label for="edit-username" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Nome de Utilizador</label>
-        <input type="text" id="edit-username" value="${
-          user.username
-        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-username" value="${user.username}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
       <div>
         <label for="edit-email" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Email</label>
-        <input type="email" id="edit-email" value="${
-          user.email
-        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="email" id="edit-email" value="${user.email}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
       <div>
-        <label for="edit-password" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Nova Senha (deixe em branco para manter)</label>
-        <input type="password" id="edit-password" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <label for="edit-phone" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Telefone</label>
+        <input type="text" id="edit-phone" value="${user.telefone || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
+      <div>
+        <label for="edit-birth" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Data de Nascimento</label>
+        <input type="date" id="edit-birth" value="${user.dataNascimento || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+      </div>
       <div>
         <label for="edit-avatar" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">URL do Avatar</label>
-        <input type="text" id="edit-avatar" value="${
-          user.avatar || ""
-        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-avatar" value="${user.avatar || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
-      
       <div class="flex items-center mt-4">
-        <input type="checkbox" id="edit-private" ${
-          user.private ? "checked" : ""
-        } class="h-4 w-4 text-Main-Primary dark:text-cyan-600 border-gray-300 rounded">
+        <input type="checkbox" id="edit-private" ${user.isPrivate ? "checked" : ""} class="h-4 w-4 text-Main-Primary dark:text-cyan-600 border-gray-300 rounded">
         <label for="edit-private" class="ml-2 block text-Text-Subtitles dark:text-gray-400 text-sm font-medium">Perfil Privado</label>
       </div>
-      
       <div class="flex justify-end gap-4 mt-6">
         <button type="button" id="cancel-edit" class="py-2 px-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-medium rounded-md transition duration-300">
           Cancelar
@@ -795,49 +788,34 @@ function closeEditProfileModal() {
 /* Guardar alterações do perfil */
 function saveProfileChanges(event) {
   event.preventDefault();
-
-  /* Obter dados do formulário */
   const username = document.getElementById("edit-username").value.trim();
   const email = document.getElementById("edit-email").value.trim();
-  const password = document.getElementById("edit-password").value;
+  const telefone = document.getElementById("edit-phone").value.trim();
+  const dataNascimento = document.getElementById("edit-birth").value;
   const avatar = document.getElementById("edit-avatar").value.trim();
   const isPrivate = document.getElementById("edit-private").checked;
-
-  /* Validar dados */
   if (!username || !email) {
     alert("Nome de utilizador e email são obrigatórios.");
     return;
   }
-  /* Verificar se utilizador está logado */
   if (!UserModel.isLogged()) {
     alert("Deve fazer login primeiro!");
     return;
   }
-  /* Obter utilizador logado */
   const currentUser = UserModel.getUserLogged();
-
-  /* Criar objeto com novos dados */
   const updatedUser = {
     ...currentUser,
-    username: username,
-    email: email,
-    avatar: avatar,
-    private: isPrivate,
+    username,
+    email,
+    telefone,
+    dataNascimento,
+    avatar,
+    isPrivate,
   };
-
-  /* Atualizar senha apenas se foi fornecida */
-  if (password) {
-    updatedUser.password = password;
-  }
   try {
-    /* Atualizar utilizador usando o modelo */
     UserModel.update(currentUser.id, updatedUser);
-
-    /* Fechar modal e recarregar informações */
     closeEditProfileModal();
     loadUserInfo();
-
-    /* Mostrar mensagem de sucesso */
     alert("Perfil atualizado com sucesso!");
   } catch (error) {
     alert(`Erro ao atualizar perfil: ${error.message}`);
@@ -847,42 +825,61 @@ function saveProfileChanges(event) {
 /* Processar atualização do perfil */
 function handleProfileUpdate(event) {
   event.preventDefault();
-
   const user = UserModel.getUserLogged();
   if (!user) {
     showToast("Erro: Utilizador não encontrado", "error");
     return;
   }
-
-  /* Obter dados do formulário */
+  // Obter dados do formulário
   const formData = new FormData(event.target);
-  const userData = {
-    username: formData.get("user-name-input") || formData.get("username"),
-    email: formData.get("user-email-input") || formData.get("email"),
-    telefone: formData.get("user-phone-input") || formData.get("telefone"),
-    dataNascimento: formData.get("user-birth-input") || formData.get("birth"),
+
+  // Password change logic (acesso direto aos inputs pelo id)
+  const currentPassword = document.getElementById("current-password")?.value || "";
+  const newPassword = document.getElementById("new-password")?.value || "";
+  const confirmPassword = document.getElementById("confirm-password")?.value || "";
+  if (currentPassword || newPassword || confirmPassword) {
+    // Só tenta alterar se algum campo de password foi preenchido
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showToast("Preencha todos os campos de password.", "error");
+      return;
+    }
+    if (currentPassword !== user.password) {
+      showToast("Password atual incorreta.", "error");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showToast("A nova password e a confirmação não coincidem.", "error");
+      return;
+    }
+    if (newPassword.length < 6) {
+      showToast("A nova password deve ter pelo menos 6 caracteres.", "error");
+      return;
+    }
+    user.password = newPassword;
+  }
+
+  // Atualizar todos os campos relevantes do utilizador
+  const updatedUser = {
+    ...user,
+    username: formData.get("user-name-input") || formData.get("username") || user.username,
+    email: formData.get("user-email-input") || formData.get("email") || user.email,
+    telefone: formData.get("user-phone-input") || formData.get("telefone") || user.telefone,
+    dataNascimento: formData.get("user-birth-input") || formData.get("birth") || user.dataNascimento,
+    avatar: formData.get("settings-avatar") || user.avatar,
+    isPrivate: formData.get("user-private-input") === "on" || user.isPrivate,
   };
-
+  // Preferências (notificações/newsletter) - manter compatibilidade
+  updatedUser.preferences = {
+    ...user.preferences,
+    emailNotifications: document.querySelector('#settings-email-notifications')?.checked ?? user.preferences?.emailNotifications,
+    newsletter: document.querySelector('#newsletter-check')?.checked ?? user.preferences?.newsletter,
+  };
+  // Atualizar também user.newsletter diretamente
+  updatedUser.newsletter = document.querySelector('#newsletter-check')?.checked ?? user.newsletter;
   try {
-    /* Atualizar dados do utilizador */
-    UserModel.update(user.id, userData);
-
-    /* Atualizar informações na página */
-    if (userData.username) {
-      document.getElementById("user-name").textContent = userData.username;
-      const infoUsername = document.getElementById("info-username");
-      if (infoUsername) infoUsername.textContent = userData.username;
-    }
-
-    if (userData.email) {
-      const infoEmail = document.getElementById("info-email");
-      if (infoEmail) infoEmail.textContent = userData.email;
-    }
-
-    /* Atualizar navbar */
-    updateNavbarUser();
-
-    /* Mostrar sucesso */
+    const result = UserModel.update(user.id, updatedUser);
+    sessionStorage.setItem("loggedUser", JSON.stringify(updatedUser));
+    loadUserInfo();
     showToast("Perfil atualizado com sucesso!", "success");
   } catch (error) {
     showToast("Erro ao atualizar perfil: " + error.message, "error");
@@ -893,49 +890,31 @@ function handleProfileUpdate(event) {
 function handleAvatarUpload(event) {
   const file = event.target.files[0];
   if (file) {
-    /* Validar tipo de ficheiro */
     if (!file.type.startsWith("image/")) {
-      showToast("Por favor, seleciona apenas ficheiros de imagem", "error");
+      showToast("Por favor, selecione um ficheiro de imagem.", "error");
       return;
     }
-
     const reader = new FileReader();
     reader.onload = function (e) {
-      const newAvatarUrl = e.target.result;
-
+      // Guardar o base64 no perfil do utilizador
+      const user = UserModel.getUserLogged();
+      if (!user) {
+        showToast("Utilizador não encontrado.", "error");
+        return;
+      }
+      user.avatar = e.target.result; // base64
       try {
-        /* Atualizar preview do avatar */
-        const avatarImg = document.getElementById("settings-avatar");
-        if (avatarImg) {
-          avatarImg.src = newAvatarUrl;
-        }
-
-        /* Atualizar avatar no utilizador logado */
-        const user = UserModel.getUserLogged();
-        if (user) {
-          UserModel.changeAvater(user, newAvatarUrl);
-          UserModel.update(user.id, user);
-
-          /* Atualizar avatar principal do perfil */
-          const mainAvatar = document.getElementById("user-avatar");
-          if (mainAvatar) {
-            mainAvatar.src = newAvatarUrl;
-          }
-
-          /* Atualizar navbar */
-          updateNavbarUser();
-
-          showToast("Avatar atualizado com sucesso!", "success");
-        }
+        UserModel.update(user.id, user);
+        sessionStorage.setItem("loggedUser", JSON.stringify(user));
+        loadUserInfo();
+        showToast("Avatar atualizado com sucesso!", "success");
       } catch (error) {
         showToast("Erro ao atualizar avatar: " + error.message, "error");
       }
     };
-
     reader.onerror = function () {
-      showToast("Erro ao ler o ficheiro", "error");
+      showToast("Erro ao ler o ficheiro de imagem.", "error");
     };
-
     reader.readAsDataURL(file);
   }
 }
@@ -1242,4 +1221,125 @@ function formatDateTime(dateStr) {
     minute: '2-digit',
     hour12: false
   });
+}
+
+/* Remove favorite from user's favorites list */
+function removeFavorite(favoriteIndex) {
+  // Check if user is logged in
+  if (!UserModel.isLogged()) {
+    alert("Deve fazer login primeiro!");
+    return;
+  }
+
+  const currentUser = UserModel.getUserLogged();
+  
+  // Check if favorites array exists and index is valid
+  if (!currentUser.favoritos || favoriteIndex < 0 || favoriteIndex >= currentUser.favoritos.length) {
+    console.error("[Favoritos] Invalid favorite index or no favorites array");
+    return;
+  }
+
+  // Get the favorite to be removed for confirmation
+  const favoriteToRemove = currentUser.favoritos[favoriteIndex];
+  const favoriteName = favoriteToRemove.destino || favoriteToRemove.nome || favoriteToRemove.title || "este favorito";
+  
+  // Confirm removal
+  showToast(`Favorito ${favoriteName} removido com sucesso!`);
+
+  try {
+    // Try to use the UserModel to remove the favorite first
+    let success = false;
+    
+    // Check if the favorite has flight number properties
+    if (favoriteToRemove.numeroVoo || favoriteToRemove.nVoo) {
+      success = UserModel.removeFavorite(currentUser, favoriteToRemove);
+    }
+    
+    // If UserModel method failed or couldn't be used, remove manually by index
+    if (!success) {
+      currentUser.favoritos.splice(favoriteIndex, 1);
+      UserModel.update(currentUser.id, currentUser);
+      success = true;
+    }
+    
+    if (success) {
+      // Reload the favorites display
+      loadFavoritos(currentUser);
+      
+      showToast(`Favorito ${favoriteName} removido com sucesso!`);
+
+      console.log(`[Favoritos] Removed favorite: ${favoriteName}`);
+      
+      // Show success message
+    } else {
+      throw new Error("Falha ao remover favorito");
+    }
+    
+  } catch (error) {
+    console.error("[Favoritos] Error removing favorite:", error);
+    alert("Erro ao remover favorito. Tente novamente.");
+  }
+}
+
+/* Carregar favoritos */
+function loadFavoritos(user) {
+  // Find the bookmarks container in the Perfil tab
+  const bookmarksContainer = document.getElementById("bookmarks-container");
+  const bookmarksEmpty = document.getElementById("bookmarks-empty");
+
+  if (!bookmarksContainer) {
+    console.error("[Favoritos] bookmarks-container not found in DOM");
+    return;
+  }
+
+  // Limpa o container
+  bookmarksContainer.innerHTML = "";
+
+  // Debug: log the favoritos array
+  console.log("[Favoritos] user.favoritos:", user.favoritos);
+
+  if (!user.favoritos || user.favoritos.length === 0) {
+    if (bookmarksEmpty) {
+      bookmarksEmpty.classList.remove("hidden");
+    }
+    return;
+  } else {
+    if (bookmarksEmpty) bookmarksEmpty.classList.add("hidden");
+  }
+  user.favoritos.forEach((fav, idx) => {
+    console.log(`[Favoritos] Rendering favorite #${idx}:`, fav);
+    // Render a card matching the provided HTML
+    const card = document.createElement("div");
+    card.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
+    
+    card.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-rose-500 hover:text-rose-600 cursor-pointer transition-colors favorite-heart" data-favorite-index="${fav}">favorite</span>
+        <div>
+          <h3 class="font-medium">${fav.destino || fav.nome || fav.title || "Favorito"}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">
+            ${fav.origem ? `${fav.origem} → ${fav.destino}` : ""}
+            ${fav.partida ? `| ${fav.partida.split(' ')[0]}` : ""}
+            ${fav.companhia ? `| ${fav.companhia}` : ""}
+          </p>
+        </div>
+      </div>
+      <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
+    `;    // Add click event to the heart icon for removing favorite
+    const heartIcon = card.querySelector('.favorite-heart');
+    heartIcon.addEventListener('click', function(e) {
+      e.stopPropagation(); // Prevent card click from triggering
+      removeFavorite(idx);
+    });
+    
+    // Add click event for navigation to the entire card
+    card.addEventListener('click', function() {
+      window.location.href = `/html/flight_itinerary.html?id=${fav.numeroVoo || fav.nVoo || ""}`;
+    });
+    
+    bookmarksContainer.appendChild(card);
+  });
+
+  // Final debug
+  console.log(`[Favoritos] Rendered ${user.favoritos.length} favorite(s).`);
 }

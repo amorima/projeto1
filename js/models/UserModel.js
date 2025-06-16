@@ -12,6 +12,8 @@ let reviews = [];
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
   users = localStorage.user ? JSON.parse(localStorage.user) : [];
+  // Garantir que todos os utilizadores têm user.pontos como inteiro
+  users = users.map(u => ({ ...u, pontos: parseInt(u.pontos || 0, 10) }));
   newsletter = localStorage.newsletter
     ? loadFromLocalStorage("newsletter", newsletter)
     : [];
@@ -23,7 +25,7 @@ export function add(username, email, password, acceptNewsletter = false) {
   if (users.some((user) => user.email === email)) {
     throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
-    const newUser = new User(username,password,email,acceptNewsletter,)
+    const newUser = new User(username, password, email, acceptNewsletter, "", 50, false, false);
     users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
 
@@ -37,12 +39,17 @@ export function add(username, email, password, acceptNewsletter = false) {
 
 // ALTERAR DADOS DO UTILIZADOR
 export function update(id, newUser) {
-  const index = users.findIndex((u) => u.id == id);
+  // Garantir que o id é sempre número
+  const userId = parseInt(id, 10);
+  console.log('[DEBUG][UserModel] Utilizadores antes do update:', users);
+  const index = users.findIndex((u) => parseInt(u.id, 10) === userId);
   if (index !== -1) {
-    users[index] = { ...users[index], ...newUser };
+    users[index] = { ...users[index], ...newUser, id: userId };
     localStorage.setItem("user", JSON.stringify(users));
+    console.log('[DEBUG][UserModel] Utilizadores após o update:', users);
     return true;
   }
+  console.error('[DEBUG][UserModel] Utilizador não encontrado para update. id:', id, 'users:', users);
   throw Error("Utilizador não encontrado");
 }
 
@@ -176,8 +183,8 @@ export function isAdmin(user) {
  * addNewsletterUser('user@example.com');
  * Agora o utilizador com o email 'user@example.com' está subscrito à newsletter.
  */
-export function addNewsletterUser(mail) {
-  const newsletterUser = new User("", "", mail);
+export function addNewsletterUser(email) {
+  const newsletterUser = new User("", "", email);
   newsletter.push(newsletterUser);
   saveToLocalStorage("newsletter", newsletter);
 }
@@ -196,8 +203,8 @@ export function addNewsletterUser(mail) {
  *
  * @throws {Error} Se não houver subscrição encontrada com o email fornecido.
  */
-export function removeNewsletterUser(mail) {
-  const index = newsletter.findIndex((n) => n.mail == mail);
+export function removeNewsletterUser(email) {
+  const index = newsletter.findIndex((n) => n.email == email);
   if (index !== -1) {
     newsletter.splice(index, 1);
     saveToLocalStorage("newsletter", newsletter);
@@ -227,10 +234,9 @@ export function getUserByName(username) {
  * newsletterToUser('newUser', 'password123', 'user@gmail.com');
  * Agora o utilizador com o email 'user@gmail.com' foi removido da newsletter e adicionado como um utilizador normal com o nome de utilizador 'newUser' e senha 'password123'.
  */
-export function newsletterToUser(username, password, mail) {
-  //! May not be needed
-  removeNewsletterUser(mail);
-  add(username, password, mail);
+export function newsletterToUser(username, password, email) {
+  removeNewsletterUser(email);
+  add(username, email, password);
 }
 
 // USER AVATAR
@@ -419,6 +425,15 @@ export function clearTestSession() {
   sessionStorage.removeItem("loggedUser");
 }
 
+export function getUserImage(username) {
+  const userAvatar = getUserByName(username);
+  if (userAvatar && userAvatar.avatar) {
+    return userAvatar.avatar;
+  }
+  // Retorna uma imagem padrão se o utilizador não tiver avatar
+  return false;
+}
+
 export function addReservation(userAdd, reservation){
   if (!userAdd.reservas) userAdd.reservas = [];
   // Verifica se já existe reserva com o mesmo numeroVoo
@@ -429,20 +444,46 @@ export function addReservation(userAdd, reservation){
   update(userAdd.id, userAdd);
   return true; 
 }
-export function addFavorite(userAdd, fav){
-  if (!userAdd.favorite) userAdd.favorite = [];
-  // Verifica se já existe reserva com o mesmo numeroVoo
-  if (fav && fav.numeroVoo && userAdd.favorite.some(f => f.numeroVoo == fav.numeroVoo)) {
+export function addFavorite(user, trip) {
+  if (!user.favoritos) user.favoritos = [];
+  // Verifica se já existe favorito com o mesmo numeroVoo
+  if (trip && trip.numeroVoo && user.favoritos.some(f => f.numeroVoo == trip.numeroVoo)) {
     return false; // Já existe
   }
-  userAdd.favorite.push(fav);
-  update(userAdd.id, userAdd);
-  return true; 
+  user.favoritos.push(trip);
+  update(user.id, user);
+  // Atualizar sessão se for o user logado
+  const loggedUser = getUserLogged();
+  if (loggedUser && loggedUser.id == user.id) {
+    sessionStorage.setItem("loggedUser", JSON.stringify(user));
+  }
+  return true;
+}
+
+export function removeFavorite(user, trip) {
+  if (!user.favoritos) return false;
+  const idx = user.favoritos.findIndex(f => 
+    (f.numeroVoo && trip.numeroVoo && f.numeroVoo == trip.numeroVoo) ||
+    (f.nVoo && trip.nVoo && f.nVoo == trip.nVoo) ||
+    (f.numeroVoo && trip.nVoo && f.numeroVoo == trip.nVoo) ||
+    (f.nVoo && trip.numeroVoo && f.nVoo == trip.numeroVoo)
+  );
+  if (idx !== -1) {
+    user.favoritos.splice(idx, 1);
+    update(user.id, user);
+    // Atualizar sessão se for o user logado
+    const loggedUser = getUserLogged();
+    if (loggedUser && loggedUser.id == user.id) {
+      sessionStorage.setItem("loggedUser", JSON.stringify(user));
+    }
+    return true;
+  }
+  return false;
 }
 
 export function addPontos(user, pontos) {
   if (!user.pontos) user.pontos = 0;
-  user.pontos += pontos;
+  user.pontos = parseInt(user.pontos, 10) + parseInt(pontos, 10);
 }
 
 /**
@@ -450,7 +491,7 @@ export function addPontos(user, pontos) {
  * @class User
  * @property {string} username - O nome de utilizador do utilizador.
  * @property {string} password - A senha do utilizador.
- * @property {string} mail - O email do utilizador.
+ * @property {string} email - O email do utilizador.
  * @property {string} avatar - A URL do avatar do utilizador.
  * @property {number} points - Os pontos acumulados pelo utilizador.
  * @property {boolean} isPrivate - Indica se o perfil do utilizador é privado.
@@ -464,23 +505,23 @@ export function addPontos(user, pontos) {
  * console.log(user.level); // 'Viajante'
  */
 class User {
-  id = 0
+  id = 0;
   username = "";
   password = "";
-  mail = "";
+  email = "";
   newsletter = false;
   avatar = "";
-  points = 0;
+  pontos = 0;
   isPrivate = false;
   admin = false;
 
   constructor(
     username = "",
     password = "",
-    mail,
+    email = "",
     newsletter = false,
     avatar = "",
-    points = 50,
+    pontos = 50,
     isPrivate = false,
     admin = false
   ) {
@@ -488,21 +529,21 @@ class User {
     this.newsletter = newsletter;
     this.username = username;
     this.password = password;
-    this.mail = mail;
+    this.email = email;
     this.avatar = avatar;
-    this.points = points;
+    this.pontos = parseInt(pontos || 0, 10); // Garante inteiro
     this.isPrivate = isPrivate;
     this.admin = admin;
   }
 
   get level() {
-    if (this.points >= 5000) {
+    if (this.pontos >= 5000) {
       return "Embaixador";
-    } else if (this.points >= 3000) {
+    } else if (this.pontos >= 3000) {
       return "Globetrotter";
-    } else if (this.points >= 1500) {
+    } else if (this.pontos >= 1500) {
       return "Aventureiro";
-    } else if (this.points >= 250) {
+    } else if (this.pontos >= 250) {
       return "Viajante";
     } else {
       return "Explorador";
@@ -812,3 +853,5 @@ export function addReplyToReview(reviewId, reply) {
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReply;
 }
+
+

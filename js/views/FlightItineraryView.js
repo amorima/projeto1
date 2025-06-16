@@ -63,6 +63,7 @@ if (btnReservar) {
       sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
     }
     showToast("Viagem reservada!", "success");
+    mostrarConfettiNoToast();
 
     if (
       !window.customElements ||
@@ -113,18 +114,44 @@ if (favItinerary) {
   });
   favItinerary.addEventListener("click", function () {
     const icon = favItinerary.querySelector("span");
-    const isFav = favItinerary.getAttribute("data-favorito") === "true";
-    favItinerary.setAttribute("data-favorito", String(!isFav));
-    if (!isFav) {
-      icon.style.fontVariationSettings = "'FILL' 1";
-    } else {
-      icon.style.fontVariationSettings = "'FILL' 0";
+    if (!User.isLogged()) {
+      showToast("Faça login para adicionar aos favoritos");
+      window.location.href = "_login.html?redirect=" + encodeURIComponent(window.location.pathname + window.location.search);
+      return;
     }
+    const user = User.getUserLogged();
+    // Check if this flight is already a favorite
+    const isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === vooShallow.numeroVoo);
+    if (isFav) {
+      User.removeFavorite(user, vooShallow);
+      favItinerary.setAttribute("data-favorito", "false");
+      icon.style.fontVariationSettings = "'FILL' 0";
+      showToast("Removido dos favoritos");
+    } else {
+      User.addFavorite(user, vooShallow);
+      favItinerary.setAttribute("data-favorito", "true");
+      icon.style.fontVariationSettings = "'FILL' 1";
+      showToast("Adicionado aos favoritos");
+    }
+    icon.classList.remove("scale-110");
+    void icon.offsetWidth;
     icon.classList.add("scale-110");
     setTimeout(function () {
       icon.classList.remove("scale-110");
     }, 150);
   });
+}
+
+function updateFavItineraryState(flight) {
+  const favItinerary = document.getElementById("fav-itinerary");
+  if (!favItinerary || !flight || !flight.numeroVoo) return;
+  if (User.isLogged()) {
+    const user = User.getUserLogged();
+    const isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === flight.numeroVoo);
+    favItinerary.setAttribute("data-favorito", isFav ? "true" : "false");
+    const icon = favItinerary.querySelector("span");
+    if (icon) icon.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+  }
 }
 
 function carregarHoteis(destino) {
@@ -518,6 +545,7 @@ function atualizarSidebarVoo(voo) {
         // Update session user
         sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
 
+        mostrarConfettiNoToast();
         showToast("Viagem reservada!", "success");
         if (!window.customElements || !window.customElements.get("dotlottie-player")) {
         let script = document.createElement("script");
@@ -548,18 +576,22 @@ function atualizarSidebarVoo(voo) {
 
 document.addEventListener("DOMContentLoaded", () => {
   // Buscar o numeroVoo da query string
+  User.init()
   const params = new URLSearchParams(window.location.search);
   const numeroVoo = params.get("id");
   let destinoVoo = null;
+  let voo = null;
   if (numeroVoo) {
     FlightModel.init();
-    const voo = FlightModel.getByNumeroVoo(numeroVoo);
+    voo = FlightModel.getByNumeroVoo(numeroVoo);
     if (voo) {
       vooShallow = {...voo}
       destinoVoo = voo.destino;
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
       atualizarSidebarVoo(voo);
+      // Atualiza o estado do favorito usando vooShallow se possível, senão voo
+      updateFavItineraryState(vooShallow && vooShallow.numeroVoo ? vooShallow : voo);
     }
   }
   carregarHoteis(destinoVoo);

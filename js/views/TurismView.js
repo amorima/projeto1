@@ -1,6 +1,7 @@
 /* Importação de helpers e modelos necessários para a renderização dos componentes e manipulação dos dados das viagens */
 import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
+import * as User from "../models/UserModel.js";
 
 /* Importa apenas a função de renderização dos cards do FlightView */
 import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
@@ -166,7 +167,7 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
           .join("")
       : "";
 
-    container.innerHTML += `
+    const cardHTML = `
       <div class="bg-white dark:bg-gray-800 w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="relative w-full h-80">
           <img class="w-full h-80 object-cover" src="${imagem}" alt="Imagem do destino">
@@ -176,9 +177,9 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
         </div>
         <div class="p-4">
           <p class="text-Text-Body dark:text-gray-100 text-2xl font-bold font-['Space_Mono'] mb-2">${cidade}</p>
-          <div class="inline-flex">
-            <span class="material-symbols-outlined text-Text-Subtitles dark:text-gray-300">calendar_month</span>
-            <p class="text-Text-Subtitles dark:text-gray-300 align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">${datas}</p>
+          <div class="inline-flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-Text-Subtitles dark:text-gray-300" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+            <p class="text-Text-Subtitles dark:text-gray-300 align-bottom font-normal font-['IBM_Plex_Sans']">${datas}</p>
           </div>
           <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
           <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
@@ -190,19 +191,49 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
         </div>
       </div>
     `;
-  });
-  // Ativa/desativa favorito ao clicar no ícone
-  container.querySelectorAll(".favorite-icon").forEach((icon) => {
-    const initialIsFav = icon.getAttribute("data-favorito") === "true";
-    icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
-    icon.addEventListener("click", function () {
-      const currentIsFav = this.getAttribute("data-favorito") === "true";
-      const newIsFav = !currentIsFav;
-      this.setAttribute("data-favorito", String(newIsFav));
-      this.style.fontVariationSettings = newIsFav ? "'FILL' 1" : "'FILL' 0";
-      this.classList.add("scale-110");
-      setTimeout(() => this.classList.remove("scale-110"), 150);
-    });
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = cardHTML.trim();
+    const card = tempDiv.firstElementChild;
+    container.appendChild(card);
+
+    // Now add the event listener to the heart icon inside this card
+    const heart = card.querySelector('.favorite-icon');
+    if (heart) {
+      // Set initial fill state based on whether this trip is a favorite
+      let isFav = false;
+      if (User.isLogged()) {
+        const user = User.getUserLogged();
+        isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === viagem.numeroVoo);
+      }
+      heart.setAttribute("data-favorito", isFav ? "true" : "false");
+      heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+
+      heart.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!User.isLogged()) {
+          showToast("Faça login para adicionar aos favoritos");
+          window.location.href = "../html/_login.html";
+          return;
+        }
+        const user = User.getUserLogged();
+        const currentlyFav = heart.getAttribute("data-favorito") === "true";
+        if (currentlyFav) {
+          User.removeFavorite(user, viagem);
+          heart.setAttribute("data-favorito", "false");
+          heart.style.fontVariationSettings = "'FILL' 0";
+          showToast("Removido dos favoritos");
+        } else {
+          User.addFavorite(user, viagem);
+          heart.setAttribute("data-favorito", "true");
+          heart.style.fontVariationSettings = "'FILL' 1";
+          showToast("Adicionado aos favoritos");
+        }
+        heart.classList.remove("scale-110"); // Reset before triggering
+        void heart.offsetWidth; // Force reflow for animation restart
+        heart.classList.add("scale-110");
+        setTimeout(() => heart.classList.remove("scale-110"), 150);
+      });
+    }
   });
 }
 
