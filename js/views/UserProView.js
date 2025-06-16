@@ -45,7 +45,6 @@ window.onload = async function () {
     /* Agora que os componentes estão carregados, carregar informações do utilizador e configurar eventos */
     loadUserInfo(); /* Esta função chama updateNavbarUser */
     setupEventListeners();
-    setupCodeRedeemEvents()
 
     /* Inicializar funcionalidades das abas após um pequeno delay */
     /* Considerar se este timeout ainda é necessário ou se pode ser chamado diretamente */
@@ -85,13 +84,12 @@ function setupEventListeners() {
       }
     });
   }
-
   /* Botão de copiar link de convite */
   const btnCopy = document.querySelector("button.bg-Button-Main.rounded-r-lg");
   if (btnCopy) {
     btnCopy.addEventListener("click", function () {
-      const linkInput = document.querySelector("input[readonly]");
-      if (linkInput) {
+      const linkInput = document.getElementById("referral-link");
+      if (linkInput && linkInput.value) {
         linkInput.select();
         document.execCommand("copy");
 
@@ -219,12 +217,23 @@ function loadUserInfo() {
 
   /* Carregar preferências de viagem */
   loadTravelPreferences(user);
-
   /* Carregar reservas */
   loadReservas(user);
 
   /* Carregar favoritos */
   loadFavoritos(user);
+
+  /* Set referral link */
+  const referralLinkInput = document.getElementById("referral-link");
+  if (referralLinkInput) {
+    try {
+      const referralLink = UserModel.getReferralLink(user);
+      referralLinkInput.value = referralLink;
+    } catch (error) {
+      console.error('Erro ao gerar link de referência:', error);
+      referralLinkInput.value = '';
+    }
+  }
 }
 
 /* Popular campos do formulário de definições */
@@ -932,7 +941,7 @@ function initGamificationModal() {
   setupGamificationModalEvents();
 
   /* Configurar funcionalidade de redeem de código */
-  ;
+  setupCodeRedeemEvents();
 
   /* Usar event delegation para o botão "Saber mais" */
   document.addEventListener("click", function (e) {
@@ -1022,25 +1031,23 @@ function setupCodeRedeemEvents() {
       const codigo = inputCodigo.value.trim();
 
       if (!codigo) {
-        showToast("Por favor, insira um código válido.", "error");
+        showCodeMessage("Por favor, insira um código válido.", "error");
         return;
       }
       try {
         saveSpecialCode(codigo);
-        const user = UserModel.getUserLogged()
-        user.pontos += 200;
-        UserModel.update(user.id, user);
-        sessionStorage.setItem("loggedUser", JSON.stringify(user));
-
-        showToast(
+        showCodeMessage(
           "Código resgatado com sucesso! Ganhaste 200 pontos.",
           "success"
         );
         inputCodigo.value = "";
 
         /* Limpar mensagem após 5 segundos */
+        setTimeout(() => {
+          showCodeMessage("", "hidden");
+        }, 5000);
       } catch (error) {
-        showToast(error.message, "error");
+        showCodeMessage(error.message, "error");
       }
     });
 

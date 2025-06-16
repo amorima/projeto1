@@ -21,7 +21,7 @@ export function init() {
 }
 
 // ADICIONAR UTILIZADOR
-export function add(username, email, password, acceptNewsletter = false) {
+export function add(username, email, password, acceptNewsletter = false, referralCode = null) {
   if (users.some((user) => user.email === email)) {
     throw Error(`Utilizador com email "${email}" já existe!`);
   } else {
@@ -33,6 +33,15 @@ export function add(username, email, password, acceptNewsletter = false) {
     if (acceptNewsletter) {
       newsletter.push({ email: email, date: new Date().toISOString() });
       saveToLocalStorage("newsletter", newsletter);
+    }
+
+    /* Process referral if provided */
+    if (referralCode) {
+      console.log(`[DEBUG] Processando código de referência: ${referralCode}`);
+      const referralResult = processReferral(referralCode);
+      console.log(`[DEBUG] Resultado do processamento de referência: ${referralResult}`);
+    } else {
+      console.log(`[DEBUG] Nenhum código de referência fornecido`);
     }
   }
 }
@@ -728,7 +737,7 @@ export function forceShowGamificationModal() {
 }
 
 /* Função para guardar código especial */
-export function saveSpecialCode(code,user) {
+export function saveSpecialCode(code) {
   if (!code || code.trim() === "") {
     throw new Error("Código inválido");
   }
@@ -737,21 +746,14 @@ export function saveSpecialCode(code,user) {
   const existingCodes = JSON.parse(
     localStorage.getItem("specialCodes") || "[]"
   );
-  
-
 
   /* Verificar se código já foi usado */
-  if (user.usedCodes.includes(code.trim())) {
+  if (existingCodes.includes(code.trim())) {
     throw new Error("Este código já foi utilizado");
   }
 
-  user.usedCodes ? user.usedCodes = user.usedCodes : user.usedCodes = [];
-  user.usedCodes = user.usedCodes.push(code);
-  update(user.id, user);
-  sessionStorage.setItem("loggedUser", JSON.stringify(user));
-
-  //existingCodes.push(code.trim());
-  //localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
+  existingCodes.push(code.trim());
+  localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
 
   return true;
 }
@@ -859,6 +861,59 @@ export function addReplyToReview(reviewId, reply) {
   reviews[idx].respostas.push(newReply);
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReply;
+}
+
+// REFERRAL SYSTEM
+/**
+ * Generates a referral link for the given user
+ * @param {Object} user - The user to generate the referral link for
+ * @returns {string} The referral link
+ */
+export function getReferralLink(user) {
+  if (!user || !user.id) {
+    throw new Error('Utilizador inválido para gerar link de referência');
+  }
+  // Create the referral link pointing to the login page
+  return `${window.location.origin}/html/_login.html?ref=${user.id}`;
+}
+
+/**
+ * Processes a referral code and awards points to the referring user
+ * @param {string} referralCode - The referral code (user ID) from the URL
+ * @returns {boolean} True if the referral was processed successfully
+ */
+export function processReferral(referralCode) {
+  if (!referralCode) {
+    return false;
+  }
+
+  try {
+    // Find the referring user by ID
+    const referringUser = getUserById(parseInt(referralCode, 10));
+    
+    if (!referringUser) {
+      console.warn('Utilizador de referência não encontrado:', referralCode);
+      return false;
+    }
+
+    // Award 100 points to the referring user
+    const currentPoints = parseInt(referringUser.pontos) || 0;
+    const newPoints = currentPoints + 100;
+
+    // Update the user in the users array
+    const userIndex = users.findIndex(u => parseInt(u.id, 10) === parseInt(referralCode, 10));
+    if (userIndex !== -1) {
+      users[userIndex].pontos = newPoints;
+      localStorage.setItem("user", JSON.stringify(users));
+      console.log(`Referência processada: ${referringUser.username} recebeu 100 pontos (${currentPoints} -> ${newPoints})`);
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.warn('Erro ao processar referência:', error.message);
+    return false;
+  }
 }
 
 
