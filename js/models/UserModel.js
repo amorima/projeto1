@@ -728,7 +728,7 @@ export function forceShowGamificationModal() {
 }
 
 /* Função para guardar código especial */
-export function saveSpecialCode(code) {
+export function saveSpecialCode(code,user) {
   if (!code || code.trim() === "") {
     throw new Error("Código inválido");
   }
@@ -737,14 +737,21 @@ export function saveSpecialCode(code) {
   const existingCodes = JSON.parse(
     localStorage.getItem("specialCodes") || "[]"
   );
+  
+
 
   /* Verificar se código já foi usado */
-  if (existingCodes.includes(code.trim())) {
+  if (user.usedCodes.includes(code.trim())) {
     throw new Error("Este código já foi utilizado");
   }
 
-  existingCodes.push(code.trim());
-  localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
+  user.usedCodes ? user.usedCodes = user.usedCodes : user.usedCodes = [];
+  user.usedCodes = user.usedCodes.push(code);
+  update(user.id, user);
+  sessionStorage.setItem("loggedUser", JSON.stringify(user));
+
+  //existingCodes.push(code.trim());
+  //localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
 
   return true;
 }
