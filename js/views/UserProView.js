@@ -1244,9 +1244,7 @@ function removeFavorite(favoriteIndex) {
   const favoriteName = favoriteToRemove.destino || favoriteToRemove.nome || favoriteToRemove.title || "este favorito";
   
   // Confirm removal
-  if (!confirm(`Tem certeza que deseja remover "${favoriteName}" dos seus favoritos?`)) {
-    return;
-  }
+  showToast(`Favorito ${favoriteName} removido com sucesso!`);
 
   try {
     // Try to use the UserModel to remove the favorite first
@@ -1268,19 +1266,11 @@ function removeFavorite(favoriteIndex) {
       // Reload the favorites display
       loadFavoritos(currentUser);
       
+      showToast(`Favorito ${favoriteName} removido com sucesso!`);
+
       console.log(`[Favoritos] Removed favorite: ${favoriteName}`);
       
       // Show success message
-      const toast = document.createElement("div");
-      toast.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300";
-      toast.textContent = `"${favoriteName}" removido dos favoritos!`;
-      document.body.appendChild(toast);
-      
-      // Remove toast after 3 seconds
-      setTimeout(() => {
-        toast.style.opacity = "0";
-        setTimeout(() => document.body.removeChild(toast), 300);
-      }, 3000);
     } else {
       throw new Error("Falha ao remover favorito");
     }
