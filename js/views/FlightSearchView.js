@@ -1,4 +1,6 @@
 import * as Flight from "../models/FlightModel.js";
+import * as User from "../models/UserModel.js";
+import { showToast } from "./ViewHelpers.js";
 // Objeto global para todos os filtros e ordenação
 let filters = {
   origem: '',
@@ -167,9 +169,7 @@ function renderFlightCards(maxCards = 18) {
     const datas = dataPartida && dataRegresso ? `${dataPartida} - ${dataRegresso}` : dataPartida;
     const preco = custo || "-";
     const imgSrc = imagem || "https://placehold.co/413x327";
-    const nVoo = numeroVoo || "AF151";
-
-    const card = document.createElement("div");
+    const nVoo = numeroVoo || "AF151";    const card = document.createElement("div");
     card.className = "bg-white dark:bg-gray-800 w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 overflow-hidden";
     card.innerHTML = `
       <img class="w-full h-80 object-cover" src="${imgSrc}" alt="Imagem do destino">
@@ -187,21 +187,48 @@ function renderFlightCards(maxCards = 18) {
     `;
     container.appendChild(card);
 
-  });
+    // Now add the event listener to the heart icon inside this card
+    const heart = card.querySelector('.favorite-icon');
+    if (heart) {
+      // Set initial fill state based on whether this trip is a favorite
+      let isFav = false;
+      if (User.isLogged()) {
+        const user = User.getUserLogged();
+        isFav = user.favoritos && user.favoritos.some(fav => 
+          (fav.numeroVoo && fav.numeroVoo === flight.numeroVoo) ||
+          (fav.nVoo && fav.nVoo === flight.numeroVoo) ||
+          (fav.numeroVoo && fav.numeroVoo === flight.nVoo) ||
+          (fav.nVoo && fav.nVoo === flight.nVoo)
+        );
+      }
+      heart.setAttribute("data-favorito", isFav ? "true" : "false");
+      heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
 
-  // Ativar toggle de favorito
-  container.querySelectorAll(".favorite-icon").forEach((icon) => {
-    const initialIsFav = icon.getAttribute("data-favorito") === "true";
-    icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
+      heart.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!User.isLogged()) {
+          showToast("Faça login para adicionar aos favoritos", "error");
+          window.location.href = "_login.html";
+          return;
+        }
+        const user = User.getUserLogged();
+        const currentlyFav = heart.getAttribute("data-favorito") === "true";
+        if (currentlyFav) {
+          User.removeFavorite(user, flight);
+          heart.setAttribute("data-favorito", "false");
+          heart.style.fontVariationSettings = "'FILL' 0";
+          showToast("Removido dos favoritos", "success");
+        } else {
+          User.addFavorite(user, flight);
+          heart.setAttribute("data-favorito", "true");
+          heart.style.fontVariationSettings = "'FILL' 1";
+          showToast("Adicionado aos favoritos", "success");
+        }
+        heart.classList.add("scale-110");
+        setTimeout(() => heart.classList.remove("scale-110"), 150);
+      });
+    }
 
-    icon.addEventListener("click", function () {
-      const currentIsFav = this.getAttribute("data-favorito") === "true";
-      const newIsFav = !currentIsFav;
-      this.setAttribute("data-favorito", String(newIsFav));
-      this.style.fontVariationSettings = newIsFav ? "'FILL' 1" : "'FILL' 0";
-      this.classList.add("scale-110");
-      setTimeout(() => this.classList.remove("scale-110"), 150);
-    });
   });
 }
 
@@ -279,6 +306,7 @@ function deixarScroll() {
 }
 document.addEventListener("DOMContentLoaded", () => {
   Flight.init();
+  User.init();
   const planitFilter = preencherCamposPesquisa();
   // Atualiza o botão de datas/viajantes se vier do index
   if (planitFilter && planitFilter.dataPartida && planitFilter.dataRegresso) {
