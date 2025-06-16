@@ -270,6 +270,101 @@ export function getSearchData() {
   };
 }
 
+/* Filtrar hotéis baseado nos dados de pesquisa */
+export function filterHotelsBySearchData(searchData) {
+  let hotels = getAll();
+  
+  // Filtrar por destino (cidade)
+  if (searchData.destination) {
+    const cidadeDestino = searchData.destination.cidade;
+    hotels = hotels.filter(hotel => 
+      hotel.cidade && hotel.cidade.toLowerCase() === cidadeDestino.toLowerCase()
+    );
+  }
+  
+  // Filtrar por capacidade baseado no número de hóspedes
+  if (searchData.guests) {
+    const totalHospedes = searchData.guests.adultos + searchData.guests.criancas;
+    hotels = hotels.filter(hotel => {
+      if (!hotel.quartos || hotel.quartos.length === 0) return false;
+      
+      // Verificar se algum quarto tem capacidade suficiente
+      return hotel.quartos.some(quarto => 
+        quarto.capacidade >= totalHospedes
+      );
+    });
+  }
+  
+  // Filtrar por acessibilidades selecionadas
+  if (searchData.accessibilities && searchData.accessibilities.length > 0) {
+    const accessibilityList = getAccessibilities();
+    const selectedAccessibilityTexts = searchData.accessibilities.map(index => 
+      accessibilityList[index]
+    ).filter(Boolean);
+    
+    if (selectedAccessibilityTexts.length > 0) {
+      hotels = hotels.filter(hotel => {
+        if (!hotel.quartos || hotel.quartos.length === 0) return false;
+        
+        // Verificar se algum quarto tem pelo menos uma das acessibilidades selecionadas
+        return hotel.quartos.some(quarto => {
+          if (!quarto.acessibilidade) return false;
+          
+          const quartoAccessibilities = Array.isArray(quarto.acessibilidade) 
+            ? quarto.acessibilidade 
+            : [quarto.acessibilidade];
+            
+          return selectedAccessibilityTexts.some(selectedAcc =>
+            quartoAccessibilities.some(quartoAcc => 
+              quartoAcc.toLowerCase().includes(selectedAcc.toLowerCase())
+            )
+          );
+        });
+      });
+    }
+  }
+  
+  // Filtrar por datas (verificar disponibilidade)
+  if (searchData.dates && searchData.dates.checkin && searchData.dates.checkout) {
+    const checkinDate = new Date(searchData.dates.checkin);
+    const checkoutDate = new Date(searchData.dates.checkout);
+    
+    hotels = hotels.filter(hotel => {
+      if (!hotel.quartos || hotel.quartos.length === 0) return true; // Se não há quartos definidos, considera disponível
+      
+      // Verificar se algum quarto está disponível nas datas selecionadas
+      return hotel.quartos.some(quarto => {
+        // Se não há data de check-in definida no quarto, considera disponível
+        if (!quarto.dataCheckin) return true;
+        
+        const quartoCheckin = new Date(quarto.dataCheckin);
+        const quartoCheckout = new Date(quartoCheckin);
+        quartoCheckout.setDate(quartoCheckout.getDate() + (quarto.numeroNoites || 1));
+        
+        // Verificar se as datas não se sobrepõem
+        return checkoutDate <= quartoCheckin || checkinDate >= quartoCheckout;
+      });
+    });
+  }
+  
+  console.log(`Filtrados ${hotels.length} hotéis de ${getAll().length} total`);
+  return hotels;
+}
+
+/* Limpar filtros de pesquisa */
+export function clearSearchFilters() {
+  selectedDestination = null;
+  hotelDates.checkin = "";
+  hotelDates.checkout = "";
+  hotelGuests.adultos = 2;
+  hotelGuests.criancas = 0;
+  hotelGuests.quartos = 1;
+  selectedAccessibilities.length = 0; // Limpar array
+  
+  // Remover do localStorage
+  localStorage.removeItem("acessibilidadesSelecionadasHotel");
+}
+
 /**
  * CLASSE QUE MODELA UM HOTEL NA APLICAÇÃO
  * @param {number} id - ID do hotel
@@ -359,5 +454,7 @@ export default {
   confirmAccessibilities,
   getSelectedAccessibilities,
   getAccessibilitiesText,
-  getSearchData
+  getSearchData,
+  filterHotelsBySearchData,
+  clearSearchFilters
 };

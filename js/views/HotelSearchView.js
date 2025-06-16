@@ -333,11 +333,15 @@ function setupModalButtons() {
   if (btnHospedes) {
     btnHospedes.addEventListener("click", abrirModalHospedes);
   }
-
   // Botão para abrir modal de acessibilidade
   const btnAcessibilidade = document.getElementById("btn-acessibilidade-hotel");
   if (btnAcessibilidade) {
     btnAcessibilidade.addEventListener("click", abrirModalAcessibilidade);
+  }
+  // Botão para limpar filtros
+  const btnClearFilters = document.getElementById("clear-filters-btn");
+  if (btnClearFilters) {
+    btnClearFilters.addEventListener("click", clearSearchFilters);
   }
 
   // Formulário de pesquisa
@@ -641,9 +645,24 @@ function handleSearchSubmit(e) {
   const searchData = HotelModel.getSearchData();
   console.log("Dados da pesquisa:", searchData);
   
-  // Aqui poderia filtrar os hotéis com base nos critérios de pesquisa
-  // Por agora, vamos apenas aplicar os filtros existentes
-  applyFilters();
+  // Filtrar hotéis baseado nos critérios de pesquisa usando o modelo
+  const filteredHotels = HotelModel.filterHotelsBySearchData(searchData);
+  renderHotelCards(filteredHotels);
+}
+
+/* Limpar filtros de pesquisa e mostrar todos os hotéis */
+function clearSearchFilters() {
+  // Usar a função do modelo para limpar filtros
+  HotelModel.clearSearchFilters();
+  
+  // Atualizar interface
+  updateDestinationButton();
+  updateDatesButton();
+  updateGuestsButton();
+  updateAccessibilityButton();
+  
+  // Mostrar todos os hotéis
+  renderHotelCards();
 }
 
 // --- Função principal ---
