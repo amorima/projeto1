@@ -287,7 +287,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const bebes = planitFilter.bebes || 0;
     updateDatesButton(planitFilter.dataPartida, planitFilter.dataRegresso, adultos, criancas, bebes);
   }
-  renderFlightCards();
+  filters.origem = document.querySelector('#btn-open p')?.textContent.trim() || '';
+      filters.destino = document.querySelector('#btn-destino p')?.textContent.trim() || '';
+      filters.tipoTurismo = (document.getElementById('texto-tipo-turismo')?.textContent.trim().replace(/\s+/g, '') || '');
+      filters.acessibilidade = document.getElementById('texto-acessibilidade')?.textContent.trim() || '';
+      // Datas e viajantes
+      let dataPartida = '', dataRegresso = '', adultos = 1, criancas = 0, bebes = 0;
+      if (typeof Flight !== 'undefined' && Flight.getDatesTravelers) {
+        const dt = Flight.getDatesTravelers();
+        dataPartida = dt.dataPartida;
+        dataRegresso = dt.dataRegresso;
+        adultos = dt.adultos;
+        criancas = dt.criancas;
+        bebes = dt.bebes;
+      }
+      filters.dataPartida = dataPartida;
+      filters.dataRegresso = dataRegresso;
+      filters.adultos = adultos;
+      filters.criancas = criancas;
+      filters.bebes = bebes;
+      sessionStorage.setItem('planit_search', JSON.stringify(filters));
+      renderFlightCards();
   setupFlightFilters();
   setupModalButtons();
 
