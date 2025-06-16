@@ -1223,6 +1223,61 @@ function formatDateTime(dateStr) {
   });
 }
 
+/* Remove favorite from user's favorites list */
+function removeFavorite(favoriteIndex) {
+  // Check if user is logged in
+  if (!UserModel.isLogged()) {
+    alert("Deve fazer login primeiro!");
+    return;
+  }
+
+  const currentUser = UserModel.getUserLogged();
+  
+  // Check if favorites array exists and index is valid
+  if (!currentUser.favoritos || favoriteIndex < 0 || favoriteIndex >= currentUser.favoritos.length) {
+    console.error("[Favoritos] Invalid favorite index or no favorites array");
+    return;
+  }
+
+  // Get the favorite to be removed for confirmation
+  const favoriteToRemove = currentUser.favoritos[favoriteIndex];
+  const favoriteName = favoriteToRemove.destino || favoriteToRemove.nome || favoriteToRemove.title || "este favorito";
+  
+  // Confirm removal
+  if (!confirm(`Tem certeza que deseja remover "${favoriteName}" dos seus favoritos?`)) {
+    return;
+  }
+
+  try {
+    // Remove the favorite from the array
+    currentUser.favoritos.splice(favoriteIndex, 1);
+    
+    // Update the user in the model
+    UserModel.update(currentUser.id, currentUser);
+    
+    // Reload the favorites display
+    loadFavoritos(currentUser);
+    
+    console.log(`[Favoritos] Removed favorite: ${favoriteName}`);
+    
+    // Show success message
+    const toast = document.createElement("div");
+    toast.className = "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300";
+    toast.textContent = `"${favoriteName}" removido dos favoritos!`;
+    document.body.appendChild(toast);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      setTimeout(() => document.body.removeChild(toast), 300);
+    }, 3000);
+    
+  } catch (error) {
+    console.error("[Favoritos] Error removing favorite:", error);
+    alert("Erro ao remover favorito. Tente novamente.");
+  }
+}
+
 /* Carregar favoritos */
 function loadFavoritos(user) {
   // Find the bookmarks container in the Perfil tab
@@ -1248,15 +1303,15 @@ function loadFavoritos(user) {
   } else {
     if (bookmarksEmpty) bookmarksEmpty.classList.add("hidden");
   }
-
   user.favoritos.forEach((fav, idx) => {
     console.log(`[Favoritos] Rendering favorite #${idx}:`, fav);
     // Render a card matching the provided HTML
     const card = document.createElement("div");
     card.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
+    
     card.innerHTML = `
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-rose-500">favorite</span>
+        <span class="material-symbols-outlined text-rose-500 hover:text-rose-600 cursor-pointer transition-colors favorite-heart" data-favorite-index="${fav}">favorite</span>
         <div>
           <h3 class="font-medium">${fav.destino || fav.nome || fav.title || "Favorito"}</h3>
           <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -1268,9 +1323,18 @@ function loadFavoritos(user) {
       </div>
       <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
     `;
-    card.onclick = function() {
+      // Add click event to the heart icon for removing favorite
+    const heartIcon = card.querySelector('.favorite-heart');
+    heartIcon.addEventListener('click', function(e) {
+      e.stopPropagation(); // Prevent card click from triggering
+      UserModel.removeFavorite(UserModel.getUserLogged(),fav);
+    });
+    
+    // Add click event for navigation to the entire card
+    card.addEventListener('click', function() {
       window.location.href = `/html/flight_itinerary.html?id=${fav.numeroVoo || fav.nVoo || ""}`;
-    };
+    });
+    
     bookmarksContainer.appendChild(card);
   });
 
