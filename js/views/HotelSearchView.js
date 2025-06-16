@@ -150,11 +150,11 @@ function renderHotelCards(filteredHotels = null) {
           >favorite</span>
         </div>
       </div>
-    `;
+    `;  
   });
 
   // Ativar toggle de favorito
-  container.querySelectorAll(".favorite-icon").forEach((icon) => {
+   container.querySelectorAll(".favorite-icon").forEach((icon) => {
     const initialIsFav = icon.getAttribute("data-favorito") === "true";
     icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
     icon.addEventListener("click", function () {
