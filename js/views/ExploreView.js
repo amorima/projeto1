@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <div class="flex justify-between items-center mb-2">
             <div>
-              <p class="text-sm font-medium">$${
+              <p class="text-sm font-medium">${
                 voo.direto === "S" ? "Voo direto" : "Voo com escala"
               }</p>
               <p class="text-xs text-gray-500 dark:text-gray-400">${
@@ -365,30 +365,49 @@ document.addEventListener("DOMContentLoaded", () => {
             </form>
           </div>
         `;
-        document.body.appendChild(modal);
-
-        // Star rating logic
+        document.body.appendChild(modal);        // Star rating logic
         let selectedRating = 0;
         const stars = modal.querySelectorAll('#star-input span');
         stars.forEach(star => {
           star.addEventListener('mouseenter', () => {
             const val = +star.dataset.value;
             stars.forEach((s, i) => {
-              s.classList.toggle('text-yellow-400', i < val);
-              s.classList.toggle('text-gray-300', i >= val);
+              if (i < val) {
+                s.classList.add('text-yellow-400');
+                s.classList.remove('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 1";
+              } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 0";
+              }
             });
           });
           star.addEventListener('mouseleave', () => {
             stars.forEach((s, i) => {
-              s.classList.toggle('text-yellow-400', i < selectedRating);
-              s.classList.toggle('text-gray-300', i >= selectedRating);
+              if (i < selectedRating) {
+                s.classList.add('text-yellow-400');
+                s.classList.remove('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 1";
+              } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 0";
+              }
             });
           });
           star.addEventListener('click', () => {
             selectedRating = +star.dataset.value;
             stars.forEach((s, i) => {
-              s.classList.toggle('text-yellow-400', i < selectedRating);
-              s.classList.toggle('text-gray-300', i >= selectedRating);
+              if (i < selectedRating) {
+                s.classList.add('text-yellow-400');
+                s.classList.remove('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 1";
+              } else {
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+                s.style.fontVariationSettings = "'FILL' 0";
+              }
             });
           });
         });
