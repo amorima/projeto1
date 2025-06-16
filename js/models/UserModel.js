@@ -26,6 +26,9 @@ export function init() {
     loadFromLocalStorage("newsletter", newsletter);
   }
   
+  // Rebuild newsletter from users with newsletter preferences (avoid duplicates)
+  rebuildNewsletterFromUsers();
+  
   reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
 }
 
@@ -36,15 +39,11 @@ export function add(username, email, password, acceptNewsletter = false, referra
   } else {
     console.log(`[DEBUG] Criando utilizador com newsletter: ${acceptNewsletter}`);
     const newUser = new User(username, password, email, acceptNewsletter, "", 50, false, false);
-    console.log(`[DEBUG] Utilizador criado:`, newUser);
-    users.push(newUser);
+    console.log(`[DEBUG] Utilizador criado:`, newUser);    users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
 
-    /* Adicionar à newsletter se aceitar */
-    if (acceptNewsletter) {
-      newsletter.push({ email: email, date: new Date().toISOString() });
-      saveToLocalStorage("newsletter", newsletter);
-    }
+    /* Update newsletter based on user preferences */
+    updateNewsletterFromUserPreferences(newUser);
 
     /* Process referral if provided */
     if (referralCode) {
@@ -64,7 +63,15 @@ export function update(id, newUser) {
   console.log('[DEBUG][UserModel] Utilizadores antes do update:', users);
   const index = users.findIndex((u) => parseInt(u.id, 10) === userId);
   if (index !== -1) {
+    const oldUser = users[index];
     users[index] = { ...users[index], ...newUser, id: userId };
+    
+    // Update newsletter if preferences changed
+    const updatedUser = users[index];
+    if (oldUser.preferences?.newsletter !== updatedUser.preferences?.newsletter) {
+      updateNewsletterFromUserPreferences(updatedUser);
+    }
+    
     localStorage.setItem("user", JSON.stringify(users));
     console.log('[DEBUG][UserModel] Utilizadores após o update:', users);
     return true;
@@ -930,6 +937,107 @@ export function processReferral(referralCode) {
     console.warn('Erro ao processar referência:', error.message);
     return false;
   }
+}
+
+/**
+ * Handles newsletter subscription from the homepage form
+ * @param {string} email - The email to subscribe to newsletter
+ * @returns {Object} Result object with success status and message
+ * @description
+ * This function checks if the email belongs to a registered user.
+ * If it does, returns an error message.
+ * If it doesn't, adds the email as a newsletter subscriber.
+ */
+export function subscribeToNewsletter(email) {
+  // Check if email belongs to a registered user
+  const existingUser = users.find(user => user.email === email);
+  
+  if (existingUser) {
+    return {
+      success: false,
+      message: "User já existente"
+    };
+  }
+  
+  // Check if email is already in newsletter (avoid duplicates)
+  const existingNewsletterSub = newsletter.find(sub => sub.email === email);
+  
+  if (existingNewsletterSub) {
+    return {
+      success: false,
+      message: "Email já subscrito à newsletter"
+    };
+  }
+  
+  // Add email to newsletter (simple structure)
+  const newsletterSubscription = {
+    email: email
+  };
+  
+  newsletter.push(newsletterSubscription);
+  saveToLocalStorage("newsletter", newsletter);
+  
+  return {
+    success: true,
+    message: "Newsletter subscrita com sucesso!"
+  };
+}
+
+/**
+ * Updates newsletter array when user preferences change
+ * @param {Object} user - The user whose preferences changed
+ * @description
+ * This function adds/removes users from newsletter based on their preferences.
+ * Ensures no duplicates exist in the newsletter array.
+ */
+export function updateNewsletterFromUserPreferences(user) {
+  // Remove any existing entry for this user (avoid duplicates)
+  newsletter = newsletter.filter(sub => sub.email !== user.email);
+  
+  // If user wants newsletter, add them to the newsletter array
+  if (user.preferences && user.preferences.newsletter === true) {
+    const userNewsletterEntry = {
+      username: user.username,
+      email: user.email
+    };
+    newsletter.push(userNewsletterEntry);
+  }
+  
+  saveToLocalStorage("newsletter", newsletter);
+}
+
+/**
+ * Rebuilds newsletter array to include users with newsletter preferences
+ * Removes duplicates and ensures proper structure
+ */
+function rebuildNewsletterFromUsers() {
+  // Remove any user entries that might be duplicated (keep only standalone emails)
+  newsletter = newsletter.filter(sub => !sub.username);
+  
+  // Add users with newsletter preference enabled
+  users.forEach(user => {
+    if (user.preferences && user.preferences.newsletter === true) {
+      // Check if not already in newsletter (avoid duplicates)
+      const exists = newsletter.find(sub => sub.email === user.email);
+      if (!exists) {
+        newsletter.push({
+          username: user.username,
+          email: user.email
+        });
+      }
+    }
+  });
+  
+  saveToLocalStorage("newsletter", newsletter);
+}
+
+/**
+ * Gets all newsletter subscribers including users with newsletter preference
+ * @returns {Array} Array of all newsletter subscribers (no duplicates)
+ */
+export function getAllNewsletterSubscribers() {
+  // Get current newsletter array (already contains both types)
+  return newsletter;
 }
 
 

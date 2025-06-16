@@ -41,6 +41,7 @@ window.ignoreGamificationModal = function () {
 /* Inicializar a aplicacao */
 let filters = {}
 Flight.init();
+User.init(); // Initialize UserModel
 initView();
 
 function initView() {
@@ -51,11 +52,11 @@ function initView() {
     const closest = closestAirport(location, aeroportos);
     document.querySelector("#btn-open p").innerText = closest.cidade;
   });
-
   showCookieBanner();
   initSlider();
   setupModalButtons();
   initGamificationModal(); /* Mostrar modal se necessário */
+  setupNewsletterForm(); /* Handle newsletter subscription */
 
   /* Renderizar cards na homepage se o container existir */
   if (document.querySelector(".card-viagens")) {
@@ -888,3 +889,32 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', handlePlanItFormSubmit);
   }
 });
+
+/* Setup newsletter form submission handling */
+function setupNewsletterForm() {
+  const newsletterForm = document.getElementById("newsletter-form");
+  
+  if (!newsletterForm) return;
+  
+  newsletterForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const emailInput = document.getElementById("newsletter-email");
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+      showToast("Por favor, introduza um email válido", "error");
+      return;
+    }
+    
+    // Call the model function to handle subscription
+    const result = User.subscribeToNewsletter(email);
+    
+    if (result.success) {
+      showToast(result.message, "success");
+      emailInput.value = ""; // Clear the form
+    } else {
+      showToast(result.message, "error");
+    }
+  });
+}
