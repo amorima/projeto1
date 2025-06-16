@@ -7,9 +7,29 @@ import {
 /* array para os hoteis */
 let hoteis = [];
 
+/* Dados para pesquisa de hotéis */
+let selectedDestination = null;
+let hotelDates = {
+  checkin: "",
+  checkout: ""
+};
+let hotelGuests = {
+  adultos: 2,
+  criancas: 0,
+  quartos: 1
+};
+let selectedAccessibilities = [];
+
 /* função para iniciar o modelo com dados da localStorage */
 export function init() {
   hoteis = localStorage.hoteis ? loadFromLocalStorage("hoteis", hoteis) : [];
+  
+  // Carregar acessibilidades selecionadas se existirem
+  const savedAccessibilities = localStorage.getItem("acessibilidadesSelecionadasHotel");
+  if (savedAccessibilities) {
+    selectedAccessibilities = JSON.parse(savedAccessibilities);
+  }
+  
   return hoteis;
 }
 
@@ -126,6 +146,130 @@ export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
 
+/* === FUNCOES PARA PESQUISA DE HOTÉIS === */
+
+/* Funcoes para gestao de destinos */
+export function getDestinations() {
+  return JSON.parse(localStorage.getItem("destinos")) || [];
+}
+
+export function filterDestinations(searchTerm) {
+  const destinations = getDestinations();
+  return destinations.filter((destino) =>
+    destino.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    destino.aeroporto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    destino.pais.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+}
+
+export function setDestination(destino) {
+  selectedDestination = destino;
+}
+
+export function getSelectedDestination() {
+  return selectedDestination;
+}
+
+/* Funcoes para gestao de datas */
+export function setDates(checkin, checkout) {
+  hotelDates.checkin = checkin;
+  hotelDates.checkout = checkout;
+}
+
+export function getDates() {
+  return hotelDates;
+}
+
+export function getDatesText() {
+  if (!hotelDates.checkin || !hotelDates.checkout) {
+    return { checkin: "Check-in", checkout: "Check-out" };
+  }
+  
+  const checkinFormatted = new Date(hotelDates.checkin).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+  
+  const checkoutFormatted = new Date(hotelDates.checkout).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: '2-digit', 
+    year: 'numeric'
+  });
+  
+  return { checkin: checkinFormatted, checkout: checkoutFormatted };
+}
+
+/* Funcoes para gestao de hospedes */
+export function setGuests(adultos, criancas, quartos) {
+  hotelGuests.adultos = adultos;
+  hotelGuests.criancas = criancas;
+  hotelGuests.quartos = quartos;
+}
+
+export function getGuests() {
+  return hotelGuests;
+}
+
+export function getGuestsText() {
+  const { adultos, criancas, quartos } = hotelGuests;
+  let texto = `${adultos} adulto${adultos > 1 ? 's' : ''}`;
+  if (criancas > 0) {
+    texto += `, ${criancas} criança${criancas > 1 ? 's' : ''}`;
+  }
+  texto += `, ${quartos} quarto${quartos > 1 ? 's' : ''}`;
+  return texto;
+}
+
+/* Funcoes para gestao de acessibilidade */
+export function getAccessibilities() {
+  return JSON.parse(localStorage.getItem("acessibilidade")) || [];
+}
+
+export function filterAccessibilities(searchTerm) {
+  const accessibilities = getAccessibilities();
+  return accessibilities.filter((acessibilidade) =>
+    acessibilidade.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+}
+
+export function toggleAccessibility(index) {
+  const position = selectedAccessibilities.indexOf(index);
+  if (position > -1) {
+    selectedAccessibilities.splice(position, 1);
+  } else {
+    selectedAccessibilities.push(index);
+  }
+}
+
+export function confirmAccessibilities() {
+  localStorage.setItem(
+    "acessibilidadesSelecionadasHotel",
+    JSON.stringify(selectedAccessibilities)
+  );
+}
+
+export function getSelectedAccessibilities() {
+  return selectedAccessibilities;
+}
+
+export function getAccessibilitiesText() {
+  const quantidade = selectedAccessibilities.length;
+  if (quantidade === 0) return "Nenhum";
+  if (quantidade === 1) return "1 selecionado";
+  return `${quantidade} selecionados`;
+}
+
+/* Função para obter dados completos da pesquisa */
+export function getSearchData() {
+  return {
+    destination: selectedDestination,
+    dates: hotelDates,
+    guests: hotelGuests,
+    accessibilities: selectedAccessibilities
+  };
+}
+
 /**
  * CLASSE QUE MODELA UM HOTEL NA APLICAÇÃO
  * @param {number} id - ID do hotel
@@ -199,4 +343,21 @@ export default {
   add,
   update,
   remove,
+  getDestinations,
+  filterDestinations,
+  setDestination,
+  getSelectedDestination,
+  setDates,
+  getDates,
+  getDatesText,
+  setGuests,
+  getGuests,
+  getGuestsText,
+  getAccessibilities,
+  filterAccessibilities,
+  toggleAccessibility,
+  confirmAccessibilities,
+  getSelectedAccessibilities,
+  getAccessibilitiesText,
+  getSearchData
 };

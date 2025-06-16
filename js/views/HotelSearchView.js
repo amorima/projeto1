@@ -1,5 +1,7 @@
 import {
   showCookieBanner,
+  openModal,
+  closeModal
 } from "./ViewHelpers.js";
 import HotelModel from "../models/HotelModel.js";
 
@@ -305,10 +307,350 @@ function setupFilters() {
   applyFilters();
 }
 
+/* Inicializar a view de pesquisa de hotéis */
+function initHotelSearchView() {
+  HotelModel.init();
+  setupModalButtons();
+  renderInitialData();
+}
+
+/* Configurar eventos dos botões dos modais */
+function setupModalButtons() {
+  // Botão para abrir modal de destino
+  const btnDestino = document.getElementById("btn-destino-hotel");
+  if (btnDestino) {
+    btnDestino.addEventListener("click", abrirModalDestino);
+  }
+
+  // Botão para abrir modal de datas  
+  const btnDatas = document.getElementById("btn-datas-hotel");
+  if (btnDatas) {
+    btnDatas.addEventListener("click", abrirModalDatas);
+  }
+
+  // Botão para abrir modal de hóspedes
+  const btnHospedes = document.getElementById("btn-hospedes-hotel");
+  if (btnHospedes) {
+    btnHospedes.addEventListener("click", abrirModalHospedes);
+  }
+
+  // Botão para abrir modal de acessibilidade
+  const btnAcessibilidade = document.getElementById("btn-acessibilidade-hotel");
+  if (btnAcessibilidade) {
+    btnAcessibilidade.addEventListener("click", abrirModalAcessibilidade);
+  }
+
+  // Formulário de pesquisa
+  const form = document.getElementById("hotel-search-form");
+  if (form) {
+    form.addEventListener("submit", handleSearchSubmit);
+  }
+}
+
+/* Renderizar dados iniciais */
+function renderInitialData() {
+  updateDestinationButton();
+  updateDatesButton();
+  updateGuestsButton();
+  updateAccessibilityButton();
+}
+
+/* Modal de Destino */
+function abrirModalDestino() {
+  const modal = document.getElementById("modal-destino-hotel");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+      // Carregar lista de destinos
+    const lista = document.getElementById("lista-destinos-hotel");
+    if (lista) {
+      const destinos = HotelModel.getDestinations();
+      renderDestinationList(destinos, lista);
+    }
+
+    // Pesquisa de destinos
+    const pesquisa = document.getElementById("pesquisa-destino-hotel");
+    if (pesquisa) {
+      pesquisa.addEventListener("input", (e) => {
+        const filtered = HotelModel.filterDestinations(e.target.value);
+        renderDestinationList(filtered, lista);
+      });
+    }
+
+    // Botão fechar
+    const fechar = document.getElementById("fechar-modal-destino-hotel");
+    if (fechar) {
+      fechar.addEventListener("click", fecharModalDestino);
+    }
+  }
+}
+
+function renderDestinationList(destinos, lista) {
+  lista.innerHTML = "";
+  destinos.forEach((destino) => {
+    const li = document.createElement("li");
+    li.className = "p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors";
+    li.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">flight_takeoff</span>
+        <div class="flex flex-col">
+          <span class="font-medium text-gray-900 dark:text-white">${destino.cidade}</span>
+          <span class="text-sm text-gray-500 dark:text-gray-400">${destino.aeroporto} - ${destino.pais}</span>
+        </div>
+      </div>
+    `;
+    li.addEventListener("click", () => {
+      HotelModel.setDestination(destino);
+      updateDestinationButton();
+      fecharModalDestino();
+    });
+    lista.appendChild(li);
+  });
+}
+
+function updateDestinationButton() {
+  const texto = document.getElementById("texto-destino-hotel");
+  const destino = HotelModel.getSelectedDestination();
+  if (texto) {
+    texto.textContent = destino ? `${destino.cidade} (${destino.aeroporto})` : "Destino";
+  }
+}
+
+function fecharModalDestino() {
+  const modal = document.getElementById("modal-destino-hotel");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+/* Modal de Datas */
+function abrirModalDatas() {
+  const modal = document.getElementById("modal-datas-hotel");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+    // Botão confirmar
+    const confirmar = document.getElementById("confirmar-datas-hotel");
+    if (confirmar) {
+      confirmar.addEventListener("click", () => {
+        const checkin = document.getElementById("data-checkin").value;
+        const checkout = document.getElementById("data-checkout").value;
+          if (checkin && checkout) {
+          HotelModel.setDates(checkin, checkout);
+          updateDatesButton();
+          fecharModalDatas();
+        }
+      });
+    }
+
+    // Botão fechar
+    const fechar = document.getElementById("fechar-modal-datas-hotel");
+    if (fechar) {
+      fechar.addEventListener("click", fecharModalDatas);
+    }
+  }
+}
+
+function updateDatesButton() {
+  const textoCheckin = document.getElementById("texto-checkin");
+  const textoCheckout = document.getElementById("texto-checkout");
+  const dates = HotelModel.getDatesText();
+  
+  if (textoCheckin) textoCheckin.textContent = dates.checkin;
+  if (textoCheckout) textoCheckout.textContent = dates.checkout;
+}
+
+function fecharModalDatas() {
+  const modal = document.getElementById("modal-datas-hotel");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+/* Modal de Hóspedes */
+function abrirModalHospedes() {
+  const modal = document.getElementById("modal-hospedes-hotel");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+    setupGuestCounters();
+
+    // Botão confirmar
+    const confirmar = document.getElementById("confirmar-hospedes-hotel");
+    if (confirmar) {
+      confirmar.addEventListener("click", () => {
+        const adultos = parseInt(document.getElementById("contador-adultos-hotel").textContent);
+        const criancas = parseInt(document.getElementById("contador-criancas-hotel").textContent);
+        const quartos = parseInt(document.getElementById("contador-quartos-hotel").textContent);
+          HotelModel.setGuests(adultos, criancas, quartos);
+        updateGuestsButton();
+        fecharModalHospedes();
+      });
+    }
+
+    // Botão fechar
+    const fechar = document.getElementById("fechar-modal-hospedes-hotel");
+    if (fechar) {
+      fechar.addEventListener("click", fecharModalHospedes);
+    }
+  }
+}
+
+function setupGuestCounters() {
+  const guests = HotelModel.getGuests();
+  
+  // Contadores para adultos
+  setupCounter("adultos-hotel", guests.adultos, 1, 10);
+  
+  // Contadores para crianças
+  setupCounter("criancas-hotel", guests.criancas, 0, 5);
+  
+  // Contadores para quartos
+  setupCounter("quartos-hotel", guests.quartos, 1, 5);
+}
+
+function setupCounter(type, initialValue, min, max) {
+  const contador = document.getElementById(`contador-${type}`);
+  const diminuir = document.getElementById(`diminuir-${type}`);
+  const aumentar = document.getElementById(`aumentar-${type}`);
+  
+  if (contador && diminuir && aumentar) {
+    contador.textContent = initialValue;
+    
+    diminuir.addEventListener("click", () => {
+      const current = parseInt(contador.textContent);
+      if (current > min) {
+        contador.textContent = current - 1;
+      }
+    });
+    
+    aumentar.addEventListener("click", () => {
+      const current = parseInt(contador.textContent);
+      if (current < max) {
+        contador.textContent = current + 1;
+      }
+    });
+  }
+}
+
+function updateGuestsButton() {
+  const texto = document.getElementById("texto-hospedes-hotel");
+  if (texto) {
+    texto.textContent = HotelModel.getGuestsText();
+  }
+}
+
+function fecharModalHospedes() {
+  const modal = document.getElementById("modal-hospedes-hotel");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+/* Modal de Acessibilidade */
+function abrirModalAcessibilidade() {
+  const modal = document.getElementById("modal-acessibilidade-hotel");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+      // Carregar lista de acessibilidades
+    const lista = document.getElementById("lista-acessibilidades-hotel");
+    if (lista) {
+      const acessibilidades = HotelModel.getAccessibilities();
+      renderAccessibilityList(acessibilidades, lista);
+    }
+
+    // Pesquisa de acessibilidades
+    const pesquisa = document.getElementById("pesquisa-acessibilidade-hotel");
+    if (pesquisa) {
+      pesquisa.addEventListener("input", (e) => {
+        const filtered = HotelModel.filterAccessibilities(e.target.value);
+        renderAccessibilityList(filtered, lista);
+      });
+    }
+
+    // Botão confirmar
+    const confirmar = document.getElementById("confirmar-acessibilidade-hotel");
+    if (confirmar) {
+      confirmar.addEventListener("click", () => {
+        HotelModel.confirmAccessibilities();
+        updateAccessibilityButton();
+        fecharModalAcessibilidade();
+      });
+    }
+
+    // Botão fechar
+    const fechar = document.getElementById("fechar-modal-acessibilidade-hotel");
+    if (fechar) {
+      fechar.addEventListener("click", fecharModalAcessibilidade);
+    }
+  }
+}
+
+function renderAccessibilityList(acessibilidades, lista) {
+  lista.innerHTML = "";
+  const selectedAccessibilities = HotelModel.getSelectedAccessibilities();
+  
+  acessibilidades.forEach((acessibilidade, index) => {
+    const li = document.createElement("li");
+    const isSelected = selectedAccessibilities.includes(index);
+    const icon = getAcessibilidadeIcon(acessibilidade);
+    
+    li.className = `p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900' : ''}`;
+    li.innerHTML = `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">${icon}</span>
+          <span class="text-gray-900 dark:text-white">${acessibilidade}</span>
+        </div>
+        <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 ${isSelected ? '' : 'opacity-0'}">check</span>
+      </div>
+    `;
+    li.addEventListener("click", () => {
+      HotelModel.toggleAccessibility(index);
+      renderAccessibilityList(acessibilidades, lista);
+    });
+    lista.appendChild(li);
+  });
+}
+
+function updateAccessibilityButton() {
+  const texto = document.getElementById("texto-acessibilidade-hotel");
+  if (texto) {
+    texto.textContent = HotelModel.getAccessibilitiesText();
+  }
+}
+
+function fecharModalAcessibilidade() {
+  const modal = document.getElementById("modal-acessibilidade-hotel");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+/* Manipular submissão do formulário */
+function handleSearchSubmit(e) {
+  e.preventDefault();
+  
+  const searchData = HotelModel.getSearchData();
+  console.log("Dados da pesquisa:", searchData);
+  
+  // Aqui poderia filtrar os hotéis com base nos critérios de pesquisa
+  // Por agora, vamos apenas aplicar os filtros existentes
+  applyFilters();
+}
+
 // --- Função principal ---
 document.addEventListener("DOMContentLoaded", () => {
   HotelModel.init(); // Inicializa o modelo
   showCookieBanner();
   renderHotelCards();
   setupFilters();
+  initHotelSearchView();
 });
