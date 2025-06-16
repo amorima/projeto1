@@ -45,6 +45,7 @@ window.onload = async function () {
     /* Agora que os componentes estão carregados, carregar informações do utilizador e configurar eventos */
     loadUserInfo(); /* Esta função chama updateNavbarUser */
     setupEventListeners();
+    setupCodeRedeemEvents()
 
     /* Inicializar funcionalidades das abas após um pequeno delay */
     /* Considerar se este timeout ainda é necessário ou se pode ser chamado diretamente */
@@ -931,7 +932,7 @@ function initGamificationModal() {
   setupGamificationModalEvents();
 
   /* Configurar funcionalidade de redeem de código */
-  setupCodeRedeemEvents();
+  ;
 
   /* Usar event delegation para o botão "Saber mais" */
   document.addEventListener("click", function (e) {
@@ -1021,23 +1022,25 @@ function setupCodeRedeemEvents() {
       const codigo = inputCodigo.value.trim();
 
       if (!codigo) {
-        showCodeMessage("Por favor, insira um código válido.", "error");
+        showToast("Por favor, insira um código válido.", "error");
         return;
       }
       try {
         saveSpecialCode(codigo);
-        showCodeMessage(
+        const user = UserModel.getUserLogged()
+        user.pontos += 200;
+        UserModel.update(user.id, user);
+        sessionStorage.setItem("loggedUser", JSON.stringify(user));
+
+        showToast(
           "Código resgatado com sucesso! Ganhaste 200 pontos.",
           "success"
         );
         inputCodigo.value = "";
 
         /* Limpar mensagem após 5 segundos */
-        setTimeout(() => {
-          showCodeMessage("", "hidden");
-        }, 5000);
       } catch (error) {
-        showCodeMessage(error.message, "error");
+        showToast(error.message, "error");
       }
     });
 
