@@ -1,6 +1,9 @@
 import * as UserModel from "../models/UserModel.js";
 import { loadComponent } from "./ViewHelpers.js";
 
+// Disable automatic header loading since we handle it manually
+window.skipAutoHeaderLoad = true;
+
 /* Inicializar quando a página carrega */
 window.onload = function () {
   UserModel.init();

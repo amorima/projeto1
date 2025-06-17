@@ -3,6 +3,7 @@ import {
   getFormData,
   showToast,
   getUserLocation,
+  loadComponent,
 } from "./ViewHelpers.js";
 
 import * as HotelModel from "../models/HotelModel.js";
@@ -685,7 +686,14 @@ function atualizarItinerarioVoo(voo) {
   }
 }
 
+// Disable automatic header loading since we handle it manually
+window.skipAutoHeaderLoad = true;
+
 window.onload = function () {
+  // Manually load header and footer since we're using window.onload
+  loadComponent("../html/_header.html", "header-placeholder");
+  loadComponent("../html/_footer.html", "footer-placeholder");
+  
   adicionarEventosCarros();
   adicionarEventoSeguro();
 };

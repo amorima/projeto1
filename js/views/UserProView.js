@@ -4,6 +4,9 @@ import { getLevelSymbol } from "./RewarditView.js";
 import * as FlightModel from "../models/FlightModel.js";
 import { updateNavbarUser } from "./NavbarView.js";
 
+// Disable automatic header loading since we handle it manually
+window.skipAutoHeaderLoad = true;
+
 /* Funções globais para o modal de gamificação */
 window.openGamificationModal = function () {
   const modal = document.getElementById("modal-gamificacao");

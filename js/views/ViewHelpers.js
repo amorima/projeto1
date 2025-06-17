@@ -376,14 +376,12 @@ applyStoredTheme();
 document.addEventListener("DOMContentLoaded", () => {
   // Skip automatic loading if a view file will handle it manually
   // This prevents duplicate loading for pages like user_pro.html and _login.html
-  const hasManualLoader = window.onload !== null && window.onload !== undefined;
-  
-  if (hasManualLoader) {
-    console.log("[DEBUG ViewHelpers] Manual loader detected, skipping automatic header loading");
+  if (window.skipAutoHeaderLoad) {
+    console.log("[DEBUG ViewHelpers] Auto header loading disabled by view");
     return;
   }
   
-  console.log("[DEBUG ViewHelpers] No manual loader detected, using automatic header loading");
+  console.log("[DEBUG ViewHelpers] Using automatic header loading");
   
   // Determina o caminho base (root)
   let root = "/"; // Por defeito, para index.html
