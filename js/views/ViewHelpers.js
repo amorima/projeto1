@@ -286,19 +286,22 @@ export function loadComponent(componentPath, elementId) {
       return response.text();
     })
     .then((html) => {
-      document.getElementById(elementId).innerHTML =
-        html; /* Se for o header, inicializar */
+      document.getElementById(elementId).innerHTML =        html; /* Se for o header, inicializar */
       if (componentPath.includes("_header.html")) {
-        setTimeout(() => {
-          /* Inicializar tema */
+        setTimeout(() => {          /* Inicializar tema */
           const themeToggle = document.getElementById("theme-toggle");
           const profileIcon = document.getElementById("profile");
           if (themeToggle) {
+            console.log("[DEBUG ViewHelpers] Setting up theme toggle in header");
             const isDark = document.documentElement.classList.contains("dark");
             themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
-            themeToggle.addEventListener("click", () =>
-              toggleThemeIcon(themeToggle)
-            );
+            console.log("[DEBUG ViewHelpers] Initial theme state:", isDark ? "dark" : "light");
+            themeToggle.addEventListener("click", () => {
+              console.log("[DEBUG ViewHelpers] Theme toggle clicked (ViewHelpers listener)");
+              toggleThemeIcon(themeToggle);
+            });
+          } else {
+            console.log("[DEBUG ViewHelpers] Theme toggle element not found");
           }
 
           /* Executar scripts do header */
@@ -316,9 +319,8 @@ export function loadComponent(componentPath, elementId) {
           /* Chamar setupMenu se existir */
           if (typeof window.setupMenu === "function") {
             setTimeout(window.setupMenu, 100);
-          }
-
-          /* Inicializar navbar */
+          }          /* Inicializar navbar */
+          console.log("[DEBUG ViewHelpers] About to initialize navbar");
           initNavbar();
         }, 200);
       }
@@ -335,17 +337,25 @@ export function loadComponent(componentPath, elementId) {
 
 // Alterna o ícone entre dark_mode e light_mode para um elemento passado
 export function toggleThemeIcon(element) {
-  if (!element) return;
+  console.log("[DEBUG ViewHelpers] toggleThemeIcon called");
+  if (!element) {
+    console.log("[DEBUG ViewHelpers] No element provided to toggleThemeIcon");
+    return;
+  }
   const html = document.documentElement;
   const isDark = html.classList.contains("dark");
+  console.log("[DEBUG ViewHelpers] Current theme before toggle:", isDark ? "dark" : "light");
+  
   if (isDark) {
     html.classList.remove("dark");
     element.textContent = "dark_mode";
     setUserPreference("theme", "light");
+    console.log("[DEBUG ViewHelpers] Switched to light theme");
   } else {
     html.classList.add("dark");
     element.textContent = "light_mode";
     setUserPreference("theme", "dark");
+    console.log("[DEBUG ViewHelpers] Switched to dark theme");
   }
 }
 
@@ -364,6 +374,17 @@ applyStoredTheme();
 
 // Carregar header automaticamente se existir o placeholder
 document.addEventListener("DOMContentLoaded", () => {
+  // Skip automatic loading if a view file will handle it manually
+  // This prevents duplicate loading for pages like user_pro.html and _login.html
+  const hasManualLoader = window.onload !== null && window.onload !== undefined;
+  
+  if (hasManualLoader) {
+    console.log("[DEBUG ViewHelpers] Manual loader detected, skipping automatic header loading");
+    return;
+  }
+  
+  console.log("[DEBUG ViewHelpers] No manual loader detected, using automatic header loading");
+  
   // Determina o caminho base (root)
   let root = "/"; // Por defeito, para index.html
   if (
@@ -438,12 +459,16 @@ export function closestAirport(userLocation, locationArray) {
 
 /* Função para inicializar a navbar com informações do utilizador */
 export function initNavbar() {
+  console.log("[DEBUG ViewHelpers] initNavbar called");
   /* Pequeno delay para garantir que o UserModel foi inicializado */
   setTimeout(() => {
+    console.log("[DEBUG ViewHelpers] initNavbar timeout executing");
     /* Importar NavbarView dinamicamente para evitar dependências circulares */
     import("./NavbarView.js")
       .then((NavbarView) => {
+        console.log("[DEBUG ViewHelpers] NavbarView imported successfully");
         if (NavbarView.LoginNav) {
+          console.log("[DEBUG ViewHelpers] Calling LoginNav");
           NavbarView.LoginNav();
         }
         /* Chamar updateNavbarUser depois de LoginNav para preservar avatar */

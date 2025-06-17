@@ -34,14 +34,21 @@ const loadComponent = async (url, placeholderId) => {
 
 /* Carregar os componentes quando o DOM estiver pronto - apenas se não existir header */
 document.addEventListener("DOMContentLoaded", () => {
-  if (!document.getElementById("header-placeholder")) {
+  // Only load header/footer if no header placeholder exists (for pages that don't load components themselves)
+  const headerPlaceholder = document.getElementById("header-placeholder");
+  if (!headerPlaceholder) {
+    console.log("[DEBUG NavbarView] No header placeholder found, loading components");
     loadComponent("_header.html", "header-placeholder").then(() => {
       User.init();
       updateNavbarUser();
+      console.log("[DEBUG NavbarView] Calling LoginNav from DOMContentLoaded");
       LoginNav();
+      console.log("[DEBUG NavbarView] Calling initThemeToggle from DOMContentLoaded");
       initThemeToggle();
     });
     loadComponent("_footer.html", "footer-placeholder");
+  } else {
+    console.log("[DEBUG NavbarView] Header placeholder found, skipping component loading");
   }
 });
 
@@ -166,6 +173,7 @@ export function updateNavbarUser() {
 }
 
 export function LoginNav() {
+  console.log("[DEBUG NavbarView] LoginNav function called");
   const profileElement = document.getElementById("profile");
   const mobileProfile = document.getElementById("mobile-profile");
   const desktopLogoutBtn = document.getElementById("desktop-logout-btn");
@@ -249,29 +257,43 @@ function handleProfileClick() {
 }
 
 export function initThemeToggle() {
+  console.log("[DEBUG NavbarView] initThemeToggle called");
   const themeToggle = document.getElementById("theme-toggle");
   const mobileThemeToggle = document.getElementById("mobile-theme-toggle");
 
   if (themeToggle) {
+    console.log("[DEBUG NavbarView] Setting up desktop theme toggle");
     /* Atualizar o ícone do tema de acordo com o tema atual */
     const isDark = document.documentElement.classList.contains("dark");
     themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
-    themeToggle.addEventListener("click", () => toggleThemeIcon(themeToggle));
+    console.log("[DEBUG NavbarView] Desktop theme toggle initial state:", isDark ? "dark" : "light");
+    themeToggle.addEventListener("click", () => {
+      console.log("[DEBUG NavbarView] Desktop theme toggle clicked (NavbarView listener)");
+      toggleThemeIcon(themeToggle);
+    });
+  } else {
+    console.log("[DEBUG NavbarView] Desktop theme toggle element not found");
   }
 
   if (mobileThemeToggle) {
+    console.log("[DEBUG NavbarView] Setting up mobile theme toggle");
     const isDark = document.documentElement.classList.contains("dark");
     const mobileIcon = mobileThemeToggle.querySelector(
       "span.material-symbols-outlined"
     );
     if (mobileIcon) {
       mobileIcon.textContent = isDark ? "light_mode" : "dark_mode";
+      console.log("[DEBUG NavbarView] Mobile theme toggle initial state:", isDark ? "dark" : "light");
     }
     mobileThemeToggle.addEventListener("click", () => {
+      console.log("[DEBUG NavbarView] Mobile theme toggle clicked");
       if (themeToggle) {
+        console.log("[DEBUG NavbarView] Triggering desktop theme toggle from mobile");
         themeToggle.click();
       }
     });
+  } else {
+    console.log("[DEBUG NavbarView] Mobile theme toggle element not found");
   }
 }
 
