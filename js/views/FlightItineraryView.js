@@ -55,8 +55,17 @@ if (btnReservar) {
     if(User.isLogged()){
       console.log("hello?");
       const utilizador = User.getUserLogged();
-      const pontos = Number(document.getElementById("pontos-add").textContent);
-      User.addPontos(utilizador, pontos, `Reserva de voo: ${vooShallow.destino || 'Voo'}`);
+      
+      // Get points from the calculated value, not from DOM
+      const pontos = vooShallow.pointsAR || 0;
+      
+      // Create descriptive message for points
+      let description = `Reserva de voo: ${vooShallow.destino || 'Voo'}`;
+      if (vooShallow.hotel) description += ` + Hotel`;
+      if (vooShallow.car) description += ` + Carro`;
+      if (vooShallow.seguro) description += ` + Seguro`;
+      
+      User.addPontos(utilizador, pontos, description);
       User.addReservation(utilizador, vooShallow);
       // Persist the change in the main users array
       User.update(utilizador.id, utilizador);
@@ -448,7 +457,6 @@ function atualizarSidebarVoo(voo) {
       numNoites = 1;
     }
   }
-
   if (voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0) {
     const quarto = voo.hotel.quartos[0];
     let multiplicadorQuartos = 1;
@@ -457,11 +465,36 @@ function atualizarSidebarVoo(voo) {
     }
     precoBase += quarto.precoNoite * numNoites * multiplicadorQuartos;
   }
-  if (voo.car) precoBase += 1 //!Read car price
-  if (voo.seguro) precoBase = precoBase * 1.2
+  
+  // Fix car pricing - use car price * number of days
+  if (voo.car && voo.car.preco) {
+    precoBase += voo.car.preco * numNoites;
+  }
+  
+  if (voo.seguro) precoBase = Math.round(precoBase * 1.2);
+  
   const precoComDesconto = desconto ? Math.round(precoBase * (1 - desconto / 100)) : precoBase;
-  vooShallow.pointsAR = precoComDesconto
-  const pontosAcumular = precoComDesconto;
+  
+  // Calculate points based on new rules
+  let pointsMultiplier = 1.0; // Base: 1 point per euro for flight only
+  
+  // Check what's included to determine multiplier
+  const hasCar = !!(voo.car && voo.car.preco);
+  const hasHotel = !!(voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0);
+  
+  if (hasCar && hasHotel) {
+    pointsMultiplier = 1.25; // Flight + car + hotel
+  } else if (hasCar || hasHotel) {
+    pointsMultiplier = 1.1; // Flight + car OR flight + hotel
+  }
+  
+  // Apply insurance bonus if present
+  if (voo.seguro) {
+    pointsMultiplier *= 1.05;
+  }
+  
+  const pontosAcumular = Math.round(precoComDesconto * pointsMultiplier);
+  vooShallow.pointsAR = pontosAcumular;
   const tipoVoo = voo.tipo ? (voo.tipo === 'ida' ? 'Só ida' : voo.tipo === 'ida e volta' ? 'Ida e volta' : 'Multitryp') : 'Só ida';
   const dataFormatada = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);
   const descontoBadge = desconto ? `<span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded ml-2">${desconto}% desconto</span>` : '';
@@ -532,14 +565,23 @@ function atualizarSidebarVoo(voo) {
       vooShallow.nPessoas = valor;
       atualizarSidebarVoo(vooShallow);
     };
-  }
-  if (btnReservar) {
+  }  if (btnReservar) {
     btnReservar.onclick = function () {
       
       User.init();
-      if(User.isLogged()){        const utilizador = User.getUserLogged();
-        const pontos = Number(document.getElementById("pontos-add").textContent)
-        User.addPontos(utilizador, pontos, `Reserva de voo: ${vooShallow.destino || 'Voo'}`);
+      if(User.isLogged()){
+        const utilizador = User.getUserLogged();
+        
+        // Get points from the calculated value, not from DOM
+        const pontos = vooShallow.pointsAR || 0;
+        
+        // Create descriptive message for points
+        let description = `Reserva de voo: ${vooShallow.destino || 'Voo'}`;
+        if (vooShallow.hotel) description += ` + Hotel`;
+        if (vooShallow.car) description += ` + Carro`;
+        if (vooShallow.seguro) description += ` + Seguro`;
+        
+        User.addPontos(utilizador, pontos, description);
         User.addReservation(utilizador, vooShallow);
         // Persist the change in the main users array
         User.update(utilizador.id, utilizador);
