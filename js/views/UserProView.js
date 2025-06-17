@@ -1343,27 +1343,45 @@ function loadFavoritos(user) {
     return;
   } else {
     if (bookmarksEmpty) bookmarksEmpty.classList.add("hidden");
-  }
-  user.favoritos.forEach((fav, idx) => {
+  }  user.favoritos.forEach((fav, idx) => {
     console.log(`[Favoritos] Rendering favorite #${idx}:`, fav);
+    
+    // Determine if it's a hotel or flight
+    const isHotel = fav.id && !fav.numeroVoo && !fav.nVoo;
+    const isFlight = fav.numeroVoo || fav.nVoo;
+    
     // Render a card matching the provided HTML
     const card = document.createElement("div");
     card.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
     
+    let title, subtitle, navigationUrl;
+    
+    if (isHotel) {
+      title = fav.nome || "Hotel";
+      subtitle = `${fav.cidade || "Localização"} | Hotel`;
+      navigationUrl = `/html/hotel.html?id=${fav.id}`;
+    } else if (isFlight) {
+      title = fav.destino || fav.nome || fav.title || "Voo";
+      subtitle = `${fav.origem ? `${fav.origem} → ${fav.destino}` : ""}${fav.partida ? ` | ${fav.partida.split(' ')[0]}` : ""}${fav.companhia ? ` | ${fav.companhia}` : ""}`;
+      navigationUrl = `/html/flight_itinerary.html?id=${fav.numeroVoo || fav.nVoo || ""}`;
+    } else {
+      title = "Favorito";
+      subtitle = "Tipo desconhecido";
+      navigationUrl = "#";
+    }
+    
     card.innerHTML = `
       <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-rose-500 hover:text-rose-600 cursor-pointer transition-colors favorite-heart" data-favorite-index="${fav}">favorite</span>
+        <span class="material-symbols-outlined text-rose-500 hover:text-rose-600 cursor-pointer transition-colors favorite-heart" data-favorite-index="${idx}">favorite</span>
         <div>
-          <h3 class="font-medium">${fav.destino || fav.nome || fav.title || "Favorito"}</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">
-            ${fav.origem ? `${fav.origem} → ${fav.destino}` : ""}
-            ${fav.partida ? `| ${fav.partida.split(' ')[0]}` : ""}
-            ${fav.companhia ? `| ${fav.companhia}` : ""}
-          </p>
+          <h3 class="font-medium">${title}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">${subtitle}</p>
         </div>
       </div>
       <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
-    `;    // Add click event to the heart icon for removing favorite
+    `;
+    
+    // Add click event to the heart icon for removing favorite
     const heartIcon = card.querySelector('.favorite-heart');
     heartIcon.addEventListener('click', function(e) {
       e.stopPropagation(); // Prevent card click from triggering
@@ -1372,7 +1390,7 @@ function loadFavoritos(user) {
     
     // Add click event for navigation to the entire card
     card.addEventListener('click', function() {
-      window.location.href = `/html/flight_itinerary.html?id=${fav.numeroVoo || fav.nVoo || ""}`;
+      window.location.href = navigationUrl;
     });
     
     bookmarksContainer.appendChild(card);

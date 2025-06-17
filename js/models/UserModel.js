@@ -471,13 +471,25 @@ export function addReservation(userAdd, reservation){
   update(userAdd.id, userAdd);
   return true; 
 }
-export function addFavorite(user, trip) {
+export function addFavorite(user, item) {
   if (!user.favoritos) user.favoritos = [];
-  // Verifica se já existe favorito com o mesmo numeroVoo
-  if (trip && trip.numeroVoo && user.favoritos.some(f => f.numeroVoo == trip.numeroVoo)) {
-    return false; // Já existe
+  
+  // Verifica se é um hotel (tem id) ou flight (tem numeroVoo)
+  if (item && item.id) {
+    // É um hotel
+    if (user.favoritos.some(f => f.id == item.id)) {
+      return false; // Hotel já existe nos favoritos
+    }
+  } else if (item && item.numeroVoo) {
+    // É um flight
+    if (user.favoritos.some(f => f.numeroVoo == item.numeroVoo)) {
+      return false; // Flight já existe nos favoritos
+    }
+  } else {
+    return false; // Item inválido
   }
-  user.favoritos.push(trip);
+  
+  user.favoritos.push(item);
   update(user.id, user);
   // Atualizar sessão se for o user logado
   const loggedUser = getUserLogged();
@@ -487,14 +499,25 @@ export function addFavorite(user, trip) {
   return true;
 }
 
-export function removeFavorite(user, trip) {
+export function removeFavorite(user, item) {
   if (!user.favoritos) return false;
-  const idx = user.favoritos.findIndex(f => 
-    (f.numeroVoo && trip.numeroVoo && f.numeroVoo == trip.numeroVoo) ||
-    (f.nVoo && trip.nVoo && f.nVoo == trip.nVoo) ||
-    (f.numeroVoo && trip.nVoo && f.numeroVoo == trip.nVoo) ||
-    (f.nVoo && trip.numeroVoo && f.nVoo == trip.numeroVoo)
-  );
+  
+  let idx = -1;
+  
+  // Verifica se é um hotel (tem id) ou flight (tem numeroVoo/nVoo)
+  if (item && item.id) {
+    // É um hotel
+    idx = user.favoritos.findIndex(f => f.id == item.id);
+  } else if (item && (item.numeroVoo || item.nVoo)) {
+    // É um flight
+    idx = user.favoritos.findIndex(f => 
+      (f.numeroVoo && item.numeroVoo && f.numeroVoo == item.numeroVoo) ||
+      (f.nVoo && item.nVoo && f.nVoo == item.nVoo) ||
+      (f.numeroVoo && item.nVoo && f.numeroVoo == item.nVoo) ||
+      (f.nVoo && item.numeroVoo && f.nVoo == item.numeroVoo)
+    );
+  }
+  
   if (idx !== -1) {
     user.favoritos.splice(idx, 1);
     update(user.id, user);
@@ -1110,6 +1133,19 @@ export function removeReservation(userId, reservationIndex) {
       message: error.message
     };
   }
+}
+
+export function isHotelInFavorites(user, hotelId) {
+  if (!user.favoritos) return false;
+  return user.favoritos.some(f => f.id == hotelId);
+}
+
+export function isFlightInFavorites(user, flightId) {
+  if (!user.favoritos) return false;
+  return user.favoritos.some(f => 
+    (f.numeroVoo && f.numeroVoo == flightId) ||
+    (f.nVoo && f.nVoo == flightId)
+  );
 }
 
 
