@@ -101,8 +101,7 @@ function loadTable() {
 
     try {
         let flights = FlightModel.getAll() || [];
-        
-        // Apply search filter
+          // Apply search filter
         if (flightTableConfig.searchTerm) {
             const searchTerm = flightTableConfig.searchTerm.toLowerCase();
             flights = flights.filter(flight => 
@@ -111,7 +110,8 @@ function loadTable() {
                 flight.destino.toLowerCase().includes(searchTerm) ||
                 flight.companhia.toLowerCase().includes(searchTerm) ||
                 flight.partida.toLowerCase().includes(searchTerm) ||
-                (flight.direto === 'S' ? 'sim' : 'não').includes(searchTerm)
+                (flight.direto === 'S' ? 'sim' : 'não').includes(searchTerm) ||
+                (flight.custo ? flight.custo.toString().includes(searchTerm) : false)
             );
         }
 
@@ -131,9 +131,7 @@ function loadTable() {
         const totalPages = Math.ceil(totalFlights / flightTableConfig.rowsPerPage);
         const startIndex = (flightTableConfig.currentPage - 1) * flightTableConfig.rowsPerPage;
         const endIndex = startIndex + flightTableConfig.rowsPerPage;
-        const paginatedFlights = flights.slice(startIndex, endIndex);
-
-        // Render table
+        const paginatedFlights = flights.slice(startIndex, endIndex);        // Render table
         tableBody.innerHTML = paginatedFlights.map(flight => `
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
                 <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">${escapeHtml(flight.numeroVoo)}</td>
@@ -146,6 +144,7 @@ function loadTable() {
                         ${flight.direto === 'S' ? 'Sim' : 'Não'}
                     </span>
                 </td>
+                <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 font-medium">€${parseFloat(flight.custo || 0).toFixed(2)}</td>
                 <td class="px-6 py-4 text-sm text-right">
                     <div class="flex items-center justify-end gap-2">
                         <button onclick="editFlight('${flight.numeroVoo}')" class="p-1.5 text-primary hover:text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150" title="Editar voo">
@@ -162,7 +161,7 @@ function loadTable() {
         if (paginatedFlights.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                    <td colspan="8" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                         <div class="flex flex-col items-center gap-2">
                             <span class="material-symbols-outlined text-4xl">flight</span>
                             <p class="text-lg font-medium">Nenhum voo encontrado</p>
@@ -190,6 +189,7 @@ function getSortValue(flight, column) {
         case 'company': return flight.companhia || '';
         case 'leaves': return flight.partida || '';
         case 'direct': return flight.direto === 'S' ? 'Sim' : 'Não';
+        case 'custo': return (parseFloat(flight.custo) || 0).toString().padStart(10, '0');
         default: return '';
     }
 }
@@ -296,8 +296,7 @@ function createFlight() {
     try {
         const form = document.getElementById('add_flight_form');
         const formData = new FormData(form);
-        
-        const flightData = {
+          const flightData = {
             numeroVoo: formData.get('name'),
             origem: formData.get('from'),
             destino: formData.get('to'),
@@ -305,7 +304,7 @@ function createFlight() {
             partida: formatDateTime(formData.get('leaves')),
             chegada: '', // Could be calculated or left empty
             direto: formData.get('direct') === 'Sim' ? 'S' : 'N',
-            custo: 0, // Default value, could be added to form
+            custo: parseFloat(formData.get('custo')) || 0,
             imagem: 'https://placehold.co/413x327', // Default placeholder
             dataVolta: '' // Default empty
         };
@@ -313,6 +312,11 @@ function createFlight() {
         // Validation
         if (!flightData.numeroVoo || !flightData.origem || !flightData.destino || !flightData.companhia || !flightData.partida) {
             showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
+            return;
+        }
+
+        if (flightData.custo < 0) {
+            showToast('O custo não pode ser negativo.', 'error');
             return;
         }
 
@@ -347,14 +351,13 @@ function editFlight(numeroVoo) {
         if (!flight) {
             showToast('Voo não encontrado.', 'error');
             return;
-        }
-
-        // Fill form with flight data
+        }        // Fill form with flight data
         document.getElementById('name').value = flight.numeroVoo;
         document.getElementById('from').value = flight.origem;
         document.getElementById('to').value = flight.destino;
         document.getElementById('company').value = flight.companhia;
         document.getElementById('leaves').value = parseDateTime(flight.partida);
+        document.getElementById('custo').value = flight.custo || 0;
         document.getElementById('direct').value = flight.direto === 'S' ? 'Sim' : 'Não';
 
         // Update modal title and button
@@ -378,8 +381,7 @@ function updateFlight() {
     try {
         const form = document.getElementById('add_flight_form');
         const formData = new FormData(form);
-        
-        const flightData = {
+          const flightData = {
             numeroVoo: formData.get('name'),
             origem: formData.get('from'),
             destino: formData.get('to'),
@@ -387,7 +389,7 @@ function updateFlight() {
             partida: formatDateTime(formData.get('leaves')),
             chegada: '', // Keep existing or empty
             direto: formData.get('direct') === 'Sim' ? 'S' : 'N',
-            custo: 0, // Keep existing or default
+            custo: parseFloat(formData.get('custo')) || 0,
             imagem: 'https://placehold.co/413x327', // Keep existing or default
             dataVolta: '' // Keep existing or empty
         };
@@ -398,6 +400,11 @@ function updateFlight() {
             return;
         }
 
+        if (flightData.custo < 0) {
+            showToast('O custo não pode ser negativo.', 'error');
+            return;
+        }
+
         // Get existing flight to preserve other properties
         const flights = FlightModel.getAll();
         const existingFlight = flights.find(f => f.numeroVoo === editingFlightId);
@@ -405,9 +412,7 @@ function updateFlight() {
         if (!existingFlight) {
             showToast('Voo não encontrado.', 'error');
             return;
-        }
-
-        // Create updated flight object preserving existing properties
+        }        // Create updated flight object preserving existing properties
         const updatedFlight = {
             ...existingFlight,
             numeroVoo: flightData.numeroVoo,
@@ -415,7 +420,8 @@ function updateFlight() {
             destino: flightData.destino,
             companhia: flightData.companhia,
             partida: flightData.partida,
-            direto: flightData.direto
+            direto: flightData.direto,
+            custo: flightData.custo
         };
 
         FlightModel.update(editingFlightId, updatedFlight);
