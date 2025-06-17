@@ -1,4 +1,5 @@
 import * as HotelModel from "../models/HotelModel.js";
+import * as User from "../models/UserModel.js";
 import {
   getFormData,
   showToast,
@@ -7,8 +8,12 @@ import {
   updateTable,
 } from "./ViewHelpers.js";
 
+// Global variable to store current hotel data
+let currentHotel = null;
+
 async function initHotelView() {
   HotelModel.init();
+  User.init(); // Initialize user model
 
   const urlParams = new URLSearchParams(window.location.search);
   const hotelId = Number(urlParams.get("id")) || 1;
@@ -43,6 +48,7 @@ async function initHotelView() {
  */
 function renderHotelDetail(hotelId) {
   const hotel = HotelModel.getById(hotelId);
+  currentHotel = hotel; // Store hotel globally
 
   if (!hotel) {
     const corpoPrincipal =
@@ -91,10 +97,13 @@ function renderHotelDetail(hotelId) {
 
   renderIconsList("hotel-acessibilidade", comodidades);
   renderIconsList("hotel-acessibilidade-extra", acessibilidade);
-
   document
     .getElementById("fav-hotel")
     .addEventListener("click", toggleFavorito);
+    
+  // Initialize favorite state
+  initializeFavoriteState(hotel);
+    
   document
     .getElementById("btn-mais-hospedes")
     .addEventListener("click", aumentarHospedes);
@@ -263,19 +272,37 @@ function renderIconsList(containerId, lista) {
  * O estado de favorito é armazenado no atributo `data-favorito` do botão.
  */
 function toggleFavorito() {
-  const favBtn = document.getElementById("fav-hotel");
-  const isFavorito = favBtn.getAttribute("data-favorito") === "true";
-  const iconElement = favBtn.querySelector(".material-symbols-outlined");
+  if (!User.isLogged()) {
+    showToast("Faça login para adicionar aos favoritos", "error");
+    window.location.href = "_login.html";
+    return;
+  }
 
-  if (isFavorito) {
+  if (!currentHotel) {
+    showToast("Erro: Hotel não encontrado", "error");
+    return;
+  }
+
+  const favBtn = document.getElementById("fav-hotel");
+  const iconElement = favBtn.querySelector(".material-symbols-outlined");
+  const user = User.getUserLogged();
+  const currentlyFav = favBtn.getAttribute("data-favorito") === "true";
+
+  if (currentlyFav) {
+    User.removeFavorite(user, currentHotel);
     favBtn.setAttribute("data-favorito", "false");
     iconElement.style.fontVariationSettings = "'FILL' 0";
-    showToast("Removido dos favoritos");
+    showToast("Hotel removido dos favoritos", "success");
   } else {
+    User.addFavorite(user, currentHotel);
     favBtn.setAttribute("data-favorito", "true");
     iconElement.style.fontVariationSettings = "'FILL' 1";
-    showToast("Adicionado aos favoritos");
+    showToast("Hotel adicionado aos favoritos", "success");
   }
+
+  // Add scale animation
+  iconElement.classList.add("scale-110");
+  setTimeout(() => iconElement.classList.remove("scale-110"), 150);
 }
 
 /**
@@ -350,6 +377,35 @@ function reservar(hotel) {
   setTimeout(() => {
     window.location.href = "../index.html";
   }, 2000);
+}
+
+/**
+ * Initializes the favorite state of the hotel button
+ * @param {Object} hotel - The hotel object
+ */
+function initializeFavoriteState(hotel) {
+  const favBtn = document.getElementById("fav-hotel");
+  if (!favBtn) return;
+  
+  // Create heart icon if it doesn't exist
+  let iconElement = favBtn.querySelector(".material-symbols-outlined");
+  if (!iconElement) {
+    iconElement = document.createElement("span");
+    iconElement.classList.add("material-symbols-outlined", "text-red-500", "text-3xl");
+    iconElement.textContent = "favorite";
+    favBtn.appendChild(iconElement);
+  }
+  
+  // Check if hotel is in user favorites
+  if (User.isLogged()) {
+    const user = User.getUserLogged();
+    const isFav = User.isHotelInFavorites(user, hotel.id);
+    favBtn.setAttribute("data-favorito", isFav ? "true" : "false");
+    iconElement.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+  } else {
+    favBtn.setAttribute("data-favorito", "false");
+    iconElement.style.fontVariationSettings = "'FILL' 0";
+  }
 }
 
 // Inicializar quando a página carrega

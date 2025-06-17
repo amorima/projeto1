@@ -1,9 +1,11 @@
 import {
   showCookieBanner,
   openModal,
-  closeModal
+  closeModal,
+  showToast
 } from "./ViewHelpers.js";
 import HotelModel from "../models/HotelModel.js";
+import * as User from "../models/UserModel.js";
 
 // Mapeamento simples de acessibilidade para ícones Material Symbols
 const acessibilidadeIcons = {
@@ -80,15 +82,13 @@ function renderHotelCards(filteredHotels = null) {
       ? quarto.acessibilidade
       : quarto.acessibilidade
       ? [quarto.acessibilidade]
-      : [];
-
-    const imagem = quarto.foto || hotel.foto || "https://placehold.co/413x327";
+      : [];    const imagem = quarto.foto || hotel.foto || "https://placehold.co/413x327";
     const preco = quarto.precoNoite ? quarto.precoNoite + " €" : "-";
     const nome = hotel.nome || hotel.titulo || "Hotel";
     const localizacao = hotel.cidade || "Localização";
     const numeroNoites = quarto.numeroNoites || 1;
     const capacidade = quarto.capacidade || 1;
-    const id = quarto.id || hotel.id || 1;
+    const hotelId = hotel.id; // Use hotel ID, not room ID
 
     // Pills de acessibilidade (padding igual em toda a volta, alinhados à direita, pill ajusta à altura do conteúdo)
     let pillsHTML = "";
@@ -142,11 +142,14 @@ function renderHotelCards(filteredHotels = null) {
               <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco}</p>
               <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Preço por noite</p>
             </div>
-            <a href="hotel.html?id=${id}" class="h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
+            <a href="hotel.html?id=${hotelId}" class="h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
           </div>
           <span 
             class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"
+            data-favorito="false"          <span 
+            class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon"
             data-favorito="false" 
+            data-hotel-id="${hotelId}"
           >favorite</span>
         </div>
       </div>
@@ -154,16 +157,43 @@ function renderHotelCards(filteredHotels = null) {
   });
 
   // Ativar toggle de favorito
-   container.querySelectorAll(".favorite-icon").forEach((icon) => {
-    const initialIsFav = icon.getAttribute("data-favorito") === "true";
-    icon.style.fontVariationSettings = initialIsFav ? "'FILL' 1" : "'FILL' 0";
-    icon.addEventListener("click", function () {
-      const currentIsFav = this.getAttribute("data-favorito") === "true";
-      const newIsFav = !currentIsFav;
-      this.setAttribute("data-favorito", String(newIsFav));
-      this.style.fontVariationSettings = newIsFav ? "'FILL' 1" : "'FILL' 0";
-      this.classList.add("scale-110");
-      setTimeout(() => this.classList.remove("scale-110"), 150);
+  container.querySelectorAll(".favorite-icon").forEach((heart) => {
+    const hotelId = heart.getAttribute("data-hotel-id");
+    const hotel = hotels.find(h => h.id == hotelId);
+    
+    // Verificar se hotel está nos favoritos do utilizador
+    if (User.isLogged()) {
+      const user = User.getUserLogged();
+      const isFav = User.isHotelInFavorites(user, hotelId);
+      heart.setAttribute("data-favorito", isFav ? "true" : "false");
+      heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+    }
+
+    heart.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!User.isLogged()) {
+        showToast("Faça login para adicionar aos favoritos", "error");
+        window.location.href = "_login.html";
+        return;
+      }
+      
+      const user = User.getUserLogged();
+      const currentlyFav = heart.getAttribute("data-favorito") === "true";
+      
+      if (currentlyFav) {
+        User.removeFavorite(user, hotel);
+        heart.setAttribute("data-favorito", "false");
+        heart.style.fontVariationSettings = "'FILL' 0";
+        showToast("Hotel removido dos favoritos", "success");
+      } else {
+        User.addFavorite(user, hotel);
+        heart.setAttribute("data-favorito", "true");
+        heart.style.fontVariationSettings = "'FILL' 1";
+        showToast("Hotel adicionado aos favoritos", "success");
+      }
+      
+      heart.classList.add("scale-110");
+      setTimeout(() => heart.classList.remove("scale-110"), 150);
     });
   });
 }
@@ -668,6 +698,7 @@ function clearSearchFilters() {
 // --- Função principal ---
 document.addEventListener("DOMContentLoaded", () => {
   HotelModel.init(); // Inicializa o modelo
+  User.init(); // Inicializa o modelo de utilizador
   showCookieBanner();
   renderHotelCards();
   setupFilters();
