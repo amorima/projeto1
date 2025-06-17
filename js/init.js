@@ -1,7 +1,6 @@
 initdata();
 
-function initdata() {
-  // Utilizador inicial
+function initdata() {  // Utilizador inicial
   if (!localStorage.user) {
     const user = [
       {
@@ -13,16 +12,219 @@ function initdata() {
         password: "40240119",
         isPrivate: false,
         admin: false,
+        preferences: {
+          newsletter: true
+        },
+        reservas: [
+          {
+            numeroVoo: "TAP101",
+            origem: "OPO - Porto",
+            destino: "Lisboa",
+            companhia: "TAP",
+            partida: "15/07/2025 10:00",
+            chegada: "15/07/2025 11:00",
+            direto: "S",
+            custo: 150,
+            imagem: "https://placehold.co/413x327",
+            dataVolta: "20/07/2025 18:00",
+            turismo: ["Turismo Cultural"],
+            pointsAR: 150,
+            car: {},
+            hotel: {},
+            seguro: false,
+            nPessoas: 1
+          }
+        ],
+        favoritos: [
+          {
+            numeroVoo: "BA101",
+            origem: "OPO - Porto",
+            destino: "Londres",
+            companhia: "British Airways",
+            partida: "01/08/2025 14:00",
+            chegada: "01/08/2025 16:00",
+            direto: "S",
+            custo: 200,
+            imagem: "https://placehold.co/413x327",
+            dataVolta: "08/08/2025 10:00",
+            turismo: ["Turismo Cultural", "Turismo Urbano"]
+          }
+        ]
       },
       {
         id: 2,
         username: "Gabriel Paiva",
         avatar: "/img/users/40240137.jpg",
-        pontos: 0,
+        pontos: 1265,
         email: "40240137@esmad.ipp.pt",
         password: "40240137",
         isPrivate: false,
         admin: true,
+        preferences: {
+          newsletter: true
+        },
+        reservas: [
+          {
+            numeroVoo: "BA1002",
+            origem: "LHR - Londres",
+            destino: "Porto",
+            companhia: "British Airways",
+            partida: "07/07/2025 14:00",
+            chegada: "07/07/2025 16:00",
+            direto: "S",
+            custo: 210,
+            imagem: "https://placehold.co/413x327",
+            dataVolta: "12/07/2025 14:00",
+            turismo: [
+              "Turismo Cultural",
+              "Turismo Gastronómico"
+            ],
+            pointsAR: 1265,
+            car: {
+              nome: "Ford Fiesta",
+              preco: 24
+            },
+            hotel: {
+              id: 4,
+              cidade: "Porto",
+              nome: "Hotel Carris Porto Ribeira",
+              foto: "https://placehold.co/600x400/B8860B/FFFFFF?text=Hotel+Porto+4",
+              quartos: [
+                {
+                  tipo: "Standard",
+                  camas: 1,
+                  capacidade: 2,
+                  precoNoite: 150,
+                  foto: "https://placehold.co/300x200/F4A460/000000?text=Quarto+Standard",
+                  acessibilidade: [
+                    "Quartos Adaptados"
+                  ],
+                  dataCheckin: "2025-07-10",
+                  numeroNoites: 5,
+                  pequenoAlmocoIncluido: true,
+                  comodidades: [
+                    "Restaurante",
+                    "Bar"
+                  ],
+                  wifiGratis: true,
+                  descricao: "Quarto confortável no centro histórico do Porto."
+                }
+              ]
+            },
+            seguro: true,
+            nPessoas: 2
+          }
+        ],
+        favoritos: [
+          {
+            numeroVoo: "EI9101",
+            origem: "OPO - Porto",
+            destino: "Dublin",
+            companhia: "Aer Lingus",
+            partida: "18/11/2025 08:00",
+            chegada: "18/11/2025 10:00",
+            direto: "S",
+            custo: 130,
+            imagem: "https://placehold.co/413x327",
+            dataVolta: "23/11/2025 16:00",
+            turismo: [
+              "Turismo Cultural",
+              "Turismo Urbano",
+              "Turismo Gastronómico"
+            ]
+          },
+          {
+            numeroVoo: "AF205",
+            origem: "OPO - Porto",
+            destino: "Paris",
+            companhia: "Air France",
+            partida: "15/12/2025 09:00",
+            chegada: "15/12/2025 12:00",
+            direto: "S",
+            custo: 180,
+            imagem: "https://placehold.co/413x327",
+            dataVolta: "22/12/2025 15:00",
+            turismo: [
+              "Turismo Cultural",
+              "Turismo Gastronómico"
+            ]          }
+        ]
+      },
+      {
+        id: 3,
+        username: "Test User 1",
+        avatar: "/img/users/40240119.jpg",
+        pontos: 500,
+        email: "test1@example.com",
+        password: "test123",
+        isPrivate: false,
+        admin: false,
+        preferences: {
+          newsletter: false
+        },
+        reservas: [],
+        favoritos: [
+          {
+            numeroVoo: "TAP301",
+            origem: "LIS - Lisboa",
+            destino: "Londres",
+            companhia: "TAP",
+            partida: "10/08/2025 16:00",
+            chegada: "10/08/2025 19:00",
+            direto: "S",
+            custo: 220,
+            turismo: ["Turismo Cultural"]
+          },
+          {
+            numeroVoo: "FR502",
+            origem: "OPO - Porto",
+            destino: "Madrid",
+            companhia: "Ryanair",
+            partida: "05/09/2025 12:00",
+            chegada: "05/09/2025 14:00",
+            direto: "S",
+            custo: 89,
+            turismo: ["Turismo Urbano"]
+          }
+        ]
+      },
+      {
+        id: 4,
+        username: "Test User 2",
+        avatar: "/img/users/40240137.jpg",
+        pontos: 1200,
+        email: "test2@example.com",
+        password: "test456",
+        isPrivate: false,
+        admin: false,
+        preferences: {
+          newsletter: true
+        },
+        reservas: [],
+        favoritos: [
+          {
+            numeroVoo: "LH401",
+            origem: "OPO - Porto",
+            destino: "Paris",
+            companhia: "Lufthansa",
+            partida: "20/10/2025 10:00",
+            chegada: "20/10/2025 13:00",
+            direto: "S",
+            custo: 190,
+            turismo: ["Turismo Cultural", "Turismo Gastronómico"]
+          },
+          {
+            numeroVoo: "KL601",
+            origem: "LIS - Lisboa",
+            destino: "Dublin",
+            companhia: "KLM",
+            partida: "15/11/2025 14:00",
+            chegada: "15/11/2025 17:00",
+            direto: "S",
+            custo: 165,
+            turismo: ["Turismo Cultural"]
+          }
+        ]
       },
     ];
     localStorage.setItem("user", JSON.stringify(user));
@@ -3649,8 +3851,34 @@ function initdata() {
         comentario:
           "Varsóvia renasceu das cinzas da Segunda Guerra Mundial. O centro histórico reconstruído é encantador e os parques são imensos. Cidade moderna com preços acessíveis.",
         respostas: [],
-      },
-    ];
+      },    ];
     localStorage.setItem("reviews", JSON.stringify(reviews));
+  }
+  
+  // Newsletter subscribers
+  if (!localStorage.newsletter) {
+    const newsletter = [
+      {
+        username: "António Amorim",
+        email: "40240119@esmad.ipp.pt"
+      },
+      {
+        email: "unregistered1@example.com"
+      },
+      {
+        email: "unregistered2@example.com"
+      },
+      {
+        email: "unregistered3@example.com"
+      },
+      {
+        username: "Gabriel Paiva",
+        email: "40240137@esmad.ipp.pt"
+      },
+      {
+        email: "newsletter.subscriber@example.com"
+      }
+    ];
+    localStorage.setItem("newsletter", JSON.stringify(newsletter));
   }
 }
