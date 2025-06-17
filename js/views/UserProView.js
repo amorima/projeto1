@@ -178,7 +178,7 @@ function loadUserInfo() {
   const levelIcon = getLevelSymbol(userLevel);
   document.querySelector(
     ".absolute.bottom-0.right-0 .material-symbols-outlined"
-  ).textContent = levelIcon; /* Atualizar avatar */
+  ).textContent = levelIcon;  /* Atualizar avatar */
   const avatarElement = document.getElementById("user-avatar");
   if (avatarElement) {
     if (user.avatar && user.avatar !== "") {
@@ -188,10 +188,10 @@ function loadUserInfo() {
         : `..${user.avatar}`;
       avatarElement.src = avatarPath;
     } else {
-      /* Se não tem avatar, usar uma imagem padrão */
-      avatarElement.src = "../img/users/40240119.jpg";
+      /* Se não tem avatar, usar um placeholder */
+      avatarElement.src = "https://placehold.co/80x80/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
     }
-  } /* Atualizar navbar após carregar os dados */
+  }/* Atualizar navbar após carregar os dados */
   updateNavbarUser();
   /* Preencher informações pessoais */
   if (document.getElementById("info-username"))
@@ -239,8 +239,13 @@ function loadUserInfo() {
 function populateSettingsForm(user) {
   // Avatar nas definições
   const settingsAvatar = document.getElementById("settings-avatar");
-  if (settingsAvatar && user.avatar) {
-    settingsAvatar.src = user.avatar;
+  if (settingsAvatar) {
+    if (user.avatar && user.avatar !== "") {
+      settingsAvatar.src = user.avatar;
+    } else {
+      /* Se não tem avatar, usar um placeholder */
+      settingsAvatar.src = "https://placehold.co/96x96/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
+    }
   }
 
   /* Campos de dados pessoais */
