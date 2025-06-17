@@ -194,7 +194,142 @@ export function getUserById(id) {
  * @return {boolean} Retorna true se o utilizador for administrador, caso contrário, retorna false.
  */
 export function isAdmin(user) {
-  return user && user.admin === true;
+  return user && (user.admin === true || user.admin === 'Admin');
+}
+
+/**
+ * Obtém o nível do utilizador baseado nos pontos.
+ * @param {number} points - Pontos do utilizador.
+ * @return {string} Nível do utilizador.
+ */
+export function getUserLevel(points) {
+  if (points >= 5000) {
+    return "Embaixador";
+  } else if (points >= 3000) {
+    return "Globetrotter";
+  } else if (points >= 1500) {
+    return "Aventureiro";
+  } else if (points >= 250) {
+    return "Viajante";
+  } else {
+    return "Explorador";
+  }
+}
+
+// ADMIN FUNCTIONS
+/**
+ * Obtém todos os utilizadores.
+ * @return {Array} Array com todos os utilizadores registados.
+ */
+export function getAll() {
+  return [...users]; // Return a copy to prevent direct modification
+}
+
+/**
+ * Filtra utilizadores por termo de pesquisa.
+ * @param {string} searchTerm - Termo para pesquisar em username e email.
+ * @return {Array} Array com utilizadores filtrados.
+ */
+export function search(searchTerm) {
+  if (!searchTerm || searchTerm.trim() === '') {
+    return getAll();
+  }
+  
+  const term = searchTerm.toLowerCase().trim();
+  return users.filter(user => 
+    (user.username && user.username.toLowerCase().includes(term)) ||
+    (user.email && user.email.toLowerCase().includes(term))
+  );
+}
+
+/**
+ * Ordena utilizadores por uma coluna específica.
+ * @param {string} column - Coluna para ordenar (username, email, pontos, admin, isPrivate).
+ * @param {string} direction - Direção da ordenação ('asc' ou 'desc').
+ * @return {Array} Array com utilizadores ordenados.
+ */
+export function sortBy(column, direction = 'asc') {
+  const sortedUsers = [...users].sort((a, b) => {
+    let valueA = a[column];
+    let valueB = b[column];
+    
+    // Handle different data types
+    if (column === 'pontos') {
+      valueA = parseInt(valueA) || 0;
+      valueB = parseInt(valueB) || 0;
+    } else if (column === 'isPrivate') {
+      // Handle both privacidade and isPrivate properties
+      valueA = a.privacidade === 'S' || a.isPrivate === true;
+      valueB = b.privacidade === 'S' || b.isPrivate === true;
+    } else if (column === 'admin') {
+      // Handle both boolean and string admin values
+      valueA = a.admin === true || a.admin === 'Admin';
+      valueB = b.admin === true || b.admin === 'Admin';
+    } else if (typeof valueA === 'string') {
+      valueA = valueA.toLowerCase();
+      valueB = valueB ? valueB.toLowerCase() : '';
+    }
+    
+    if (direction === 'asc') {
+      return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+    } else {
+      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+    }
+  });
+  
+  return sortedUsers;
+}
+
+/**
+ * Cria um novo utilizador via admin.
+ * @param {Object} userData - Dados do utilizador a ser criado.
+ * @return {Object} O utilizador criado.
+ */
+export function createUser(userData) {
+  const { 
+    username, 
+    email, 
+    password, 
+    pontos = 50, 
+    privacidade = 'N', 
+    admin = 'User' 
+  } = userData;
+  
+  // Validate required fields
+  if (!username || !email || !password) {
+    throw new Error('Username, email e password são obrigatórios');
+  }
+  
+  // Check if email already exists
+  if (users.some(user => user.email === email)) {
+    throw new Error(`Utilizador com email "${email}" já existe`);
+  }
+  
+  const isPrivate = privacidade === 'S';
+  const isAdmin = admin === 'Admin';
+  
+  // Create user object with the same structure as existing users
+  const newUser = {
+    id: getNextId(users),
+    username: username,
+    avatar: "", // Default empty avatar
+    pontos: parseInt(pontos) || 50,
+    email: email,
+    password: password,
+    isPrivate: isPrivate,
+    admin: isAdmin,
+    // Additional properties for compatibility
+    privacidade: privacidade,
+    newsletter: false,
+    preferences: {},
+    reservas: [],
+    favoritos: []
+  };
+  
+  users.push(newUser);
+  localStorage.setItem("user", JSON.stringify(users));
+  
+  return newUser;
 }
 
 // USER NEWSLETTER
