@@ -683,24 +683,55 @@ export function removeFavorite(user, item) {
 
 export function addPontos(user, pontos, description = "Pontos adicionados") {
   if (!user.pontos) user.pontos = 0;
-  if (!user.movimentosPontos) user.movimentosPontos = [];
+  
+  // Initialize movements array and add registration bonus if needed
+  if (!user.movimentosPontos) {
+    user.movimentosPontos = [];
+    
+    // If user has existing points but no movements, add the registration movement
+    if (user.pontos > 0) {
+      user.movimentosPontos.push({
+        data: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Set to yesterday
+        descricao: "Registo na plataforma",
+        valor: 50, // Registration bonus
+        saldoAnterior: 0,
+        saldoAtual: 50
+      });
+    }
+  }
   
   const pontosValue = parseInt(pontos, 10);
-  user.pontos = parseInt(user.pontos, 10) + pontosValue;
+  const saldoAnterior = parseInt(user.pontos, 10);
+  user.pontos = saldoAnterior + pontosValue;
   
   // Add movement record
   user.movimentosPontos.push({
     data: new Date().toISOString(),
     descricao: description,
     valor: pontosValue,
-    saldoAnterior: user.pontos - pontosValue,
+    saldoAnterior: saldoAnterior,
     saldoAtual: user.pontos
   });
 }
 
 export function subtractPontos(user, pontos, description = "Pontos subtraídos") {
   if (!user.pontos) user.pontos = 0;
-  if (!user.movimentosPontos) user.movimentosPontos = [];
+  
+  // Initialize movements array and add registration bonus if needed
+  if (!user.movimentosPontos) {
+    user.movimentosPontos = [];
+    
+    // If user has existing points but no movements, add the registration movement
+    if (user.pontos > 0) {
+      user.movimentosPontos.push({
+        data: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Set to yesterday
+        descricao: "Registo na plataforma",
+        valor: 50, // Registration bonus
+        saldoAnterior: 0,
+        saldoAtual: 50
+      });
+    }
+  }
   
   const pontosValue = parseInt(pontos, 10);
   const saldoAnterior = parseInt(user.pontos, 10);
@@ -746,8 +777,7 @@ class User {
   admin = false;
   preferences = {};
   reservas = [];
-  favoritos = [];
-  constructor(
+  favoritos = [];  constructor(
     username = "",
     password = "",
     email = "",
@@ -769,6 +799,17 @@ class User {
     // Initialize arrays for user data
     this.reservas = [];
     this.favoritos = [];
+    // Initialize movements array with registration bonus if points > 0
+    this.movimentosPontos = [];
+    if (this.pontos > 0) {
+      this.movimentosPontos.push({
+        data: new Date().toISOString(),
+        descricao: "Registo na plataforma",
+        valor: this.pontos,
+        saldoAnterior: 0,
+        saldoAtual: this.pontos
+      });
+    }
     // Set preferences object with newsletter preference
     this.preferences = {
       newsletter: newsletter
@@ -1328,15 +1369,37 @@ export function isFlightInFavorites(user, flightId) {
 export function getUserPointMovements(user) {
   if (!user.movimentosPontos) {
     user.movimentosPontos = [];
-    // Add initial movement if user has points
-    if (user.pontos && user.pontos > 0) {
-      user.movimentosPontos.push({
-        data: new Date().toISOString(),
-        descricao: "Pontos iniciais",
-        valor: user.pontos,
-        saldoAnterior: 0,
-        saldoAtual: user.pontos
-      });
+  }
+  
+  // Check if we need to add initial movement
+  // This should only happen if user has points but no initial movement recorded
+  if (user.pontos && user.pontos > 0) {
+    const hasInitialMovement = user.movimentosPontos.some(movement => 
+      movement.descricao === "Pontos iniciais" || movement.descricao === "Registo na plataforma"
+    );
+    
+    if (!hasInitialMovement) {
+      // Calculate what the initial points should be by looking at the earliest balance
+      let initialPoints = 50; // Default registration bonus
+      
+      // If there are movements, calculate the initial points from the earliest movement
+      if (user.movimentosPontos.length > 0) {
+        // Sort movements by date (oldest first) to find the earliest balance
+        const sortedMovements = [...user.movimentosPontos].sort((a, b) => new Date(a.data) - new Date(b.data));
+        const earliestMovement = sortedMovements[0];
+        initialPoints = earliestMovement.saldoAnterior;
+      }
+      
+      // Only add initial movement if there were actually initial points
+      if (initialPoints > 0) {
+        user.movimentosPontos.push({
+          data: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Set to yesterday to ensure it appears first
+          descricao: "Registo na plataforma",
+          valor: initialPoints,
+          saldoAnterior: 0,
+          saldoAtual: initialPoints
+        });
+      }
     }
   }
   
