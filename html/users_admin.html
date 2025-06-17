@@ -2,7 +2,20 @@
 <html lang="pt" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=d    <!-- Modal Adicionar -->
+    <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        
+        <!-- Modal Container -->
+        <div class="fixed inset-0 flex items-center justify-center px-4 py-8">
+            <!-- Modal Content -->
+            <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Novo Utilizador</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Preencha os dados do utilizador</p>
+                </div>nitial-scale=1.0">    
     <title>Gestão de Utilizadores - Planeador de Viagens</title>
     <link rel="icon" href="../img/favicon.svg" type="image/x-icon">
     
@@ -126,16 +139,15 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Modal Adicionar -->
+    </div>    <!-- Modal Adicionar -->
     <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Overlay -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-            
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        
+        <!-- Modal Container -->
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
             <!-- Modal Content -->
-            <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+            <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl z-10">
                 <!-- Header -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Novo Utilizador</h3>

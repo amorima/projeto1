@@ -141,7 +141,8 @@ export function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
   modal.classList.remove("hidden");
-  modal.classList.add("flex");
+  // Prevent body scroll when modal is open
+  document.body.style.overflow = 'hidden';
 }
 
 export function closeModal(modalId, formId, modalTitle) {
@@ -149,6 +150,9 @@ export function closeModal(modalId, formId, modalTitle) {
   if (modal) {
     modal.classList.add("hidden");
   }
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
   
   const form = document.getElementById(formId);
   if (form) {
