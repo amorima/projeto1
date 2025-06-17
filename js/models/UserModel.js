@@ -598,10 +598,25 @@ export function getUserImage(username) {
 
 export function addReservation(userAdd, reservation){
   if (!userAdd.reservas) userAdd.reservas = [];
-  // Verifica se já existe reserva com o mesmo numeroVoo
+  
+  // Verifica se já existe reserva baseada no tipo
   if (reservation && reservation.numeroVoo && userAdd.reservas.some(r => r.numeroVoo == reservation.numeroVoo)) {
-    return false; // Já existe
+    return false; // Já existe voo
   }
+  
+  if (reservation && reservation.tipo === 'hotel' && reservation.id) {
+    // Check for duplicate hotel reservations with same id, checkIn and checkOut dates
+    const existingHotel = userAdd.reservas.find(r => 
+      r.tipo === 'hotel' && 
+      r.id == reservation.id && 
+      r.checkIn === reservation.checkIn && 
+      r.checkOut === reservation.checkOut
+    );
+    if (existingHotel) {
+      return false; // Já existe reserva de hotel para as mesmas datas
+    }
+  }
+  
   userAdd.reservas.push(reservation);
   update(userAdd.id, userAdd);
   return true; 
@@ -1225,11 +1240,10 @@ export function removeReservation(userId, reservationIndex) {
     // Check if reservation index is valid
     if (reservationIndex < 0 || reservationIndex >= user.reservas.length) {
       throw new Error("Reserva não encontrada");
-    }
-
-    // Get the reservation to remove
+    }    // Get the reservation to remove
     const reservationToRemove = user.reservas[reservationIndex];
-    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || 0;    // Remove the reservation
+    // Check for points in different possible property names (flight uses pointsAR, hotel uses pontos)
+    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || parseInt(reservationToRemove.pontos) || 0;// Remove the reservation
     user.reservas.splice(reservationIndex, 1);
 
     // Subtract points from user

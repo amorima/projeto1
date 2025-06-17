@@ -1087,19 +1087,25 @@ function loadReservas(user) {
   } else {
     if (emptyDiv) emptyDiv.classList.add("hidden");
   }
+  
   user.reservas.forEach((reserva, idx) => {
     const card = document.createElement("div");
     card.className =
       "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl w-full mb-6 cursor-pointer hover:shadow-lg transition-shadow";
-      // Add click event to navigate to flight itinerary
+      
+    // Add click event based on reservation type
     card.addEventListener("click", function(e) {
       // Don't navigate if clicking the delete button
       if (e.target.closest('.delete-reservation-btn')) {
         return;
       }
       
-      // Navigate to flight itinerary with the reservation ID
-      window.location.href = `flight_itinerary.html?id=${(reserva.numeroVoo || '')}`;
+      // Navigate based on reservation type
+      if (reserva.tipo === 'hotel') {
+        window.location.href = `hotel.html?id=${reserva.id}`;
+      } else if (reserva.numeroVoo) {
+        window.location.href = `flight_itinerary.html?id=${reserva.numeroVoo}`;
+      }
     });
 
     // Botão de apagar
@@ -1117,80 +1123,97 @@ function loadReservas(user) {
       "h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover";
     img.src = reserva.imagem || "https://placehold.co/200x200";
     img.alt = "Imagem promocional";
-    card.appendChild(img);
-
-    // Área do conteúdo
+    card.appendChild(img);    // Área do conteúdo
     const content = document.createElement("div");
     content.className = "flex flex-row items-center justify-between flex-1 p-4 w-full";
 
-    // Itinerário (lado esquerdo)
+    // Itinerário (lado esquerdo) - give more space for hotel reservations
     const itinerary = document.createElement("div");
-    itinerary.className = "flex flex-col gap-2 text-left flex-1";
+    if (reserva.tipo === 'hotel') {
+      itinerary.className = "flex flex-col gap-2 text-left w-full"; // Full width for hotels
+    } else {
+      itinerary.className = "flex flex-col gap-2 text-left flex-1"; // Original for flights
+    }
 
     // Destino em destaque
     itinerary.innerHTML = `<span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">${reserva.destino || 'Destino'}</span>`;
 
-    // Ida
-    if (reserva.partida && reserva.origem && reserva.chegada && reserva.destino) {
-      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.partida} (${reserva.origem}) » ${reserva.chegada} (${reserva.destino})</span>`;
+    // Display based on reservation type
+    if (reserva.tipo === 'hotel') {
+      // Hotel reservation display
+      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Hotel: ${reserva.nome || 'Hotel'}</span>`;
+      
+      if (reserva.checkIn && reserva.checkOut) {
+        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Check-in: ${reserva.checkIn} | Check-out: ${reserva.checkOut}</span>`;
+      }
+        if (reserva.hospedes) {
+        itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">${reserva.hospedes} hóspedes</span>`;
+      }
     } else {
-      itinerary.innerHTML += `<span class="text-xs text-red-500">Faltam dados de ida</span>`;
-    }
+      // Flight reservation display (original logic)
+      if (reserva.partida && reserva.origem && reserva.chegada && reserva.destino) {
+        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.partida} (${reserva.origem}) » ${reserva.chegada} (${reserva.destino})</span>`;
+      } else {
+        itinerary.innerHTML += `<span class="text-xs text-red-500">Faltam dados de ida</span>`;
+      }
 
-    // Volta
-    if (reserva.dataVolta && reserva.destino && reserva.origem) {
-      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.dataVolta} (${reserva.destino}) » ? (${reserva.origem})</span>`;
-    }
+      // Volta
+      if (reserva.dataVolta && reserva.destino && reserva.origem) {
+        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.dataVolta} (${reserva.destino}) » ? (${reserva.origem})</span>`;
+      }
 
-    // Voo
-    if (reserva.numeroVoo) {
-      itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo ${reserva.numeroVoo}</span>`;
-    }
+      // Voo
+      if (reserva.numeroVoo) {
+        itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo ${reserva.numeroVoo}</span>`;
+      }
+    }    content.appendChild(itinerary);
 
-    content.appendChild(itinerary);
-
-    // Imagem da companhia aérea (lado direito)
-    const companhiaDiv = document.createElement("div");
-    companhiaDiv.className = "pl-4 flex-shrink-0 flex items-center";
-    let companhiaImgSrc = "";
-    // Tenta usar um ícone da companhia se existir, senão usa um placeholder
-    if (reserva.companhia && typeof reserva.companhia === 'string') {
-      // Exemplo de correspondência simples para TAP, Ryanair, etc.
-      const companhiaMap = {
-        'TAP': '../img/icons/ca_tap.jpg',
-        'Brussels Airlines': '../img/icons/ca_brussels.png',
-        'Ryanair': '../img/icons/ca_ryanair.jpg',
-        'KLM': '../img/icons/ca_klm.png',
-        'Air France': '../img/icons/ca_air_france.jpg',
-        'Swiss': '../img/icons/ca_swiss.png',
-        'Vueling': '../img/icons/ca_vueling.png',
-        'Wizz Air': '../img/icons/ca_wizz.png',
-        'Norwegian': '../img/icons/ca_Norwegian.png',
-        'British Airways': '../img/icons/ca_british_airways.jpg',
-        'Alitalia': '../img/icons/ca_alitalia.png',
-        'Austrian': '../img/icons/ca_Austrian.png',
-        'SAS': '../img/icons/ca_sas.png',
-        'LOT': '../img/icons/ca_LOT.png',
-        'ITA': '../img/icons/ca_ITA.png',
-        'Tarom': '../img/icons/ca-tarom.jpg',
-      };
-      for (const key in companhiaMap) {
-        if (reserva.companhia.toLowerCase().includes(key.toLowerCase())) {
-          companhiaImgSrc = companhiaMap[key];
-          break;
+    // Icon/Logo (lado direito) - only for flights, not hotels
+    if (reserva.tipo !== 'hotel') {
+      const iconDiv = document.createElement("div");
+      iconDiv.className = "pl-4 flex-shrink-0 flex items-center";
+      
+      // Airline logo (original logic)
+      let companhiaImgSrc = "";
+      // Tenta usar um ícone da companhia se existir, senão usa um placeholder
+      if (reserva.companhia && typeof reserva.companhia === 'string') {
+        // Exemplo de correspondência simples para TAP, Ryanair, etc.
+        const companhiaMap = {
+          'TAP': '../img/icons/ca_tap.jpg',
+          'Brussels Airlines': '../img/icons/ca_brussels.png',
+          'Ryanair': '../img/icons/ca_ryanair.jpg',
+          'KLM': '../img/icons/ca_klm.png',
+          'Air France': '../img/icons/ca_air_france.jpg',
+          'Swiss': '../img/icons/ca_swiss.png',
+          'Vueling': '../img/icons/ca_vueling.png',
+          'Wizz Air': '../img/icons/ca_wizz.png',
+          'Norwegian': '../img/icons/ca_Norwegian.png',
+          'British Airways': '../img/icons/ca_british_airways.jpg',
+          'Alitalia': '../img/icons/ca_alitalia.png',
+          'Austrian': '../img/icons/ca_Austrian.png',
+          'SAS': '../img/icons/ca_sas.png',
+          'LOT': '../img/icons/ca_LOT.png',
+          'ITA': '../img/icons/ca_ITA.png',
+          'Tarom': '../img/icons/ca-tarom.jpg',
+        };
+        for (const key in companhiaMap) {
+          if (reserva.companhia.toLowerCase().includes(key.toLowerCase())) {
+            companhiaImgSrc = companhiaMap[key];
+            break;
+          }
         }
       }
+      if (!companhiaImgSrc) {
+        companhiaImgSrc = "https://placehold.co/64x64?text=Airline";
+      }
+      const companhiaImg = document.createElement("img");
+      companhiaImg.className = "w-16 h-16 rounded-full object-cover";
+      companhiaImg.src = companhiaImgSrc;
+      companhiaImg.alt = reserva.companhia || "Companhia aérea";
+      iconDiv.appendChild(companhiaImg);
+      
+      content.appendChild(iconDiv);
     }
-    if (!companhiaImgSrc) {
-      companhiaImgSrc = "https://placehold.co/64x64?text=Airline";
-    }
-    const companhiaImg = document.createElement("img");
-    companhiaImg.className = "w-16 h-16 rounded-full object-cover";
-    companhiaImg.src = companhiaImgSrc;
-    companhiaImg.alt = reserva.companhia || "Companhia aérea";
-    companhiaDiv.appendChild(companhiaImg);
-    content.appendChild(companhiaDiv);
-
     card.appendChild(content);
     container.appendChild(card);
   });
