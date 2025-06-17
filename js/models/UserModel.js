@@ -194,7 +194,142 @@ export function getUserById(id) {
  * @return {boolean} Retorna true se o utilizador for administrador, caso contrário, retorna false.
  */
 export function isAdmin(user) {
-  return user && user.admin === true;
+  return user && (user.admin === true || user.admin === 'Admin');
+}
+
+/**
+ * Obtém o nível do utilizador baseado nos pontos.
+ * @param {number} points - Pontos do utilizador.
+ * @return {string} Nível do utilizador.
+ */
+export function getUserLevel(points) {
+  if (points >= 5000) {
+    return "Embaixador";
+  } else if (points >= 3000) {
+    return "Globetrotter";
+  } else if (points >= 1500) {
+    return "Aventureiro";
+  } else if (points >= 250) {
+    return "Viajante";
+  } else {
+    return "Explorador";
+  }
+}
+
+// ADMIN FUNCTIONS
+/**
+ * Obtém todos os utilizadores.
+ * @return {Array} Array com todos os utilizadores registados.
+ */
+export function getAll() {
+  return [...users]; // Return a copy to prevent direct modification
+}
+
+/**
+ * Filtra utilizadores por termo de pesquisa.
+ * @param {string} searchTerm - Termo para pesquisar em username e email.
+ * @return {Array} Array com utilizadores filtrados.
+ */
+export function search(searchTerm) {
+  if (!searchTerm || searchTerm.trim() === '') {
+    return getAll();
+  }
+  
+  const term = searchTerm.toLowerCase().trim();
+  return users.filter(user => 
+    (user.username && user.username.toLowerCase().includes(term)) ||
+    (user.email && user.email.toLowerCase().includes(term))
+  );
+}
+
+/**
+ * Ordena utilizadores por uma coluna específica.
+ * @param {string} column - Coluna para ordenar (username, email, pontos, admin, isPrivate).
+ * @param {string} direction - Direção da ordenação ('asc' ou 'desc').
+ * @return {Array} Array com utilizadores ordenados.
+ */
+export function sortBy(column, direction = 'asc') {
+  const sortedUsers = [...users].sort((a, b) => {
+    let valueA = a[column];
+    let valueB = b[column];
+    
+    // Handle different data types
+    if (column === 'pontos') {
+      valueA = parseInt(valueA) || 0;
+      valueB = parseInt(valueB) || 0;
+    } else if (column === 'isPrivate') {
+      // Handle both privacidade and isPrivate properties
+      valueA = a.privacidade === 'S' || a.isPrivate === true;
+      valueB = b.privacidade === 'S' || b.isPrivate === true;
+    } else if (column === 'admin') {
+      // Handle both boolean and string admin values
+      valueA = a.admin === true || a.admin === 'Admin';
+      valueB = b.admin === true || b.admin === 'Admin';
+    } else if (typeof valueA === 'string') {
+      valueA = valueA.toLowerCase();
+      valueB = valueB ? valueB.toLowerCase() : '';
+    }
+    
+    if (direction === 'asc') {
+      return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+    } else {
+      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+    }
+  });
+  
+  return sortedUsers;
+}
+
+/**
+ * Cria um novo utilizador via admin.
+ * @param {Object} userData - Dados do utilizador a ser criado.
+ * @return {Object} O utilizador criado.
+ */
+export function createUser(userData) {
+  const { 
+    username, 
+    email, 
+    password, 
+    pontos = 50, 
+    privacidade = 'N', 
+    admin = 'User' 
+  } = userData;
+  
+  // Validate required fields
+  if (!username || !email || !password) {
+    throw new Error('Username, email e password são obrigatórios');
+  }
+  
+  // Check if email already exists
+  if (users.some(user => user.email === email)) {
+    throw new Error(`Utilizador com email "${email}" já existe`);
+  }
+  
+  const isPrivate = privacidade === 'S';
+  const isAdmin = admin === 'Admin';
+  
+  // Create user object with the same structure as existing users
+  const newUser = {
+    id: getNextId(users),
+    username: username,
+    avatar: "", // Default empty avatar
+    pontos: parseInt(pontos) || 50,
+    email: email,
+    password: password,
+    isPrivate: isPrivate,
+    admin: isAdmin,
+    // Additional properties for compatibility
+    privacidade: privacidade,
+    newsletter: false,
+    preferences: {},
+    reservas: [],
+    favoritos: []
+  };
+  
+  users.push(newUser);
+  localStorage.setItem("user", JSON.stringify(users));
+  
+  return newUser;
 }
 
 // USER NEWSLETTER
@@ -463,10 +598,25 @@ export function getUserImage(username) {
 
 export function addReservation(userAdd, reservation){
   if (!userAdd.reservas) userAdd.reservas = [];
-  // Verifica se já existe reserva com o mesmo numeroVoo
+  
+  // Verifica se já existe reserva baseada no tipo
   if (reservation && reservation.numeroVoo && userAdd.reservas.some(r => r.numeroVoo == reservation.numeroVoo)) {
-    return false; // Já existe
+    return false; // Já existe voo
   }
+  
+  if (reservation && reservation.tipo === 'hotel' && reservation.id) {
+    // Check for duplicate hotel reservations with same id, checkIn and checkOut dates
+    const existingHotel = userAdd.reservas.find(r => 
+      r.tipo === 'hotel' && 
+      r.id == reservation.id && 
+      r.checkIn === reservation.checkIn && 
+      r.checkOut === reservation.checkOut
+    );
+    if (existingHotel) {
+      return false; // Já existe reserva de hotel para as mesmas datas
+    }
+  }
+  
   userAdd.reservas.push(reservation);
   update(userAdd.id, userAdd);
   return true; 
@@ -531,9 +681,70 @@ export function removeFavorite(user, item) {
   return false;
 }
 
-export function addPontos(user, pontos) {
+export function addPontos(user, pontos, description = "Pontos adicionados") {
   if (!user.pontos) user.pontos = 0;
-  user.pontos = parseInt(user.pontos, 10) + parseInt(pontos, 10);
+  
+  // Initialize movements array and add registration bonus if needed
+  if (!user.movimentosPontos) {
+    user.movimentosPontos = [];
+    
+    // If user has existing points but no movements, add the registration movement
+    if (user.pontos > 0) {
+      user.movimentosPontos.push({
+        data: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Set to yesterday
+        descricao: "Registo na plataforma",
+        valor: 50, // Registration bonus
+        saldoAnterior: 0,
+        saldoAtual: 50
+      });
+    }
+  }
+  
+  const pontosValue = parseInt(pontos, 10);
+  const saldoAnterior = parseInt(user.pontos, 10);
+  user.pontos = saldoAnterior + pontosValue;
+  
+  // Add movement record
+  user.movimentosPontos.push({
+    data: new Date().toISOString(),
+    descricao: description,
+    valor: pontosValue,
+    saldoAnterior: saldoAnterior,
+    saldoAtual: user.pontos
+  });
+}
+
+export function subtractPontos(user, pontos, description = "Pontos subtraídos") {
+  if (!user.pontos) user.pontos = 0;
+  
+  // Initialize movements array and add registration bonus if needed
+  if (!user.movimentosPontos) {
+    user.movimentosPontos = [];
+    
+    // If user has existing points but no movements, add the registration movement
+    if (user.pontos > 0) {
+      user.movimentosPontos.push({
+        data: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Set to yesterday
+        descricao: "Registo na plataforma",
+        valor: 50, // Registration bonus
+        saldoAnterior: 0,
+        saldoAtual: 50
+      });
+    }
+  }
+  
+  const pontosValue = parseInt(pontos, 10);
+  const saldoAnterior = parseInt(user.pontos, 10);
+  user.pontos = Math.max(0, saldoAnterior - pontosValue);
+  
+  // Add movement record
+  user.movimentosPontos.push({
+    data: new Date().toISOString(),
+    descricao: description,
+    valor: -pontosValue,
+    saldoAnterior: saldoAnterior,
+    saldoAtual: user.pontos
+  });
 }
 
 /**
@@ -566,8 +777,7 @@ class User {
   admin = false;
   preferences = {};
   reservas = [];
-  favoritos = [];
-  constructor(
+  favoritos = [];  constructor(
     username = "",
     password = "",
     email = "",
@@ -589,6 +799,17 @@ class User {
     // Initialize arrays for user data
     this.reservas = [];
     this.favoritos = [];
+    // Initialize movements array with registration bonus if points > 0
+    this.movimentosPontos = [];
+    if (this.pontos > 0) {
+      this.movimentosPontos.push({
+        data: new Date().toISOString(),
+        descricao: "Registo na plataforma",
+        valor: this.pontos,
+        saldoAnterior: 0,
+        saldoAtual: this.pontos
+      });
+    }
     // Set preferences object with newsletter preference
     this.preferences = {
       newsletter: newsletter
@@ -1090,20 +1311,17 @@ export function removeReservation(userId, reservationIndex) {
     // Check if reservation index is valid
     if (reservationIndex < 0 || reservationIndex >= user.reservas.length) {
       throw new Error("Reserva não encontrada");
-    }
+    }    // Get the reservation to remove
+    const reservationToRemove = user.reservas[reservationIndex];    // Check for points in different possible property names (flight uses pointsAR, hotel uses pontos)
+    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || parseInt(reservationToRemove.pontos) || 0;
 
-    // Get the reservation to remove
-    const reservationToRemove = user.reservas[reservationIndex];
-    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || 0;    // Remove the reservation
+    // Remove the reservation
     user.reservas.splice(reservationIndex, 1);
 
-    // Subtract points from user
-    user.pontos = parseInt(user.pontos || 0, 10) - pointsToSubtract;
-    
-    // Ensure points don't go below 0
-    if (user.pontos < 0) {
-      user.pontos = 0;
-    }
+    // Subtract points from user using the new function
+    const reservationType = reservationToRemove.tipo === 'hotel' ? 'hotel' : 'voo';
+    const description = `Cancelamento de reserva de ${reservationType}: ${reservationToRemove.nome || reservationToRemove.destino || 'Reserva'}`;
+    subtractPontos(user, pointsToSubtract, description);
 
     // Update user in users array
     users[userIndex] = user;
@@ -1146,6 +1364,47 @@ export function isFlightInFavorites(user, flightId) {
     (f.numeroVoo && f.numeroVoo == flightId) ||
     (f.nVoo && f.nVoo == flightId)
   );
+}
+
+export function getUserPointMovements(user) {
+  if (!user.movimentosPontos) {
+    user.movimentosPontos = [];
+  }
+  
+  // Check if we need to add initial movement
+  // This should only happen if user has points but no initial movement recorded
+  if (user.pontos && user.pontos > 0) {
+    const hasInitialMovement = user.movimentosPontos.some(movement => 
+      movement.descricao === "Pontos iniciais" || movement.descricao === "Registo na plataforma"
+    );
+    
+    if (!hasInitialMovement) {
+      // Calculate what the initial points should be by looking at the earliest balance
+      let initialPoints = 50; // Default registration bonus
+      
+      // If there are movements, calculate the initial points from the earliest movement
+      if (user.movimentosPontos.length > 0) {
+        // Sort movements by date (oldest first) to find the earliest balance
+        const sortedMovements = [...user.movimentosPontos].sort((a, b) => new Date(a.data) - new Date(b.data));
+        const earliestMovement = sortedMovements[0];
+        initialPoints = earliestMovement.saldoAnterior;
+      }
+      
+      // Only add initial movement if there were actually initial points
+      if (initialPoints > 0) {
+        user.movimentosPontos.push({
+          data: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Set to yesterday to ensure it appears first
+          descricao: "Registo na plataforma",
+          valor: initialPoints,
+          saldoAnterior: 0,
+          saldoAtual: initialPoints
+        });
+      }
+    }
+  }
+  
+  // Return movements sorted by date (most recent first)
+  return user.movimentosPontos.sort((a, b) => new Date(b.data) - new Date(a.data));
 }
 
 

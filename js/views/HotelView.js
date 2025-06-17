@@ -345,11 +345,13 @@ function diminuirHospedes() {
 }
 
 /**
- * Reserva um hotel com as informações fornecidas pelo usuário.
+ * Reserva um hotel e adiciona pontos ao utilizador
  * @param {Object} hotel - O objeto do hotel a ser reservado.
  * @returns {void}
  * @description
  * Coleta as informações de check-in, check-out e número de hóspedes do formulário.
+ * Se o utilizador estiver logado, adiciona pontos e salva a reserva.
+ * Se não estiver logado, oferece a opção de fazer login.
  * Exibe um toast de confirmação com os detalhes da reserva.
  * Marca o hotel como ocupado e atualiza o modelo de hotel.
  * Redireciona o usuário para a página principal após 2 segundos.
@@ -359,24 +361,79 @@ function reservar(hotel) {
   const checkOut = document.getElementById("check-out").value;
   const hospedes = document.getElementById("hospedes").value;
 
-  showToast(
-    "Reserva confirmada: " +
-      hotel.nome +
-      " de " +
-      checkIn +
-      " a " +
-      checkOut +
-      " para " +
-      hospedes +
-      " hóspedes."
-  );
+  if (!checkIn || !checkOut) {
+    showToast("Por favor, selecione as datas de check-in e check-out.", "error");
+    return;
+  }
+
+  User.init();
+  
+  if (User.isLogged()) {
+    const utilizador = User.getUserLogged();
+    
+    // Calculate points based on hotel price and number of nights
+    let pontos = 0;
+    if (checkIn && checkOut) {
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+      const noites = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+      pontos = Math.max(50, Math.round((hotel.custo || 100) * noites * 0.1)); // 10% of total cost as points, minimum 50
+    } else {
+      pontos = 100; // Default points if dates not available
+    }
+    
+    // Create reservation object for hotel
+    const hotelReservation = {
+      id: hotel.id,
+      tipo: 'hotel',
+      nome: hotel.nome,
+      destino: hotel.cidade || hotel.destino || 'Destino',
+      checkIn: checkIn,
+      checkOut: checkOut,
+      hospedes: hospedes,
+      custo: hotel.custo,
+      imagem: hotel.foto || hotel.imagem || "https://placehold.co/200x200",
+      pontos: pontos,
+      dataReserva: new Date().toISOString().split('T')[0]
+    };
+      // Add points and reservation
+    User.addPontos(utilizador, pontos, `Reserva de hotel: ${hotel.nome}`);
+    const adicionado = User.addReservation(utilizador, hotelReservation);
+    
+    if (adicionado) {
+      // Persist the change in the main users array
+      User.update(utilizador.id, utilizador);
+      
+      // Update session user
+      sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
+      
+      showToast(
+        `Reserva confirmada: ${hotel.nome} de ${checkIn} a ${checkOut} para ${hospedes} hóspedes. +${pontos} pontos!`,
+        "success"
+      );
+    } else {
+      showToast("Já tem uma reserva para este hotel nas mesmas datas.", "warning");
+      return;
+    }
+  } else {
+    // User not logged in - offer to login
+    showToast("Reserva confirmada: " + hotel.nome + " de " + checkIn + " a " + checkOut + " para " + hospedes + " hóspedes. Faça login para ganhar pontos!", "warning");
+    
+    setTimeout(() => {
+      const confirmLogin = confirm("Deseja fazer login para ganhar pontos e guardar esta reserva?");
+      if (confirmLogin) {
+        window.location.href = `_login.html?redirect=hotel.html?id=${hotel.id}`;
+        return;
+      }
+    }, 2000);
+  }
 
   //! hotel.occupy(); Este metodo só existe no modelo Hotel, não nos objetos init para consistensia de resultados está desativado
   HotelModel.update(hotel.id, hotel);
 
   setTimeout(() => {
     window.location.href = "../index.html";
-  }, 2000);
+  }, 3000);
 }
 
 /**

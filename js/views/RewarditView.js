@@ -354,15 +354,14 @@ async function updateUserAvatar() {
     const userAvatarElement = document.getElementById("userAvatar");
     
     if (!userAvatarElement) return;
-    
-    if (!isLogged()) {
+      if (!isLogged()) {
       // Avatar padrão para utilizador não logado
-      userAvatarElement.src = "img/users/default-avatar.png";
+      userAvatarElement.src = "https://placehold.co/80x80/6b7280/ffffff?text=U";
       return;
     }
-    
-    const user = getUserLogged();
-    const avatarUrl = getUserImage(user.username) || user.avatar || "img/users/default-avatar.png";
+      const user = getUserLogged();
+    const avatarUrl = getUserImage(user.username) || user.avatar || 
+      "https://placehold.co/80x80/6b7280/ffffff?text=" + encodeURIComponent((user.username || 'U').charAt(0).toUpperCase());
     
     userAvatarElement.src = avatarUrl;
     userAvatarElement.alt = `Avatar de ${user.username || 'Utilizador'}`;

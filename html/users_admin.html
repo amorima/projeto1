@@ -2,7 +2,20 @@
 <html lang="pt" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=d    <!-- Modal Adicionar -->
+    <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        
+        <!-- Modal Container -->
+        <div class="fixed inset-0 flex items-center justify-center px-4 py-8">
+            <!-- Modal Content -->
+            <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Novo Utilizador</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Preencha os dados do utilizador</p>
+                </div>nitial-scale=1.0">    
     <title>Gestão de Utilizadores - Planeador de Viagens</title>
     <link rel="icon" href="../img/favicon.svg" type="image/x-icon">
     
@@ -41,9 +54,8 @@
                         >
                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 text-xl">search</span>
                     </div>
-                    
-                    <button 
-                        onclick="openModal('modal-adicionar')" 
+                      <button 
+                        id="add-user-btn"
                         class="inline-flex items-center gap-2 px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors duration-200 min-h-[46px]"
                     >
                         <span class="material-symbols-outlined text-xl">add</span>
@@ -59,38 +71,36 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <tr>
-                            <th onclick="sortTableBy('username', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                        <tr>                            <th data-sort="username" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Nome de Utilizador</span>
                                     <span id="sort-icon-username" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('email', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="email" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Email</span>
                                     <span id="sort-icon-email" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
-                            </th>
-                            <th onclick="sortTableBy('points', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            </th>                            <th data-sort="pontos" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Pontos</span>
-                                    <span id="sort-icon-points" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
+                                    <span id="sort-icon-pontos" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('level', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="level" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Nível</span>
                                     <span id="sort-icon-level" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('private', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="isPrivate" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Privacidade</span>
-                                    <span id="sort-icon-private" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
+                                    <span id="sort-icon-isPrivate" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('admin', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="admin" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Tipo</span>
                                     <span id="sort-icon-admin" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
@@ -98,35 +108,8 @@
                             </th>
                             <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">Ações</th>
                         </tr>
-                    </thead>
-                    <tbody id="tableContent" class="divide-y divide-gray-200 dark:divide-gray-600">
-                        <!-- Exemplo de linha -->
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">joao_silva</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">joao@exemplo.com</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">1250</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">Bronze</td>
-                            <td class="px-6 py-4 text-sm">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                    Público
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                    Utilizador
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="p-1.5 text-primary hover:text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">
-                                        <span class="material-symbols-outlined text-lg">edit</span>
-                                    </button>
-                                    <button class="p-1.5 text-red-600 hover:text-red-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">
-                                        <span class="material-symbols-outlined text-lg">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                    </thead>                    <tbody id="tableContent" class="divide-y divide-gray-200 dark:divide-gray-600">
+                        <!-- Table content will be loaded dynamically -->
                     </tbody>
                 </table>
             </div>
@@ -156,16 +139,15 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Modal Adicionar -->
+    </div>    <!-- Modal Adicionar -->
     <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Overlay -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-            
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        
+        <!-- Modal Container -->
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
             <!-- Modal Content -->
-            <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+            <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl z-10">
                 <!-- Header -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Novo Utilizador</h3>
@@ -175,11 +157,11 @@
                 <!-- Form -->
                 <form id="add_user_form" class="space-y-4">
                     <input type="hidden" id="id">
-                    
-                    <div>
+                      <div>
                         <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome de Utilizador</label>
                         <input 
                             id="username" 
+                            name="username"
                             type="text" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             placeholder="Ex: joao_silva"
@@ -190,6 +172,7 @@
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                         <input 
                             id="email" 
+                            name="email"
                             type="email" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             placeholder="Ex: utilizador@exemplo.com"
@@ -200,6 +183,7 @@
                         <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                         <input 
                             id="password" 
+                            name="password"
                             type="password" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             placeholder="Insira a password"
@@ -210,6 +194,7 @@
                         <label for="points" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pontos Iniciais</label>
                         <input 
                             id="points" 
+                            name="points"
                             type="number" 
                             min="0"
                             value="50"
@@ -221,7 +206,7 @@
                         <div>
                             <label for="private" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Privacidade</label>
                             <div class="relative">
-                                <select id="private" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
+                                <select id="private" name="private" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
                                     <option value="N">Público</option>
                                     <option value="S">Privado</option>
                                 </select>
@@ -232,7 +217,7 @@
                         <div>
                             <label for="admin" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo</label>
                             <div class="relative">
-                                <select id="admin" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
+                                <select id="admin" name="admin" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
                                     <option value="User">Utilizador</option>
                                     <option value="Admin">Administrador</option>
                                 </select>
@@ -243,15 +228,14 @@
                 </form>
 
                 <!-- Actions -->
-                <div class="flex gap-3 mt-6">
-                    <button 
-                        onclick="closeModal('modal-adicionar','add_user_form','Adicionar Novo Utilizador',createUser)" 
+                <div class="flex gap-3 mt-6">                    <button 
+                        id="cancel-user-btn"
                         class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors duration-200"
                     >
                         Cancelar
                     </button>
                     <button 
-                        onclick="createUser()" 
+                        id="create-user-btn"
                         class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors duration-200"
                     >
                         <span class="material-symbols-outlined text-lg">add</span>
@@ -266,5 +250,6 @@
     
     <script type="module" src="../js/init.js" defer></script>
     <script type="module" src="../js/views/ViewHelpers.js"></script>
+    <script type="module" src="../js/views/UserAdminView.js"></script>
 </body>
 </html>

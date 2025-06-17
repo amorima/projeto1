@@ -41,9 +41,8 @@
                         >
                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 text-xl">search</span>
                     </div>
-                    
-                    <button 
-                        onclick="openModal('modal-adicionar')" 
+                      <button 
+                        id="add-hotel-btn"
                         class="inline-flex items-center gap-2 px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors duration-200 min-h-[46px]"
                     >
                         <span class="material-symbols-outlined text-xl">add</span>
@@ -59,98 +58,65 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <tr>
-                            <th onclick="sortTableBy('destinoId', hotelTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                        <tr>                            <th data-sort="destinoId" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Localização</span>
                                     <span id="sort-icon-destinoId" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('name', hotelTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="name" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Nome</span>
                                     <span id="sort-icon-name" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
-                            </th>
-                            <th onclick="sortTableBy('quartos', hotelTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            </th>                            <th data-sort="quartos" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
-                                    <span>Quartos</span>
+                                    <span>Tipo/Preço</span>
                                     <span id="sort-icon-quartos" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
                             <th class="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">Ações</th>
                         </tr>
-                    </thead>
-                    <tbody id="tableContent" class="divide-y divide-gray-200 dark:divide-gray-600">
-                        <!-- Exemplo de linha -->
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">Lisboa</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">Hotel Tivoli Oriente</td>
-                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">279</td>
-                            <td class="px-6 py-4 text-sm text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <button class="p-1.5 text-primary hover:text-primary-dark hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">
-                                        <span class="material-symbols-outlined text-lg">edit</span>
-                                    </button>
-                                    <button class="p-1.5 text-red-600 hover:text-red-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">
-                                        <span class="material-symbols-outlined text-lg">delete</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                    </thead>                    <tbody id="tableContent" class="divide-y divide-gray-200 dark:divide-gray-600">
+                        <!-- Dynamic content will be inserted here -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+            <!-- Pagination -->            <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
                 <div id="pagination-controls" class="flex items-center justify-between">
                     <div class="text-sm text-gray-700 dark:text-gray-300">
-                        A mostrar <span class="font-medium">1</span> a <span class="font-medium">10</span> de <span class="font-medium">97</span> resultados
+                        A mostrar <span class="font-medium">0</span> a <span class="font-medium">0</span> de <span class="font-medium">0</span> resultados
                     </div>
                     
                     <div class="flex items-center gap-1">
-                        <button class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-white dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-150">
-                            <span class="material-symbols-outlined text-lg">chevron_left</span>
-                        </button>
-                        
-                        <button class="px-3 py-2 text-sm font-medium text-white bg-primary rounded-lg">1</button>
-                        <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">2</button>
-                        <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">3</button>
-                        <span class="px-3 py-2 text-sm text-gray-500">...</span>
-                        <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors duration-150">89</button>
-                        
-                        <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-150">
-                            <span class="material-symbols-outlined text-lg">chevron_right</span>
-                        </button>
+                        <!-- Pagination buttons will be inserted here dynamically -->
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Modal Adicionar -->
+    </div>    <!-- Modal Adicionar -->
     <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Overlay -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-            
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+        
+        <!-- Modal Container -->
+        <div class="fixed inset-0 flex items-center justify-center px-4 py-8">
             <!-- Modal Content -->
-            <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+            <div class="relative w-full max-w-2xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
                 <!-- Header -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Novo Hotel</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Preencha os dados do hotel</p>
                 </div>
                 
-                <!-- Form -->
-                <form id="add_hotel_form" class="space-y-4">
+                <!-- Form -->                <form id="add_hotel_form" class="space-y-4">
                     <input type="hidden" id="id">
                     
                     <div>
                         <label for="destinoId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Localização</label>
                         <div class="relative">
-                            <select id="destinoId" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
+                            <select id="destinoId" name="destinoId" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
                                 <option value="">Selecionar...</option>
                             </select>
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 pointer-events-none">expand_more</span>
@@ -161,44 +127,96 @@
                         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do Hotel</label>
                         <input 
                             id="name" 
+                            name="name"
                             type="text" 
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                             placeholder="Ex: Hotel Tivoli Oriente"
                         />
-                    </div>
-
-                    <div>
-                        <label for="foto" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto</label>
+                    </div>                    <div>
+                        <label for="foto" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Foto do Hotel</label>
                         <input 
                             id="foto" 
+                            name="foto"
                             type="file" 
                             accept="image/*"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                         />
                     </div>
 
-                    <div>
-                        <label for="quartos" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número de Quartos</label>
-                        <input 
-                            id="quartos" 
-                            type="number" 
-                            min="1"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                            placeholder="Ex: 150"
-                        />
+                    <!-- Room Details Section -->
+                    <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+                        <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Detalhes do Quarto</h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="tipo" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo do Quarto</label>
+                                <input 
+                                    id="tipo" 
+                                    name="tipo"
+                                    type="text" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="Ex: Deluxe King"
+                                />
+                            </div>
+
+                            <div>
+                                <label for="camas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Número de Camas</label>
+                                <input 
+                                    id="camas" 
+                                    name="camas"
+                                    type="number" 
+                                    min="1"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="1"
+                                />
+                            </div>
+
+                            <div>
+                                <label for="capacidade" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Capacidade</label>
+                                <input 
+                                    id="capacidade" 
+                                    name="capacidade"
+                                    type="number" 
+                                    min="1"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="2"
+                                />
+                            </div>
+
+                            <div>
+                                <label for="precoNoite" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preço por Noite (€)</label>
+                                <input 
+                                    id="precoNoite" 
+                                    name="precoNoite"
+                                    type="number" 
+                                    min="0"
+                                    step="0.01"
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                    placeholder="150.00"
+                                />
+                            </div>
+                        </div>                        <div class="mt-4">
+                            <label for="descricao" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
+                            <textarea 
+                                id="descricao" 
+                                name="descricao"
+                                rows="3"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
+                                placeholder="Descrição do quarto..."
+                            ></textarea>
+                        </div>
                     </div>
                 </form>
 
                 <!-- Actions -->
-                <div class="flex gap-3 mt-6">
-                    <button 
-                        onclick="closeModal('modal-adicionar','add_hotel_form','Adicionar Novo Hotel',createHotel)" 
+                <div class="flex gap-3 mt-6">                    <button 
+                        id="cancel-hotel-btn"
                         class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors duration-200"
                     >
                         Cancelar
                     </button>
                     <button 
-                        onclick="createHotel()" 
+                        id="create-hotel-btn"
                         class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors duration-200"
                     >
                         <span class="material-symbols-outlined text-lg">add</span>
@@ -213,5 +231,6 @@
     
     <script type="module" src="../js/init.js" defer></script>
     <script type="module" src="../js/views/ViewHelpers.js"></script>
+    <script type="module" src="../js/views/HotelAdminView.js"></script>
 </body>
 </html>

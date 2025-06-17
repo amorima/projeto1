@@ -41,9 +41,8 @@
                         >
                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 text-xl">search</span>
                     </div>
-                    
-                    <button 
-                        onclick="openModal('modal-adicionar')" 
+                      <button 
+                        id="add-activity-btn"
                         class="inline-flex items-center gap-2 px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors duration-200 min-h-[46px]"
                     >
                         <span class="material-symbols-outlined text-xl">add</span>
@@ -59,32 +58,31 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <tr>
-                            <th onclick="sortTableBy('act_destinoId', activitiesTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                        <tr>                            <th data-sort="act_destinoId" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Localização</span>
                                     <span id="sort-icon-act_destinoId" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('act_turism', activitiesTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="act_turism" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Tipo de Turismo</span>
                                     <span id="sort-icon-act_turism" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('act_name', activitiesTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="act_name" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Nome</span>
                                     <span id="sort-icon-act_name" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('act_description', activitiesTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="act_description" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Descrição</span>
                                     <span id="sort-icon-act_description" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('act_acess', activitiesTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="act_acess" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Acessibilidade</span>
                                     <span id="sort-icon-act_acess" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
@@ -145,16 +143,14 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Modal Adicionar -->
+    </div>    <!-- Modal Adicionar -->
     <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Overlay -->
-            <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-            
+        <!-- Overlay -->
+        <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+          <!-- Modal Container -->
+        <div class="modal-container px-4 py-8">
             <!-- Modal Content -->
-            <div class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+            <div class="relative w-full max-w-md p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
                 <!-- Header -->
                 <div class="mb-6">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Nova Atividade</h3>
@@ -173,17 +169,24 @@
                             </select>
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 pointer-events-none">expand_more</span>
                         </div>
-                    </div>
-
-                    <div>
+                    </div>                    <div>
                         <label for="act_turism" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Turismo</label>
                         <div class="relative">
                             <select id="act_turism" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
                                 <option value="">Selecionar...</option>
-                                <option value="Cultural">Cultural</option>
-                                <option value="Natureza">Natureza</option>
-                                <option value="Aventura">Aventura</option>
-                                <option value="Gastronómico">Gastronómico</option>
+                                <option value="Turismo Cultural">Turismo Cultural</option>
+                                <option value="Turismo Urbano">Turismo Urbano</option>
+                                <option value="Turismo Gastronómico">Turismo Gastronómico</option>
+                                <option value="Turismo Histórico">Turismo Histórico</option>
+                                <option value="Enoturismo">Enoturismo</option>
+                                <option value="Turismo de Natureza">Turismo de Natureza</option>
+                                <option value="Turismo de Aventura">Turismo de Aventura</option>
+                                <option value="Turismo Rural">Turismo Rural</option>
+                                <option value="Turismo Religioso">Turismo Religioso</option>
+                                <option value="Turismo de Bem-estar">Turismo de Bem-estar</option>
+                                <option value="Turismo de Negócios">Turismo de Negócios</option>
+                                <option value="Turismo de Praia">Turismo de Praia</option>
+                                <option value="Ecoturismo">Ecoturismo</option>
                             </select>
                             <span class="absolute right-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 pointer-events-none">expand_more</span>
                         </div>
@@ -207,31 +210,51 @@
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 resize-none"
                             placeholder="Descrição da atividade..."
                         ></textarea>
-                    </div>
-
-                    <div>
-                        <label for="act_acess" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Acessibilidade</label>
-                        <div class="relative">
-                            <select id="act_acess" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent appearance-none transition-all duration-200">
-                                <option value="Acessível">Acessível</option>
-                                <option value="Parcialmente Acessível">Parcialmente Acessível</option>
-                                <option value="Não Acessível">Não Acessível</option>
-                            </select>
-                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 pointer-events-none">expand_more</span>
+                    </div>                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Acessibilidade</label>
+                        <div class="space-y-2">
+                            <div class="flex flex-wrap gap-2" id="selected-accessibility">
+                                <!-- Selected accessibility options will appear here -->
+                            </div>
+                            <div class="flex gap-2">
+                                <select id="accessibility-select" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
+                                    <option value="">Selecionar opção de acessibilidade...</option>
+                                    <option value="Acesso Sem Degraus">Acesso Sem Degraus</option>
+                                    <option value="Elevadores Disponíveis">Elevadores Disponíveis</option>
+                                    <option value="Casas de Banho Adaptadas">Casas de Banho Adaptadas</option>
+                                    <option value="Transporte Acessível">Transporte Acessível</option>
+                                    <option value="Ambientes Sensoriais Calmos">Ambientes Sensoriais Calmos</option>
+                                    <option value="Opções Alimentares Específicas">Opções Alimentares Específicas</option>
+                                    <option value="Acesso Sem Degraus (limitado)">Acesso Sem Degraus (limitado)</option>
+                                    <option value="Acesso Sem Degraus (parcial)">Acesso Sem Degraus (parcial)</option>
+                                    <option value="Elevadores Disponíveis (parcial)">Elevadores Disponíveis (parcial)</option>
+                                    <option value="Transporte Acessível (limitado)">Transporte Acessível (limitado)</option>
+                                    <option value="Muitos degraus">Muitos degraus</option>
+                                    <option value="Percurso com subidas">Percurso com subidas</option>
+                                    <option value="Multidões">Multidões</option>
+                                    <option value="Não especificado">Não especificado</option>
+                                </select>
+                                <button 
+                                    type="button" 
+                                    id="add-accessibility-btn"
+                                    class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200"
+                                >
+                                    <span class="material-symbols-outlined text-lg">add</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
 
                 <!-- Actions -->
-                <div class="flex gap-3 mt-6">
-                    <button 
-                        onclick="closeModal('modal-adicionar','add_activitie_form','Adicionar Nova Atividade',createActivitie)" 
+                <div class="flex gap-3 mt-6">                    <button 
+                        id="cancel-activity-btn"
                         class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors duration-200"
                     >
                         Cancelar
                     </button>
                     <button 
-                        onclick="createActivitie()" 
+                        id="create-activity-btn"
                         class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors duration-200"
                     >
                         <span class="material-symbols-outlined text-lg">add</span>
@@ -246,5 +269,6 @@
     
     <script type="module" src="../js/init.js" defer></script>
     <script type="module" src="../js/views/ViewHelpers.js"></script>
+    <script type="module" src="../js/views/ActivityAdminView.js"></script>
 </body>
 </html>

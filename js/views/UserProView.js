@@ -65,27 +65,50 @@ function setupEventListeners() {
   const editProfileBtn = document.getElementById("btn-editar-perfil");
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", openEditProfileModal);
-  }
-
-  /* Botão para movimentos de pontos */
+  }  /* Botão para movimentos de pontos */
   const btnMovimentos = document.getElementById("btn-movimentos");
   const modalPontos = document.getElementById("pontos-modal");
-  const closeModalBtn = document.getElementById("close-pontos-modal");
 
-  if (btnMovimentos && modalPontos && closeModalBtn) {
-    btnMovimentos.addEventListener("click", function () {
-      modalPontos.classList.remove("hidden");
-    });
+  console.log("Searching for modal elements:", { 
+    btnMovimentos: btnMovimentos ? "found" : "not found", 
+    modalPontos: modalPontos ? "found" : "not found" 
+  });
 
-    closeModalBtn.addEventListener("click", function () {
-      modalPontos.classList.add("hidden");
-    });
-
+  if (btnMovimentos && modalPontos) {
+    console.log("Setting up points modal event listeners");    btnMovimentos.addEventListener("click", function () {
+      console.log("Points button clicked");
+      console.log("Modal current classes:", modalPontos.className);
+      try {
+        loadPointMovements();
+        modalPontos.classList.remove("hidden");
+        modalPontos.style.display = "block"; // Force display
+        modalPontos.style.zIndex = "9999"; // Ensure high z-index
+        document.body.style.overflow = "hidden"; // Prevent background scroll
+        console.log("Modal classes after opening:", modalPontos.className);
+        console.log("Modal style display:", modalPontos.style.display);
+        console.log("Modal should be visible now");
+      } catch (error) {
+        console.error("Error loading point movements:", error);
+      }
+    });    // Close modal when clicking outside
     window.addEventListener("click", function (e) {
       if (e.target === modalPontos) {
         modalPontos.classList.add("hidden");
+        modalPontos.style.display = ""; // Reset inline style
+        document.body.style.overflow = ""; // Restore scroll
       }
     });
+
+    // Close modal with ESC key
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !modalPontos.classList.contains("hidden")) {
+        modalPontos.classList.add("hidden");
+        modalPontos.style.display = ""; // Reset inline style
+        document.body.style.overflow = ""; // Restore scroll
+      }
+    });
+  } else {
+    console.log("Modal elements not found:", { btnMovimentos, modalPontos });
   }
   /* Botão de copiar link de convite */
   const btnCopy = document.querySelector("button.bg-Button-Main.rounded-r-lg");
@@ -155,7 +178,7 @@ function loadUserInfo() {
   const levelIcon = getLevelSymbol(userLevel);
   document.querySelector(
     ".absolute.bottom-0.right-0 .material-symbols-outlined"
-  ).textContent = levelIcon; /* Atualizar avatar */
+  ).textContent = levelIcon;  /* Atualizar avatar */
   const avatarElement = document.getElementById("user-avatar");
   if (avatarElement) {
     if (user.avatar && user.avatar !== "") {
@@ -165,10 +188,10 @@ function loadUserInfo() {
         : `..${user.avatar}`;
       avatarElement.src = avatarPath;
     } else {
-      /* Se não tem avatar, usar uma imagem padrão */
-      avatarElement.src = "../img/users/40240119.jpg";
+      /* Se não tem avatar, usar um placeholder */
+      avatarElement.src = "https://placehold.co/80x80/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
     }
-  } /* Atualizar navbar após carregar os dados */
+  }/* Atualizar navbar após carregar os dados */
   updateNavbarUser();
   /* Preencher informações pessoais */
   if (document.getElementById("info-username"))
@@ -216,8 +239,13 @@ function loadUserInfo() {
 function populateSettingsForm(user) {
   // Avatar nas definições
   const settingsAvatar = document.getElementById("settings-avatar");
-  if (settingsAvatar && user.avatar) {
-    settingsAvatar.src = user.avatar;
+  if (settingsAvatar) {
+    if (user.avatar && user.avatar !== "") {
+      settingsAvatar.src = user.avatar;
+    } else {
+      /* Se não tem avatar, usar um placeholder */
+      settingsAvatar.src = "https://placehold.co/96x96/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
+    }
   }
 
   /* Campos de dados pessoais */
@@ -1087,19 +1115,25 @@ function loadReservas(user) {
   } else {
     if (emptyDiv) emptyDiv.classList.add("hidden");
   }
+  
   user.reservas.forEach((reserva, idx) => {
     const card = document.createElement("div");
     card.className =
       "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl w-full mb-6 cursor-pointer hover:shadow-lg transition-shadow";
-      // Add click event to navigate to flight itinerary
+      
+    // Add click event based on reservation type
     card.addEventListener("click", function(e) {
       // Don't navigate if clicking the delete button
       if (e.target.closest('.delete-reservation-btn')) {
         return;
       }
       
-      // Navigate to flight itinerary with the reservation ID
-      window.location.href = `flight_itinerary.html?id=${(reserva.numeroVoo || '')}`;
+      // Navigate based on reservation type
+      if (reserva.tipo === 'hotel') {
+        window.location.href = `hotel.html?id=${reserva.id}`;
+      } else if (reserva.numeroVoo) {
+        window.location.href = `flight_itinerary.html?id=${reserva.numeroVoo}`;
+      }
     });
 
     // Botão de apagar
@@ -1117,80 +1151,97 @@ function loadReservas(user) {
       "h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover";
     img.src = reserva.imagem || "https://placehold.co/200x200";
     img.alt = "Imagem promocional";
-    card.appendChild(img);
-
-    // Área do conteúdo
+    card.appendChild(img);    // Área do conteúdo
     const content = document.createElement("div");
     content.className = "flex flex-row items-center justify-between flex-1 p-4 w-full";
 
-    // Itinerário (lado esquerdo)
+    // Itinerário (lado esquerdo) - give more space for hotel reservations
     const itinerary = document.createElement("div");
-    itinerary.className = "flex flex-col gap-2 text-left flex-1";
+    if (reserva.tipo === 'hotel') {
+      itinerary.className = "flex flex-col gap-2 text-left w-full"; // Full width for hotels
+    } else {
+      itinerary.className = "flex flex-col gap-2 text-left flex-1"; // Original for flights
+    }
 
     // Destino em destaque
     itinerary.innerHTML = `<span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">${reserva.destino || 'Destino'}</span>`;
 
-    // Ida
-    if (reserva.partida && reserva.origem && reserva.chegada && reserva.destino) {
-      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.partida} (${reserva.origem}) » ${reserva.chegada} (${reserva.destino})</span>`;
+    // Display based on reservation type
+    if (reserva.tipo === 'hotel') {
+      // Hotel reservation display
+      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Hotel: ${reserva.nome || 'Hotel'}</span>`;
+      
+      if (reserva.checkIn && reserva.checkOut) {
+        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Check-in: ${reserva.checkIn} | Check-out: ${reserva.checkOut}</span>`;
+      }
+        if (reserva.hospedes) {
+        itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">${reserva.hospedes} hóspedes</span>`;
+      }
     } else {
-      itinerary.innerHTML += `<span class="text-xs text-red-500">Faltam dados de ida</span>`;
-    }
+      // Flight reservation display (original logic)
+      if (reserva.partida && reserva.origem && reserva.chegada && reserva.destino) {
+        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.partida} (${reserva.origem}) » ${reserva.chegada} (${reserva.destino})</span>`;
+      } else {
+        itinerary.innerHTML += `<span class="text-xs text-red-500">Faltam dados de ida</span>`;
+      }
 
-    // Volta
-    if (reserva.dataVolta && reserva.destino && reserva.origem) {
-      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.dataVolta} (${reserva.destino}) » ? (${reserva.origem})</span>`;
-    }
+      // Volta
+      if (reserva.dataVolta && reserva.destino && reserva.origem) {
+        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.dataVolta} (${reserva.destino}) » ? (${reserva.origem})</span>`;
+      }
 
-    // Voo
-    if (reserva.numeroVoo) {
-      itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo ${reserva.numeroVoo}</span>`;
-    }
+      // Voo
+      if (reserva.numeroVoo) {
+        itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo ${reserva.numeroVoo}</span>`;
+      }
+    }    content.appendChild(itinerary);
 
-    content.appendChild(itinerary);
-
-    // Imagem da companhia aérea (lado direito)
-    const companhiaDiv = document.createElement("div");
-    companhiaDiv.className = "pl-4 flex-shrink-0 flex items-center";
-    let companhiaImgSrc = "";
-    // Tenta usar um ícone da companhia se existir, senão usa um placeholder
-    if (reserva.companhia && typeof reserva.companhia === 'string') {
-      // Exemplo de correspondência simples para TAP, Ryanair, etc.
-      const companhiaMap = {
-        'TAP': '../img/icons/ca_tap.jpg',
-        'Brussels Airlines': '../img/icons/ca_brussels.png',
-        'Ryanair': '../img/icons/ca_ryanair.jpg',
-        'KLM': '../img/icons/ca_klm.png',
-        'Air France': '../img/icons/ca_air_france.jpg',
-        'Swiss': '../img/icons/ca_swiss.png',
-        'Vueling': '../img/icons/ca_vueling.png',
-        'Wizz Air': '../img/icons/ca_wizz.png',
-        'Norwegian': '../img/icons/ca_Norwegian.png',
-        'British Airways': '../img/icons/ca_british_airways.jpg',
-        'Alitalia': '../img/icons/ca_alitalia.png',
-        'Austrian': '../img/icons/ca_Austrian.png',
-        'SAS': '../img/icons/ca_sas.png',
-        'LOT': '../img/icons/ca_LOT.png',
-        'ITA': '../img/icons/ca_ITA.png',
-        'Tarom': '../img/icons/ca-tarom.jpg',
-      };
-      for (const key in companhiaMap) {
-        if (reserva.companhia.toLowerCase().includes(key.toLowerCase())) {
-          companhiaImgSrc = companhiaMap[key];
-          break;
+    // Icon/Logo (lado direito) - only for flights, not hotels
+    if (reserva.tipo !== 'hotel') {
+      const iconDiv = document.createElement("div");
+      iconDiv.className = "pl-4 flex-shrink-0 flex items-center";
+      
+      // Airline logo (original logic)
+      let companhiaImgSrc = "";
+      // Tenta usar um ícone da companhia se existir, senão usa um placeholder
+      if (reserva.companhia && typeof reserva.companhia === 'string') {
+        // Exemplo de correspondência simples para TAP, Ryanair, etc.
+        const companhiaMap = {
+          'TAP': '../img/icons/ca_tap.jpg',
+          'Brussels Airlines': '../img/icons/ca_brussels.png',
+          'Ryanair': '../img/icons/ca_ryanair.jpg',
+          'KLM': '../img/icons/ca_klm.png',
+          'Air France': '../img/icons/ca_air_france.jpg',
+          'Swiss': '../img/icons/ca_swiss.png',
+          'Vueling': '../img/icons/ca_vueling.png',
+          'Wizz Air': '../img/icons/ca_wizz.png',
+          'Norwegian': '../img/icons/ca_Norwegian.png',
+          'British Airways': '../img/icons/ca_british_airways.jpg',
+          'Alitalia': '../img/icons/ca_alitalia.png',
+          'Austrian': '../img/icons/ca_Austrian.png',
+          'SAS': '../img/icons/ca_sas.png',
+          'LOT': '../img/icons/ca_LOT.png',
+          'ITA': '../img/icons/ca_ITA.png',
+          'Tarom': '../img/icons/ca-tarom.jpg',
+        };
+        for (const key in companhiaMap) {
+          if (reserva.companhia.toLowerCase().includes(key.toLowerCase())) {
+            companhiaImgSrc = companhiaMap[key];
+            break;
+          }
         }
       }
+      if (!companhiaImgSrc) {
+        companhiaImgSrc = "https://placehold.co/64x64?text=Airline";
+      }
+      const companhiaImg = document.createElement("img");
+      companhiaImg.className = "w-16 h-16 rounded-full object-cover";
+      companhiaImg.src = companhiaImgSrc;
+      companhiaImg.alt = reserva.companhia || "Companhia aérea";
+      iconDiv.appendChild(companhiaImg);
+      
+      content.appendChild(iconDiv);
     }
-    if (!companhiaImgSrc) {
-      companhiaImgSrc = "https://placehold.co/64x64?text=Airline";
-    }
-    const companhiaImg = document.createElement("img");
-    companhiaImg.className = "w-16 h-16 rounded-full object-cover";
-    companhiaImg.src = companhiaImgSrc;
-    companhiaImg.alt = reserva.companhia || "Companhia aérea";
-    companhiaDiv.appendChild(companhiaImg);
-    content.appendChild(companhiaDiv);
-
     card.appendChild(content);
     container.appendChild(card);
   });
@@ -1401,4 +1452,100 @@ function loadFavoritos(user) {
 
   // Final debug
   console.log(`[Favoritos] Rendered ${user.favoritos.length} favorite(s).`);
+}
+
+/* Load and display point movements in the modal */
+function loadPointMovements() {
+  console.log("loadPointMovements called");
+  const user = UserModel.getUserLogged();
+  if (!user) {
+    console.log("No user logged in");
+    return;
+  }
+
+  console.log("User found:", user.username);
+  const movements = UserModel.getUserPointMovements(user);
+  console.log("Point movements:", movements);
+  
+  const modalContent = document.querySelector("#pontos-modal .inline-block");
+  console.log("Modal content element found:", modalContent ? "yes" : "no");
+  
+  if (!modalContent) return;
+
+  modalContent.innerHTML = `
+    <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-600">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        Movimentos de Pontos
+      </h3>
+      <button id="close-pontos-modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+        <span class="material-symbols-outlined">close</span>
+        <span class="sr-only">Fechar modal</span>
+      </button>
+    </div>
+    
+    <div class="mt-4">
+      <div class="mb-4 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-cyan-800 dark:text-cyan-200">Saldo Atual</span>
+          <span class="text-2xl font-bold text-cyan-800 dark:text-cyan-200">${user.pontos || 0} pontos</span>
+        </div>
+      </div>
+      
+      ${movements.length === 0 ? 
+        '<div class="text-center py-8 text-gray-500 dark:text-gray-400">Nenhum movimento de pontos encontrado</div>' :
+        `<div class="max-h-96 overflow-y-auto">
+          ${movements.map(movement => `
+            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-600 last:border-b-0">
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                  ${movement.descricao}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                  ${formatMovementDate(movement.data)}
+                </div>
+              </div>
+              <div class="flex flex-col items-end ml-4">
+                <span class="text-sm font-semibold ${movement.valor >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                  ${movement.valor >= 0 ? '+' : ''}${movement.valor} pts
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  Saldo: ${movement.saldoAtual} pts
+                </span>
+              </div>
+            </div>
+          `).join('')}
+        </div>`
+      }
+    </div>
+  `;  // Reattach close button event listener
+  const newCloseBtn = document.getElementById("close-pontos-modal");
+  if (newCloseBtn) {
+    newCloseBtn.addEventListener("click", function () {
+      const modal = document.getElementById("pontos-modal");
+      modal.classList.add("hidden");
+      modal.style.display = ""; // Reset inline style
+      document.body.style.overflow = ""; // Restore scroll
+    });
+  }
+}
+
+/* Format movement date for display */
+function formatMovementDate(dateStr) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffInHours = (now - date) / (1000 * 60 * 60);
+  
+  if (diffInHours < 24) {
+    return `Hoje às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
+  } else if (diffInHours < 48) {
+    return `Ontem às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
+  } else {
+    return date.toLocaleDateString('pt-PT', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 }

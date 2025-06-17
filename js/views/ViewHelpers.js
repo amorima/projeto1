@@ -141,13 +141,31 @@ export function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
   modal.classList.remove("hidden");
-  modal.classList.add("flex");
+  // Prevent body scroll when modal is open
+  document.body.style.overflow = 'hidden';
 }
 
 export function closeModal(modalId, formId, modalTitle) {
-  document.getElementById(modalId).classList.add("hidden");
-  document.getElementById(formId).reset();
-  document.querySelector(`#${modalId} h2`).innerText = modalTitle;
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+  
+  const form = document.getElementById(formId);
+  if (form) {
+    form.reset();
+  }
+  
+  // Look for h2, h3, or any heading element and update the title
+  if (modalTitle) {
+    const heading = modal?.querySelector('h2, h3, h1, h4, h5, h6');
+    if (heading) {
+      heading.innerText = modalTitle;
+    }
+  }
 }
 
 export function selectOptions(items, selectId) {
