@@ -65,27 +65,50 @@ function setupEventListeners() {
   const editProfileBtn = document.getElementById("btn-editar-perfil");
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", openEditProfileModal);
-  }
-
-  /* Botão para movimentos de pontos */
+  }  /* Botão para movimentos de pontos */
   const btnMovimentos = document.getElementById("btn-movimentos");
   const modalPontos = document.getElementById("pontos-modal");
-  const closeModalBtn = document.getElementById("close-pontos-modal");
 
-  if (btnMovimentos && modalPontos && closeModalBtn) {
-    btnMovimentos.addEventListener("click", function () {
-      modalPontos.classList.remove("hidden");
-    });
+  console.log("Searching for modal elements:", { 
+    btnMovimentos: btnMovimentos ? "found" : "not found", 
+    modalPontos: modalPontos ? "found" : "not found" 
+  });
 
-    closeModalBtn.addEventListener("click", function () {
-      modalPontos.classList.add("hidden");
-    });
-
+  if (btnMovimentos && modalPontos) {
+    console.log("Setting up points modal event listeners");    btnMovimentos.addEventListener("click", function () {
+      console.log("Points button clicked");
+      console.log("Modal current classes:", modalPontos.className);
+      try {
+        loadPointMovements();
+        modalPontos.classList.remove("hidden");
+        modalPontos.style.display = "block"; // Force display
+        modalPontos.style.zIndex = "9999"; // Ensure high z-index
+        document.body.style.overflow = "hidden"; // Prevent background scroll
+        console.log("Modal classes after opening:", modalPontos.className);
+        console.log("Modal style display:", modalPontos.style.display);
+        console.log("Modal should be visible now");
+      } catch (error) {
+        console.error("Error loading point movements:", error);
+      }
+    });    // Close modal when clicking outside
     window.addEventListener("click", function (e) {
       if (e.target === modalPontos) {
         modalPontos.classList.add("hidden");
+        modalPontos.style.display = ""; // Reset inline style
+        document.body.style.overflow = ""; // Restore scroll
       }
     });
+
+    // Close modal with ESC key
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !modalPontos.classList.contains("hidden")) {
+        modalPontos.classList.add("hidden");
+        modalPontos.style.display = ""; // Reset inline style
+        document.body.style.overflow = ""; // Restore scroll
+      }
+    });
+  } else {
+    console.log("Modal elements not found:", { btnMovimentos, modalPontos });
   }
   /* Botão de copiar link de convite */
   const btnCopy = document.querySelector("button.bg-Button-Main.rounded-r-lg");
@@ -1424,4 +1447,100 @@ function loadFavoritos(user) {
 
   // Final debug
   console.log(`[Favoritos] Rendered ${user.favoritos.length} favorite(s).`);
+}
+
+/* Load and display point movements in the modal */
+function loadPointMovements() {
+  console.log("loadPointMovements called");
+  const user = UserModel.getUserLogged();
+  if (!user) {
+    console.log("No user logged in");
+    return;
+  }
+
+  console.log("User found:", user.username);
+  const movements = UserModel.getUserPointMovements(user);
+  console.log("Point movements:", movements);
+  
+  const modalContent = document.querySelector("#pontos-modal .inline-block");
+  console.log("Modal content element found:", modalContent ? "yes" : "no");
+  
+  if (!modalContent) return;
+
+  modalContent.innerHTML = `
+    <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-600">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        Movimentos de Pontos
+      </h3>
+      <button id="close-pontos-modal" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white">
+        <span class="material-symbols-outlined">close</span>
+        <span class="sr-only">Fechar modal</span>
+      </button>
+    </div>
+    
+    <div class="mt-4">
+      <div class="mb-4 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-cyan-800 dark:text-cyan-200">Saldo Atual</span>
+          <span class="text-2xl font-bold text-cyan-800 dark:text-cyan-200">${user.pontos || 0} pontos</span>
+        </div>
+      </div>
+      
+      ${movements.length === 0 ? 
+        '<div class="text-center py-8 text-gray-500 dark:text-gray-400">Nenhum movimento de pontos encontrado</div>' :
+        `<div class="max-h-96 overflow-y-auto">
+          ${movements.map(movement => `
+            <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-600 last:border-b-0">
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                  ${movement.descricao}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                  ${formatMovementDate(movement.data)}
+                </div>
+              </div>
+              <div class="flex flex-col items-end ml-4">
+                <span class="text-sm font-semibold ${movement.valor >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                  ${movement.valor >= 0 ? '+' : ''}${movement.valor} pts
+                </span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  Saldo: ${movement.saldoAtual} pts
+                </span>
+              </div>
+            </div>
+          `).join('')}
+        </div>`
+      }
+    </div>
+  `;  // Reattach close button event listener
+  const newCloseBtn = document.getElementById("close-pontos-modal");
+  if (newCloseBtn) {
+    newCloseBtn.addEventListener("click", function () {
+      const modal = document.getElementById("pontos-modal");
+      modal.classList.add("hidden");
+      modal.style.display = ""; // Reset inline style
+      document.body.style.overflow = ""; // Restore scroll
+    });
+  }
+}
+
+/* Format movement date for display */
+function formatMovementDate(dateStr) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffInHours = (now - date) / (1000 * 60 * 60);
+  
+  if (diffInHours < 24) {
+    return `Hoje às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
+  } else if (diffInHours < 48) {
+    return `Ontem às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
+  } else {
+    return date.toLocaleDateString('pt-PT', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
 }

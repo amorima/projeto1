@@ -396,9 +396,8 @@ function reservar(hotel) {
       pontos: pontos,
       dataReserva: new Date().toISOString().split('T')[0]
     };
-    
-    // Add points and reservation
-    User.addPontos(utilizador, pontos);
+      // Add points and reservation
+    User.addPontos(utilizador, pontos, `Reserva de hotel: ${hotel.nome}`);
     const adicionado = User.addReservation(utilizador, hotelReservation);
     
     if (adicionado) {

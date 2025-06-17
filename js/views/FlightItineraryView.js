@@ -53,10 +53,10 @@ if (btnReservar) {
   btnReservar.onclick = function () {
     console.log("hello?")
     if(User.isLogged()){
-      console.log("hello?")
+      console.log("hello?");
       const utilizador = User.getUserLogged();
       const pontos = Number(document.getElementById("pontos-add").textContent);
-      User.addPontos(utilizador, pontos);
+      User.addPontos(utilizador, pontos, `Reserva de voo: ${vooShallow.destino || 'Voo'}`);
       User.addReservation(utilizador, vooShallow);
       // Persist the change in the main users array
       User.update(utilizador.id, utilizador);
@@ -537,10 +537,9 @@ function atualizarSidebarVoo(voo) {
     btnReservar.onclick = function () {
       
       User.init();
-      if(User.isLogged()){
-        const utilizador = User.getUserLogged();
+      if(User.isLogged()){        const utilizador = User.getUserLogged();
         const pontos = Number(document.getElementById("pontos-add").textContent)
-        User.addPontos(utilizador, pontos);
+        User.addPontos(utilizador, pontos, `Reserva de voo: ${vooShallow.destino || 'Voo'}`);
         User.addReservation(utilizador, vooShallow);
         // Persist the change in the main users array
         User.update(utilizador.id, utilizador);

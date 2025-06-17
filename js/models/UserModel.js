@@ -681,9 +681,39 @@ export function removeFavorite(user, item) {
   return false;
 }
 
-export function addPontos(user, pontos) {
+export function addPontos(user, pontos, description = "Pontos adicionados") {
   if (!user.pontos) user.pontos = 0;
-  user.pontos = parseInt(user.pontos, 10) + parseInt(pontos, 10);
+  if (!user.movimentosPontos) user.movimentosPontos = [];
+  
+  const pontosValue = parseInt(pontos, 10);
+  user.pontos = parseInt(user.pontos, 10) + pontosValue;
+  
+  // Add movement record
+  user.movimentosPontos.push({
+    data: new Date().toISOString(),
+    descricao: description,
+    valor: pontosValue,
+    saldoAnterior: user.pontos - pontosValue,
+    saldoAtual: user.pontos
+  });
+}
+
+export function subtractPontos(user, pontos, description = "Pontos subtraídos") {
+  if (!user.pontos) user.pontos = 0;
+  if (!user.movimentosPontos) user.movimentosPontos = [];
+  
+  const pontosValue = parseInt(pontos, 10);
+  const saldoAnterior = parseInt(user.pontos, 10);
+  user.pontos = Math.max(0, saldoAnterior - pontosValue);
+  
+  // Add movement record
+  user.movimentosPontos.push({
+    data: new Date().toISOString(),
+    descricao: description,
+    valor: -pontosValue,
+    saldoAnterior: saldoAnterior,
+    saldoAtual: user.pontos
+  });
 }
 
 /**
@@ -1241,18 +1271,16 @@ export function removeReservation(userId, reservationIndex) {
     if (reservationIndex < 0 || reservationIndex >= user.reservas.length) {
       throw new Error("Reserva não encontrada");
     }    // Get the reservation to remove
-    const reservationToRemove = user.reservas[reservationIndex];
-    // Check for points in different possible property names (flight uses pointsAR, hotel uses pontos)
-    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || parseInt(reservationToRemove.pontos) || 0;// Remove the reservation
+    const reservationToRemove = user.reservas[reservationIndex];    // Check for points in different possible property names (flight uses pointsAR, hotel uses pontos)
+    const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || parseInt(reservationToRemove.pontos) || 0;
+
+    // Remove the reservation
     user.reservas.splice(reservationIndex, 1);
 
-    // Subtract points from user
-    user.pontos = parseInt(user.pontos || 0, 10) - pointsToSubtract;
-    
-    // Ensure points don't go below 0
-    if (user.pontos < 0) {
-      user.pontos = 0;
-    }
+    // Subtract points from user using the new function
+    const reservationType = reservationToRemove.tipo === 'hotel' ? 'hotel' : 'voo';
+    const description = `Cancelamento de reserva de ${reservationType}: ${reservationToRemove.nome || reservationToRemove.destino || 'Reserva'}`;
+    subtractPontos(user, pointsToSubtract, description);
 
     // Update user in users array
     users[userIndex] = user;
@@ -1295,6 +1323,25 @@ export function isFlightInFavorites(user, flightId) {
     (f.numeroVoo && f.numeroVoo == flightId) ||
     (f.nVoo && f.nVoo == flightId)
   );
+}
+
+export function getUserPointMovements(user) {
+  if (!user.movimentosPontos) {
+    user.movimentosPontos = [];
+    // Add initial movement if user has points
+    if (user.pontos && user.pontos > 0) {
+      user.movimentosPontos.push({
+        data: new Date().toISOString(),
+        descricao: "Pontos iniciais",
+        valor: user.pontos,
+        saldoAnterior: 0,
+        saldoAtual: user.pontos
+      });
+    }
+  }
+  
+  // Return movements sorted by date (most recent first)
+  return user.movimentosPontos.sort((a, b) => new Date(b.data) - new Date(a.data));
 }
 
 
