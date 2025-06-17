@@ -41,9 +41,8 @@
                         >
                         <span class="absolute left-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 text-xl">search</span>
                     </div>
-                    
-                    <button 
-                        onclick="openModal('modal-adicionar')" 
+                      <button 
+                        id="add-user-btn"
                         class="inline-flex items-center gap-2 px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors duration-200 min-h-[46px]"
                     >
                         <span class="material-symbols-outlined text-xl">add</span>
@@ -59,38 +58,37 @@
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
-                        <tr>
-                            <th onclick="sortTableBy('username', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                        <tr>                            <th data-sort="username" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Nome de Utilizador</span>
                                     <span id="sort-icon-username" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('email', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="email" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Email</span>
                                     <span id="sort-icon-email" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('points', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="points" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Pontos</span>
                                     <span id="sort-icon-points" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('level', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="level" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Nível</span>
                                     <span id="sort-icon-level" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('private', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="private" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Privacidade</span>
                                     <span id="sort-icon-private" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
                                 </div>
                             </th>
-                            <th onclick="sortTableBy('admin', userTableConfig)" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                            <th data-sort="admin" class="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                                 <div class="flex items-center gap-2">
                                     <span>Tipo</span>
                                     <span id="sort-icon-admin" class="material-symbols-outlined text-gray-400 text-lg">unfold_more</span>
@@ -243,15 +241,14 @@
                 </form>
 
                 <!-- Actions -->
-                <div class="flex gap-3 mt-6">
-                    <button 
-                        onclick="closeModal('modal-adicionar','add_user_form','Adicionar Novo Utilizador',createUser)" 
+                <div class="flex gap-3 mt-6">                    <button 
+                        id="cancel-user-btn"
                         class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors duration-200"
                     >
                         Cancelar
                     </button>
                     <button 
-                        onclick="createUser()" 
+                        id="create-user-btn"
                         class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors duration-200"
                     >
                         <span class="material-symbols-outlined text-lg">add</span>
