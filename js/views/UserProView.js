@@ -39,6 +39,7 @@ window.onload = async function () {
   /* Inicializar o modelo */
   UserModel.init();
   FlightModel.init();
+  initGamificationModal()
 
   try {
     /* Carregar componentes de header e footer e aguardar a sua conclusão */
@@ -1035,23 +1036,24 @@ function setupCodeRedeemEvents() {
       const codigo = inputCodigo.value.trim();
 
       if (!codigo) {
-        showCodeMessage("Por favor, insira um código válido.", "error");
+        showToast("Por favor, insira um código válido.", "error");
         return;
       }
+      
       try {
-        saveSpecialCode(codigo);
-        showCodeMessage(
-          "Código resgatado com sucesso! Ganhaste 200 pontos.",
-          "success"
-        );
-        inputCodigo.value = "";
-
-        /* Limpar mensagem após 5 segundos */
-        setTimeout(() => {
-          showCodeMessage("", "hidden");
-        }, 5000);
+        const result = saveSpecialCode(codigo);
+        if (result.success) {
+          showToast(
+            "Código resgatado com sucesso! Ganhaste 200 pontos.",
+            "success"
+          );
+          inputCodigo.value = "";
+          
+          // Reload user info to update points display
+          loadUserInfo();
+        }
       } catch (error) {
-        showCodeMessage(error.message, "error");
+        showToast(error.message, "error");
       }
     });
 
@@ -1085,19 +1087,46 @@ function saveSpecialCode(code) {
     throw new Error("Código inválido");
   }
 
-  /* Guardar código na local storage */
-  const existingCodes = JSON.parse(
-    localStorage.getItem("specialCodes") || "[]"
-  );
-
-  /* Verificar se código já foi usado */
-  if (existingCodes.includes(code.trim())) {
-    throw new Error("Este código já foi utilizado");
+  // Check if user is logged in
+  if (!UserModel.isLogged()) {
+    throw new Error("Deve fazer login para resgatar códigos");
   }
-  existingCodes.push(code.trim());
-  localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
 
-  return true;
+  const validCode = "PITSIWESMAD";
+  const codeToCheck = code.trim().toUpperCase();
+
+  // Check if code is valid
+  if (codeToCheck !== validCode) {
+    throw new Error("Código inválido");
+  }
+  // Get current user
+  const currentUser = UserModel.getUserLogged();
+  
+  // Check if user already used this code
+  if (!currentUser.redeemedCodes) {
+    currentUser.redeemedCodes = [];
+  }
+  
+  if (currentUser.redeemedCodes.includes(validCode)) {
+    throw new Error("Este código já foi utilizado por si");
+  }
+
+  // Add points to user (UserModel.addPontos handles adding points to currentUser.pontos)
+  const pointsToAdd = 200;
+  
+  // Add code to user's redeemed codes
+  currentUser.redeemedCodes.push(validCode);
+  
+  // Add point movement record and points
+  UserModel.addPontos(currentUser, pointsToAdd, `Código especial resgatado: ${validCode}`);
+  
+  // Update user in storage
+  UserModel.update(currentUser.id, currentUser);
+  
+  // Update session storage
+  sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
+
+  return { success: true };
 }
 
 /* Carregar reservas */
