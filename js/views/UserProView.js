@@ -1,4 +1,4 @@
-import { loadComponent, showToast } from "./ViewHelpers.js";
+import { loadComponent, showToast, showConfirm } from "./ViewHelpers.js";
 import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
 import * as FlightModel from "../models/FlightModel.js";
@@ -1121,38 +1121,50 @@ function setupReservationDeleteListeners() {
       // Get the logged user
       const user = UserModel.getUserLogged();
       if (!user) {
-        alert("Erro: Utilizador não está logado");
+        showToast("Erro: Utilizador não está logado", "error");
         return;
       }
+      
       // Get reservation index from data attribute
       const reservationIndex = parseInt(this.dataset.reservationIndex, 10);
-      // Call model function to remove reservation and subtract points
-      const result = UserModel.removeReservation(user.id, reservationIndex);      if (result.success) {
-        // Find the parent card element
-        let reservaCard = this.parentElement;
-        while (reservaCard && !reservaCard.classList.contains('mb-6')) {
-          reservaCard = reservaCard.parentElement;
-        }
-        if (reservaCard) {
-          /* Animação de fade-out antes de remover */
-          reservaCard.style.transition = "opacity 0.3s ease";
-          reservaCard.style.opacity = "0";
-          setTimeout(() => {
-            reservaCard.remove();
-            /* Verificar se ainda existem reservas */
-            const reservasContainer = document.getElementById("reservas-container");
-            if (reservasContainer && reservasContainer.children.length === 0) {
-              document.getElementById("reservas-empty").classList.remove("hidden");
+      const reservation = user.reservas && user.reservas[reservationIndex];
+      const reservationName = reservation ? 
+        (reservation.numeroVoo || reservation.hotel?.nome || `Reserva ${reservationIndex + 1}`) :
+        `Reserva ${reservationIndex + 1}`;
+        showConfirm(`Tem a certeza que pretende cancelar a reserva "${reservationName}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+          if (confirmed) {
+            // Call model function to remove reservation and subtract points
+            const result = UserModel.removeReservation(user.id, reservationIndex);
+            
+            if (result.success) {
+              // Find the parent card element
+              let reservaCard = this.parentElement;
+              while (reservaCard && !reservaCard.classList.contains('mb-6')) {
+                reservaCard = reservaCard.parentElement;
+              }
+              if (reservaCard) {
+                /* Animação de fade-out antes de remover */
+                reservaCard.style.transition = "opacity 0.3s ease";
+                reservaCard.style.opacity = "0";
+                setTimeout(() => {
+                  reservaCard.remove();
+                  /* Verificar se ainda existem reservas */
+                  const reservasContainer = document.getElementById("reservas-container");
+                  if (reservasContainer && reservasContainer.children.length === 0) {
+                    document.getElementById("reservas-empty").classList.remove("hidden");
+                  }
+                }, 300);
+              }
+              // Show success message with points info - use toast instead of alert
+              showToast(`Reserva removida! Pontos subtraídos: ${result.pointsSubtracted}. Pontos atuais: ${result.newPoints}`, "success");
+              // Reload user info to update UI
+              loadUserInfo();
+            } else {
+              showToast(`Erro ao remover reserva: ${result.message}`, "error");
             }
-          }, 300);
-        }
-        // Show success message with points info - use toast instead of alert
-        showToast(`Reserva removida! Pontos subtraídos: ${result.pointsSubtracted}. Pontos atuais: ${result.newPoints}`, "success");
-        // Reload user info to update UI
-        loadUserInfo();
-      } else {
-        showToast(`Erro ao remover reserva: ${result.message}`, "error");
-      }
+          }
+        });
     });
   });
 }

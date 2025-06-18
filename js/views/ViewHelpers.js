@@ -130,6 +130,97 @@ export function showToast(msg, type = "success") {
   }, 3000);
 }
 /**
+ * Mostra um diálogo de confirmação personalizado
+ * @param {string} msg - Mensagem a mostrar
+ * @returns {Promise<boolean>} Promise que resolve para true (confirmar) ou false (cancelar)
+ */
+export function showConfirm(msg) {
+  return new Promise((resolve) => {
+    const confirmBox = document.createElement("div");
+    confirmBox.className = `
+      fixed inset-0 flex items-center justify-center z-50
+      bg-black bg-opacity-50 transition-opacity duration-200
+    `;
+    
+    confirmBox.innerHTML = `
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl max-w-md w-full mx-4 transform transition-all duration-200 scale-95">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0 w-10 h-10 mx-auto flex items-center justify-center bg-red-100 dark:bg-red-900 rounded-full">
+            <span class="material-symbols-outlined text-red-600 dark:text-red-400">warning</span>
+          </div>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center mb-4 font-['Space_Mono']">
+          Confirmar Ação
+        </h3>
+        <p class="text-gray-600 dark:text-gray-300 text-center mb-6 font-['IBM_Plex_Sans']">
+          ${msg}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-2">
+          <button id="cancel-btn" 
+            class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 font-semibold font-['IBM_Plex_Sans'] transition-colors duration-200 order-2 sm:order-1">
+            Cancelar
+          </button>
+          <button id="confirm-btn" 
+            class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold font-['IBM_Plex_Sans'] transition-colors duration-200 order-1 sm:order-2">
+            Apagar
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(confirmBox);
+    document.body.style.overflow = 'hidden';
+    
+    // Animação de entrada
+    setTimeout(() => {
+      confirmBox.classList.remove('opacity-0');
+      const dialog = confirmBox.querySelector('div');
+      dialog.classList.remove('scale-95');
+      dialog.classList.add('scale-100');
+    }, 10);
+    
+    // Event listeners
+    const confirmBtn = confirmBox.querySelector('#confirm-btn');
+    const cancelBtn = confirmBox.querySelector('#cancel-btn');
+    
+    const cleanup = () => {
+      document.body.style.overflow = '';
+      confirmBox.classList.add('opacity-0');
+      const dialog = confirmBox.querySelector('div');
+      dialog.classList.add('scale-95');
+      setTimeout(() => confirmBox.remove(), 200);
+    };
+    
+    confirmBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(true);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(false);
+    });
+    
+    // Fechar com ESC
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') {
+        cleanup();
+        resolve(false);
+        document.removeEventListener('keydown', handleKeydown);
+      }
+    };
+    document.addEventListener('keydown', handleKeydown);
+    
+    // Fechar clicando fora
+    confirmBox.addEventListener('click', (e) => {
+      if (e.target === confirmBox) {
+        cleanup();
+        resolve(false);
+      }
+    });
+  });
+}
+/**
  * Abre um modal
  * @param {string} modalId - ID do modal
  */

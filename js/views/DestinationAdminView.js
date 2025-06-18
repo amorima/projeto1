@@ -1,5 +1,5 @@
 // DestinationAdminView.js - View for destination admin management
-import { showToast, openModal, closeModal } from './ViewHelpers.js';
+import { showToast, openModal, closeModal, showConfirm } from './ViewHelpers.js';
 import { 
     getAllDestinations, 
     searchDestinations, 
@@ -418,13 +418,21 @@ window.removeAccessibility = function(acc) {
 };
 // Handle destination deletion
 function handleDeleteDestination(id) {
-    const result = deleteDestination(id);
-    if (result.success) {
-        showToast('Destino eliminado com sucesso!', 'success');
-        loadDestinations();
-    } else {
-        showToast(result.error, 'error');
-    }
+    const destination = getAllDestinations().find(dest => dest.id === parseInt(id));
+    const destinationName = destination ? destination.cidade || `Destino ID ${id}` : `Destino ID ${id}`;
+    
+    showConfirm(`Tem a certeza que pretende eliminar o destino "${destinationName}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                const result = deleteDestination(id);
+                if (result.success) {
+                    showToast('Destino eliminado com sucesso!', 'success');
+                    loadDestinations();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            }
+        });
 }
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

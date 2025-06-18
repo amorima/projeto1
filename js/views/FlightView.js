@@ -57,7 +57,7 @@ function initView() {  getUserLocation((location) => {
     const closest = closestAirport(location, aeroportos);
     const btnOpenElement = document.querySelector("#btn-open p");
     if (btnOpenElement && closest) {
-      btnOpenElement.innerText = closest.cidade;
+      btnOpenElement.innerText = `${closest.codigo} - ${closest.cidade}`;
     }
   });
   showCookieBanner();
@@ -259,7 +259,7 @@ function updateOriginButton(aeroporto) {
     Flight.updateMultitripSegment(window.currentSegmentId, { origem: aeroporto });
     const segmentElement = document.getElementById(`segment-${window.currentSegmentId}-origem`);
     if (segmentElement) {
-      segmentElement.textContent = aeroporto.cidade;
+      segmentElement.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
     }
     // Clear the current segment tracking
     window.currentSegmentId = null;
@@ -342,7 +342,7 @@ function updateDestinationButton(aeroporto) {
     Flight.updateMultitripSegment(window.currentSegmentId, { destino: aeroporto });
     const segmentElement = document.getElementById(`segment-${window.currentSegmentId}-destino`);
     if (segmentElement) {
-      segmentElement.textContent = aeroporto.cidade;
+      segmentElement.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
     }
     // Clear the current segment tracking
     window.currentSegmentId = null;
@@ -719,15 +719,14 @@ function renderMultitripSegments() {
     const segmentDiv = document.createElement('div');
     segmentDiv.className = 'flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
     segmentDiv.innerHTML = `
-      <span class="font-medium text-Main-Primary dark:text-cyan-400">${index + 1}.</span>
-      <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentOriginModal(${segment.id})">
+      <span class="font-medium text-Main-Primary dark:text-cyan-400">${index + 1}.</span>      <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentOriginModal(${segment.id})">
         <span class="text-sm text-gray-500 dark:text-gray-400">Origem</span>
-        <div class="font-medium" id="segment-${segment.id}-origem">${segment.origem ? segment.origem.cidade : 'Selecionar'}</div>
+        <div class="font-medium" id="segment-${segment.id}-origem">${segment.origem ? `${segment.origem.codigo || 'XXX'} - ${segment.origem.cidade}` : 'Selecionar'}</div>
       </button>
       <span class="material-symbols-outlined text-gray-400">arrow_forward</span>
       <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentDestinationModal(${segment.id})">
         <span class="text-sm text-gray-500 dark:text-gray-400">Destino</span>
-        <div class="font-medium" id="segment-${segment.id}-destino">${segment.destino ? segment.destino.cidade : 'Selecionar'}</div>
+        <div class="font-medium" id="segment-${segment.id}-destino">${segment.destino ? `${segment.destino.codigo || 'XXX'} - ${segment.destino.cidade}` : 'Selecionar'}</div>
       </button>
       ${segments.length > 1 ? `<button type="button" onclick="removeMultitripSegment(${segment.id})" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
         <span class="material-symbols-outlined">delete</span>

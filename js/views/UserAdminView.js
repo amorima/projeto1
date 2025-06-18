@@ -1,6 +1,6 @@
 // UserAdminView.js - User admin management view
 import * as UserModel from '../models/UserModel.js';
-import { openModal, closeModal, showToast } from './ViewHelpers.js';
+import { openModal, closeModal, showToast, showConfirm } from './ViewHelpers.js';
 // View configuration
 let userTableConfig = {
     sortColumn: null,
@@ -357,15 +357,20 @@ function updateUser() {
     }
 }
 function deleteUser(userId, username) {
-    try {
-        // Use the model's delete function
-        UserModel.deleteUser(userId);
-        // Refresh table
-        loadTable();
-        showToast('Utilizador eliminado com sucesso!', 'success');
-    } catch (error) {
-        showToast(error.message || 'Erro ao eliminar utilizador. Tente novamente.', 'error');
-    }
+    showConfirm(`Tem a certeza que pretende eliminar o utilizador "${username}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                try {
+                    // Use the model's delete function
+                    UserModel.deleteUser(userId);
+                    // Refresh table
+                    loadTable();
+                    showToast('Utilizador eliminado com sucesso!', 'success');
+                } catch (error) {
+                    showToast(error.message || 'Erro ao eliminar utilizador. Tente novamente.', 'error');
+                }
+            }
+        });
 }
 function resetForm() {
     const form = document.getElementById('add_user_form');

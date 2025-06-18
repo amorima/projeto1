@@ -1,7 +1,7 @@
 // FlightAdminView.js - Flight admin management view
 import * as FlightModel from '../models/FlightModel.js';
 import { getAllDestinations } from '../models/DestinationModel.js';
-import { openModal, closeModal, showToast } from './ViewHelpers.js';
+import { openModal, closeModal, showToast, showConfirm } from './ViewHelpers.js';
 // View configuration
 let flightTableConfig = {
     sortColumn: null,
@@ -17,14 +17,15 @@ function init() {
     setupEventListeners();
     setupTableSorting();
     loadDestinations();
+    loadCompanies();
     loadTable();
 }
-function setupEventListeners() {
-    // Add flight button
+function setupEventListeners() {    // Add flight button
     const addFlightBtn = document.getElementById('add-flight-btn');    if (addFlightBtn) {
         addFlightBtn.addEventListener('click', () => {
             resetForm();
             loadDestinations(); // Refresh destinations before opening modal
+            loadCompanies(); // Refresh companies before opening modal
             openModal('modal-adicionar');
         });
     }
@@ -123,6 +124,63 @@ function loadDestinations() {
         });
     }
 }
+
+/**
+ * Carrega companhias aéreas disponíveis para seleção no dropdown de companhia
+ */
+function loadCompanies() {
+    const companies = FlightModel.getAllCompanhiasAereas();
+    const companySelect = document.getElementById('company');
+    
+    if (companySelect && companies) {
+        companySelect.innerHTML = '<option value="">Selecionar...</option>';
+        
+        // Sort companies alphabetically
+        const sortedCompanies = companies.sort((a, b) => a.nome.localeCompare(b.nome));
+        
+        // Add options to select
+        sortedCompanies.forEach(company => {
+            const option = document.createElement('option');
+            option.value = company.nome;
+            option.textContent = company.nome;
+            companySelect.appendChild(option);
+        });
+        
+        // Set size attribute to limit visible options (max 8 options visible)
+        const maxVisibleOptions = 8;
+        if (sortedCompanies.length > maxVisibleOptions) {
+            companySelect.setAttribute('data-max-options', maxVisibleOptions);
+            // Add CSS class for styling
+            companySelect.classList.add('has-many-options');
+        }
+        
+        // Add custom behavior for better dropdown experience
+        setupScrollableDropdown(companySelect);
+    }
+}
+
+/**
+ * Configura comportamento personalizado para dropdown com scroll
+ * @param {HTMLSelectElement} selectElement - Elemento select
+ */
+function setupScrollableDropdown(selectElement) {
+    // Add event listener for better UX
+    selectElement.addEventListener('focus', function() {
+        // Optional: Add custom styling when focused
+        this.style.maxHeight = '200px';
+    });
+    
+    selectElement.addEventListener('blur', function() {
+        // Reset styling when not focused
+        this.style.maxHeight = '';
+    });
+    
+    // For browsers that support it, try to limit the dropdown height
+    if (selectElement.children.length > 8) {
+        selectElement.style.setProperty('--dropdown-max-height', '200px');
+    }
+}
+
 function loadTable() {
     const tableBody = document.getElementById('tableContent');
     if (!tableBody) return;
@@ -347,9 +405,9 @@ function editFlight(numeroVoo) {
             showToast('Voo não encontrado.', 'error');
             return;
         }
-        
-        // Refresh destinations before opening modal
+          // Refresh destinations and companies before opening modal
         loadDestinations();
+        loadCompanies();
         
         // Fill form with flight data
         document.getElementById('name').value = flight.numeroVoo;
@@ -423,13 +481,18 @@ function updateFlight() {
     }
 }
 function deleteFlight(numeroVoo, flightName) {
-    try {
-        FlightModel.deleteTrip(numeroVoo);
-        loadTable();
-        showToast('Voo eliminado com sucesso!', 'success');
-    } catch (error) {
-        showToast('Erro ao eliminar voo. Tente novamente.', 'error');
-    }
+    showConfirm(`Tem a certeza que pretende eliminar o voo "${numeroVoo}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                try {
+                    FlightModel.deleteTrip(numeroVoo);
+                    loadTable();
+                    showToast('Voo eliminado com sucesso!', 'success');
+                } catch (error) {
+                    showToast('Erro ao eliminar voo. Tente novamente.', 'error');
+                }
+            }
+        });
 }
 function formatDateTime(dateTimeString) {
     if (!dateTimeString) return '';

@@ -1,5 +1,5 @@
 // ActivityAdminView.js - View for activity admin management
-import { showToast, openModal, closeModal } from './ViewHelpers.js';
+import { showToast, openModal, closeModal, showConfirm } from './ViewHelpers.js';
 import { 
     getAll as getAllActivities, 
     search as searchActivities, 
@@ -346,18 +346,20 @@ window.openEditActivityModal = function(activityId) {
 window.deleteActivity = function(activityId) {
     const activity = getActivityById(activityId);
     if (!activity) {
-        showToast('Atividade não encontrada', 'error');
-        return;
+        showToast('Atividade não encontrada', 'error');        return;
     }
-    if (confirm(`Tem certeza que deseja apagar a atividade "${activity.nome}"?`)) {
-        const result = removeActivity(activityId);
-        if (result.success) {
-            showToast('Atividade apagada com sucesso', 'success');
-            loadActivities();
-        } else {
-            showToast('Erro ao apagar atividade: ' + result.error, 'error');
-        }
-    }
+    showConfirm(`Tem a certeza que pretende eliminar a atividade "${activity.nome}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                const result = removeActivity(activityId);
+                if (result.success) {
+                    showToast('Atividade apagada com sucesso', 'success');
+                    loadActivities();
+                } else {
+                    showToast('Erro ao apagar atividade: ' + result.error, 'error');
+                }
+            }
+        });
 };
 // Handle form submission
 function handleFormSubmit(event) {

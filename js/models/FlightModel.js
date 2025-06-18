@@ -632,6 +632,15 @@ export function getCompanhiaAereaByNome(nomeCompanhia) {
   );
   return companhias.find((comp) => comp.nome === nomeCompanhia) || null;
 }
+
+/**
+ * Obtém todas as companhias aéreas disponíveis
+ * @returns {Array} - Array com todas as companhias aéreas
+ */
+export function getAllCompanhiasAereas() {
+  return JSON.parse(localStorage.getItem("companhiasAereas") || "[]");
+}
+
 /**
  * Obtém todos os voos disponíveis para um destino específico
  * @param {string} destino - Nome do destino (cidade)

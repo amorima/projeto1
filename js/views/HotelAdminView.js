@@ -1,5 +1,5 @@
 // HotelAdminView.js - Hotel admin management view (MV Pattern - Functions only)
-import { showToast, openModal } from './ViewHelpers.js';
+import { showToast, openModal, showConfirm } from './ViewHelpers.js';
 // State variables
 let allHotels = [];
 let filteredHotels = [];
@@ -235,19 +235,27 @@ function handleFormSubmit() {
 }
 // Delete hotel
 function deleteHotel(hotelId) {
-    try {
-        const hotelIndex = allHotels.findIndex(h => h.id === hotelId);
-        if (hotelIndex !== -1) {
-            allHotels.splice(hotelIndex, 1);
-            saveHotels();
-            showToast('Hotel removido com sucesso!', 'success');
-            refreshTable();
-        } else {
-            showToast('Erro ao remover hotel.', 'error');
-        }
-    } catch (error) {
-        showToast('Erro interno. Tente novamente.', 'error');
-    }
+    const hotel = allHotels.find(h => h.id === hotelId);
+    const hotelName = hotel ? hotel.nome || `Hotel ID ${hotelId}` : `Hotel ID ${hotelId}`;
+    
+    showConfirm(`Tem a certeza que pretende eliminar o hotel "${hotelName}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                try {
+                    const hotelIndex = allHotels.findIndex(h => h.id === hotelId);
+                    if (hotelIndex !== -1) {
+                        allHotels.splice(hotelIndex, 1);
+                        saveHotels();
+                        showToast('Hotel removido com sucesso!', 'success');
+                        refreshTable();
+                    } else {
+                        showToast('Erro ao remover hotel.', 'error');
+                    }
+                } catch (error) {
+                    showToast('Erro interno. Tente novamente.', 'error');
+                }
+            }
+        });
 }
 // Handle search functionality
 function handleSearch(searchTerm) {

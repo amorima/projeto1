@@ -160,18 +160,19 @@
                                 <span class="absolute right-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 pointer-events-none">expand_more</span>
                             </div>
                         </div>
-                    </div>
-
-                    <div>
-                        <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Companhia Aérea</label>
-                        <input 
-                            id="company" 
-                            name="company"
-                            type="text" 
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
-                            placeholder="Ex: TAP Air Portugal"
-                        />
                     </div>                    <div>
+                        <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Companhia Aérea</label>
+                        <div class="relative">
+                            <select 
+                                id="company" 
+                                name="company"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 appearance-none cursor-pointer scrollable-select"
+                            >
+                                <option value="">Selecionar...</option>
+                            </select>
+                            <span class="absolute right-3 top-1/2 transform -translate-y-1/2 material-symbols-outlined text-gray-400 pointer-events-none">expand_more</span>
+                        </div>
+                    </div><div>
                         <label for="leaves" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data e Hora de Partida</label>
                         <input 
                             id="leaves" 

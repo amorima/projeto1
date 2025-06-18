@@ -1,5 +1,5 @@
 // TurismAdminView.js - Inline Tourism Types Admin Management
-import { openModal, closeModal, showToast } from './ViewHelpers.js';
+import { openModal, closeModal, showToast, showConfirm } from './ViewHelpers.js';
 import { 
     getAllTourismTypes, 
     addTourismType, 
@@ -216,14 +216,19 @@ function openEditModal(tipo) {
 }
 // Handle deleting tourism type
 function handleDeleteTurismType(tipo) {
-    const result = deleteTourismType(tipo);
-    if (result.success) {
-        showToast('Tipo de turismo eliminado com sucesso!', 'success');
-        loadTurismTypes();
-        updateStats();
-    } else {
-        showToast(result.error, 'error');
-    }
+    showConfirm(`Tem a certeza que pretende eliminar o tipo de turismo "${tipo}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                const result = deleteTourismType(tipo);
+                if (result.success) {
+                    showToast('Tipo de turismo eliminado com sucesso!', 'success');
+                    loadTurismTypes();
+                    updateStats();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            }
+        });
 }
 // Update statistics display
 function updateStats() {
