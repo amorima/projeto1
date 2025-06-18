@@ -20,6 +20,17 @@ let datesTravelers = {
 let selectedAccessibilities = [];
 let selectedTourismType = null;
 
+/* Multitrip data */
+let tripType = 'ida-volta'; // 'ida', 'ida-volta', 'multitrip'
+let multitripSegments = [
+  {
+    origem: null,
+    destino: null,
+    dataPartida: "",
+    id: 1
+  }
+]
+
 /* Array de tipos de turismo - dados estáticos */
 const tourismTypes = [
   {
@@ -83,8 +94,95 @@ export function init() {
   viagens = localStorage.viagens
     ? loadFromLocalStorage("viagens", viagens)
     : [];
+    
+  // If no flights in localStorage, load sample data
+  if (viagens.length === 0) {
+    loadSampleFlights();
+  }
+  
   loadSavedData();
   return viagens;
+}
+
+/* Load sample flight data for testing */
+function loadSampleFlights() {
+  const sampleFlights = [
+    {
+      numeroVoo: "TP123",
+      origem: "OPO - Porto",
+      destino: "LIS - Lisboa",
+      companhia: "TAP Air Portugal",
+      partida: "15/01/2025 08:30",
+      chegada: "15/01/2025 09:45",
+      direto: true,
+      custo: "89",
+      imagem: "../img/destinos/Lisboa/lisboa-1.jpg",
+      dataVolta: "18/01/2025 18:30"
+    },
+    {
+      numeroVoo: "TP456",
+      origem: "LIS - Lisboa",
+      destino: "MAD - Madrid",
+      companhia: "TAP Air Portugal",
+      partida: "16/01/2025 10:15",
+      chegada: "16/01/2025 12:30",
+      direto: true,
+      custo: "156",
+      imagem: "../img/destinos/Madrid/madrid-1.jpg",
+      dataVolta: "20/01/2025 16:45"
+    },
+    {
+      numeroVoo: "FR789",
+      origem: "OPO - Porto",
+      destino: "LON - Londres",
+      companhia: "Ryanair",
+      partida: "17/01/2025 06:00",
+      chegada: "17/01/2025 08:15",
+      direto: true,
+      custo: "78",
+      imagem: "../img/destinos/Londres/londres-1.jpg",
+      dataVolta: "22/01/2025 14:20"
+    },
+    {
+      numeroVoo: "AF321",
+      origem: "LIS - Lisboa",
+      destino: "PAR - Paris",
+      companhia: "Air France",
+      partida: "18/01/2025 14:40",
+      chegada: "18/01/2025 18:55",
+      direto: true,
+      custo: "198",
+      imagem: "../img/destinos/Paris/paris-1.jpg",
+      dataVolta: "25/01/2025 11:30"
+    },
+    {
+      numeroVoo: "LH567",
+      origem: "OPO - Porto",
+      destino: "ROM - Roma",
+      companhia: "Lufthansa",
+      partida: "19/01/2025 12:15",
+      chegada: "19/01/2025 16:45",
+      direto: false,
+      custo: "234",
+      imagem: "../img/destinos/Roma/roma-1.jpg",
+      dataVolta: "26/01/2025 09:20"
+    },
+    {
+      numeroVoo: "KL890",
+      origem: "LIS - Lisboa",
+      destino: "AMS - Amsterdão",
+      companhia: "KLM",
+      partida: "20/01/2025 07:30",
+      chegada: "20/01/2025 11:10",
+      direto: true,
+      custo: "167",
+      imagem: "../img/destinos/Amsterdao/amsterdao-1.jpg",
+      dataVolta: "27/01/2025 15:45"
+    }
+  ];
+  
+  viagens = sampleFlights;
+  saveToLocalStorage("viagens", viagens);
 }
 
 /* Carregar dados guardados na localStorage */
@@ -611,6 +709,149 @@ export function getByNumeroVoo(numeroVoo) {
   return viagens.find((v) => String(v.numeroVoo) === String(numeroVoo)) || null;
 }
 
+/* Multitrip functions */
+export function setTripType(type) {
+  tripType = type;
+  if (type === 'multitrip' && multitripSegments.length === 1) {
+    // Add a second segment for multitrip
+    addMultitripSegment();
+  }
+}
+
+export function getTripType() {
+  return tripType;
+}
+
+export function addMultitripSegment() {
+  const newSegment = {
+    origem: null,
+    destino: null,
+    dataPartida: "",
+    id: multitripSegments.length + 1
+  };
+  multitripSegments.push(newSegment);
+  return newSegment;
+}
+
+export function removeMultitripSegment(segmentId) {
+  if (multitripSegments.length > 1) {
+    multitripSegments = multitripSegments.filter(seg => seg.id !== segmentId);
+    // Renumber IDs
+    multitripSegments.forEach((seg, index) => {
+      seg.id = index + 1;
+    });
+  }
+}
+
+export function updateMultitripSegment(segmentId, data) {
+  const segment = multitripSegments.find(seg => seg.id === segmentId);
+  
+  if (segment) {
+    Object.assign(segment, data);
+  }
+}
+
+export function getMultitripSegments() {
+  return multitripSegments;
+}
+
+export function clearMultitripSegments() {
+  multitripSegments = [
+    {
+      origem: null,
+      destino: null,
+      dataPartida: "",
+      id: 1
+    }
+  ];
+}
+
+/* Function to build search data for sessionStorage */
+export function buildSearchData() {
+  const data = {
+    tripType: tripType,
+    origem: selectedOrigin,
+    destino: selectedDestination,
+    dataPartida: datesTravelers.dataPartida,
+    dataRegresso: datesTravelers.dataRegresso,
+    adultos: datesTravelers.adultos,
+    criancas: datesTravelers.criancas,
+    bebes: datesTravelers.bebes,
+    tipoTurismo: selectedTourismType,
+    acessibilidade: selectedAccessibilities,
+    multitripSegments: tripType === 'multitrip' ? multitripSegments : null
+  };
+  return data;
+}
+
+/* Function to filter flights based on search criteria */
+export function filterFlights(searchData) {
+  let flights = [...viagens];
+  
+  if (!searchData) return flights;
+  
+  // Filter by origin
+  if (searchData.origem && searchData.origem.cidade) {
+    flights = flights.filter(flight => 
+      flight.origem && flight.origem.toLowerCase().includes(searchData.origem.cidade.toLowerCase())
+    );
+  }
+  
+  // Filter by destination
+  if (searchData.destino && searchData.destino.cidade) {
+    flights = flights.filter(flight => 
+      flight.destino && flight.destino.toLowerCase().includes(searchData.destino.cidade.toLowerCase())
+    );
+  }
+  
+  // Filter by tourism type
+  if (searchData.tipoTurismo && searchData.tipoTurismo.nome && searchData.tipoTurismo.nome !== 'Nenhum') {
+    flights = flights.filter(flight => 
+      flight.tipoTurismo && flight.tipoTurismo.toLowerCase().includes(searchData.tipoTurismo.nome.toLowerCase())
+    );
+  }
+  
+  // Filter by accessibility (if flight has accessibility info)
+  if (searchData.acessibilidade && searchData.acessibilidade.length > 0) {
+    flights = flights.filter(flight => {
+      if (!flight.acessibilidade) return true; // If no accessibility info, include flight
+      return searchData.acessibilidade.some(acc => 
+        flight.acessibilidade.toLowerCase().includes(acc.toLowerCase())
+      );
+    });
+  }
+  
+  // Filter by date (if departure date is specified)
+  if (searchData.dataPartida) {
+    const searchDate = new Date(searchData.dataPartida);
+    flights = flights.filter(flight => {
+      if (!flight.partida) return true;
+      const flightDate = parseFlightDate(flight.partida);
+      return flightDate >= searchDate;
+    });
+  }
+  
+  return flights;
+}
+
+/* Helper function to parse flight dates */
+function parseFlightDate(dateStr) {
+  // Handle different date formats that might be in the flight data
+  if (!dateStr) return new Date();
+  
+  // If it's already a Date object
+  if (dateStr instanceof Date) return dateStr;
+  
+  // If it's in DD/MM/YYYY format
+  if (dateStr.includes('/')) {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(year, month - 1, day);
+  }
+  
+  // Try to parse as ISO date or other standard format
+  return new Date(dateStr);
+}
+
 /**
  * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
  * @class Trip
@@ -661,4 +902,28 @@ class Trip {
     this.imagem = imagem;
     this.dataVolta = dataVolta;
   }
+}
+
+/* Reset all state variables to their default values */
+export function resetState() {
+  selectedOrigin = null;
+  selectedDestination = null;
+  datesTravelers = {
+    dataPartida: "",
+    dataRegresso: "",
+    adultos: 1,
+    criancas: 0,
+    bebes: 0,
+  };
+  selectedAccessibilities = [];
+  selectedTourismType = null;
+  tripType = 'ida-volta';
+  multitripSegments = [
+    {
+      origem: null,
+      destino: null,
+      dataPartida: "",
+      id: 1
+    }
+  ];
 }
