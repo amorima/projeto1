@@ -7,7 +7,7 @@ import {
 } from "./ViewHelpers.js";
 
 import * as HotelModel from "../models/HotelModel.js";
-import * as ActivityModel from "../models/ActivityModel.js";
+import { ActivityModel } from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
 
@@ -260,7 +260,6 @@ function carregarHoteis(destino) {
 
 function carregarActividades(destino) {
   try {
-    ActivityModel.init();
     let todasAtividades = ActivityModel.getAll();
     let atividadesDestino = [];
     if (destino) {
