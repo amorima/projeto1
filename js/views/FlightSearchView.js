@@ -17,20 +17,17 @@ let filters = {
   sortDate: '',
   sortPrice: ''
 };
-
 // Preenche os campos do topo da página de pesquisa com os dados vindos do sessionStorage
 function preencherCamposPesquisa() {
   const params = sessionStorage.getItem('planit_search');
   if (!params) return null;
   const dados = JSON.parse(params);
-
   // Origem
   const origemBtn = document.querySelector('#btn-open p');
   if (origemBtn && dados.origem) {
     const origemText = dados.origem.cidade ? `${dados.origem.codigo || 'XXX'} - ${dados.origem.cidade}` : dados.origem;
     origemBtn.textContent = origemText;
   }
-
   // Destino
   const destinoBtn = document.querySelector('#btn-destino p');
   if (destinoBtn && dados.destino) {
@@ -43,7 +40,6 @@ function preencherCamposPesquisa() {
     const destinoText = dados.destino.cidade ? `${dados.destino.codigo || 'XXX'} - ${dados.destino.cidade}` : dados.destino;
     destinoDiv.textContent = destinoText;
   }
-
   // Datas e viajantes
   const datasDiv = document.querySelectorAll('form > div')[1];
   if (datasDiv && dados.dataPartida) {
@@ -52,7 +48,6 @@ function preencherCamposPesquisa() {
                      dados.tripType === 'multitrip' ? 'Multitrip' :
                      `${dados.dataPartida} - ${dados.dataRegresso || ''}`;
     if (datasP) datasP.textContent = dataText;
-    
     const viajantesP = datasDiv.querySelectorAll('p')[1];
     const viajantes = (dados.adultos || 1) + (dados.criancas || 0) + (dados.bebes || 0);
     if (viajantesP) viajantesP.textContent = `${viajantes} Viajante${viajantes > 1 ? 's' : ''}`;
@@ -63,11 +58,9 @@ function preencherCamposPesquisa() {
     const tipoText = dados.tipoTurismo.nome ? dados.tipoTurismo.nome : dados.tipoTurismo;
     tipoTurismoP.textContent = tipoText !== 'Nenhum' ? tipoText : 'Nenhum';
   }
-
   // Acessibilidade
   const acessibilidadeP = document.getElementById('texto-acessibilidade');
   if (acessibilidadeP && dados.acessibilidade) acessibilidadeP.textContent = dados.acessibilidade;
-
   // Tipo de viagem
   const tipoViagemP = document.getElementById('texto-tipo-viagem');
   if (tipoViagemP && dados.tripType) {
@@ -76,7 +69,6 @@ function preencherCamposPesquisa() {
                         dados.tripType === 'multitrip' ? 'Multitrip' : 'Ida e Volta';
     tipoViagemP.textContent = tripTypeText;
   }
-
   // Show/hide multitrip container based on trip type
   const multitripContainer = document.getElementById('multitrip-container');
   if (multitripContainer) {
@@ -87,10 +79,8 @@ function preencherCamposPesquisa() {
       multitripContainer.classList.add('hidden');
     }
   }
-
   return dados;
 }
-
 /**
  * Renderiza cards de voos.
  * @param {Array} filteredFlights - Lista de voos filtrados (opcional).
@@ -101,17 +91,14 @@ function renderFlightCards(maxCards = 18) {
   // Get search data from sessionStorage if available
   const searchData = sessionStorage.getItem('planit_search');
   let flights = Flight.getAll();
-
   // Apply search filters from PlanIt form if available
   if (searchData) {
     const parsedSearchData = JSON.parse(searchData);
     flights = Flight.filterFlights(parsedSearchData);
   }
-
   // Apply additional UI filters
   flights = flights.filter(flight => {
     let match = true;
-    
     // Origem filter (from UI)
     if (filters.origem && filters.origem !== 'Qualquer' && filters.origem !== 'Nenhum' && filters.origem !== 'Origem' && flight.origem) {
       const origemCidade = flight.origem.split('-').pop().trim().toLowerCase();
@@ -120,7 +107,6 @@ function renderFlightCards(maxCards = 18) {
       const origemMatch = origemCidade.includes(filtroOrigem) || origemCodigo.includes(filtroOrigem) || filtroOrigem.includes(origemCidade) || filtroOrigem.includes(origemCodigo);
       match = match && origemMatch;
     }
-    
     // Destino filter (from UI)
     if (filters.destino && filters.destino !== 'Qualquer' && filters.destino !== 'Nenhum' && filters.destino !== 'Destino' && flight.destino) {
       const destinoCidade = flight.destino.split('-').pop().trim().toLowerCase();
@@ -129,7 +115,6 @@ function renderFlightCards(maxCards = 18) {
       const destinoMatch = destinoCidade.includes(filtroDestino) || destinoCodigo.includes(filtroDestino) || filtroDestino.includes(destinoCidade) || filtroDestino.includes(destinoCodigo);
       match = match && destinoMatch;
     }
-    
     // Date filters (from UI)
     if (filters.dataPartida && flight.partida) {
       const filtroData = new Date(filters.dataPartida);
@@ -141,14 +126,11 @@ function renderFlightCards(maxCards = 18) {
       const dataVoo = new Date(flight.dataVolta.split(" ")[0].split("/").reverse().join("-"));
       if (dataVoo > filtroData) match = false;
     }
-    
     // Price filter (from UI)
     const preco = parseFloat(flight.custo) || 0;
     if (preco < (filters.minPrice || 0) || preco > (filters.maxPrice || Infinity)) match = false;
-    
     return match;
   });
-
   // Ordenação
   if (filters.sortDate === 'recent') {
     flights.sort((a, b) => new Date(b.partida) - new Date(a.partida));
@@ -161,19 +143,15 @@ function renderFlightCards(maxCards = 18) {
     flights.sort((a, b) => Number(b.custo) - Number(a.custo));
   }  // Limitar o número de cards
   flights = flights.slice(0, maxCards);
-
   const container = document.querySelector(".card-viagens");
   if (!container) {
-    console.error('Container .card-viagens not found!');
     return;
   }
   container.innerHTML = "";
-
   if (!flights.length) {
     container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Nenhuma viagem encontrada.</div>`;
     return;
   }
-
   // Função para formatar datas no estilo homepage
   const formatarData = (dataStr) => {
     if (!dataStr) return "";
@@ -185,7 +163,6 @@ function renderFlightCards(maxCards = 18) {
     ];
     return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
   };
-
   flights.forEach((flight) => {
     const {
       numeroVoo,
@@ -222,7 +199,6 @@ function renderFlightCards(maxCards = 18) {
       </div>
     `;
     container.appendChild(card);
-
     // Now add the event listener to the heart icon inside this card
     const heart = card.querySelector('.favorite-icon');
     if (heart) {
@@ -239,7 +215,6 @@ function renderFlightCards(maxCards = 18) {
       }
       heart.setAttribute("data-favorito", isFav ? "true" : "false");
       heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
-
       heart.addEventListener("click", (e) => {
         e.stopPropagation();
         if (!User.isLogged()) {
@@ -264,10 +239,8 @@ function renderFlightCards(maxCards = 18) {
         setTimeout(() => heart.classList.remove("scale-110"), 150);
       });
     }
-
   });
 }
-
 // --- Filtros de pesquisa de voos ---
 function setupFlightFilters() {
   const sortDate = document.getElementById("sort-date");
@@ -275,7 +248,6 @@ function setupFlightFilters() {
   const minPrice = document.getElementById("min-price");
   const maxPrice = document.getElementById("max-price");
   const clearFiltersBtn = document.getElementById("clear-filters-btn");
-
   function updateAndRender() {
     filters.minPrice = parseFloat(minPrice?.value) || 0;
     filters.maxPrice = parseFloat(maxPrice?.value) || Infinity;
@@ -283,12 +255,10 @@ function setupFlightFilters() {
     filters.sortPrice = sortPrice?.value || '';
     renderFlightCards();
   }
-
   if (sortDate) sortDate.addEventListener("change", updateAndRender);
   if (sortPrice) sortPrice.addEventListener("change", updateAndRender);
   if (minPrice) minPrice.addEventListener("input", updateAndRender);
   if (maxPrice) maxPrice.addEventListener("input", updateAndRender);
-
   // Clear filters functionality
   if (clearFiltersBtn) {
     clearFiltersBtn.addEventListener("click", () => {
@@ -297,26 +267,22 @@ function setupFlightFilters() {
       if (sortPrice) sortPrice.value = '';
       if (minPrice) minPrice.value = '';
       if (maxPrice) maxPrice.value = '';
-      
       // Reset filter object
       filters.minPrice = 0;
       filters.maxPrice = Infinity;
       filters.sortDate = '';
       filters.sortPrice = '';
-      
       // Reset search form buttons to default values
       const origemBtn = document.querySelector('#btn-open p');
       const destinoBtn = document.querySelector('#btn-destino p');
       const tipoTurismoText = document.getElementById('texto-tipo-turismo');
       const acessibilidadeText = document.getElementById('texto-acessibilidade');
       const tipoViagemText = document.getElementById('texto-tipo-viagem');
-      
       if (origemBtn) origemBtn.textContent = 'Origem';
       if (destinoBtn) destinoBtn.textContent = 'Destino';
       if (tipoTurismoText) tipoTurismoText.textContent = 'Nenhum';
       if (acessibilidadeText) acessibilidadeText.textContent = 'Nenhum';
       if (tipoViagemText) tipoViagemText.textContent = 'Ida e Volta';
-      
       // Reset dates and travelers button
       const btnDatas = document.getElementById("btn-datas");
       if (btnDatas) {
@@ -325,7 +291,6 @@ function setupFlightFilters() {
         if (datasP) datasP.textContent = 'Datas';
         if (viajantesP) viajantesP.textContent = 'Viajantes';
       }
-      
       // Reset filters object
       filters.origem = '';
       filters.destino = '';
@@ -336,31 +301,24 @@ function setupFlightFilters() {
       filters.adultos = 1;
       filters.criancas = 0;
       filters.bebes = 0;
-      
       // Hide multitrip container
       const multitripContainer = document.getElementById('multitrip-container');
       if (multitripContainer) {
         multitripContainer.classList.add('hidden');
       }
-      
       // Clear sessionStorage
       sessionStorage.removeItem('planit_search');
-      
       // Reset Flight model state
       if (Flight.resetState) {
         Flight.resetState();
       }
-      
       // Re-render with all flights
       renderFlightCards();
-      
       showToast('Filtros limpos!', 'info');
     });
   }
-
   updateAndRender();
 }
-
 function setupModalButtons() {
   const btnOrigem = document.getElementById("btn-open");
   if (btnOrigem) {
@@ -369,7 +327,6 @@ function setupModalButtons() {
       abrirModalOrigem();
     });
   }
-
   const btnDestino = document.getElementById("btn-destino");
   if (btnDestino) {
     btnDestino.addEventListener("click", (e) => {
@@ -377,7 +334,6 @@ function setupModalButtons() {
       abrirModalDestino();
     });
   }
-
   const btnDatas = document.getElementById("btn-datas");
   if (btnDatas) {
     btnDatas.addEventListener("click", (e) => {
@@ -385,7 +341,6 @@ function setupModalButtons() {
       abrirModalDatas();
     });
   }
-
   const btnAcessibilidade = document.getElementById("btn-acessibilidade");
   if (btnAcessibilidade) {
     btnAcessibilidade.addEventListener("click", (e) => {
@@ -400,7 +355,6 @@ function setupModalButtons() {
       abrirModalTipoTurismo();
     });
   }
-
   const btnTipoViagem = document.getElementById("btn-tipo-viagem");
   if (btnTipoViagem) {
     btnTipoViagem.addEventListener("click", (e) => {
@@ -413,17 +367,14 @@ function setupModalButtons() {
 function pararScroll() {
   document.body.classList.add("modal-aberto");
 }
-
 function deixarScroll() {
   document.body.classList.remove("modal-aberto");
 }
 document.addEventListener("DOMContentLoaded", () => {
   Flight.init();
   User.init();
-  
   // Fill search fields from sessionStorage
   const planitFilter = preencherCamposPesquisa();
-  
   // Update filters from search data or UI
   if (planitFilter) {
     // Update filters from search data
@@ -436,7 +387,6 @@ document.addEventListener("DOMContentLoaded", () => {
     filters.adultos = planitFilter.adultos || 1;
     filters.criancas = planitFilter.criancas || 0;
     filters.bebes = planitFilter.bebes || 0;
-    
     // Update date button if dates are available
     if (planitFilter.dataPartida) {
       const adultos = planitFilter.adultos || 1;
@@ -450,7 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
     filters.destino = document.querySelector('#btn-destino p')?.textContent.trim() || '';
     filters.tipoTurismo = (document.getElementById('texto-tipo-turismo')?.textContent.trim().replace(/\s+/g, '') || '');
     filters.acessibilidade = document.getElementById('texto-acessibilidade')?.textContent.trim() || '';
-    
     // Get dates and travelers from Flight model if available
     if (typeof Flight !== 'undefined' && Flight.getDatesTravelers) {
       const dt = Flight.getDatesTravelers();
@@ -461,14 +410,12 @@ document.addEventListener("DOMContentLoaded", () => {
       filters.bebes = dt.bebes;
     }
   }
-  
   // Render initial flight cards with any available filters
   renderFlightCards();
     // Setup filters and modal buttons
   setupFlightFilters();
   setupModalButtons();
   setupTripTypeButtons(); // Setup multitrip functionality
-  
   // Prevent default form submission to avoid page reload
   const form = document.querySelector('form');
   if (form) {
@@ -479,24 +426,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
 // --- Trip type functions ---
 function setupTripTypeButtons() {
   const btnTipoViagem = document.getElementById('btn-tipo-viagem');
   const multitripContainer = document.getElementById('multitrip-container');
   const btnAddSegment = document.getElementById('btn-add-segment');
-
   if (!btnTipoViagem) return;
-
   // Set default trip type
   Flight.setTripType('ida-volta');
-
   // Trip type button handler - opens modal
   btnTipoViagem.addEventListener('click', (e) => {
     e.preventDefault();
     abrirModalTipoViagem();
   });
-
   // Add segment button handler
   if (btnAddSegment) {
     btnAddSegment.addEventListener('click', (e) => {
@@ -506,17 +448,14 @@ function setupTripTypeButtons() {
     });
   }
 }
-
 function renderMultitripSegments() {
   const segmentsContainer = document.getElementById('multitrip-segments');
   if (!segmentsContainer) return;
   const segments = Flight.getMultitripSegments();
   segmentsContainer.innerHTML = '';
-
   segments.forEach((segment, index) => {
     const segmentDiv = document.createElement('div');
     segmentDiv.className = 'flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
-    
     segmentDiv.innerHTML = `
       <span class="font-medium text-Main-Primary dark:text-cyan-400">${index + 1}.</span>
       <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentOriginModal(${segment.id})">
@@ -532,39 +471,32 @@ function renderMultitripSegments() {
         <span class="material-symbols-outlined">delete</span>
       </button>` : ''}
     `;
-    
     segmentsContainer.appendChild(segmentDiv);
   });
 }
-
 // Global functions for multitrip segment management
 window.removeMultitripSegment = function(segmentId) {
   Flight.removeMultitripSegment(segmentId);
   renderMultitripSegments();
 };
-
 window.openSegmentOriginModal = function(segmentId) {
   // Store current segment ID for modal
   window.currentSegmentId = segmentId;
   window.currentSegmentField = 'origem';
   abrirModalOrigem();
 };
-
 window.openSegmentDestinationModal = function(segmentId) {
   // Store current segment ID for modal
   window.currentSegmentId = segmentId;
   window.currentSegmentField = 'destino';
   abrirModalDestino();
 };
-
 function abrirModalTipoViagem() {
   pararScroll();
   const modal = document.getElementById("modal-tipo-viagem");
   if (!modal) return;
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   // Add event listeners for trip type options
   const options = modal.querySelectorAll('.trip-type-option');
   options.forEach(option => {
@@ -572,7 +504,6 @@ function abrirModalTipoViagem() {
       e.preventDefault();
       const tripType = option.dataset.type;
       Flight.setTripType(tripType);
-      
       // Update UI
       const textoTipoViagem = document.getElementById('texto-tipo-viagem');
       if (textoTipoViagem) {
@@ -581,7 +512,6 @@ function abrirModalTipoViagem() {
                             tripType === 'multitrip' ? 'Multitrip' : 'Ida e Volta';
         textoTipoViagem.textContent = tripTypeText;
       }
-      
       // Show/hide multitrip container
       const multitripContainer = document.getElementById('multitrip-container');
       if (multitripContainer) {
@@ -595,24 +525,20 @@ function abrirModalTipoViagem() {
           multitripContainer.classList.add('hidden');
         }
       }
-      
       fecharModalTipoViagem();
     });
   });
-
   // Close modal events
   const fecharBtn = document.getElementById("fechar-modal-tipo-viagem");
   if (fecharBtn) {
     fecharBtn.addEventListener("click", fecharModalTipoViagem);
   }
-  
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       fecharModalTipoViagem();
     }
   });
 }
-
 function fecharModalTipoViagem() {
   deixarScroll();
   const modal = document.getElementById("modal-tipo-viagem");
@@ -621,20 +547,16 @@ function fecharModalTipoViagem() {
     modal.classList.remove("flex");
   }
 }
-
 // --- Modal functions ---
 function abrirModalOrigem() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-origem");
   const listaAeroportos = document.getElementById("lista-aeroportos");
   const pesquisaInput = document.getElementById("pesquisa-aeroporto");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarAeroportos(lista) {
     listaAeroportos.innerHTML = "";
-
     lista.forEach((aeroporto) => {
       const li = document.createElement("li");
       li.className =
@@ -652,28 +574,23 @@ function abrirModalOrigem() {
           </div>
         </div>
       `;
-
       li.addEventListener("click", () => {
         Flight.setOrigin(aeroporto);
         filters.origem = aeroporto.cidade; // Corrigido: salva a cidade do aeroporto
         updateOriginButton(aeroporto);
         fecharModalOrigem();
       });
-
       listaAeroportos.appendChild(li);
     });
   }
-
   /* Mostrar todos os aeroportos inicialmente */
   mostrarAeroportos(Flight.getAirports());
-
   /* Pesquisa em tempo real */
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const aeroportosFiltrados = Flight.filterAirports(termoPesquisa);
     mostrarAeroportos(aeroportosFiltrados);
   });
-
   /* Eventos para fechar modal */
   document
     .getElementById("fechar-modal-origem")
@@ -684,7 +601,6 @@ function abrirModalOrigem() {
     }
   });
 }
-
 function updateOriginButton(aeroporto) {
   // Check if we're updating a multitrip segment
   if (window.currentSegmentId && window.currentSegmentField === 'origem') {
@@ -697,7 +613,6 @@ function updateOriginButton(aeroporto) {
     btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
   }
 }
-
 function fecharModalOrigem() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-origem");
@@ -706,19 +621,15 @@ function fecharModalOrigem() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 function abrirModalDestino() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-destino");
   const listaDestinos = document.getElementById("lista-destinos");
   const pesquisaInput = document.getElementById("pesquisa-destino");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarDestinos(lista) {
     listaDestinos.innerHTML = "";
-
     lista.forEach((aeroporto) => {
       const li = document.createElement("li");
       li.className =
@@ -736,26 +647,21 @@ function abrirModalDestino() {
           </div>
         </div>
       `;
-
       li.addEventListener("click", () => {
         Flight.setDestination(aeroporto);
         filters.destino = aeroporto.cidade; // Corrigido: salva a cidade do aeroporto
         updateDestinationButton(aeroporto);
         fecharModalDestino();
       });
-
       listaDestinos.appendChild(li);
     });
   }
-
   mostrarDestinos(Flight.getAirports());
-
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const destinosFiltrados = Flight.filterAirports(termoPesquisa);
     mostrarDestinos(destinosFiltrados);
   });
-
   document
     .getElementById("fechar-modal-destino")
     .addEventListener("click", fecharModalDestino);
@@ -765,7 +671,6 @@ function abrirModalDestino() {
     }
   });
 }
-
 function updateDestinationButton(aeroporto) {
   // Check if we're updating a multitrip segment
   if (window.currentSegmentId && window.currentSegmentField === 'destino') {
@@ -778,7 +683,6 @@ function updateDestinationButton(aeroporto) {
     btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
   }
 }
-
 function fecharModalDestino() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-destino");
@@ -787,33 +691,28 @@ function fecharModalDestino() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 function abrirModalDatas() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-datas");
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   /* Obter dados salvos */
   const savedData = Flight.getDatesTravelers();
   let adultos = savedData.adultos;
   let criancas = savedData.criancas;
   let bebes = savedData.bebes;
-
   /* Elementos dos contadores */
   const contadorAdultos = document.getElementById("contador-adultos");
   const contadorCriancas = document.getElementById("contador-criancas");
   const contadorBebes = document.getElementById("contador-bebes");
   const inputDataPartida = document.getElementById("data-partida");
   const inputDataRegresso = document.getElementById("data-regresso");
-
   /* Carregar valores salvos */
   contadorAdultos.textContent = adultos;
   contadorCriancas.textContent = criancas;
   contadorBebes.textContent = bebes;
   inputDataPartida.value = savedData.dataPartida;
   inputDataRegresso.value = savedData.dataRegresso;
-
   /* Configurar botoes de contadores */
   setupCounters(
     contadorAdultos,
@@ -823,21 +722,17 @@ function abrirModalDatas() {
     criancas,
     bebes
   );
-
   /* Configurar datas minimas */
   const hoje = new Date().toISOString().split("T")[0];
   inputDataPartida.min = hoje;
   inputDataRegresso.min = hoje;
-
   inputDataPartida.addEventListener("change", (e) => {
     inputDataRegresso.min = e.target.value;
   });
-
   /* Botao confirmar */
   document.getElementById("confirmar-datas").addEventListener("click", () => {
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
-
     if (dataPartida && dataRegresso) {
       Flight.setDatesTravelers(
         dataPartida,
@@ -855,7 +750,6 @@ function abrirModalDatas() {
       fecharModalDatas();
     }
   });
-
   document
     .getElementById("fechar-modal-datas")
     .addEventListener("click", fecharModalDatas);
@@ -865,7 +759,6 @@ function abrirModalDatas() {
     }
   });
 }
-
 function setupCounters(
   contadorAdultos,
   contadorCriancas,
@@ -879,33 +772,28 @@ function setupCounters(
     adultos++;
     contadorAdultos.textContent = adultos;
   });
-
   document.getElementById("diminuir-adultos").addEventListener("click", () => {
     if (adultos > 1) {
       adultos--;
       contadorAdultos.textContent = adultos;
     }
   });
-
   /* Botoes para criancas */
   document.getElementById("aumentar-criancas").addEventListener("click", () => {
     criancas++;
     contadorCriancas.textContent = criancas;
   });
-
   document.getElementById("diminuir-criancas").addEventListener("click", () => {
     if (criancas > 0) {
       criancas--;
       contadorCriancas.textContent = criancas;
     }
   });
-
   /* Botoes para bebes */
   document.getElementById("aumentar-bebes").addEventListener("click", () => {
     bebes++;
     contadorBebes.textContent = bebes;
   });
-
   document.getElementById("diminuir-bebes").addEventListener("click", () => {
     if (bebes > 0) {
       bebes--;
@@ -913,7 +801,6 @@ function setupCounters(
     }
   });
 }
-
 function updateDatesButton(
   dataPartida,
   dataRegresso,
@@ -928,21 +815,17 @@ function updateDatesButton(
   const totalTravelers = adultos + criancas + bebes;
   const travelersText =
     totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
-
   const btnDatas = document.getElementById("btn-datas");
   const textoDatas = btnDatas.querySelector("div:first-child p");
   const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
-
   textoDatas.textContent = formattedDates;
   textoViajantesElemento.textContent = travelersText;
 }
-
 function fecharModalDatas() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-datas");
   modal.classList.add("hidden");
   modal.classList.remove("flex");
-
   // Atualizar o número de viajantes ao fechar o modal
   const contadorAdultos = document.getElementById("contador-adultos");
   const contadorCriancas = document.getElementById("contador-criancas");
@@ -956,27 +839,21 @@ function fecharModalDatas() {
   const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
   if (textoViajantesElemento) textoViajantesElemento.textContent = travelersText;
 }
-
 function abrirModalAcessibilidade() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-acessibilidade");
   const listaAcessibilidades = document.getElementById("lista-acessibilidades");
   const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarAcessibilidades(lista) {
     listaAcessibilidades.innerHTML = "";
-
     lista.forEach((acessibilidade, index) => {
       const li = document.createElement("li");
       li.className =
         "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
-
       const selected = Flight.getSelectedAccessibilities().includes(index);
       const icon = Flight.getAccessibilityIcon(acessibilidade);
-
       li.innerHTML = `
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -994,34 +871,27 @@ function abrirModalAcessibilidade() {
           </div>
         </div>
       `;
-
       li.addEventListener("click", () => {
         Flight.toggleAccessibility(index);
         mostrarAcessibilidades(lista);
       });
-
       listaAcessibilidades.appendChild(li);
     });
   }
-
   mostrarAcessibilidades(Flight.getAccessibilities());
-
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const filteredAccessibilities = Flight.filterAccessibilities(termoPesquisa);
     mostrarAcessibilidades(filteredAccessibilities);
   });
-
   document
     .getElementById("confirmar-acessibilidade")
     .addEventListener("click", () => {
       Flight.confirmAccessibilities();
       updateAccessibilityButton();
-
       filters.acessibilidade = Flight.getSelectedAccessibilities();
       fecharModalAcessibilidade();
     });
-
   document
     .getElementById("fechar-modal-acessibilidade")
     .addEventListener("click", fecharModalAcessibilidade);
@@ -1031,12 +901,10 @@ function abrirModalAcessibilidade() {
     }
   });
 }
-
 function updateAccessibilityButton() {
   const textoAcessibilidade = document.getElementById("texto-acessibilidade");
   textoAcessibilidade.textContent = Flight.getAccessibilitiesText();
 }
-
 function fecharModalAcessibilidade() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-acessibilidade");
@@ -1045,24 +913,19 @@ function fecharModalAcessibilidade() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 function abrirModalTipoTurismo() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-tipo-turismo");
   const gridTipos = document.getElementById("grid-tipos-turismo");
   const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarTiposTurismo(lista) {
     gridTipos.innerHTML = "";
-
     lista.forEach((tipo) => {
       const card = document.createElement("div");
       card.className =
         "w-full h-32 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200";
-
       card.innerHTML = `
         <img draggable="false" class="absolute inset-0 w-full h-full object-cover" src="${tipo.imagem}" alt="${tipo.nome}" />
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-end p-3">
@@ -1071,26 +934,21 @@ function abrirModalTipoTurismo() {
           </div>
         </div>
       `;
-
       card.addEventListener("click", () => {
         Flight.setTourismType(tipo);
         filters.tipoTurismo = tipo;
         updateTourismButton(tipo);
         fecharModalTipoTurismo();
       });
-
       gridTipos.appendChild(card);
     });
   }
-
   mostrarTiposTurismo(Flight.getTourismTypes());
-
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const filteredTypes = Flight.filterTourismTypes(termoPesquisa);
     mostrarTiposTurismo(filteredTypes);
   });
-
   document
     .getElementById("fechar-modal-tipo-turismo")
     .addEventListener("click", fecharModalTipoTurismo);
@@ -1100,12 +958,10 @@ function abrirModalTipoTurismo() {
     }
   });
 }
-
 function updateTourismButton(tipo) {
   const textoTipoTurismo = document.getElementById("texto-tipo-turismo");
   textoTipoTurismo.textContent = tipo.nome;
 }
-
 function fecharModalTipoTurismo() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-tipo-turismo");

@@ -2,10 +2,8 @@
 import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
-
 /* Importa apenas a função de renderização dos cards do FlightView */
 import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
-
 /* Tradução dos tipos de turismo para apresentação nos cards */
 const TURISMO_LABELS = {
   TurismodeSolePraia: "Turismo de Sol e Praia",
@@ -18,7 +16,6 @@ const TURISMO_LABELS = {
   SaudeeBemEstar: "Saúde e Bem-estar",
   Ecourismo: "Ecoturismo",
 };
-
 /* Dados dos tipos de turismo */
 const TURISMO_CARDS = [
   {
@@ -67,19 +64,16 @@ const TURISMO_CARDS = [
     img: "../img/tipos-turismo/negocios.png",
   },
 ];
-
 // Função para obter todas as viagens de um tipo de turismo
 function getAllTripsForTipoTurismo(tipoTurismo) {
   return Flight.getTripsByTurismo(tipoTurismo);
 }
-
 // Função para filtrar e ordenar viagens
 function filterAndSortTrips(
   trips,
   { sortDate, sortPrice, minPrice, maxPrice }
 ) {
   let filtered = [...trips];
-
   // Filtrar por preço mínimo/máximo
   if (minPrice !== "" && !isNaN(Number(minPrice))) {
     filtered = filtered.filter((v) => Number(v.custo) >= Number(minPrice));
@@ -87,7 +81,6 @@ function filterAndSortTrips(
   if (maxPrice !== "" && !isNaN(Number(maxPrice))) {
     filtered = filtered.filter((v) => Number(v.custo) <= Number(maxPrice));
   }
-
   // Ordenar por data
   if (sortDate === "recent" || sortDate === "oldest") {
     filtered.sort((a, b) => {
@@ -105,17 +98,14 @@ function filterAndSortTrips(
       return sortDate === "recent" ? dateA - dateB : dateB - dateA;
     });
   }
-
   // Ordenar por preço
   if (sortPrice === "price-asc") {
     filtered.sort((a, b) => Number(a.custo) - Number(b.custo));
   } else if (sortPrice === "price-desc") {
     filtered.sort((a, b) => Number(b.custo) - Number(a.custo));
   }
-
   return filtered;
 }
-
 // Renderiza os cards das viagens filtradas
 function renderFilteredCardsFromList(viagens, tipoTurismo) {
   const container = document.querySelector(".card-viagens");
@@ -166,7 +156,6 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
           })
           .join("")
       : "";
-
     const cardHTML = `
       <div class="bg-white dark:bg-gray-800 w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div class="relative w-full h-80">
@@ -195,7 +184,6 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
     tempDiv.innerHTML = cardHTML.trim();
     const card = tempDiv.firstElementChild;
     container.appendChild(card);
-
     // Now add the event listener to the heart icon inside this card
     const heart = card.querySelector('.favorite-icon');
     if (heart) {
@@ -207,7 +195,6 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
       }
       heart.setAttribute("data-favorito", isFav ? "true" : "false");
       heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
-
       heart.addEventListener("click", (e) => {
         e.stopPropagation();
         if (!User.isLogged()) {
@@ -236,7 +223,6 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
     }
   });
 }
-
 // Renderiza a barra de tipos de turismo
 function renderTourismTypesBar() {
   const bar = document.getElementById("tourism-types-bar");
@@ -258,13 +244,11 @@ function renderTourismTypesBar() {
   `
   ).join("");
 }
-
 // Obtém o tipo de turismo da query string
 function getTipoTurismoFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("turismo") || "";
 }
-
 // Função para ler os valores dos filtros
 function getFilterValues() {
   return {
@@ -274,7 +258,6 @@ function getFilterValues() {
     maxPrice: document.getElementById("max-price")?.value || "",
   };
 }
-
 // Função principal para aplicar filtros e renderizar
 function applyFiltersAndRender(tipoTurismo) {
   const allTrips = getAllTripsForTipoTurismo(tipoTurismo);
@@ -282,7 +265,6 @@ function applyFiltersAndRender(tipoTurismo) {
   const filteredTrips = filterAndSortTrips(allTrips, filters);
   renderFilteredCardsFromList(filteredTrips, tipoTurismo);
 }
-
 // Adiciona listeners aos filtros
 function setupFilterListeners(tipoTurismo) {
   ["sort-date", "sort-price", "min-price", "max-price"].forEach((id) => {
@@ -310,10 +292,8 @@ function setupFilterListeners(tipoTurismo) {
     });
   }
 }
-
 // Carrega componentes e inicializa dados ao carregar a página
 document.addEventListener("DOMContentLoaded", () => {
-  loadComponent("../html/_slider.html", "slider-placeholder");
   Flight.init();
   const tipoTurismo = getTipoTurismoFromURL();
   if (tipoTurismo) {

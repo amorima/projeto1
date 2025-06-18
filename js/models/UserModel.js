@@ -3,12 +3,10 @@ import {
   saveToLocalStorage,
   getNextId,
 } from "./ModelHelpers.js";
-
 // ARRAY USERS
 let users;
 let newsletter;
 let reviews = [];
-
 // CARREGAR UTILIZADORES DA LOCALSTORAGE
 export function init() {
   users = localStorage.user ? JSON.parse(localStorage.user) : [];
@@ -19,67 +17,46 @@ export function init() {
     // Add preferences object if it doesn't exist (backward compatibility)
     preferences: u.preferences || { newsletter: u.newsletter || false }
   }));
-  
   // Initialize newsletter array first, then load from localStorage
   newsletter = [];
   if (localStorage.newsletter) {
     loadFromLocalStorage("newsletter", newsletter);
   }
-  
   // Rebuild newsletter from users with newsletter preferences (avoid duplicates)
   rebuildNewsletterFromUsers();
-  
   reviews = localStorage.reviews ? JSON.parse(localStorage.reviews) : [];
 }
-
 // ADICIONAR UTILIZADOR
 export function add(username, email, password, acceptNewsletter = false, referralCode = null) {
   if (users.some((user) => user.email === email)) {
-    throw Error(`Utilizador com email "${email}" já existe!`);
-  } else {
-    console.log(`[DEBUG] Criando utilizador com newsletter: ${acceptNewsletter}`);
+    throw Error(`Utilizador com email "${email}" já existe!`);  } else {
     const newUser = new User(username, password, email, acceptNewsletter, "", 50, false, false);
-    console.log(`[DEBUG] Utilizador criado:`, newUser);    users.push(newUser);
+    users.push(newUser);
     localStorage.setItem("user", JSON.stringify(users));
+    /* Update newsletter based on user preferences */    updateNewsletterFromUserPreferences(newUser);
 
-    /* Update newsletter based on user preferences */
-    updateNewsletterFromUserPreferences(newUser);
-
-    /* Process referral if provided */
     if (referralCode) {
-      console.log(`[DEBUG] Processando código de referência: ${referralCode}`);
       const referralResult = processReferral(referralCode);
-      console.log(`[DEBUG] Resultado do processamento de referência: ${referralResult}`);
-    } else {
-      console.log(`[DEBUG] Nenhum código de referência fornecido`);
     }
   }
 }
-
 // ALTERAR DADOS DO UTILIZADOR
 export function update(id, newUser) {
-  // Garantir que o id é sempre número
   const userId = parseInt(id, 10);
-  console.log('[DEBUG][UserModel] Utilizadores antes do update:', users);
   const index = users.findIndex((u) => parseInt(u.id, 10) === userId);
   if (index !== -1) {
     const oldUser = users[index];
     users[index] = { ...users[index], ...newUser, id: userId };
-    
     // Update newsletter if preferences changed
-    const updatedUser = users[index];
-    if (oldUser.preferences?.newsletter !== updatedUser.preferences?.newsletter) {
+    const updatedUser = users[index];    if (oldUser.preferences?.newsletter !== updatedUser.preferences?.newsletter) {
       updateNewsletterFromUserPreferences(updatedUser);
     }
     
     localStorage.setItem("user", JSON.stringify(users));
-    console.log('[DEBUG][UserModel] Utilizadores após o update:', users);
     return true;
   }
-  console.error('[DEBUG][UserModel] Utilizador não encontrado para update. id:', id, 'users:', users);
   throw Error("Utilizador não encontrado");
 }
-
 // APAGAR UTILIZADOR
 export function deleteUser(id) {
   const index = users.findIndex((u) => u.id == id);
@@ -90,7 +67,6 @@ export function deleteUser(id) {
   }
   throw Error("Utilizador não encontrado");
 }
-
 // ALTERAR PALAVRA-PASSE
 export function changePassword(email, newPassword) {
   const user = users.find((u) => u.email === email);
@@ -101,7 +77,6 @@ export function changePassword(email, newPassword) {
   }
   throw Error("Email não encontrado");
 }
-
 // LOGIN E MANIPULAÇÃO DE SESSÃO
 /**
  * Autentica um utilizador e armazena suas informações na sessão.
@@ -121,7 +96,6 @@ export function login(email, password) {
     throw Error("Email ou palavra-passe incorretos!");
   }
 }
-
 /**
  * Remove o utilizador autenticado da sessão.
  * @description
@@ -137,7 +111,6 @@ export function login(email, password) {
 export function logout() {
   sessionStorage.removeItem("loggedUser");
 }
-
 /**
  * Verifica se um utilizador está autenticado.
  * @return {boolean} Retorna true se o utilizador estiver autenticado, caso contrário, retorna false.
@@ -150,16 +123,13 @@ export function logout() {
  * import { isLogged } from './UserModel.js';
  * const loggedIn = isLogged();
  * if (loggedIn) {
- *  console.log('Utilizador está autenticado.');
  * } else {
- *  console.log('Utilizador não está autenticado.');
  * }
  * @see getUserLogged - Para obter o utilizador autenticado, se existir.
  */
 export function isLogged() {
   return sessionStorage.getItem("loggedUser") ? true : false;
 }
-
 /**
  * Obtém o utilizador autenticado.
  * @return {Object|null} O utilizador autenticado ou null se não houver utilizador autenticado.
@@ -170,16 +140,13 @@ export function isLogged() {
  * import { getUserLogged } from './UserModel.js';
  * const user = getUserLogged();
  * if (user) {
- *   console.log(`Bem-vindo, ${user.username}!`);
  * } else {
- *   console.log('Nenhum utilizador autenticado.');
  * }
  * @see isLogged - Para verificar se há um utilizador autenticado.
  */
 export function getUserLogged() {
   return JSON.parse(sessionStorage.getItem("loggedUser"));
 }
-
 export function getUserById(id) {
   const user = users.find((u) => u.id == id);
   if (user) {
@@ -187,7 +154,6 @@ export function getUserById(id) {
   }
   throw Error("Utilizador não encontrado");
 }
-
 /**
  * Verifica se um utilizador é administrador.
  * @param {Object} user - O utilizador a ser verificado.
@@ -196,7 +162,6 @@ export function getUserById(id) {
 export function isAdmin(user) {
   return user && (user.admin === true || user.admin === 'Admin');
 }
-
 /**
  * Obtém o nível do utilizador baseado nos pontos.
  * @param {number} points - Pontos do utilizador.
@@ -215,7 +180,6 @@ export function getUserLevel(points) {
     return "Explorador";
   }
 }
-
 // ADMIN FUNCTIONS
 /**
  * Obtém todos os utilizadores.
@@ -224,7 +188,6 @@ export function getUserLevel(points) {
 export function getAll() {
   return [...users]; // Return a copy to prevent direct modification
 }
-
 /**
  * Filtra utilizadores por termo de pesquisa.
  * @param {string} searchTerm - Termo para pesquisar em username e email.
@@ -234,14 +197,12 @@ export function search(searchTerm) {
   if (!searchTerm || searchTerm.trim() === '') {
     return getAll();
   }
-  
   const term = searchTerm.toLowerCase().trim();
   return users.filter(user => 
     (user.username && user.username.toLowerCase().includes(term)) ||
     (user.email && user.email.toLowerCase().includes(term))
   );
 }
-
 /**
  * Ordena utilizadores por uma coluna específica.
  * @param {string} column - Coluna para ordenar (username, email, pontos, admin, isPrivate).
@@ -252,7 +213,6 @@ export function sortBy(column, direction = 'asc') {
   const sortedUsers = [...users].sort((a, b) => {
     let valueA = a[column];
     let valueB = b[column];
-    
     // Handle different data types
     if (column === 'pontos') {
       valueA = parseInt(valueA) || 0;
@@ -269,17 +229,14 @@ export function sortBy(column, direction = 'asc') {
       valueA = valueA.toLowerCase();
       valueB = valueB ? valueB.toLowerCase() : '';
     }
-    
     if (direction === 'asc') {
       return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
     } else {
       return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
     }
   });
-  
   return sortedUsers;
 }
-
 /**
  * Cria um novo utilizador via admin.
  * @param {Object} userData - Dados do utilizador a ser criado.
@@ -294,20 +251,16 @@ export function createUser(userData) {
     privacidade = 'N', 
     admin = 'User' 
   } = userData;
-  
   // Validate required fields
   if (!username || !email || !password) {
     throw new Error('Username, email e password são obrigatórios');
   }
-  
   // Check if email already exists
   if (users.some(user => user.email === email)) {
     throw new Error(`Utilizador com email "${email}" já existe`);
   }
-  
   const isPrivate = privacidade === 'S';
   const isAdmin = admin === 'Admin';
-  
   // Create user object with the same structure as existing users
   const newUser = {
     id: getNextId(users),
@@ -325,13 +278,10 @@ export function createUser(userData) {
     reservas: [],
     favoritos: []
   };
-  
   users.push(newUser);
   localStorage.setItem("user", JSON.stringify(users));
-  
   return newUser;
 }
-
 // USER NEWSLETTER
 /**
  * Adiciona um utilizador à lista de subscritores da newsletter.
@@ -350,7 +300,6 @@ export function addNewsletterUser(email) {
   newsletter.push(newsletterUser);
   saveToLocalStorage("newsletter", newsletter);
 }
-
 /**
  * Remove um utilizador da lista de subscritores da newsletter.
  * @param {string} mail - O email do utilizador a ser removido.
@@ -374,7 +323,6 @@ export function removeNewsletterUser(email) {
   }
   throw Error("No Subscription Found");
 }
-
 export function getUserByName(username) {
   const user = users.find((u) => u.username === username);
   if (user) {
@@ -382,7 +330,6 @@ export function getUserByName(username) {
   }
   return false;
 }
-
 /**
  * Converte um utilizador de newsletter para um utilizador normal.
  * @param {string} username - O nome de utilizador a ser atribuído.
@@ -400,7 +347,6 @@ export function newsletterToUser(username, password, email) {
   removeNewsletterUser(email);
   add(username, email, password);
 }
-
 // USER AVATAR
 /**
  * Altera o avatar de um utilizador.
@@ -426,7 +372,6 @@ export function changeAvater(user, avatar) {
   user.avatar = avatar;
   update(user.username, user);
 }
-
 // COMMENTS AND RATINGS
 /**
  * Adiciona um comentário a um lugar associado a um utilizador.
@@ -502,11 +447,9 @@ export function removeComment(user, place, comment) {
   if (!user || !place || !comment) {
     throw Error("User, place, and comment must be provided");
   }
-
   if (!place.comments || !Array.isArray(place.comments)) {
     throw Error("Place does not have comments to remove");
   }
-
   const index = place.comments.findIndex(
     (c) => c.text === comment && c.user === user.username
   );
@@ -545,11 +488,9 @@ export function editComment(user, place, comment) {
   if (!user || !place || !comment) {
     throw Error("User, place, and comment must be provided");
   }
-
   if (!place.comments || !Array.isArray(place.comments)) {
     throw Error("Place does not have comments to edit");
   }
-
   const index = place.comments.findIndex(
     (c) => c.text === comment && c.user === user.username
   );
@@ -560,7 +501,6 @@ export function editComment(user, place, comment) {
     throw Error("Comment not found or does not belong to the user");
   }
 }
-
 /* Função para criar utilizador de teste */
 export function createTestUser(username, points = 50) {
   const testUser = new User(
@@ -574,19 +514,16 @@ export function createTestUser(username, points = 50) {
   );
   return testUser;
 }
-
 /* Função para simular login de teste */
 export function loginTest(username, points = 50) {
   const testUser = createTestUser(username, points);
   sessionStorage.setItem("loggedUser", JSON.stringify(testUser));
   return testUser;
 }
-
 /* Limpar sessão de teste */
 export function clearTestSession() {
   sessionStorage.removeItem("loggedUser");
 }
-
 export function getUserImage(username) {
   const userAvatar = getUserByName(username);
   if (userAvatar && userAvatar.avatar) {
@@ -595,15 +532,12 @@ export function getUserImage(username) {
   // Retorna uma imagem padrão se o utilizador não tiver avatar
   return false;
 }
-
 export function addReservation(userAdd, reservation){
   if (!userAdd.reservas) userAdd.reservas = [];
-  
   // Verifica se já existe reserva baseada no tipo
   if (reservation && reservation.numeroVoo && userAdd.reservas.some(r => r.numeroVoo == reservation.numeroVoo)) {
     return false; // Já existe voo
   }
-  
   if (reservation && reservation.tipo === 'hotel' && reservation.id) {
     // Check for duplicate hotel reservations with same id, checkIn and checkOut dates
     const existingHotel = userAdd.reservas.find(r => 
@@ -616,14 +550,12 @@ export function addReservation(userAdd, reservation){
       return false; // Já existe reserva de hotel para as mesmas datas
     }
   }
-  
   userAdd.reservas.push(reservation);
   update(userAdd.id, userAdd);
   return true; 
 }
 export function addFavorite(user, item) {
   if (!user.favoritos) user.favoritos = [];
-  
   // Verifica se é um hotel (tem id) ou flight (tem numeroVoo)
   if (item && item.id) {
     // É um hotel
@@ -638,7 +570,6 @@ export function addFavorite(user, item) {
   } else {
     return false; // Item inválido
   }
-  
   user.favoritos.push(item);
   update(user.id, user);
   // Atualizar sessão se for o user logado
@@ -648,12 +579,9 @@ export function addFavorite(user, item) {
   }
   return true;
 }
-
 export function removeFavorite(user, item) {
   if (!user.favoritos) return false;
-  
   let idx = -1;
-  
   // Verifica se é um hotel (tem id) ou flight (tem numeroVoo/nVoo)
   if (item && item.id) {
     // É um hotel
@@ -667,7 +595,6 @@ export function removeFavorite(user, item) {
       (f.nVoo && item.numeroVoo && f.nVoo == item.numeroVoo)
     );
   }
-  
   if (idx !== -1) {
     user.favoritos.splice(idx, 1);
     update(user.id, user);
@@ -680,14 +607,11 @@ export function removeFavorite(user, item) {
   }
   return false;
 }
-
 export function addPontos(user, pontos, description = "Pontos adicionados") {
   if (!user.pontos) user.pontos = 0;
-  
   // Initialize movements array and add registration bonus if needed
   if (!user.movimentosPontos) {
     user.movimentosPontos = [];
-    
     // If user has existing points but no movements, add the registration movement
     if (user.pontos > 0) {
       user.movimentosPontos.push({
@@ -699,11 +623,9 @@ export function addPontos(user, pontos, description = "Pontos adicionados") {
       });
     }
   }
-  
   const pontosValue = parseInt(pontos, 10);
   const saldoAnterior = parseInt(user.pontos, 10);
   user.pontos = saldoAnterior + pontosValue;
-  
   // Add movement record
   user.movimentosPontos.push({
     data: new Date().toISOString(),
@@ -713,14 +635,11 @@ export function addPontos(user, pontos, description = "Pontos adicionados") {
     saldoAtual: user.pontos
   });
 }
-
 export function subtractPontos(user, pontos, description = "Pontos subtraídos") {
   if (!user.pontos) user.pontos = 0;
-  
   // Initialize movements array and add registration bonus if needed
   if (!user.movimentosPontos) {
     user.movimentosPontos = [];
-    
     // If user has existing points but no movements, add the registration movement
     if (user.pontos > 0) {
       user.movimentosPontos.push({
@@ -732,11 +651,9 @@ export function subtractPontos(user, pontos, description = "Pontos subtraídos")
       });
     }
   }
-  
   const pontosValue = parseInt(pontos, 10);
   const saldoAnterior = parseInt(user.pontos, 10);
   user.pontos = Math.max(0, saldoAnterior - pontosValue);
-  
   // Add movement record
   user.movimentosPontos.push({
     data: new Date().toISOString(),
@@ -746,7 +663,6 @@ export function subtractPontos(user, pontos, description = "Pontos subtraídos")
     saldoAtual: user.pontos
   });
 }
-
 /**
  * CLASSE QUE MODELA UM UTILIZADOR NA APLICAÇÃO
  * @class User
@@ -762,8 +678,6 @@ export function subtractPontos(user, pontos, description = "Pontos subtraídos")
  * A classe também possui um método `level` que retorna o nível do utilizador com base nos pontos acumulados.
  * @example
  * const user = new User('john_doe', 'password123', 'user@gmail.com', 'https://example.com/avatar.jpg', 1000, false, true);
- * console.log(user.username); // 'john_doe'
- * console.log(user.level); // 'Viajante'
  */
 class User {
   id = 0;
@@ -815,7 +729,6 @@ class User {
       newsletter: newsletter
     };
   }
-
   get level() {
     if (this.pontos >= 5000) {
       return "Embaixador";
@@ -830,14 +743,11 @@ class User {
     }
   }
 }
-
 // FUNÇÕES PARA CONTROLO DE ABAS DO PERFIL DE UTILIZADOR
-
 /* Função para alternar entre as abas */
 export function switchTab(tabId) {
   const tabButtons = document.querySelectorAll('[role="tab"]');
   const tabPanes = document.querySelectorAll(".tab-pane");
-
   /* Desativar todas as abas */
   tabButtons.forEach((button) => {
     button.classList.remove(
@@ -855,7 +765,6 @@ export function switchTab(tabId) {
   }); /* Ativar a aba selecionada */
   const selectedButton = document.getElementById(`tab-${tabId}-btn`);
   const selectedPane = document.getElementById(`tab-${tabId}`);
-
   if (selectedButton && selectedPane) {
     selectedButton.classList.add(
       "text-Button-Main",
@@ -867,7 +776,6 @@ export function switchTab(tabId) {
     selectedButton.setAttribute("aria-selected", "true");
     selectedPane.classList.remove("hidden");
     selectedPane.classList.add("active");
-
     /* Carregar conteúdo específico baseado na aba */
     if (tabId === "recompensas") {
       loadRewarditContent();
@@ -878,14 +786,11 @@ export function switchTab(tabId) {
     }
   }
 }
-
 /* Inicializar os eventos dos botões das abas */
 export function initTabEvents() {
   const tabButtons = document.querySelectorAll('[role="tab"]');
-
   tabButtons.forEach((button) => {
     const tabId = button.id.replace("-btn", "").replace("tab-", "");
-
     button.addEventListener("click", () => {
       switchTab(tabId);
     });
@@ -893,7 +798,6 @@ export function initTabEvents() {
   /* Iniciar na aba Perfil */
   switchTab("perfil");
 }
-
 /* Carregar conteúdo da aba Recompensas */
 function loadRewarditContent() {
   const rewarditContent = document.getElementById("rewardit-content");
@@ -912,7 +816,6 @@ function loadRewarditContent() {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         const content = doc.querySelector(".max-w-[1270px]");
-
         if (content) {
           rewarditContent.innerHTML = content.innerHTML;
           rewarditContent.classList.remove(
@@ -927,14 +830,12 @@ function loadRewarditContent() {
         }
       })
       .catch((err) => {
-        console.error("Erro ao carregar conteúdo RewardIt:", err);
         rewarditContent.innerHTML = `<div class="text-center py-8">
           <p class="text-red-500 mb-4">Erro ao carregar conteúdo</p>
           <p class="text-Text-Subtitles dark:text-gray-400">${err.message}</p>
           <button class="mt-4 bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300 py-2 px-4" onclick="location.reload()">Tentar novamente</button>
         </div>`;
       });
-
     /* Adicionar mensagem para indicar que o carregamento foi iniciado */
     rewarditContent.innerHTML = `<div class="text-center py-8">
       <p class="text-Text-Body dark:text-gray-300 mb-4">A carregar conteúdo...</p>
@@ -942,7 +843,6 @@ function loadRewarditContent() {
     </div>`;
   }
 }
-
 /* Carregar conteúdo da aba Reservas */
 function loadReservasContent() {
   /* Aqui futuramente seriam carregadas as reservas do utilizador */
@@ -961,7 +861,6 @@ function loadReservasContent() {
     }
   }
 }
-
 /* Carregar bookmarks do utilizador */
 function loadBookmarks() {
   /* Aqui futuramente seriam carregados os favoritos do utilizador */
@@ -976,14 +875,12 @@ function loadBookmarks() {
     }
   }
 }
-
 /* Funções de controlo do modal de gamificação */
 export function shouldShowGamificationModal() {
   /* Verificar se modal foi ignorado permanentemente */
   if (localStorage.getItem("gamificationModalIgnored") === "true") {
     return false;
   }
-
   /* Verificar se foi adiado para mais tarde na sessão atual */
   if (sessionStorage.getItem("gamificationModalDeferred") === "true") {
     return false;
@@ -991,48 +888,38 @@ export function shouldShowGamificationModal() {
   /* Apenas mostrar em desktop (768px+) */
   return window.innerWidth >= 768;
 }
-
 export function deferGamificationModal() {
   /* Guardar na session storage para não mostrar até à sessão acabar */
   sessionStorage.setItem("gamificationModalDeferred", "true");
 }
-
 export function ignoreGamificationModal() {
   /* Guardar na local storage para não mostrar mais */
   localStorage.setItem("gamificationModalIgnored", "true");
 }
-
 export function forceShowGamificationModal() {
   /* Forçar mostrar o modal independentemente das configurações */
   return true;
 }
-
 /* Função para guardar código especial */
 export function saveSpecialCode(code) {
   if (!code || code.trim() === "") {
     throw new Error("Código inválido");
   }
-
   /* Guardar código na local storage */
   const existingCodes = JSON.parse(
     localStorage.getItem("specialCodes") || "[]"
   );
-
   /* Verificar se código já foi usado */
   if (existingCodes.includes(code.trim())) {
     throw new Error("Este código já foi utilizado");
   }
-
   existingCodes.push(code.trim());
   localStorage.setItem("specialCodes", JSON.stringify(existingCodes));
-
   return true;
 }
-
 export function getSpecialCodes() {
   return JSON.parse(localStorage.getItem("specialCodes") || "[]");
 }
-
 /**
  * Remove uma reserva do utilizador pelo número do voo (nVoo).
  * @param {Object} user - O utilizador autenticado.
@@ -1055,7 +942,6 @@ export function removeReservaByNumeroVoo(user, numeroVoo) {
   }
   return false;
 }
-
 /**
  * Obtém todas as reviews armazenadas.
  * @return {Array} Um array de objetos de review.
@@ -1063,7 +949,6 @@ export function removeReservaByNumeroVoo(user, numeroVoo) {
 export function getReviews() {
   return reviews;
 }
-
 /**
  * Obtém as reviews de um destino específico.
  * @param {string} destino - O destino para filtrar as reviews.
@@ -1072,7 +957,6 @@ export function getReviews() {
 export function getReviewsByDestino(destino) {
   return reviews.filter(r => r.destino === destino);
 }
-
 /**
  * Adiciona uma nova review.
  * @param {Object} review - O objeto da review a ser adicionada.
@@ -1090,7 +974,6 @@ export function addReview(review) {
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReview;
 }
-
 /**
  * Adiciona uma resposta a uma review existente.
  * @param {number} reviewId - O ID da review à qual a resposta será adicionada.
@@ -1133,7 +1016,6 @@ export function addReplyToReview(reviewId, reply) {
   localStorage.setItem("reviews", JSON.stringify(reviews));
   return newReply;
 }
-
 // REFERRAL SYSTEM
 /**
  * Generates a referral link for the given user
@@ -1147,7 +1029,6 @@ export function getReferralLink(user) {
   // Create the referral link pointing to the login page
   return `${window.location.origin}/html/_login.html?ref=${user.id}`;
 }
-
 /**
  * Processes a referral code and awards points to the referring user
  * @param {string} referralCode - The referral code (user ID) from the URL
@@ -1157,36 +1038,27 @@ export function processReferral(referralCode) {
   if (!referralCode) {
     return false;
   }
-
   try {
     // Find the referring user by ID
     const referringUser = getUserById(parseInt(referralCode, 10));
-    
     if (!referringUser) {
-      console.warn('Utilizador de referência não encontrado:', referralCode);
       return false;
     }
-
     // Award 100 points to the referring user
     const currentPoints = parseInt(referringUser.pontos) || 0;
     const newPoints = currentPoints + 100;
-
     // Update the user in the users array
     const userIndex = users.findIndex(u => parseInt(u.id, 10) === parseInt(referralCode, 10));
     if (userIndex !== -1) {
       users[userIndex].pontos = newPoints;
       localStorage.setItem("user", JSON.stringify(users));
-      console.log(`Referência processada: ${referringUser.username} recebeu 100 pontos (${currentPoints} -> ${newPoints})`);
       return true;
     }
-
     return false;
   } catch (error) {
-    console.warn('Erro ao processar referência:', error.message);
     return false;
   }
 }
-
 /**
  * Handles newsletter subscription from the homepage form
  * @param {string} email - The email to subscribe to newsletter
@@ -1199,38 +1071,31 @@ export function processReferral(referralCode) {
 export function subscribeToNewsletter(email) {
   // Check if email belongs to a registered user
   const existingUser = users.find(user => user.email === email);
-  
   if (existingUser) {
     return {
       success: false,
       message: "User já existente"
     };
   }
-  
   // Check if email is already in newsletter (avoid duplicates)
   const existingNewsletterSub = newsletter.find(sub => sub.email === email);
-  
   if (existingNewsletterSub) {
     return {
       success: false,
       message: "Email já subscrito à newsletter"
     };
   }
-  
   // Add email to newsletter (simple structure)
   const newsletterSubscription = {
     email: email
   };
-  
   newsletter.push(newsletterSubscription);
   saveToLocalStorage("newsletter", newsletter);
-  
   return {
     success: true,
     message: "Newsletter subscrita com sucesso!"
   };
 }
-
 /**
  * Updates newsletter array when user preferences change
  * @param {Object} user - The user whose preferences changed
@@ -1241,7 +1106,6 @@ export function subscribeToNewsletter(email) {
 export function updateNewsletterFromUserPreferences(user) {
   // Remove any existing entry for this user (avoid duplicates)
   newsletter = newsletter.filter(sub => sub.email !== user.email);
-  
   // If user wants newsletter, add them to the newsletter array
   if (user.preferences && user.preferences.newsletter === true) {
     const userNewsletterEntry = {
@@ -1250,10 +1114,8 @@ export function updateNewsletterFromUserPreferences(user) {
     };
     newsletter.push(userNewsletterEntry);
   }
-  
   saveToLocalStorage("newsletter", newsletter);
 }
-
 /**
  * Rebuilds newsletter array to include users with newsletter preferences
  * Removes duplicates and ensures proper structure
@@ -1261,7 +1123,6 @@ export function updateNewsletterFromUserPreferences(user) {
 function rebuildNewsletterFromUsers() {
   // Remove any user entries that might be duplicated (keep only standalone emails)
   newsletter = newsletter.filter(sub => !sub.username);
-  
   // Add users with newsletter preference enabled
   users.forEach(user => {
     if (user.preferences && user.preferences.newsletter === true) {
@@ -1275,10 +1136,8 @@ function rebuildNewsletterFromUsers() {
       }
     }
   });
-  
   saveToLocalStorage("newsletter", newsletter);
 }
-
 /**
  * Gets all newsletter subscribers including users with newsletter preference
  * @returns {Array} Array of all newsletter subscribers (no duplicates)
@@ -1287,7 +1146,6 @@ export function getAllNewsletterSubscribers() {
   // Get current newsletter array (already contains both types)
   return newsletter;
 }
-
 /**
  * Removes a reservation and subtracts points from user
  * @param {number} userId - The user's ID
@@ -1301,63 +1159,49 @@ export function removeReservation(userId, reservationIndex) {
     if (userIndex === -1) {
       throw new Error("Utilizador não encontrado");
     }
-
     const user = users[userIndex];
       // Check if user has reservations
     if (!user.reservas || !Array.isArray(user.reservas)) {
       throw new Error("Utilizador não tem reservas");
     }
-
     // Check if reservation index is valid
     if (reservationIndex < 0 || reservationIndex >= user.reservas.length) {
       throw new Error("Reserva não encontrada");
     }    // Get the reservation to remove
     const reservationToRemove = user.reservas[reservationIndex];    // Check for points in different possible property names (flight uses pointsAR, hotel uses pontos)
     const pointsToSubtract = parseInt(reservationToRemove.pointsAR) || parseInt(reservationToRemove.pontos) || 0;
-
     // Remove the reservation
     user.reservas.splice(reservationIndex, 1);
-
     // Subtract points from user using the new function
     const reservationType = reservationToRemove.tipo === 'hotel' ? 'hotel' : 'voo';
     const description = `Cancelamento de reserva de ${reservationType}: ${reservationToRemove.nome || reservationToRemove.destino || 'Reserva'}`;
     subtractPontos(user, pointsToSubtract, description);
-
     // Update user in users array
     users[userIndex] = user;
-
     // Save to localStorage
     localStorage.setItem("user", JSON.stringify(users));
-
     // Update sessionStorage if this is the logged user
     const loggedUser = getUserLogged();
     if (loggedUser && parseInt(loggedUser.id, 10) === parseInt(userId, 10)) {
       sessionStorage.setItem("loggedUser", JSON.stringify(user));
     }
-
-    console.log(`[DEBUG] Reserva removida. Pontos subtraídos: ${pointsToSubtract}`);
-
     return {
       success: true,
       message: "Reserva removida com sucesso!",
       pointsSubtracted: pointsToSubtract,
       newPoints: user.pontos
     };
-
   } catch (error) {
-    console.error('[DEBUG] Erro ao remover reserva:', error.message);
     return {
       success: false,
       message: error.message
     };
   }
 }
-
 export function isHotelInFavorites(user, hotelId) {
   if (!user.favoritos) return false;
   return user.favoritos.some(f => f.id == hotelId);
 }
-
 export function isFlightInFavorites(user, flightId) {
   if (!user.favoritos) return false;
   return user.favoritos.some(f => 
@@ -1365,23 +1209,19 @@ export function isFlightInFavorites(user, flightId) {
     (f.nVoo && f.nVoo == flightId)
   );
 }
-
 export function getUserPointMovements(user) {
   if (!user.movimentosPontos) {
     user.movimentosPontos = [];
   }
-  
   // Check if we need to add initial movement
   // This should only happen if user has points but no initial movement recorded
   if (user.pontos && user.pontos > 0) {
     const hasInitialMovement = user.movimentosPontos.some(movement => 
       movement.descricao === "Pontos iniciais" || movement.descricao === "Registo na plataforma"
     );
-    
     if (!hasInitialMovement) {
       // Calculate what the initial points should be by looking at the earliest balance
       let initialPoints = 50; // Default registration bonus
-      
       // If there are movements, calculate the initial points from the earliest movement
       if (user.movimentosPontos.length > 0) {
         // Sort movements by date (oldest first) to find the earliest balance
@@ -1389,7 +1229,6 @@ export function getUserPointMovements(user) {
         const earliestMovement = sortedMovements[0];
         initialPoints = earliestMovement.saldoAnterior;
       }
-      
       // Only add initial movement if there were actually initial points
       if (initialPoints > 0) {
         user.movimentosPontos.push({
@@ -1402,9 +1241,6 @@ export function getUserPointMovements(user) {
       }
     }
   }
-  
   // Return movements sorted by date (most recent first)
   return user.movimentosPontos.sort((a, b) => new Date(b.data) - new Date(a.data));
 }
-
-

@@ -1,7 +1,7 @@
-// DashboardModel.js - Model for dashboard data and statistics
-
 import { loadFromLocalStorage } from './ModelHelpers.js';
-
+/**
+ * Classe para gestão de dados e estatísticas do dashboard
+ */
 export class DashboardModel {
     constructor() {
         this.users = [];
@@ -9,25 +9,26 @@ export class DashboardModel {
         this.destinos = [];
         this.loadData();
     }
-
+    /**
+     * Carrega dados do armazenamento local
+     */
     loadData() {
         loadFromLocalStorage('user', this.users);
         loadFromLocalStorage('newsletter', this.newsletter);
         loadFromLocalStorage('destinos', this.destinos);
     }
-
-    // Graph 1: Newsletter subscription ratio
+    /**
+     * Obtém estatísticas das subscrições da newsletter
+     * @returns {Object} Estatísticas da newsletter
+     */
     getNewsletterStats() {
         const registeredSubscribed = this.users.filter(user => 
             user.preferences && user.preferences.newsletter === true
         ).length;
-
         const unregisteredSubscribed = this.newsletter.filter(sub => 
             !sub.username || sub.username === undefined
         ).length;
-
         const totalSubscribed = registeredSubscribed + unregisteredSubscribed;
-        
         return {
             registered: registeredSubscribed,
             unregistered: unregisteredSubscribed,
@@ -36,8 +37,10 @@ export class DashboardModel {
             unregisteredPercentage: totalSubscribed > 0 ? Math.round((unregisteredSubscribed / totalSubscribed) * 100) : 0
         };
     }
-
-    // Graph 2: Types of reservations made
+    /**
+     * Obtém estatísticas dos tipos de reservas
+     * @returns {Object} Estatísticas das reservas por tipo
+     */
     getReservationStats() {
         const reservationTypes = {
             'Apenas Voo': 0,
@@ -46,18 +49,16 @@ export class DashboardModel {
             'Voo + Seguro': 0,
             'Pacote Completo': 0
         };
-
         this.users.forEach(user => {
             if (user.reservas && Array.isArray(user.reservas)) {
                 user.reservas.forEach(reserva => {
                     const hasHotel = reserva.hotel && Object.keys(reserva.hotel).length > 0;
                     const hasCar = reserva.car && Object.keys(reserva.car).length > 0;
                     const hasSeguro = reserva.seguro === true;
-
                     if (hasHotel && hasCar && hasSeguro) {
                         reservationTypes['Pacote Completo']++;
                     } else if (hasHotel && hasCar) {
-                        reservationTypes['Voo + Hotel']++; // Assuming hotel is more important
+                        reservationTypes['Voo + Hotel']++;
                     } else if (hasHotel && hasSeguro) {
                         reservationTypes['Voo + Hotel']++;
                     } else if (hasCar && hasSeguro) {
@@ -74,15 +75,14 @@ export class DashboardModel {
                 });
             }
         });
-
         return reservationTypes;
     }
-
-    // Graph 3: Top 5 most liked destinations
+    /**
+     * Obtém os 5 destinos mais populares
+     * @returns {Array} Array dos destinos mais populares com contagem
+     */
     getTopDestinations() {
         const destinationCount = {};
-
-        // Count favorites from users
         this.users.forEach(user => {
             if (user.favoritos && Array.isArray(user.favoritos)) {
                 user.favoritos.forEach(favorito => {
@@ -93,8 +93,6 @@ export class DashboardModel {
                 });
             }
         });
-
-        // Convert to array and sort by count
         const sortedDestinations = Object.entries(destinationCount)
             .sort(([,a], [,b]) => b - a)
             .slice(0, 5)
@@ -102,11 +100,12 @@ export class DashboardModel {
                 destination,
                 count
             }));
-
         return sortedDestinations;
     }
-
-    // Get all dashboard statistics
+    /**
+     * Obtém todas as estatísticas do dashboard
+     * @returns {Object} Objeto com todas as estatísticas
+     */
     getAllStats() {
         return {
             newsletter: this.getNewsletterStats(),

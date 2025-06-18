@@ -10,8 +10,9 @@ import {
   getUserLocation,
   closestAirport,
 } from "./ViewHelpers.js";
-
-/* Funções globais para o modal de gamificação */
+/**
+ * Abre o modal de gamificação
+ */
 window.openGamificationModal = function () {
   const modal = document.getElementById("modal-gamificacao");
   if (modal) {
@@ -19,7 +20,9 @@ window.openGamificationModal = function () {
     document.body.style.overflow = "hidden";
   }
 };
-
+/**
+ * Fecha o modal de gamificação
+ */
 window.closeGamificationModal = function () {
   const modal = document.getElementById("modal-gamificacao");
   if (modal) {
@@ -27,47 +30,48 @@ window.closeGamificationModal = function () {
     document.body.style.overflow = "";
   }
 };
-
+/**
+ * Adia o modal de gamificação para mais tarde
+ */
 window.deferGamificationModal = function () {
   sessionStorage.setItem("gamificationModalDeferred", "true");
   window.closeGamificationModal();
 };
-
+/**
+ * Ignora permanentemente o modal de gamificação
+ */
 window.ignoreGamificationModal = function () {
   localStorage.setItem("gamificationModalIgnored", "true");
   window.closeGamificationModal();
 };
-
-/* Inicializar a aplicacao */
 let filters = {}
 Flight.init();
-User.init(); // Initialize UserModel
+User.init();
 initView();
-
-function initView() {
-  /* Obter localizacao do utilizador e definir aeroporto mais proximo */
-  getUserLocation((location) => {
+/**
+ * Inicializa a vista principal da aplicação
+ */
+function initView() {  getUserLocation((location) => {
     if (!location) return;
     const aeroportos = Flight.getAirports();
     const closest = closestAirport(location, aeroportos);
-    document.querySelector("#btn-open p").innerText = closest.cidade;
-  });  showCookieBanner();
+    const btnOpenElement = document.querySelector("#btn-open p");
+    if (btnOpenElement && closest) {
+      btnOpenElement.innerText = closest.cidade;
+    }
+  });
+  showCookieBanner();
   initSlider();
   setupModalButtons();
-  setupTripTypeButtons(); /* Setup multitrip functionality */
-  initGamificationModal(); /* Mostrar modal se necessário */
-  setupNewsletterForm(); /* Handle newsletter subscription */
-
-  /* Renderizar cards na homepage se o container existir */
+  setupTripTypeButtons();
+  initGamificationModal();
+  setupNewsletterForm();
   if (document.querySelector(".card-viagens")) {
     renderRandomOPOCards("card-viagens");
   }
-
-  /* Inicializar vista de tabela */
   const data = Flight.getAll();
   const config = createTableConfig(data);
   updateTable(config);
-
   const form = document.getElementById("add_flight_form");
   if (form) {
     form.addEventListener("submit", (e) => {
@@ -76,78 +80,61 @@ function initView() {
     });
   }
 }
-
-/* Funcoes de interface - slider */
+/**
+ * Inicializa o slider de destinos
+ */
 function initSlider() {
   const slider = document.getElementById("slider");
   const btnLeft = document.getElementById("btn-left");
   const btnRight = document.getElementById("btn-right");
-
   if (!slider || !btnLeft || !btnRight) return;
-
   const scrollAmount = slider.clientWidth * 0.2;
-
   btnLeft.addEventListener("click", () =>
     slider.scrollBy({ left: -scrollAmount, behavior: "smooth" })
   );
   btnRight.addEventListener("click", () =>
     slider.scrollBy({ left: scrollAmount, behavior: "smooth" })
   );
-
-  /* Variaveis para controlar o arrastar do slider */
   let isDown = false;
   let startX = 0;
   let scrollLeft = 0;
-
-  /* Quando o utilizador pressiona o botao do rato */
   slider.addEventListener("mousedown", (e) => {
     isDown = true;
     slider.classList.add("grabbing");
     startX = e.pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
   });
-
-  /* Quando o utilizador solta o botao do rato */
   slider.addEventListener("mouseup", () => {
     isDown = false;
     slider.classList.remove("grabbing");
   });
-
-  /* Quando o rato sai do slider */
   slider.addEventListener("mouseleave", () => {
     isDown = false;
     slider.classList.remove("grabbing");
   });
-
-  /* Quando o utilizador move o rato enquanto arrasta */
   slider.addEventListener("mousemove", (e) => {
     if (!isDown) return;
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     slider.scrollLeft = scrollLeft - (x - startX);
   });
-
-  /* Para dispositivos moveis - quando toca no ecra */
   slider.addEventListener("touchstart", (e) => {
     isDown = true;
     startX = e.touches[0].pageX - slider.offsetLeft;
     scrollLeft = slider.scrollLeft;
   });
-
-  /* Para dispositivos moveis - quando para de tocar */
   slider.addEventListener("touchend", () => {
     isDown = false;
   });
-
-  /* Para dispositivos moveis - quando move o dedo */
   slider.addEventListener("touchmove", (e) => {
     if (!isDown) return;
     const x = e.touches[0].pageX - slider.offsetLeft;
     slider.scrollLeft = scrollLeft - (x - startX);
   });
 }
-
-/* Configurar eventos dos botoes dos modais */
+/**
+ * Configura eventos dos botões dos modais
+ */
 function setupModalButtons() {
   const btnOrigem = document.getElementById("btn-open");
   if (btnOrigem) {
@@ -156,7 +143,6 @@ function setupModalButtons() {
       abrirModalOrigem();
     });
   }
-
   const btnDestino = document.getElementById("btn-destino");
   if (btnDestino) {
     btnDestino.addEventListener("click", (e) => {
@@ -164,7 +150,6 @@ function setupModalButtons() {
       abrirModalDestino();
     });
   }
-
   const btnDatas = document.getElementById("btn-datas");
   if (btnDatas) {
     btnDatas.addEventListener("click", (e) => {
@@ -172,7 +157,6 @@ function setupModalButtons() {
       abrirModalDatas();
     });
   }
-
   const btnAcessibilidade = document.getElementById("btn-acessibilidade");
   if (btnAcessibilidade) {
     btnAcessibilidade.addEventListener("click", (e) => {
@@ -180,7 +164,6 @@ function setupModalButtons() {
       abrirModalAcessibilidade();
     });
   }
-
   const btnTipoTurismo = document.getElementById("btn-tipo-turismo");
   if (btnTipoTurismo) {
     btnTipoTurismo.addEventListener("click", (e) => {
@@ -189,29 +172,28 @@ function setupModalButtons() {
     });
   }
 }
-
-/* Funcoes para controlar scroll da pagina */
+/**
+ * Para o scroll da página
+ */
 function pararScroll() {
   document.body.classList.add("modal-aberto");
 }
-
+/**
+ * Permite o scroll da página
+ */
 function deixarScroll() {
   document.body.classList.remove("modal-aberto");
 }
-
 /* Funcoes dos modais - apenas interface */
 function abrirModalOrigem() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-origem");
   const listaAeroportos = document.getElementById("lista-aeroportos");
   const pesquisaInput = document.getElementById("pesquisa-aeroporto");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarAeroportos(lista) {
     listaAeroportos.innerHTML = "";
-
     lista.forEach((aeroporto) => {
       const li = document.createElement("li");
       li.className =
@@ -228,7 +210,6 @@ function abrirModalOrigem() {
             }</p>          </div>
         </div>
       `;
-      
       li.addEventListener("click", () => {        // Check if we're updating a multitrip segment
         if (window.currentSegmentId && window.currentSegmentField === 'origem') {
           Flight.updateMultitripSegment(window.currentSegmentId, { origem: aeroporto });
@@ -244,43 +225,34 @@ function abrirModalOrigem() {
         }
         fecharModalOrigem();
       });
-
       listaAeroportos.appendChild(li);
     });
   }
   /* Mostrar todos os aeroportos inicialmente */
   mostrarAeroportos(Flight.getAirports());
-
   /* Clear any existing event listener */
   pesquisaInput.value = "";
-  
   /* Pesquisa em tempo real */
   const handleSearch = (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const aeroportosFiltrados = Flight.filterAirports(termoPesquisa);
     mostrarAeroportos(aeroportosFiltrados);
   };
-  
   pesquisaInput.removeEventListener("input", handleSearch);
   pesquisaInput.addEventListener("input", handleSearch);
-
   /* Eventos para fechar modal */
   const fecharBtn = document.getElementById("fechar-modal-origem");
   const handleClose = () => fecharModalOrigem();
-  
   fecharBtn.removeEventListener("click", handleClose);
   fecharBtn.addEventListener("click", handleClose);
-  
   const handleModalClick = (e) => {
     if (e.target === modal) {
       fecharModalOrigem();
     }
   };
-  
   modal.removeEventListener("click", handleModalClick);
   modal.addEventListener("click", handleModalClick);
 }
-
 function updateOriginButton(aeroporto) {
   // Check if we're updating a multitrip segment
   if (window.currentSegmentId && window.currentSegmentField === 'origem') {
@@ -298,7 +270,6 @@ function updateOriginButton(aeroporto) {
     btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
   }
 }
-
 function fecharModalOrigem() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-origem");
@@ -307,19 +278,15 @@ function fecharModalOrigem() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 function abrirModalDestino() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-destino");
   const listaDestinos = document.getElementById("lista-destinos");
   const pesquisaInput = document.getElementById("pesquisa-destino");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarDestinos(lista) {
     listaDestinos.innerHTML = "";
-
     lista.forEach((aeroporto) => {
       const li = document.createElement("li");
       li.className =
@@ -351,19 +318,15 @@ function abrirModalDestino() {
         }
         fecharModalDestino();
       });
-
       listaDestinos.appendChild(li);
     });
   }
-
   mostrarDestinos(Flight.getAirports());
-
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const destinosFiltrados = Flight.filterAirports(termoPesquisa);
     mostrarDestinos(destinosFiltrados);
   });
-
   document
     .getElementById("fechar-modal-destino")
     .addEventListener("click", fecharModalDestino);
@@ -373,7 +336,6 @@ function abrirModalDestino() {
     }
   });
 }
-
 function updateDestinationButton(aeroporto) {
   // Check if we're updating a multitrip segment
   if (window.currentSegmentId && window.currentSegmentField === 'destino') {
@@ -391,7 +353,6 @@ function updateDestinationButton(aeroporto) {
     btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
   }
 }
-
 function fecharModalDestino() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-destino");
@@ -400,33 +361,28 @@ function fecharModalDestino() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 function abrirModalDatas() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-datas");
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   /* Obter dados salvos */
   const savedData = Flight.getDatesTravelers();
   let adultos = Number(savedData.adultos) || 1;
   let criancas = Number(savedData.criancas) || 0;
   let bebes = Number(savedData.bebes) || 0;
-
   /* Elementos dos contadores */
   const contadorAdultos = document.getElementById("contador-adultos");
   const contadorCriancas = document.getElementById("contador-criancas");
   const contadorBebes = document.getElementById("contador-bebes");
   const inputDataPartida = document.getElementById("data-partida");
   const inputDataRegresso = document.getElementById("data-regresso");
-
   /* Carregar valores salvos */
   contadorAdultos.textContent = adultos;
   contadorCriancas.textContent = criancas;
   contadorBebes.textContent = bebes;
   inputDataPartida.value = savedData.dataPartida;
   inputDataRegresso.value = savedData.dataRegresso;
-
   /* Configurar botoes de contadores */
   setupCounters(
     contadorAdultos,
@@ -436,16 +392,13 @@ function abrirModalDatas() {
     criancas,
     bebes
   );
-
   /* Configurar datas minimas */
   const hoje = new Date().toISOString().split("T")[0];
   inputDataPartida.min = hoje;
   inputDataRegresso.min = hoje;
-
   inputDataPartida.addEventListener("change", (e) => {
     inputDataRegresso.min = e.target.value;
   });
-
   /* Botao confirmar */
   document.getElementById("confirmar-datas").onclick = function () {
     // Atualiza os valores dos contadores antes de salvar
@@ -454,7 +407,6 @@ function abrirModalDatas() {
     bebes = Number(contadorBebes.textContent) || 0;
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
-
     if (dataPartida && dataRegresso) {
       Flight.setDatesTravelers(
         dataPartida,
@@ -472,7 +424,6 @@ function abrirModalDatas() {
       fecharModalDatas();
     }
   };
-
   document
     .getElementById("fechar-modal-datas")
     .addEventListener("click", fecharModalDatas);
@@ -482,7 +433,6 @@ function abrirModalDatas() {
     }
   });
 }
-
 function setupCounters(
   contadorAdultos,
   contadorCriancas,
@@ -496,33 +446,28 @@ function setupCounters(
     adultos++;
     contadorAdultos.textContent = adultos;
   });
-
   document.getElementById("diminuir-adultos").addEventListener("click", () => {
     if (adultos > 1) {
       adultos--;
       contadorAdultos.textContent = adultos;
     }
   });
-
   /* Botoes para criancas */
   document.getElementById("aumentar-criancas").addEventListener("click", () => {
     criancas++;
     contadorCriancas.textContent = criancas;
   });
-
   document.getElementById("diminuir-criancas").addEventListener("click", () => {
     if (criancas > 0) {
       criancas--;
       contadorCriancas.textContent = criancas;
     }
   });
-
   /* Botoes para bebes */
   document.getElementById("aumentar-bebes").addEventListener("click", () => {
     bebes++;
     contadorBebes.textContent = bebes;
   });
-
   document.getElementById("diminuir-bebes").addEventListener("click", () => {
     if (bebes > 0) {
       bebes--;
@@ -530,7 +475,6 @@ function setupCounters(
     }
   });
 }
-
 function updateDatesButton(
   dataPartida,
   dataRegresso,
@@ -545,42 +489,33 @@ function updateDatesButton(
   const totalTravelers = Number(adultos) + Number(criancas) + Number(bebes);
   const travelersText =
     totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
-
   const btnDatas = document.getElementById("btn-datas");
   const textoDatas = btnDatas.querySelector("div:first-child p");
   const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
-
   textoDatas.textContent = formattedDates;
   textoViajantesElemento.textContent = travelersText;
 }
-
 function fecharModalDatas() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-datas");
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
-
 function abrirModalAcessibilidade() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-acessibilidade");
   const listaAcessibilidades = document.getElementById("lista-acessibilidades");
   const pesquisaInput = document.getElementById("pesquisa-acessibilidade");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarAcessibilidades(lista) {
     listaAcessibilidades.innerHTML = "";
-
     lista.forEach((acessibilidade, index) => {
       const li = document.createElement("li");
       li.className =
         "p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors";
-
       const selected = Flight.getSelectedAccessibilities().includes(index);
       const icon = Flight.getAccessibilityIcon(acessibilidade);
-
       li.innerHTML = `
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -598,34 +533,27 @@ function abrirModalAcessibilidade() {
           </div>
         </div>
       `;
-
       li.addEventListener("click", () => {
         Flight.toggleAccessibility(index);
         mostrarAcessibilidades(lista);
       });
-
       listaAcessibilidades.appendChild(li);
     });
   }
-
   mostrarAcessibilidades(Flight.getAccessibilities());
-
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const filteredAccessibilities = Flight.filterAccessibilities(termoPesquisa);
     mostrarAcessibilidades(filteredAccessibilities);
   });
-
   document
     .getElementById("confirmar-acessibilidade")
     .addEventListener("click", () => {
       Flight.confirmAccessibilities();
       updateAccessibilityButton();
-
       filters.acessibilidade = Flight.getSelectedAccessibilities();
       fecharModalAcessibilidade();
     });
-
   document
     .getElementById("fechar-modal-acessibilidade")
     .addEventListener("click", fecharModalAcessibilidade);
@@ -635,12 +563,10 @@ function abrirModalAcessibilidade() {
     }
   });
 }
-
 function updateAccessibilityButton() {
   const textoAcessibilidade = document.getElementById("texto-acessibilidade");
   textoAcessibilidade.textContent = Flight.getAccessibilitiesText();
 }
-
 function fecharModalAcessibilidade() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-acessibilidade");
@@ -649,24 +575,19 @@ function fecharModalAcessibilidade() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 function abrirModalTipoTurismo() {
   pararScroll(); /* Parar scroll da pagina */
   const modal = document.getElementById("modal-tipo-turismo");
   const gridTipos = document.getElementById("grid-tipos-turismo");
   const pesquisaInput = document.getElementById("pesquisa-tipo-turismo");
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   function mostrarTiposTurismo(lista) {
     gridTipos.innerHTML = "";
-
     lista.forEach((tipo) => {
       const card = document.createElement("div");
       card.className =
         "w-full h-32 relative rounded-lg overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-200";
-
       card.innerHTML = `
         <img draggable="false" class="absolute inset-0 w-full h-full object-cover" src="${tipo.imagem}" alt="${tipo.nome}" />
         <div class="absolute inset-0 bg-black bg-opacity-30 flex items-end p-3">
@@ -675,26 +596,21 @@ function abrirModalTipoTurismo() {
           </div>
         </div>
       `;
-
       card.addEventListener("click", () => {
         Flight.setTourismType(tipo);
         filters.tipoTurismo = tipo;
         updateTourismButton(tipo);
         fecharModalTipoTurismo();
       });
-
       gridTipos.appendChild(card);
     });
   }
-
   mostrarTiposTurismo(Flight.getTourismTypes());
-
   pesquisaInput.addEventListener("input", (e) => {
     const termoPesquisa = e.target.value.toLowerCase();
     const filteredTypes = Flight.filterTourismTypes(termoPesquisa);
     mostrarTiposTurismo(filteredTypes);
   });
-
   document
     .getElementById("fechar-modal-tipo-turismo")
     .addEventListener("click", fecharModalTipoTurismo);
@@ -704,12 +620,10 @@ function abrirModalTipoTurismo() {
     }
   });
 }
-
 function updateTourismButton(tipo) {
   const textoTipoTurismo = document.getElementById("texto-tipo-turismo");
   textoTipoTurismo.textContent = tipo.nome;
 }
-
 function fecharModalTipoTurismo() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
   const modal = document.getElementById("modal-tipo-turismo");
@@ -718,24 +632,19 @@ function fecharModalTipoTurismo() {
   modal.classList.remove("flex");
   pesquisaInput.value = "";
 }
-
 /* Setup trip type buttons functionality */
 function setupTripTypeButtons() {
   const btnTipoViagem = document.getElementById('btn-tipo-viagem');
   const multitripContainer = document.getElementById('multitrip-container');
   const btnAddSegment = document.getElementById('btn-add-segment');
-
   if (!btnTipoViagem) return;
-
   // Set default trip type
   Flight.setTripType('ida-volta');
-
   // Trip type button handler - opens modal
   btnTipoViagem.addEventListener('click', (e) => {
     e.preventDefault();
     abrirModalTipoViagem();
   });
-
   // Add segment button handler
   if (btnAddSegment) {
     btnAddSegment.addEventListener('click', (e) => {
@@ -745,15 +654,12 @@ function setupTripTypeButtons() {
     });
   }
 }
-
 function abrirModalTipoViagem() {
   pararScroll();
   const modal = document.getElementById("modal-tipo-viagem");
   if (!modal) return;
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   // Add event listeners for trip type options
   const options = modal.querySelectorAll('.trip-type-option');
   options.forEach(option => {
@@ -761,7 +667,6 @@ function abrirModalTipoViagem() {
       e.preventDefault();
       const tripType = option.dataset.type;
       Flight.setTripType(tripType);
-      
       // Update UI
       const textoTipoViagem = document.getElementById('texto-tipo-viagem');
       if (textoTipoViagem) {
@@ -770,7 +675,6 @@ function abrirModalTipoViagem() {
                             tripType === 'multitrip' ? 'Multitrip' : 'Ida e Volta';
         textoTipoViagem.textContent = tripTypeText;
       }
-      
       // Show/hide multitrip container
       const multitripContainer = document.getElementById('multitrip-container');
       if (multitripContainer) {
@@ -784,24 +688,20 @@ function abrirModalTipoViagem() {
           multitripContainer.classList.add('hidden');
         }
       }
-      
       fecharModalTipoViagem();
     });
   });
-
   // Close modal events
   const fecharBtn = document.getElementById("fechar-modal-tipo-viagem");
   if (fecharBtn) {
     fecharBtn.addEventListener("click", fecharModalTipoViagem);
   }
-  
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
       fecharModalTipoViagem();
     }
   });
 }
-
 function fecharModalTipoViagem() {
   deixarScroll();
   const modal = document.getElementById("modal-tipo-viagem");
@@ -810,17 +710,14 @@ function fecharModalTipoViagem() {
     modal.classList.remove("flex");
   }
 }
-
 function renderMultitripSegments() {
   const segmentsContainer = document.getElementById('multitrip-segments');
   if (!segmentsContainer) return;
   const segments = Flight.getMultitripSegments();
   segmentsContainer.innerHTML = '';
-
   segments.forEach((segment, index) => {
     const segmentDiv = document.createElement('div');
     segmentDiv.className = 'flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
-    
     segmentDiv.innerHTML = `
       <span class="font-medium text-Main-Primary dark:text-cyan-400">${index + 1}.</span>
       <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentOriginModal(${segment.id})">
@@ -836,31 +733,26 @@ function renderMultitripSegments() {
         <span class="material-symbols-outlined">delete</span>
       </button>` : ''}
     `;
-    
     segmentsContainer.appendChild(segmentDiv);
   });
 }
-
 // Global functions for multitrip segment management
 window.removeMultitripSegment = function(segmentId) {
   Flight.removeMultitripSegment(segmentId);
   renderMultitripSegments();
 };
-
 window.openSegmentOriginModal = function(segmentId) {
   // Store current segment ID for modal
   window.currentSegmentId = segmentId;
   window.currentSegmentField = 'origem';
   abrirModalOrigem();
 };
-
 window.openSegmentDestinationModal = function(segmentId) {
   // Store current segment ID for modal
   window.currentSegmentId = segmentId;
   window.currentSegmentField = 'destino';
   abrirModalDestino();
 };
-
 /* Funcoes de tabela e formulario */
 function createTableConfig(data) {
   return {
@@ -894,7 +786,6 @@ function createTableConfig(data) {
     },
   };
 }
-
 function createFlight(config) {
   const data = getFormData("add_flight_form");
   Flight.add(data);
@@ -903,17 +794,14 @@ function createFlight(config) {
   config.data = Flight.getAll();
   updateTable(config);
 }
-
 /* Renderizar cards na homepage */
 export function renderRandomOPOCards(containerClass) {
   const shuffled = Flight.getTripsFrom();
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
   container.innerHTML = "";
-
   shuffled.forEach((viagem) => {
     const cidade = viagem.destino || "Destino";
-
     const formatarData = (dataStr) => {
       if (!dataStr) return "";
       const [dia, mes, anoHora] = dataStr.split("/");
@@ -934,16 +822,13 @@ export function renderRandomOPOCards(containerClass) {
       ];
       return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
     };
-
     const dataPartida = formatarData(viagem.partida);
     const dataVolta = formatarData(viagem.dataVolta);
     const datas =
       dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : "";
-
     const preco = viagem.custo || "-";
     const imagem = viagem.imagem || "https://placehold.co/413x327";
     const nVoo = viagem.numeroVoo || "AF151";
-
     const cardHTML = `
       <div class="bg-white dark:bg-gray-800 w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 overflow-hidden">
         <img class="w-full h-80 object-cover" src="${imagem}" alt="Imagem do destino">
@@ -964,7 +849,6 @@ export function renderRandomOPOCards(containerClass) {
     tempDiv.innerHTML = cardHTML;
     const card = tempDiv.firstElementChild;
     container.appendChild(card);
-
     // Now add the event listener to the heart icon inside this card
     const heart = card.querySelector('.favorite-icon');
     if (heart) {
@@ -976,7 +860,6 @@ export function renderRandomOPOCards(containerClass) {
       }
       heart.setAttribute("data-favorito", isFav ? "true" : "false");
       heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
-
       heart.addEventListener("click", (e) => {
         e.stopPropagation();
         if (!User.isLogged()) {
@@ -1003,7 +886,6 @@ export function renderRandomOPOCards(containerClass) {
     }
   });
 }
-
 /* Função para mostrar modal automaticamente no index */
 function initGamificationModal() {
   /* Verificar se deve mostrar o modal */
@@ -1014,35 +896,28 @@ function initGamificationModal() {
     }, 2000);
   }
 }
-
 function shouldShowModal() {
   /* Verificar se modal foi ignorado permanentemente */
   if (localStorage.getItem("gamificationModalIgnored") === "true") {
     return false;
   }
-
   /* Verificar se foi adiado para mais tarde na sessão atual */ /* Verificar se foi adiado para mais tarde na sessão atual */
   if (sessionStorage.getItem("gamificationModalDeferred") === "true") {
     return false;
   }
-
   /* Apenas mostrar em desktop */
   return window.innerWidth >= 768;
 }
-
 // Formulário PlanIt - captura e redireciona os dados para a página de pesquisa de voos
 function handlePlanItFormSubmit(e) {
   e.preventDefault();
-
   // Build search data using Flight model
   const searchData = Flight.buildSearchData();
   // Save to sessionStorage
   sessionStorage.setItem('planit_search', JSON.stringify(searchData));
-  
   // Redirect to flight search page
   window.location.href = 'html/flight_search.html';
 }
-
 // Adiciona listener ao submit do formulário principal
 // (garante que funciona para submit por enter ou botão)
 document.addEventListener('DOMContentLoaded', function() {
@@ -1052,27 +927,20 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', handlePlanItFormSubmit);
   }
 });
-
 /* Setup newsletter form submission handling */
 function setupNewsletterForm() {
   const newsletterForm = document.getElementById("newsletter-form");
-  
   if (!newsletterForm) return;
-  
   newsletterForm.addEventListener("submit", function(e) {
     e.preventDefault();
-    
     const emailInput = document.getElementById("newsletter-email");
     const email = emailInput.value.trim();
-    
     if (!email) {
       showToast("Por favor, introduza um email válido", "error");
       return;
     }
-    
     // Call the model function to handle subscription
     const result = User.subscribeToNewsletter(email);
-    
     if (result.success) {
       showToast(result.message, "success");
       emailInput.value = ""; // Clear the form

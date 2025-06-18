@@ -1,8 +1,7 @@
 // FlightAdminView.js - Flight admin management view
-
 import * as FlightModel from '../models/FlightModel.js';
+import { getAllDestinations } from '../models/DestinationModel.js';
 import { openModal, closeModal, showToast } from './ViewHelpers.js';
-
 // View configuration
 let flightTableConfig = {
     sortColumn: null,
@@ -11,28 +10,24 @@ let flightTableConfig = {
     rowsPerPage: 10,
     searchTerm: ''
 };
-
 let editingFlightId = null;
-
 // Initialize the view
 function init() {
     FlightModel.init();
     setupEventListeners();
     setupTableSorting();
-    loadAirports();
+    loadDestinations();
     loadTable();
 }
-
 function setupEventListeners() {
     // Add flight button
-    const addFlightBtn = document.getElementById('add-flight-btn');
-    if (addFlightBtn) {
+    const addFlightBtn = document.getElementById('add-flight-btn');    if (addFlightBtn) {
         addFlightBtn.addEventListener('click', () => {
             resetForm();
+            loadDestinations(); // Refresh destinations before opening modal
             openModal('modal-adicionar');
         });
     }
-
     // Create/Update flight button
     const createFlightBtn = document.getElementById('create-flight-btn');
     if (createFlightBtn) {
@@ -44,7 +39,6 @@ function setupEventListeners() {
             }
         });
     }
-
     // Cancel button
     const cancelFlightBtn = document.getElementById('cancel-flight-btn');
     if (cancelFlightBtn) {
@@ -52,7 +46,6 @@ function setupEventListeners() {
             closeModalFlight();
         });
     }
-
     // Search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -67,7 +60,6 @@ function setupEventListeners() {
         });
     }
 }
-
 function setupTableSorting() {
     const tableHeaders = document.querySelectorAll('th[data-sort]');
     tableHeaders.forEach(header => {
@@ -77,9 +69,14 @@ function setupTableSorting() {
         });
     });
 }
-
-function loadAirports() {
+/**
+ * Carrega destinos disponíveis para seleção nos dropdowns de origem e destino
+ * Combina aeroportos do FlightModel com destinos do DestinationModel
+ * Remove duplicados e ordena alfabeticamente por cidade
+ */
+function loadDestinations() {
     const airports = FlightModel.getAirports();
+    const destinations = getAllDestinations();
     const fromSelect = document.getElementById('from');
     const toSelect = document.getElementById('to');
     
@@ -87,18 +84,48 @@ function loadAirports() {
         fromSelect.innerHTML = '<option value="">Selecionar...</option>';
         toSelect.innerHTML = '<option value="">Selecionar...</option>';
         
+        // Create a map to avoid duplicates (using airport code as key)
+        const destinationMap = new Map();
+        
+        // Add airports from FlightModel
         airports.forEach(airport => {
-            const option = `<option value="${airport.codigo} - ${airport.cidade}">${airport.codigo} - ${airport.cidade}, ${airport.pais}</option>`;
+            const key = airport.codigo;
+            if (!destinationMap.has(key)) {
+                destinationMap.set(key, {
+                    codigo: airport.codigo,
+                    cidade: airport.cidade,
+                    pais: airport.pais,
+                    source: 'flight'
+                });
+            }
+        });
+        
+        // Add destinations from DestinationModel (may override flight model destinations)
+        destinations.forEach(destination => {
+            const key = destination.aeroporto;
+            destinationMap.set(key, {
+                codigo: destination.aeroporto,
+                cidade: destination.cidade,
+                pais: destination.pais,
+                source: 'destination'
+            });
+        });
+        
+        // Convert to array and sort by city name
+        const sortedDestinations = Array.from(destinationMap.values())
+            .sort((a, b) => a.cidade.localeCompare(b.cidade));
+        
+        // Add options to both selects
+        sortedDestinations.forEach(dest => {
+            const option = `<option value="${dest.codigo} - ${dest.cidade}">${dest.codigo} - ${dest.cidade}, ${dest.pais}</option>`;
             fromSelect.innerHTML += option;
             toSelect.innerHTML += option;
         });
     }
 }
-
 function loadTable() {
     const tableBody = document.getElementById('tableContent');
     if (!tableBody) return;
-
     try {
         let flights = FlightModel.getAll() || [];
           // Apply search filter
@@ -114,18 +141,15 @@ function loadTable() {
                 (flight.custo ? flight.custo.toString().includes(searchTerm) : false)
             );
         }
-
         // Apply sorting
         if (flightTableConfig.sortColumn) {
             flights.sort((a, b) => {
                 let aValue = getSortValue(a, flightTableConfig.sortColumn);
                 let bValue = getSortValue(b, flightTableConfig.sortColumn);
-                
                 const comparison = aValue.localeCompare(bValue, 'pt', { numeric: true });
                 return flightTableConfig.sortDirection === 'asc' ? comparison : -comparison;
             });
         }
-
         // Apply pagination
         const totalFlights = flights.length;
         const totalPages = Math.ceil(totalFlights / flightTableConfig.rowsPerPage);
@@ -157,7 +181,6 @@ function loadTable() {
                 </td>
             </tr>
         `).join('');
-
         if (paginatedFlights.length === 0) {
             tableBody.innerHTML = `
                 <tr>
@@ -171,16 +194,12 @@ function loadTable() {
                 </tr>
             `;
         }
-
         // Update pagination
         updatePaginationControls(totalPages, flightTableConfig.currentPage);
-
     } catch (error) {
-        console.error('Error loading flights table:', error);
         showToast('Erro ao carregar voos.', 'error');
     }
 }
-
 function getSortValue(flight, column) {
     switch (column) {
         case 'name': return flight.numeroVoo || '';
@@ -193,7 +212,6 @@ function getSortValue(flight, column) {
         default: return '';
     }
 }
-
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
@@ -204,7 +222,6 @@ function escapeHtml(text) {
     };
     return text ? text.replace(/[&<>"']/g, m => map[m]) : '';
 }
-
 function sortTableBy(column) {
     if (flightTableConfig.sortColumn === column) {
         flightTableConfig.sortDirection = flightTableConfig.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -212,11 +229,9 @@ function sortTableBy(column) {
         flightTableConfig.sortColumn = column;
         flightTableConfig.sortDirection = 'asc';
     }
-
     updateSortIcons(column, flightTableConfig.sortDirection);
     loadTable();
 }
-
 function updateSortIcons(activeColumn, direction) {
     // Reset all icons
     const allIcons = document.querySelectorAll('[id^="sort-icon-"]');
@@ -225,7 +240,6 @@ function updateSortIcons(activeColumn, direction) {
         icon.classList.remove('text-primary');
         icon.classList.add('text-gray-400');
     });
-
     // Set active icon
     const activeIcon = document.getElementById(`sort-icon-${activeColumn}`);
     if (activeIcon) {
@@ -234,20 +248,16 @@ function updateSortIcons(activeColumn, direction) {
         activeIcon.classList.add('text-primary');
     }
 }
-
 function updatePaginationControls(totalPages, currentPage) {
     const paginationContainer = document.getElementById('pagination-controls');
     if (!paginationContainer) return;
-
     if (totalPages <= 1) {
         paginationContainer.innerHTML = '<div class="text-sm text-gray-600 dark:text-gray-400">Total de resultados: 0</div>';
         return;
     }
-
     const startRecord = (currentPage - 1) * flightTableConfig.rowsPerPage + 1;
     const endRecord = Math.min(currentPage * flightTableConfig.rowsPerPage, totalPages * flightTableConfig.rowsPerPage);
     const totalRecords = totalPages * flightTableConfig.rowsPerPage;
-
     paginationContainer.innerHTML = `
         <div class="text-sm text-gray-600 dark:text-gray-400">
             Mostrando ${startRecord}-${endRecord} de ${totalRecords} resultados
@@ -256,26 +266,21 @@ function updatePaginationControls(totalPages, currentPage) {
             <button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})" class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span class="material-symbols-outlined text-lg">chevron_left</span>
             </button>
-            
             ${generatePageNumbers(totalPages, currentPage)}
-            
             <button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})" class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-white dark:hover:bg-gray-600 rounded-lg border border-gray-300 dark:border-gray-600 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span class="material-symbols-outlined text-lg">chevron_right</span>
             </button>
         </div>
     `;
 }
-
 function generatePageNumbers(totalPages, currentPage) {
     let pages = '';
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
     if (endPage - startPage + 1 < maxVisiblePages) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-
     for (let i = startPage; i <= endPage; i++) {
         const isActive = i === currentPage;
         pages += `
@@ -286,12 +291,10 @@ function generatePageNumbers(totalPages, currentPage) {
     }
     return pages;
 }
-
 function goToPage(page) {
     flightTableConfig.currentPage = page;
     loadTable();
 }
-
 function createFlight() {
     try {
         const form = document.getElementById('add_flight_form');
@@ -308,18 +311,15 @@ function createFlight() {
             imagem: 'https://placehold.co/413x327', // Default placeholder
             dataVolta: '' // Default empty
         };
-
         // Validation
         if (!flightData.numeroVoo || !flightData.origem || !flightData.destino || !flightData.companhia || !flightData.partida) {
             showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
             return;
         }
-
         if (flightData.custo < 0) {
             showToast('O custo não pode ser negativo.', 'error');
             return;
         }
-
         FlightModel.add(
             flightData.numeroVoo,
             flightData.origem,
@@ -332,26 +332,26 @@ function createFlight() {
             flightData.imagem,
             flightData.dataVolta
         );
-
         closeModalFlight();
         loadTable();
         showToast('Voo criado com sucesso!', 'success');
-
     } catch (error) {
-        console.error('Error creating flight:', error);
         showToast(error.message || 'Erro ao criar voo. Tente novamente.', 'error');
     }
 }
-
 function editFlight(numeroVoo) {
     try {
         const flights = FlightModel.getAll();
         const flight = flights.find(f => f.numeroVoo === numeroVoo);
-        
         if (!flight) {
             showToast('Voo não encontrado.', 'error');
             return;
-        }        // Fill form with flight data
+        }
+        
+        // Refresh destinations before opening modal
+        loadDestinations();
+        
+        // Fill form with flight data
         document.getElementById('name').value = flight.numeroVoo;
         document.getElementById('from').value = flight.origem;
         document.getElementById('to').value = flight.destino;
@@ -359,7 +359,6 @@ function editFlight(numeroVoo) {
         document.getElementById('leaves').value = parseDateTime(flight.partida);
         document.getElementById('custo').value = flight.custo || 0;
         document.getElementById('direct').value = flight.direto === 'S' ? 'Sim' : 'Não';
-
         // Update modal title and button
         const modalTitle = document.querySelector('#modal-adicionar h3');
         const createBtn = document.getElementById('create-flight-btn');
@@ -367,16 +366,12 @@ function editFlight(numeroVoo) {
         if (createBtn) {
             createBtn.innerHTML = '<span class="material-symbols-outlined text-lg">save</span><span>Guardar</span>';
         }
-
         editingFlightId = numeroVoo;
         openModal('modal-adicionar');
-
     } catch (error) {
-        console.error('Error loading flight for edit:', error);
         showToast('Erro ao carregar dados do voo.', 'error');
     }
 }
-
 function updateFlight() {
     try {
         const form = document.getElementById('add_flight_form');
@@ -393,22 +388,18 @@ function updateFlight() {
             imagem: 'https://placehold.co/413x327', // Keep existing or default
             dataVolta: '' // Keep existing or empty
         };
-
         // Validation
         if (!flightData.numeroVoo || !flightData.origem || !flightData.destino || !flightData.companhia || !flightData.partida) {
             showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
             return;
         }
-
         if (flightData.custo < 0) {
             showToast('O custo não pode ser negativo.', 'error');
             return;
         }
-
         // Get existing flight to preserve other properties
         const flights = FlightModel.getAll();
         const existingFlight = flights.find(f => f.numeroVoo === editingFlightId);
-        
         if (!existingFlight) {
             showToast('Voo não encontrado.', 'error');
             return;
@@ -423,59 +414,45 @@ function updateFlight() {
             direto: flightData.direto,
             custo: flightData.custo
         };
-
         FlightModel.update(editingFlightId, updatedFlight);
-
         closeModalFlight();
         loadTable();
         showToast('Voo atualizado com sucesso!', 'success');
-
     } catch (error) {
-        console.error('Error updating flight:', error);
         showToast('Erro ao atualizar voo. Tente novamente.', 'error');
     }
 }
-
 function deleteFlight(numeroVoo, flightName) {
     try {
         FlightModel.deleteTrip(numeroVoo);
         loadTable();
         showToast('Voo eliminado com sucesso!', 'success');
-
     } catch (error) {
-        console.error('Error deleting flight:', error);
         showToast('Erro ao eliminar voo. Tente novamente.', 'error');
     }
 }
-
 function formatDateTime(dateTimeString) {
     if (!dateTimeString) return '';
-    
     const date = new Date(dateTimeString);
     return date.toLocaleDateString('pt-PT') + ' ' + date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
 }
-
 function parseDateTime(dateTimeString) {
     if (!dateTimeString) return '';
-    
     // Convert "01/07/2025 08:15" to "2025-07-01T08:15"
     const [datePart, timePart] = dateTimeString.split(' ');
     const [day, month, year] = datePart.split('/');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${timePart}`;
 }
-
 function resetForm() {
     const form = document.getElementById('add_flight_form');
     if (form) {
         form.reset();
     }
 }
-
 function closeModalFlight() {
     closeModal('modal-adicionar', 'add_flight_form', null);
     editingFlightId = null;
     resetForm();
-    
     // Reset modal state for adding new flights
     const modalTitle = document.querySelector('#modal-adicionar h3');
     const createBtn = document.getElementById('create-flight-btn');
@@ -484,12 +461,10 @@ function closeModalFlight() {
         createBtn.innerHTML = '<span class="material-symbols-outlined text-lg">add</span><span>Adicionar</span>';
     }
 }
-
 // Global functions for onclick events
 window.editFlight = editFlight;
 window.deleteFlight = deleteFlight;
 window.goToPage = goToPage;
-
 // Initialize the view when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     if (document.body.querySelector('#add-flight-btn')) {

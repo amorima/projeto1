@@ -3,10 +3,8 @@ import * as UserModel from "../models/UserModel.js";
 import { getLevelSymbol } from "./RewarditView.js";
 import * as FlightModel from "../models/FlightModel.js";
 import { updateNavbarUser } from "./NavbarView.js";
-
 // Disable automatic header loading since we handle it manually
 window.skipAutoHeaderLoad = true;
-
 /* Funções globais para o modal de gamificação */
 window.openGamificationModal = function () {
   const modal = document.getElementById("modal-gamificacao");
@@ -15,7 +13,6 @@ window.openGamificationModal = function () {
     document.body.style.overflow = "hidden";
   }
 };
-
 window.closeGamificationModal = function () {
   const modal = document.getElementById("modal-gamificacao");
   if (modal) {
@@ -23,75 +20,60 @@ window.closeGamificationModal = function () {
     document.body.style.overflow = "";
   }
 };
-
 window.deferGamificationModal = function () {
   sessionStorage.setItem("gamificationModalDeferred", "true");
   window.closeGamificationModal();
 };
-
 window.ignoreGamificationModal = function () {
   localStorage.setItem("gamificationModalIgnored", "true");
   window.closeGamificationModal();
 };
-
 /* Carregar componentes na página */
 window.onload = async function () {
   /* Inicializar o modelo */
   UserModel.init();
   FlightModel.init();
   initGamificationModal()
-
   try {
     /* Carregar componentes de header e footer e aguardar a sua conclusão */
     await loadComponent("_header.html", "header-placeholder");
     await loadComponent("_footer.html", "footer-placeholder");
-
     /* Agora que os componentes estão carregados, carregar informações do utilizador e configurar eventos */
     loadUserInfo(); /* Esta função chama updateNavbarUser */
     setupEventListeners();
-
     /* Inicializar funcionalidades das abas após um pequeno delay */
     /* Considerar se este timeout ainda é necessário ou se pode ser chamado diretamente */
     setTimeout(() => {
       UserModel.initTabEvents();
     }, 100); /* Reduzido o delay, ajustar conforme necessário */
   } catch (error) {
-    console.error("Erro ao carregar componentes na UserProView:", error);
   }
 };
-
 /* Configurar listeners de eventos para interações do utilizador */
 function setupEventListeners() {
   /* Botão de edição de perfil */
   const editProfileBtn = document.getElementById("btn-editar-perfil");
   if (editProfileBtn) {
     editProfileBtn.addEventListener("click", openEditProfileModal);
-  }  /* Botão para movimentos de pontos */
+  }
+
+  /* Botão para movimentos de pontos */
   const btnMovimentos = document.getElementById("btn-movimentos");
   const modalPontos = document.getElementById("pontos-modal");
 
-  console.log("Searching for modal elements:", { 
-    btnMovimentos: btnMovimentos ? "found" : "not found", 
-    modalPontos: modalPontos ? "found" : "not found" 
-  });
-
   if (btnMovimentos && modalPontos) {
-    console.log("Setting up points modal event listeners");    btnMovimentos.addEventListener("click", function () {
-      console.log("Points button clicked");
-      console.log("Modal current classes:", modalPontos.className);
+    btnMovimentos.addEventListener("click", function () {
       try {
         loadPointMovements();
         modalPontos.classList.remove("hidden");
-        modalPontos.style.display = "block"; // Force display
-        modalPontos.style.zIndex = "9999"; // Ensure high z-index
-        document.body.style.overflow = "hidden"; // Prevent background scroll
-        console.log("Modal classes after opening:", modalPontos.className);
-        console.log("Modal style display:", modalPontos.style.display);
-        console.log("Modal should be visible now");
+        modalPontos.style.display = "block";
+        modalPontos.style.zIndex = "9999";
+        document.body.style.overflow = "hidden";
       } catch (error) {
-        console.error("Error loading point movements:", error);
       }
-    });    // Close modal when clicking outside
+    });
+
+    // Close modal when clicking outside
     window.addEventListener("click", function (e) {
       if (e.target === modalPontos) {
         modalPontos.classList.add("hidden");
@@ -99,7 +81,6 @@ function setupEventListeners() {
         document.body.style.overflow = ""; // Restore scroll
       }
     });
-
     // Close modal with ESC key
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && !modalPontos.classList.contains("hidden")) {
@@ -109,7 +90,6 @@ function setupEventListeners() {
       }
     });
   } else {
-    console.log("Modal elements not found:", { btnMovimentos, modalPontos });
   }
   /* Botão de copiar link de convite */
   const btnCopy = document.querySelector("button.bg-Button-Main.rounded-r-lg");
@@ -119,7 +99,6 @@ function setupEventListeners() {
       if (linkInput && linkInput.value) {
         linkInput.select();
         document.execCommand("copy");
-
         /* Feedback visual */
         const originalText = btnCopy.innerHTML;
         btnCopy.innerHTML =
@@ -129,19 +108,16 @@ function setupEventListeners() {
         }, 2000);
       }
     });  }
-  
   /* Formulário de definições do perfil */
   const profileForm = document.getElementById("profile-settings-form");
   if (profileForm) {
     profileForm.addEventListener("submit", handleProfileUpdate);
   }
-
   /* Upload de avatar */
   const avatarUpload = document.getElementById("avatar-upload");
   if (avatarUpload) {
     avatarUpload.addEventListener("change", handleAvatarUpload);
   }
-
   /* Botão para scan de gamificação */
   const btnScanIt = document.getElementById("btn-scan-it");
   if (btnScanIt) {
@@ -150,7 +126,6 @@ function setupEventListeners() {
     });
   }
 }
-
 /* Carregar informações do utilizador */
 function loadUserInfo() {
   /* Verificar se utilizador está logado */
@@ -158,23 +133,18 @@ function loadUserInfo() {
     window.location.href = "_login.html";
     return;
   }
-
   /* Obter dados do utilizador logado */
   const user = UserModel.getUserLogged();
-
   if (!user) {
     alert("Erro ao carregar dados do utilizador!");
     return;
   }
-
   /* Preencher informações básicas */
   document.getElementById("user-name").textContent = user.username;
-
   /* Determinar nível baseado nos pontos */
   const userPoints = parseInt(user.pontos) || 0;
   const userLevel = getUserLevel(userPoints);
   document.getElementById("user-level").textContent = userLevel;
-
   /* Atualizar o ícone do nível */
   const levelIcon = getLevelSymbol(userLevel);
   document.querySelector(
@@ -205,24 +175,18 @@ function loadUserInfo() {
     document.getElementById("info-member-since").textContent = formatDate(
       new Date()
     );
-
   /* Popular campos do formulário de definições */
   populateSettingsForm(user);
-
   /* Atualizar barra de progresso */
   updateProgressBar(userPoints);
-
   /* Carregar histórico de viagens */
   loadTravelHistory(user);
-
   /* Carregar preferências de viagem */
   loadTravelPreferences(user);
   /* Carregar reservas */
   loadReservas(user);
-
   /* Carregar favoritos */
   loadFavoritos(user);
-
   /* Set referral link */
   const referralLinkInput = document.getElementById("referral-link");
   if (referralLinkInput) {
@@ -230,12 +194,10 @@ function loadUserInfo() {
       const referralLink = UserModel.getReferralLink(user);
       referralLinkInput.value = referralLink;
     } catch (error) {
-      console.error('Erro ao gerar link de referência:', error);
       referralLinkInput.value = '';
     }
   }
 }
-
 /* Popular campos do formulário de definições */
 function populateSettingsForm(user) {
   // Avatar nas definições
@@ -248,31 +210,25 @@ function populateSettingsForm(user) {
       settingsAvatar.src = "https://placehold.co/96x96/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
     }
   }
-
   /* Campos de dados pessoais */
   const nameInput = document.getElementById("user-name-input");
   if (nameInput) {
     nameInput.value = user.username || "";
   }
-
   const emailInput = document.getElementById("user-email-input");
   if (emailInput) {
     emailInput.value = user.email || "";
   }
-
   const phoneInput = document.getElementById("user-phone-input");
   if (phoneInput) {
     phoneInput.value = user.telefone || "";
   }
-
   const birthInput = document.getElementById("user-birth-input");
   if (birthInput && user.dataNascimento) {
     birthInput.value = user.dataNascimento;
   }
-
   /* Configurações de preferências */
   const preferences = user.preferences || {};
-
   /* Notificações por email */
   const emailNotifications = document.querySelector(
     '#tab-definicoes input[type="checkbox"]:first-of-type'
@@ -280,7 +236,6 @@ function populateSettingsForm(user) {
   if (emailNotifications) {
     emailNotifications.checked = preferences.emailNotifications !== false;
   }
-
   /* Newsletter */
   const newsletter = document.querySelector(
     '#tab-definicoes input[type="checkbox"]:last-of-type'
@@ -289,7 +244,6 @@ function populateSettingsForm(user) {
     newsletter.checked = preferences.newsletter !== false;
   }
 }
-
 /* Obter nível do utilizador baseado nos pontos */
 function getUserLevel(points) {
   if (points >= 5000) {
@@ -304,7 +258,6 @@ function getUserLevel(points) {
     return "Explorador";
   }
 }
-
 /* Atualizar barra de progresso */
 function updateProgressBar(points) {
   /* Definir pontos para cada nível */
@@ -317,11 +270,9 @@ function updateProgressBar(points) {
   };
   /* Determinar nível atual e próximo nível */
   const currentLevel = getUserLevel(points);
-
   let nextLevel;
   let pointsNeeded;
   let progressPercentage = 0;
-
   /* Calcular pontos necessários para o próximo nível */
   if (currentLevel === "Embaixador") {
     nextLevel = "Máximo";
@@ -337,14 +288,12 @@ function updateProgressBar(points) {
     ];
     const currentIndex = levelOrder.indexOf(currentLevel);
     nextLevel = levelOrder[currentIndex + 1];
-
     const nextLevelPoints = levelPoints[nextLevel];
     pointsNeeded = nextLevelPoints - points;
   }
   /* Lógica da barra por segmentos progressivos */
   /* Cada segmento entre níveis representa 25% da barra total */
   const segmentPercentage = 25; /* Cada segmento vale 25% */
-
   if (points < 250) {
     /* Até 249 pontos: barra não aparece */
     progressPercentage = 0;
@@ -376,12 +325,10 @@ function updateProgressBar(points) {
     progressPercentage =
       25 + segmentProgress; /* 1 segmento completo + progresso no 2º */
   }
-
   /* Garantir que não excede 100% */ progressPercentage = Math.min(
     100,
     progressPercentage
   );
-
   /* Atualizar texto com pontos necessários */
   const pointsInfoElement = document.querySelector(
     ".text-white.dark\\:text-gray-300.text-left.text-base"
@@ -402,18 +349,15 @@ function updateProgressBar(points) {
   if (progressBar) {
     /* Remover qualquer estilo inline anterior */
     progressBar.removeAttribute("style");
-
     /* Aplicar nova largura */
     progressBar.style.width = `${progressPercentage}%`; /* Garantir que a barra é visível se houver progresso */
     if (progressPercentage > 0) {
       progressBar.style.display = "block";
     }
   }
-
   /* Atualizar ícones de nível na barra de progresso */
   updateLevelIcons(currentLevel);
 }
-
 /* Atualizar os ícones dos níveis na barra de progresso */
 function updateLevelIcons(currentLevel) {
   const levels = [
@@ -423,19 +367,14 @@ function updateLevelIcons(currentLevel) {
     "Globetrotter",
     "Embaixador",
   ];
-
   /* Selecionar todos os marcadores na barra de progresso */
   const levelMarkersContainer = document.querySelector(
     ".absolute.top-2.left-0.right-0.flex.justify-between.items-center"
   );
-
   if (!levelMarkersContainer) {
-    console.error("Contentor dos marcadores de nível não encontrado");
     return;
   }
-
   const levelMarkers = levelMarkersContainer.querySelectorAll(".relative");
-
   if (levelMarkers.length === levels.length) {
     levels.forEach((level, index) => {
       const marker = levelMarkers[index];
@@ -449,11 +388,9 @@ function updateLevelIcons(currentLevel) {
         ); /* Atualizar ícone com símbolo correto */
       icon.textContent = getLevelSymbol(level);
       const currentLevelIndex = levels.indexOf(currentLevel);
-
       /* Obter pontos do utilizador para verificação precisa */
       const user = UserModel.getUserLogged();
       const userPoints = parseInt(user.pontos) || 0;
-
       const levelPoints = {
         Explorador: 0,
         Viajante: 250,
@@ -478,7 +415,6 @@ function updateLevelIcons(currentLevel) {
           "Embaixador",
         ];
         let nextLevelIndex = -1;
-
         /* Encontrar o índice do próximo nível */
         for (let i = 0; i < levelOrder.length; i++) {
           if (userPoints < levelPoints[levelOrder[i]]) {
@@ -486,7 +422,6 @@ function updateLevelIcons(currentLevel) {
             break;
           }
         }
-
         if (index === nextLevelIndex) {
           /* Este é o próximo nível - piscar azul */
           iconContainer.className =
@@ -506,13 +441,11 @@ function updateLevelIcons(currentLevel) {
     });
   }
 }
-
 /* Carregar histórico de viagens */
 function loadTravelHistory(user) {
   const travelHistoryContainer = document.getElementById("travel-history");
   if (travelHistoryContainer) {
     travelHistoryContainer.innerHTML = "";
-
     /* Verificar se o utilizador tem histórico de viagens */
     if (!user.travelHistory || user.travelHistory.length === 0) {
       /* Mostrar botão para criar viagem de demonstração */
@@ -521,13 +454,10 @@ function loadTravelHistory(user) {
         "bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300 py-2 px-4 mb-4";
       demoButton.textContent = "Adicionar Viagem de Demonstração";
       demoButton.addEventListener("click", addDemoTrip);
-
       travelHistoryContainer.appendChild(demoButton);
-
       const emptyMessage = document.createElement("p");
       emptyMessage.className = "text-Text-Subtitles dark:text-gray-400";
       emptyMessage.textContent = "Nenhuma viagem registada.";
-
       travelHistoryContainer.appendChild(emptyMessage);
       return;
     }
@@ -550,12 +480,10 @@ function loadTravelHistory(user) {
         </div>
       </div>
     `;
-
       travelHistoryContainer.appendChild(tripElement);
     });
   }
 }
-
 /* Adicionar viagem de demonstração */
 function addDemoTrip() {
   /* Verificar se utilizador está logado */
@@ -563,10 +491,8 @@ function addDemoTrip() {
     alert("Deve fazer login primeiro!");
     return;
   }
-
   /* Obter utilizador logado */
   const currentUser = UserModel.getUserLogged();
-
   /* Destinos possíveis */
   const destinations = [
     "Lisboa, Portugal",
@@ -578,30 +504,24 @@ function addDemoTrip() {
     "Londres, Reino Unido",
     "Amesterdão, Países Baixos",
   ];
-
   /* Criar viagem de demonstração */
   const newTrip = {
     destination: destinations[Math.floor(Math.random() * destinations.length)],
     date: new Date().toISOString(),
     points: Math.floor(Math.random() * 200) + 100, // Entre 100 e 300 pontos
   };
-
   /* Adicionar à lista de viagens do utilizador */
   if (!currentUser.travelHistory) {
     currentUser.travelHistory = [];
   }
-
   currentUser.travelHistory.push(newTrip);
   /* Adicionar pontos */
   currentUser.pontos = parseInt(currentUser.pontos || 0) + newTrip.points;
-
   try {
     /* Atualizar utilizador usando o modelo */
     UserModel.update(currentUser.id, currentUser);
-
     /* Recarregar informações */
     loadUserInfo();
-
     /* Mostrar mensagem de sucesso */
     alert(
       `Viagem para ${newTrip.destination} adicionada com sucesso! Ganhou +${newTrip.points} pontos.`
@@ -610,13 +530,11 @@ function addDemoTrip() {
     alert(`Erro ao adicionar viagem: ${error.message}`);
   }
 }
-
 /* Carregar preferências de viagem */
 function loadTravelPreferences(user) {
   const preferencesContainer = document.getElementById("travel-preferences");
   if (!preferencesContainer) return;
   preferencesContainer.innerHTML = "";
-
   /* Verificar se o utilizador tem preferências de viagem */
   if (!user.preferences || Object.keys(user.preferences).length === 0) {
     /* Mostrar botão para adicionar preferências */
@@ -625,17 +543,13 @@ function loadTravelPreferences(user) {
       "bg-Main-Primary hover:bg-Main-Secondary dark:bg-cyan-700 dark:hover:bg-cyan-800 text-white font-medium rounded-md transition duration-300 py-2 px-4 mb-4";
     demoButton.textContent = "Adicionar Preferências de Demonstração";
     demoButton.addEventListener("click", addDemoPreferences);
-
     preferencesContainer.appendChild(demoButton);
-
     const emptyMessage = document.createElement("p");
     emptyMessage.className = "text-Text-Subtitles dark:text-gray-400";
     emptyMessage.textContent = "Nenhuma preferência definida.";
-
     preferencesContainer.appendChild(emptyMessage);
     return;
   }
-
   /* Mapear as preferências para nomes mais amigáveis */
   const preferenceLabels = {
     transport: "Meio de Transporte Preferido",
@@ -644,7 +558,6 @@ function loadTravelPreferences(user) {
     activities: "Atividades",
     destinations: "Destinos Favoritos",
   };
-
   /* Adicionar cada preferência */
   for (const [key, value] of Object.entries(user.preferences)) {
     if (value) {
@@ -663,13 +576,8 @@ function loadTravelPreferences(user) {
     }
   }
 }
-
 /* Adicionar viagem de demonstração */
-
-
 /* Carregar preferências de viagem */
-
-
 /* Adicionar preferências de demonstração */
 function addDemoPreferences() {
   /* Verificar se utilizador está logado */
@@ -677,10 +585,8 @@ function addDemoPreferences() {
     alert("Deve fazer login primeiro!");
     return;
   }
-
   /* Obter utilizador logado */
   const currentUser = UserModel.getUserLogged();
-
   /* Criar preferências de demonstração */
   const demoPreferences = {
     transport: ["Avião", "Comboio"],
@@ -689,23 +595,19 @@ function addDemoPreferences() {
     activities: ["Museus", "Gastronomia", "Praia"],
     destinations: ["Portugal", "Espanha", "Itália"],
   };
-
   /* Adicionar preferências ao utilizador */
   currentUser.preferences = demoPreferences;
   try {
     /* Atualizar utilizador usando o modelo */
     UserModel.update(currentUser.id, currentUser);
-
     /* Recarregar informações */
     loadUserInfo();
-
     /* Mostrar mensagem de sucesso */
     alert("Preferências de viagem adicionadas com sucesso!");
   } catch (error) {
     alert(`Erro ao adicionar preferências: ${error.message}`);
   }
 }
-
 /* Formatar data para exibição */
 function formatDate(dateStr) {
   const date = new Date(dateStr);
@@ -715,7 +617,6 @@ function formatDate(dateStr) {
     year: "numeric",
   });
 }
-
 /* Abrir modal para edição de perfil */
 function openEditProfileModal() {
   /* Criar estrutura do modal */
@@ -723,7 +624,6 @@ function openEditProfileModal() {
   modalOverlay.className =
     "fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center";
   modalOverlay.id = "edit-profile-modal";
-
   const modalContent = document.createElement("div");
   modalContent.className =
     "bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 max-h-[80vh] overflow-y-auto";
@@ -732,7 +632,6 @@ function openEditProfileModal() {
     alert("Deve fazer login primeiro!");
     return;
   }
-
   const user = UserModel.getUserLogged();
   modalContent.innerHTML = `
     <div class="flex justify-between items-center mb-6">
@@ -776,10 +675,8 @@ function openEditProfileModal() {
       </div>
     </form>
   `;
-
   modalOverlay.appendChild(modalContent);
   document.body.appendChild(modalOverlay);
-
   /* Adicionar eventos aos botões do modal */
   document
     .getElementById("close-modal")
@@ -791,7 +688,6 @@ function openEditProfileModal() {
     .getElementById("edit-profile-form")
     .addEventListener("submit", saveProfileChanges);
 }
-
 /* Fechar o modal de edição de perfil */
 function closeEditProfileModal() {
   const modal = document.getElementById("edit-profile-modal");
@@ -799,7 +695,6 @@ function closeEditProfileModal() {
     modal.remove();
   }
 }
-
 /* Guardar alterações do perfil */
 function saveProfileChanges(event) {
   event.preventDefault();
@@ -836,7 +731,6 @@ function saveProfileChanges(event) {
     alert(`Erro ao atualizar perfil: ${error.message}`);
   }
 }
-
 /* Processar atualização do perfil */
 function handleProfileUpdate(event) {
   event.preventDefault();
@@ -847,7 +741,6 @@ function handleProfileUpdate(event) {
   }
   // Obter dados do formulário
   const formData = new FormData(event.target);
-
   // Password change logic (acesso direto aos inputs pelo id)
   const currentPassword = document.getElementById("current-password")?.value || "";
   const newPassword = document.getElementById("new-password")?.value || "";
@@ -872,7 +765,6 @@ function handleProfileUpdate(event) {
     }
     user.password = newPassword;
   }
-
   // Atualizar todos os campos relevantes do utilizador
   const updatedUser = {
     ...user,
@@ -900,7 +792,6 @@ function handleProfileUpdate(event) {
     showToast("Erro ao atualizar perfil: " + error.message, "error");
   }
 }
-
 /* Processar upload de avatar */
 function handleAvatarUpload(event) {
   const file = event.target.files[0];
@@ -933,21 +824,16 @@ function handleAvatarUpload(event) {
     reader.readAsDataURL(file);
   }
 }
-
 /* Inicializar o sistema de abas */
 /* A lógica de controle das abas foi movida para o Model (UserModel.js) */
 /* Quando uma função precisar chamar funções do Model, deve usar as funções exportadas */
-
 /* As funções de carregamento de conteúdo para as abas foram movidas para o Model (UserModel.js) */
-
 /* Funções do modal de gamificação */
 function initGamificationModal() {
   /* Configurar eventos do modal primeiro */
   setupGamificationModalEvents();
-
   /* Configurar funcionalidade de redeem de código */
   setupCodeRedeemEvents();
-
   /* Usar event delegation para o botão "Saber mais" */
   document.addEventListener("click", function (e) {
     if (e.target && e.target.id === "btn-saber-mais-codigo") {
@@ -957,36 +843,28 @@ function initGamificationModal() {
     }
   });
 }
-
 function showGamificationModal() {
   const modal = document.getElementById("modal-gamificacao");
   const modalContent = document.getElementById("modal-content");
-
   if (!modal || !modalContent) return;
-
   /* Prevenir scroll da página */
   document.body.style.overflow = "hidden";
   document.body.style.paddingRight = "15px";
-
   /* Mostrar modal */
   modal.classList.remove("hidden");
   modal.style.display = "flex";
   modal.style.alignItems = "center";
   modal.style.justifyContent = "center";
-
   /* Animar entrada */
   requestAnimationFrame(() => {
     modalContent.classList.remove("scale-95", "opacity-0");
     modalContent.classList.add("scale-100", "opacity-100");
   });
 }
-
 function hideGamificationModal() {
   const modal = document.getElementById("modal-gamificacao");
   const modalContent = document.getElementById("modal-content");
-
   if (!modal || !modalContent) return;
-
   /* Animar saída */
   modalContent.classList.remove("scale-100", "opacity-100");
   modalContent.classList.add("scale-95", "opacity-0");
@@ -999,47 +877,39 @@ function hideGamificationModal() {
     document.body.style.paddingRight = "";
   }, 300);
 }
-
 function setupGamificationModalEvents() {
   const btnLembrarMaisTarde = document.getElementById("btn-lembrar-mais-tarde");
   const btnIgnorar = document.getElementById("btn-ignorar");
   const btnFechar = document.getElementById("fechar-modal-gamificacao");
-
   if (btnLembrarMaisTarde) {
     btnLembrarMaisTarde.addEventListener("click", () => {
       sessionStorage.setItem("gamificationModalDeferred", "true");
       hideGamificationModal();
     });
   }
-
   if (btnIgnorar) {
     btnIgnorar.addEventListener("click", () => {
       localStorage.setItem("gamificationModalIgnored", "true");
       hideGamificationModal();
     });
   }
-
   if (btnFechar) {
     btnFechar.addEventListener("click", () => {
       hideGamificationModal();
     });
   }
 }
-
 function setupCodeRedeemEvents() {
   const btnResgatar = document.getElementById("btn-resgatar-codigo");
   const inputCodigo = document.getElementById("input-codigo-especial");
   const mensagemDiv = document.getElementById("mensagem-codigo");
-
   if (btnResgatar && inputCodigo && mensagemDiv) {
     btnResgatar.addEventListener("click", () => {
       const codigo = inputCodigo.value.trim();
-
       if (!codigo) {
         showToast("Por favor, insira um código válido.", "error");
         return;
       }
-      
       try {
         const result = saveSpecialCode(codigo);
         if (result.success) {
@@ -1048,7 +918,6 @@ function setupCodeRedeemEvents() {
             "success"
           );
           inputCodigo.value = "";
-          
           // Reload user info to update points display
           loadUserInfo();
         }
@@ -1056,7 +925,6 @@ function setupCodeRedeemEvents() {
         showToast(error.message, "error");
       }
     });
-
     /* Permitir resgatar com Enter */
     inputCodigo.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
@@ -1065,14 +933,11 @@ function setupCodeRedeemEvents() {
     });
   }
 }
-
 function showCodeMessage(message, type) {
   const mensagemDiv = document.getElementById("mensagem-codigo");
   if (!mensagemDiv) return;
-
   mensagemDiv.textContent = message;
   mensagemDiv.classList.remove("hidden", "text-red-600", "text-green-600");
-
   if (type === "error") {
     mensagemDiv.classList.add("text-red-600");
   } else if (type === "success") {
@@ -1081,82 +946,64 @@ function showCodeMessage(message, type) {
     mensagemDiv.classList.add("hidden");
   }
 }
-
 function saveSpecialCode(code) {
   if (!code || code.trim() === "") {
     throw new Error("Código inválido");
   }
-
   // Check if user is logged in
   if (!UserModel.isLogged()) {
     throw new Error("Deve fazer login para resgatar códigos");
   }
-
   const validCode = "PITSIWESMAD";
   const codeToCheck = code.trim().toUpperCase();
-
   // Check if code is valid
   if (codeToCheck !== validCode) {
     throw new Error("Código inválido");
   }
   // Get current user
   const currentUser = UserModel.getUserLogged();
-  
   // Check if user already used this code
   if (!currentUser.redeemedCodes) {
     currentUser.redeemedCodes = [];
   }
-  
   if (currentUser.redeemedCodes.includes(validCode)) {
     throw new Error("Este código já foi utilizado por si");
   }
-
   // Add points to user (UserModel.addPontos handles adding points to currentUser.pontos)
   const pointsToAdd = 200;
-  
   // Add code to user's redeemed codes
   currentUser.redeemedCodes.push(validCode);
-  
   // Add point movement record and points
   UserModel.addPontos(currentUser, pointsToAdd, `Código especial resgatado: ${validCode}`);
-  
   // Update user in storage
   UserModel.update(currentUser.id, currentUser);
-  
   // Update session storage
   sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
-
   return { success: true };
 }
-
 /* Carregar reservas */
 function loadReservas(user) {
   const container = document.getElementById("reservas-container");
   const emptyDiv = document.getElementById("reservas-empty");
   if (!container) return;
-
   // Limpa o container
   container.innerHTML = "";
-
   if (!user.reservas || user.reservas.length === 0) {
     if (emptyDiv) emptyDiv.classList.remove("hidden");
     return;
   } else {
     if (emptyDiv) emptyDiv.classList.add("hidden");
   }
-  
   user.reservas.forEach((reserva, idx) => {
     const card = document.createElement("div");
     card.className =
       "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl w-full mb-6 cursor-pointer hover:shadow-lg transition-shadow";
-      
     // Add click event based on reservation type
     card.addEventListener("click", function(e) {
       // Don't navigate if clicking the delete button
       if (e.target.closest('.delete-reservation-btn')) {
         return;
       }
-      
       // Navigate based on reservation type
       if (reserva.tipo === 'hotel') {
         window.location.href = `hotel.html?id=${reserva.id}`;
@@ -1164,7 +1011,6 @@ function loadReservas(user) {
         window.location.href = `flight_itinerary.html?id=${reserva.numeroVoo}`;
       }
     });
-
     // Botão de apagar
     const btnDelete = document.createElement("button");
     btnDelete.className =
@@ -1173,7 +1019,6 @@ function loadReservas(user) {
       '<span class="material-symbols-outlined text-red-500 text-sm">delete</span>';
     btnDelete.dataset.reservationIndex = idx;
     card.appendChild(btnDelete);
-
     // Imagem principal
     const img = document.createElement("img");
     img.className =
@@ -1183,7 +1028,6 @@ function loadReservas(user) {
     card.appendChild(img);    // Área do conteúdo
     const content = document.createElement("div");
     content.className = "flex flex-row items-center justify-between flex-1 p-4 w-full";
-
     // Itinerário (lado esquerdo) - give more space for hotel reservations
     const itinerary = document.createElement("div");
     if (reserva.tipo === 'hotel') {
@@ -1191,15 +1035,12 @@ function loadReservas(user) {
     } else {
       itinerary.className = "flex flex-col gap-2 text-left flex-1"; // Original for flights
     }
-
     // Destino em destaque
     itinerary.innerHTML = `<span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">${reserva.destino || 'Destino'}</span>`;
-
     // Display based on reservation type
     if (reserva.tipo === 'hotel') {
       // Hotel reservation display
       itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Hotel: ${reserva.nome || 'Hotel'}</span>`;
-      
       if (reserva.checkIn && reserva.checkOut) {
         itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Check-in: ${reserva.checkIn} | Check-out: ${reserva.checkOut}</span>`;
       }
@@ -1213,23 +1054,19 @@ function loadReservas(user) {
       } else {
         itinerary.innerHTML += `<span class="text-xs text-red-500">Faltam dados de ida</span>`;
       }
-
       // Volta
       if (reserva.dataVolta && reserva.destino && reserva.origem) {
         itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.dataVolta} (${reserva.destino}) » ? (${reserva.origem})</span>`;
       }
-
       // Voo
       if (reserva.numeroVoo) {
         itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo ${reserva.numeroVoo}</span>`;
       }
     }    content.appendChild(itinerary);
-
     // Icon/Logo (lado direito) - only for flights, not hotels
     if (reserva.tipo !== 'hotel') {
       const iconDiv = document.createElement("div");
       iconDiv.className = "pl-4 flex-shrink-0 flex items-center";
-      
       // Airline logo (original logic)
       let companhiaImgSrc = "";
       // Tenta usar um ícone da companhia se existir, senão usa um placeholder
@@ -1268,17 +1105,14 @@ function loadReservas(user) {
       companhiaImg.src = companhiaImgSrc;
       companhiaImg.alt = reserva.companhia || "Companhia aérea";
       iconDiv.appendChild(companhiaImg);
-      
       content.appendChild(iconDiv);
     }
     card.appendChild(content);
     container.appendChild(card);
   });
-
   // After loading all reservations, setup the delete button listeners
   setupReservationDeleteListeners();
 }
-
 /* Setup reservation delete listeners - should be called after loadReservas */
 function setupReservationDeleteListeners() {
   const deleteButtons = document.querySelectorAll(".delete-reservation-btn");
@@ -1290,11 +1124,8 @@ function setupReservationDeleteListeners() {
         alert("Erro: Utilizador não está logado");
         return;
       }
-
       // Get reservation index from data attribute
       const reservationIndex = parseInt(this.dataset.reservationIndex, 10);
-
-
       // Call model function to remove reservation and subtract points
       const result = UserModel.removeReservation(user.id, reservationIndex);      if (result.success) {
         // Find the parent card element
@@ -1306,10 +1137,8 @@ function setupReservationDeleteListeners() {
           /* Animação de fade-out antes de remover */
           reservaCard.style.transition = "opacity 0.3s ease";
           reservaCard.style.opacity = "0";
-
           setTimeout(() => {
             reservaCard.remove();
-
             /* Verificar se ainda existem reservas */
             const reservasContainer = document.getElementById("reservas-container");
             if (reservasContainer && reservasContainer.children.length === 0) {
@@ -1317,10 +1146,8 @@ function setupReservationDeleteListeners() {
             }
           }, 300);
         }
-
         // Show success message with points info - use toast instead of alert
         showToast(`Reserva removida! Pontos subtraídos: ${result.pointsSubtracted}. Pontos atuais: ${result.newPoints}`, "success");
-        
         // Reload user info to update UI
         loadUserInfo();
       } else {
@@ -1329,7 +1156,6 @@ function setupReservationDeleteListeners() {
     });
   });
 }
-
 function formatDateTime(dateStr) {
   if (!dateStr) return "Data não disponível";
   const date = new Date(dateStr);
@@ -1343,7 +1169,6 @@ function formatDateTime(dateStr) {
     hour12: false
   });
 }
-
 /* Remove favorite from user's favorites list */
 function removeFavorite(favoriteIndex) {
   // Check if user is logged in
@@ -1351,74 +1176,52 @@ function removeFavorite(favoriteIndex) {
     alert("Deve fazer login primeiro!");
     return;
   }
-
   const currentUser = UserModel.getUserLogged();
-  
   // Check if favorites array exists and index is valid
   if (!currentUser.favoritos || favoriteIndex < 0 || favoriteIndex >= currentUser.favoritos.length) {
-    console.error("[Favoritos] Invalid favorite index or no favorites array");
     return;
   }
-
   // Get the favorite to be removed for confirmation
   const favoriteToRemove = currentUser.favoritos[favoriteIndex];
   const favoriteName = favoriteToRemove.destino || favoriteToRemove.nome || favoriteToRemove.title || "este favorito";
-  
   // Confirm removal
   showToast(`Favorito ${favoriteName} removido com sucesso!`);
-
   try {
     // Try to use the UserModel to remove the favorite first
     let success = false;
-    
     // Check if the favorite has flight number properties
     if (favoriteToRemove.numeroVoo || favoriteToRemove.nVoo) {
       success = UserModel.removeFavorite(currentUser, favoriteToRemove);
     }
-    
     // If UserModel method failed or couldn't be used, remove manually by index
     if (!success) {
       currentUser.favoritos.splice(favoriteIndex, 1);
       UserModel.update(currentUser.id, currentUser);
       success = true;
     }
-    
     if (success) {
       // Reload the favorites display
       loadFavoritos(currentUser);
-      
       showToast(`Favorito ${favoriteName} removido com sucesso!`);
-
-      console.log(`[Favoritos] Removed favorite: ${favoriteName}`);
-      
       // Show success message
     } else {
       throw new Error("Falha ao remover favorito");
     }
-    
   } catch (error) {
-    console.error("[Favoritos] Error removing favorite:", error);
     alert("Erro ao remover favorito. Tente novamente.");
   }
 }
-
 /* Carregar favoritos */
 function loadFavoritos(user) {
   // Find the bookmarks container in the Perfil tab
   const bookmarksContainer = document.getElementById("bookmarks-container");
   const bookmarksEmpty = document.getElementById("bookmarks-empty");
-
   if (!bookmarksContainer) {
-    console.error("[Favoritos] bookmarks-container not found in DOM");
     return;
   }
-
   // Limpa o container
   bookmarksContainer.innerHTML = "";
-
   // Debug: log the favoritos array
-  console.log("[Favoritos] user.favoritos:", user.favoritos);
-
   if (!user.favoritos || user.favoritos.length === 0) {
     if (bookmarksEmpty) {
       bookmarksEmpty.classList.remove("hidden");
@@ -1427,18 +1230,13 @@ function loadFavoritos(user) {
   } else {
     if (bookmarksEmpty) bookmarksEmpty.classList.add("hidden");
   }  user.favoritos.forEach((fav, idx) => {
-    console.log(`[Favoritos] Rendering favorite #${idx}:`, fav);
-    
     // Determine if it's a hotel or flight
     const isHotel = fav.id && !fav.numeroVoo && !fav.nVoo;
     const isFlight = fav.numeroVoo || fav.nVoo;
-    
     // Render a card matching the provided HTML
     const card = document.createElement("div");
     card.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
-    
     let title, subtitle, navigationUrl;
-    
     if (isHotel) {
       title = fav.nome || "Hotel";
       subtitle = `${fav.cidade || "Localização"} | Hotel`;
@@ -1452,7 +1250,6 @@ function loadFavoritos(user) {
       subtitle = "Tipo desconhecido";
       navigationUrl = "#";
     }
-    
     card.innerHTML = `
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-rose-500 hover:text-rose-600 cursor-pointer transition-colors favorite-heart" data-favorite-index="${idx}">favorite</span>
@@ -1463,44 +1260,29 @@ function loadFavoritos(user) {
       </div>
       <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
     `;
-    
     // Add click event to the heart icon for removing favorite
     const heartIcon = card.querySelector('.favorite-heart');
     heartIcon.addEventListener('click', function(e) {
       e.stopPropagation(); // Prevent card click from triggering
       removeFavorite(idx);
     });
-    
     // Add click event for navigation to the entire card
     card.addEventListener('click', function() {
       window.location.href = navigationUrl;
     });
-    
     bookmarksContainer.appendChild(card);
   });
-
   // Final debug
-  console.log(`[Favoritos] Rendered ${user.favoritos.length} favorite(s).`);
 }
-
 /* Load and display point movements in the modal */
 function loadPointMovements() {
-  console.log("loadPointMovements called");
   const user = UserModel.getUserLogged();
   if (!user) {
-    console.log("No user logged in");
     return;
   }
-
-  console.log("User found:", user.username);
   const movements = UserModel.getUserPointMovements(user);
-  console.log("Point movements:", movements);
-  
   const modalContent = document.querySelector("#pontos-modal .inline-block");
-  console.log("Modal content element found:", modalContent ? "yes" : "no");
-  
   if (!modalContent) return;
-
   modalContent.innerHTML = `
     <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-600">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
@@ -1511,7 +1293,6 @@ function loadPointMovements() {
         <span class="sr-only">Fechar modal</span>
       </button>
     </div>
-    
     <div class="mt-4">
       <div class="mb-4 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
         <div class="flex items-center justify-between">
@@ -1519,7 +1300,6 @@ function loadPointMovements() {
           <span class="text-2xl font-bold text-cyan-800 dark:text-cyan-200">${user.pontos || 0} pontos</span>
         </div>
       </div>
-      
       ${movements.length === 0 ? 
         '<div class="text-center py-8 text-gray-500 dark:text-gray-400">Nenhum movimento de pontos encontrado</div>' :
         `<div class="max-h-96 overflow-y-auto">
@@ -1557,13 +1337,11 @@ function loadPointMovements() {
     });
   }
 }
-
 /* Format movement date for display */
 function formatMovementDate(dateStr) {
   const date = new Date(dateStr);
   const now = new Date();
   const diffInHours = (now - date) / (1000 * 60 * 60);
-  
   if (diffInHours < 24) {
     return `Hoje às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
   } else if (diffInHours < 48) {

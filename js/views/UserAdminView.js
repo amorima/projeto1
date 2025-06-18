@@ -1,8 +1,6 @@
 // UserAdminView.js - User admin management view
-
 import * as UserModel from '../models/UserModel.js';
 import { openModal, closeModal, showToast } from './ViewHelpers.js';
-
 // View configuration
 let userTableConfig = {
     sortColumn: null,
@@ -11,9 +9,7 @@ let userTableConfig = {
     rowsPerPage: 10,
     searchTerm: ''
 };
-
 let editingUserId = null;
-
 // Initialize the view
 function init() {
     UserModel.init();
@@ -21,7 +17,6 @@ function init() {
     setupTableSorting();
     loadTable();
 }
-
 function setupEventListeners() {
     // Add user button
     const addUserBtn = document.getElementById('add-user-btn');
@@ -34,7 +29,6 @@ function setupEventListeners() {
             openModal('modal-adicionar');
         });
     }
-
     // Create/Update user button
     const createUserBtn = document.getElementById('create-user-btn');
     if (createUserBtn) {
@@ -46,7 +40,6 @@ function setupEventListeners() {
             }
         });
     }
-
     // Cancel button
     const cancelUserBtn = document.getElementById('cancel-user-btn');
     if (cancelUserBtn) {
@@ -54,7 +47,6 @@ function setupEventListeners() {
             closeModalUser();
         });
     }
-
     // Search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -65,7 +57,6 @@ function setupEventListeners() {
         });
     }
 }
-
 function setupTableSorting() {
     const tableHeaders = document.querySelectorAll('th[data-sort]');
     tableHeaders.forEach(header => {
@@ -75,7 +66,6 @@ function setupTableSorting() {
         });
     });
 }
-
 function sortTableBy(column) {
     // Determine new sort direction
     if (userTableConfig.sortColumn === column) {
@@ -84,14 +74,11 @@ function sortTableBy(column) {
         userTableConfig.sortColumn = column;
         userTableConfig.sortDirection = 'asc';
     }
-
     // Update UI icons
     updateSortIcons(column, userTableConfig.sortDirection);
-
     // Reload table with new sorting
     loadTable();
 }
-
 function updateSortIcons(activeColumn, direction) {
     // Reset all icons
     const allIcons = document.querySelectorAll('[id^="sort-icon-"]');
@@ -100,7 +87,6 @@ function updateSortIcons(activeColumn, direction) {
         icon.classList.remove('text-primary');
         icon.classList.add('text-gray-400');
     });
-
     // Set active icon
     const activeIcon = document.getElementById(`sort-icon-${activeColumn}`);
     if (activeIcon) {
@@ -109,12 +95,10 @@ function updateSortIcons(activeColumn, direction) {
         activeIcon.classList.add('text-primary');
     }
 }
-
 function loadTable() {
     try {
         // Get filtered and sorted users
         let users = UserModel.search(userTableConfig.searchTerm);
-        
         if (userTableConfig.sortColumn) {
             // Map level column to points for sorting
             let sortColumn = userTableConfig.sortColumn;
@@ -125,7 +109,6 @@ function loadTable() {
             if (sortColumn === 'private') {
                 sortColumn = 'isPrivate';
             }
-            
             users = UserModel.sortBy(sortColumn, userTableConfig.sortDirection);
             if (userTableConfig.searchTerm) {
                 // Apply search filter to sorted results
@@ -135,28 +118,21 @@ function loadTable() {
                 );
             }
         }
-
         // Apply pagination
         const startIndex = (userTableConfig.currentPage - 1) * userTableConfig.rowsPerPage;
         const endIndex = startIndex + userTableConfig.rowsPerPage;
         const paginatedUsers = users.slice(startIndex, endIndex);
-
         // Render table
         renderTable(paginatedUsers);
-
         // Update pagination controls
         updatePaginationControls(users.length);
-
     } catch (error) {
-        console.error('Error loading user table:', error);
         renderTable([]);
     }
 }
-
 function renderTable(users) {
     const tableBody = document.getElementById('tableContent');
     if (!tableBody) return;
-
     if (users.length === 0) {
         tableBody.innerHTML = `
             <tr>
@@ -167,11 +143,9 @@ function renderTable(users) {
         `;
         return;
     }
-
     tableBody.innerHTML = users.map(user => {
         // Handle both privacidade and isPrivate properties
         const isPrivate = user.privacidade === 'S' || user.isPrivate === true;
-        
         return `
         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
             <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">${escapeHtml(user.username)}</td>
@@ -202,26 +176,21 @@ function renderTable(users) {
         `;
     }).join('');
 }
-
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
-
 function updatePaginationControls(totalItems) {
     const totalPages = Math.ceil(totalItems / userTableConfig.rowsPerPage);
     const currentPage = userTableConfig.currentPage;
-
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * userTableConfig.rowsPerPage + 1;
     const endItem = Math.min(currentPage * userTableConfig.rowsPerPage, totalItems);
-
     // Update pagination info
     const paginationInfo = document.querySelector('#pagination-controls .text-sm');
     if (paginationInfo) {
         paginationInfo.innerHTML = `A mostrar <span class="font-medium">${startItem}</span> a <span class="font-medium">${endItem}</span> de <span class="font-medium">${totalItems}</span> resultados`;
     }
-
     // Update pagination buttons
     const paginationContainer = document.querySelector('#pagination-controls .flex.items-center.gap-1');
     if (paginationContainer) {
@@ -236,18 +205,14 @@ function updatePaginationControls(totalItems) {
         `;
     }
 }
-
 function generatePageButtons(currentPage, totalPages) {
     let buttons = '';
     const maxVisiblePages = 5;
-    
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
     if (endPage - startPage + 1 < maxVisiblePages) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-    
     for (let i = startPage; i <= endPage; i++) {
         const isActive = i === currentPage;
         buttons += `
@@ -256,28 +221,22 @@ function generatePageButtons(currentPage, totalPages) {
             </button>
         `;
     }
-    
     if (endPage < totalPages) {
         buttons += '<span class="px-3 py-2 text-sm text-gray-500">...</span>';
     }
-    
     return buttons;
 }
-
 function goToPage(page) {
     const totalItems = UserModel.search(userTableConfig.searchTerm).length;
     const totalPages = Math.ceil(totalItems / userTableConfig.rowsPerPage);
-    
     if (page >= 1 && page <= totalPages) {
         userTableConfig.currentPage = page;
         loadTable();
     }
 }
-
 function createUser() {
     const form = document.getElementById('add_user_form');
     if (!form) return;
-
     try {
         // Get form data
         const formData = new FormData(form);
@@ -289,75 +248,57 @@ function createUser() {
             privacidade: formData.get('private') || 'N',
             admin: formData.get('admin') || 'User'
         };
-
         // Validation
         if (!userData.username || !userData.email || !userData.password) {
             showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
             return;
         }
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(userData.email)) {
             showToast('Por favor, insira um email válido.', 'error');
             return;
         }
-
         // Create user via model
         UserModel.createUser(userData);
-        
         // Close modal and refresh table
         closeModalUser();
         loadTable();
-        
         showToast('Utilizador criado com sucesso!', 'success');
-
     } catch (error) {
-        console.error('Error creating user:', error);
         showToast(error.message || 'Erro ao criar utilizador. Tente novamente.', 'error');
     }
 }
-
 function editUser(userId) {
     try {
         const users = UserModel.getAll();
         const user = users.find(u => u.id == userId); // Use == for type coercion
-        
         if (!user) {
             showToast('Utilizador não encontrado.', 'error');
             return;
         }
-
         // Fill form with user data
         document.getElementById('username').value = user.username;
         document.getElementById('email').value = user.email;
         document.getElementById('password').value = ''; // Don't show existing password
         document.getElementById('points').value = user.pontos || 0;
-        
         // Handle both privacidade and isPrivate properties
         const privacidadeValue = user.privacidade || (user.isPrivate ? 'S' : 'N');
         document.getElementById('private').value = privacidadeValue;
-        
         // Handle both admin formats
         const adminValue = (user.admin === true || user.admin === 'Admin') ? 'Admin' : 'User';
         document.getElementById('admin').value = adminValue;
-
         // Update modal for editing
         editingUserId = userId;
         document.querySelector('#modal-adicionar h3').textContent = 'Editar Utilizador';
         document.getElementById('create-user-btn').innerHTML = '<span class="material-symbols-outlined text-lg">save</span><span>Guardar</span>';
-
         openModal('modal-adicionar');
-
     } catch (error) {
-        console.error('Error loading user for edit:', error);
         showToast('Erro ao carregar dados do utilizador.', 'error');
     }
 }
-
 function updateUser() {
     const form = document.getElementById('add_user_form');
     if (!form || !editingUserId) return;
-
     try {
         // Get form data
         const formData = new FormData(form);
@@ -373,13 +314,11 @@ function updateUser() {
             showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
             return;
         }
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(userData.email)) {
             showToast('Por favor, insira um email válido.', 'error');
             return;
         }
-
         // Check if email already exists in another user
         const users = UserModel.getAll();
         const emailExists = users.find(u => u.id != editingUserId && u.email === userData.email); // Use != for type coercion
@@ -387,10 +326,8 @@ function updateUser() {
             showToast(`Email "${userData.email}" já está sendo usado por outro utilizador.`, 'error');
             return;
         }
-
         // Update user via model
         const userIndex = users.findIndex(u => u.id == editingUserId); // Use == for type coercion
-        
         if (userIndex === -1) {
             showToast('Utilizador não encontrado.', 'error');
             return;
@@ -405,42 +342,31 @@ function updateUser() {
             isPrivate: userData.privacidade === 'S',
             admin: userData.admin === 'Admin'
         };
-
         // Only update password if provided
         if (userData.password && userData.password.trim() !== '') {
             users[userIndex].password = userData.password;
         }
-
         // Save to localStorage
         localStorage.setItem('user', JSON.stringify(users));
           // Close modal and refresh table
         closeModalUser();
         loadTable();
-        
         showToast('Utilizador atualizado com sucesso!', 'success');
-
     } catch (error) {
-        console.error('Error updating user:', error);
         showToast('Erro ao atualizar utilizador. Tente novamente.', 'error');
     }
 }
-
 function deleteUser(userId, username) {
     try {
         // Use the model's delete function
         UserModel.deleteUser(userId);
-        
         // Refresh table
         loadTable();
-        
         showToast('Utilizador eliminado com sucesso!', 'success');
-
     } catch (error) {
-        console.error('Error deleting user:', error);
         showToast(error.message || 'Erro ao eliminar utilizador. Tente novamente.', 'error');
     }
 }
-
 function resetForm() {
     const form = document.getElementById('add_user_form');
     if (form) {
@@ -448,29 +374,24 @@ function resetForm() {
         document.getElementById('points').value = '50'; // Set default points
     }
 }
-
 function closeModalUser() {
     closeModal('modal-adicionar', 'add_user_form', null);
     editingUserId = null;
     resetForm();
-    
     // Reset modal state for adding new users
     const modalHeading = document.querySelector('#modal-adicionar h3');
     if (modalHeading) {
         modalHeading.textContent = 'Adicionar Novo Utilizador';
     }
-    
     const createBtn = document.getElementById('create-user-btn');
     if (createBtn) {
         createBtn.innerHTML = '<span class="material-symbols-outlined text-lg">add</span><span>Adicionar</span>';
     }
 }
-
 // Global functions for onclick events
 window.editUser = editUser;
 window.deleteUser = deleteUser;
 window.goToPage = goToPage;
-
 // Initialize the view when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     if (document.body.querySelector('#add-user-btn')) {
