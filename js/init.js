@@ -25,7 +25,7 @@ function initdata() {  // Utilizador inicial
             chegada: "15/07/2025 11:00",
             direto: "S",
             custo: 150,
-            imagem: "https://placehold.co/413x327",
+            imagem: "/img/destinos/Lisboa/5.jpg",
             dataVolta: "20/07/2025 18:00",
             turismo: ["Turismo Cultural"],
             pointsAR: 150,
@@ -37,7 +37,7 @@ function initdata() {  // Utilizador inicial
         ],
         favoritos: [
           {
-            numeroVoo: "BA101",
+            numeroVoo: "TP300",
             origem: "OPO - Porto",
             destino: "Londres",
             companhia: "British Airways",
@@ -45,7 +45,7 @@ function initdata() {  // Utilizador inicial
             chegada: "01/08/2025 16:00",
             direto: "S",
             custo: 200,
-            imagem: "https://placehold.co/413x327",
+            imagem: "/img/destinos/Londres/1.jpg",
             dataVolta: "08/08/2025 10:00",
             turismo: ["Turismo Cultural", "Turismo Urbano"]
           }
