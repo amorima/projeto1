@@ -1148,7 +1148,7 @@ function loadReservas(user) {
     // Imagem principal
     const img = document.createElement("img");
     img.className =
-      "h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover";
+      "h-40 w-full sm:h-48 sm:w-48 max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover flex-shrink-0";
     img.src = reserva.imagem || "https://placehold.co/200x200";
     img.alt = "Imagem promocional";
     card.appendChild(img);    // Área do conteúdo

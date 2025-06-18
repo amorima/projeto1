@@ -344,8 +344,23 @@ function carregarActividades(destino) {
 }
 
 function adicionarEventosCarros() {
-  // Seleciona todos os cartões de carro
-  const carOptions = document.querySelectorAll(
+  // Encontra a seção de carros procurando pelo texto do título
+  const headings = document.querySelectorAll('h2');
+  let carSection = null;
+  for (let heading of headings) {
+    if (heading.textContent.includes('Aluguer de Carro')) {
+      carSection = heading.nextElementSibling;
+      break;
+    }
+  }
+  
+  if (!carSection) {
+    console.warn('Seção de carros não encontrada');
+    return;
+  }
+  
+  // Seleciona apenas os cartões de carro dentro da seção de carros
+  const carOptions = carSection.querySelectorAll(
     '.flex.items-center.justify-between.py-3.px-2.rounded-lg'
   );
   // Lista de nomes dos carros na ordem dos cartões
@@ -357,7 +372,8 @@ function adicionarEventosCarros() {
     'Mercedes Classe C'
   ];
   const carPrices = [24, 32, 45, 52, 68];
-  carOptions.forEach((option, idx) => {
+  
+  function setupCarCard(option, idx) {
     const icon = option.querySelector('.material-symbols-outlined.text-2xl');
     if (!icon) return;
     // Verifica se este carro está selecionado
@@ -382,6 +398,10 @@ function adicionarEventosCarros() {
       }
       adicionarEventosCarros(); // Atualiza ícones
     };
+  }
+  
+  carOptions.forEach((option, idx) => {
+    setupCarCard(option, idx);
   });
 }
 
