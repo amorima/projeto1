@@ -42,7 +42,7 @@ function getReservationStats() {
         'Voo + Hotel': 0,
         'Voo + Carro': 0,
         'Voo + Seguro': 0,
-        'Pacote Completo': 0
+        'P. Completo': 0
     };
 
     users.forEach(user => {
@@ -53,7 +53,7 @@ function getReservationStats() {
                 const hasSeguro = reserva.seguro === true;
 
                 if (hasHotel && hasCar && hasSeguro) {
-                    reservationTypes['Pacote Completo']++;
+                    reservationTypes['P. Completo']++;
                 } else if (hasHotel && hasCar) {
                     reservationTypes['Voo + Hotel']++; // Assuming hotel is more important
                 } else if (hasHotel && hasSeguro) {
@@ -241,7 +241,7 @@ function renderTopDestinationsChart(data) {
     const bars = data.map((item, index) => {
         const width = maxValue > 0 ? (item.count / maxValue) * 100 : 0;
         return `
-            <div class="flex items-center gap-3 mb-3">
+            <div class="flex items-center gap-3">
                 <div class="w-20 text-right text-sm text-Text-Titles dark:text-gray-100 font-medium truncate">
                     ${item.destination}
                 </div>
