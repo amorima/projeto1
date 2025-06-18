@@ -70,11 +70,17 @@ function renderHotelDetail(hotelId) {
     document.title = "Hotel Não Encontrado";
     return;
   }
-
   document.title = hotel.nome + " - Detalhes do Hotel";
   document.getElementById("hotel-nome").textContent = hotel.nome;
   document.getElementById("hotel-foto").src = hotel.foto;
   document.getElementById("hotel-tipo").textContent = hotel.tipo;
+
+  // Set the detail section image
+  const detailImage = document.querySelector(".w-32.h-32.rounded-lg.object-cover");
+  if (detailImage) {
+    detailImage.src = hotel.foto;
+    detailImage.alt = `Logo do ${hotel.nome}`;
+  }
 
   let camas = 0;
   let capacidade = 0;
