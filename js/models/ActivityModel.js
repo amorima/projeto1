@@ -1,206 +1,206 @@
-// ActivityModel.js - Model for managing activities
-
 import { loadFromLocalStorage, saveToLocalStorage, getNextId } from './ModelHelpers.js';
-
-const activities = [];
+let atividades = [];
 const STORAGE_KEY = 'atividades';
-
-// Load activities from localStorage on module initialization
-loadFromLocalStorage(STORAGE_KEY, activities);
-
-export const ActivityModel = {
-    // Get all activities
-    getAll() {
-        loadFromLocalStorage(STORAGE_KEY, activities);
-        return [...activities];
-    },
-
-    // Get activity by ID
-    getById(id) {
-        loadFromLocalStorage(STORAGE_KEY, activities);
-        return activities.find(activity => activity.id === parseInt(id));
-    },
-
-    // Search activities
-    search(searchTerm) {
-        loadFromLocalStorage(STORAGE_KEY, activities);
-        if (!searchTerm || searchTerm.trim() === '') {
-            return [...activities];
-        }
-        
-        const term = searchTerm.toLowerCase().trim();
-        return activities.filter(activity => 
-            activity.nome.toLowerCase().includes(term) ||
-            activity.descricao.toLowerCase().includes(term) ||
-            activity.tipoTurismo.toLowerCase().includes(term) ||
-            (activity.acessibilidade && activity.acessibilidade.some(acc => 
-                acc.toLowerCase().includes(term)
-            ))
-        );
-    },
-
-    // Sort activities
-    sort(activitiesList, field, ascending = true) {
-        const sorted = [...activitiesList].sort((a, b) => {
-            let aVal = '';
-            let bVal = '';
-
-            switch (field) {
-                case 'act_name':
-                    aVal = a.nome || '';
-                    bVal = b.nome || '';
-                    break;
-                case 'act_turism':
-                    aVal = a.tipoTurismo || '';
-                    bVal = b.tipoTurismo || '';
-                    break;
-                case 'act_description':
-                    aVal = a.descricao || '';
-                    bVal = b.descricao || '';
-                    break;
-                case 'act_destinoId':
-                    aVal = a.destinoId || 0;
-                    bVal = b.destinoId || 0;
-                    break;
-                case 'act_acess':
-                    aVal = Array.isArray(a.acessibilidade) ? a.acessibilidade.join(', ') : '';
-                    bVal = Array.isArray(b.acessibilidade) ? b.acessibilidade.join(', ') : '';
-                    break;
-                default:
-                    aVal = a.nome || '';
-                    bVal = b.nome || '';
-            }
-
-            if (typeof aVal === 'string') {
-                return ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-            } else {
-                return ascending ? aVal - bVal : bVal - aVal;
-            }
-        });
-
-        return sorted;
-    },
-
-    // Add new activity
-    add(activityData) {
-        try {
-            // Validate required fields
-            if (!activityData.nome || !activityData.destinoId || !activityData.tipoTurismo) {
-                throw new Error('Nome, destino e tipo de turismo são obrigatórios');
-            }
-
-            loadFromLocalStorage(STORAGE_KEY, activities);
-
-            // Check if activity already exists
-            const existing = activities.find(activity => 
-                activity.nome.toLowerCase() === activityData.nome.toLowerCase() &&
-                activity.destinoId === parseInt(activityData.destinoId)
-            );
-
-            if (existing) {
-                throw new Error('Esta atividade já existe para este destino');
-            }
-
-            // Create new activity
-            const newActivity = {
-                id: getNextId(activities),
-                destinoId: parseInt(activityData.destinoId),
-                tipoTurismo: activityData.tipoTurismo.trim(),
-                nome: activityData.nome.trim(),
-                foto: activityData.foto || `https://placehold.co/600x400/A0522D/FFFFFF?text=${encodeURIComponent(activityData.nome)}`,
-                descricao: activityData.descricao ? activityData.descricao.trim() : '',
-                acessibilidade: Array.isArray(activityData.acessibilidade) ? activityData.acessibilidade : [activityData.acessibilidade || 'Não especificado']
-            };
-
-            activities.push(newActivity);
-            saveToLocalStorage(STORAGE_KEY, activities);
-
-            return { success: true, data: newActivity };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    },
-
-    // Update activity
-    update(id, activityData) {
-        try {
-            loadFromLocalStorage(STORAGE_KEY, activities);
-            
-            const index = activities.findIndex(activity => activity.id === parseInt(id));
-            if (index === -1) {
-                throw new Error('Atividade não encontrada');
-            }
-
-            // Validate required fields
-            if (!activityData.nome || !activityData.destinoId || !activityData.tipoTurismo) {
-                throw new Error('Nome, destino e tipo de turismo são obrigatórios');
-            }
-
-            // Check if updated name conflicts with another activity (excluding current one)
-            const existing = activities.find(activity => 
-                activity.id !== parseInt(id) &&
-                activity.nome.toLowerCase() === activityData.nome.toLowerCase() &&
-                activity.destinoId === parseInt(activityData.destinoId)
-            );
-
-            if (existing) {
-                throw new Error('Esta atividade já existe para este destino');
-            }
-
-            // Update activity
-            activities[index] = {
-                ...activities[index],
-                destinoId: parseInt(activityData.destinoId),
-                tipoTurismo: activityData.tipoTurismo.trim(),
-                nome: activityData.nome.trim(),
-                foto: activityData.foto || activities[index].foto,
-                descricao: activityData.descricao ? activityData.descricao.trim() : '',
-                acessibilidade: Array.isArray(activityData.acessibilidade) ? activityData.acessibilidade : [activityData.acessibilidade || 'Não especificado']
-            };
-
-            saveToLocalStorage(STORAGE_KEY, activities);
-
-            return { success: true, data: activities[index] };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    },
-
-    // Delete activity
-    delete(id) {
-        try {
-            loadFromLocalStorage(STORAGE_KEY, activities);
-            
-            const index = activities.findIndex(activity => activity.id === parseInt(id));
-            if (index === -1) {
-                throw new Error('Atividade não encontrada');
-            }
-
-            const deletedActivity = activities[index];
-            activities.splice(index, 1);
-            saveToLocalStorage(STORAGE_KEY, activities);
-
-            return { success: true, data: deletedActivity };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    },
-
-    // Get destination name by ID
-    getDestinationName(destinoId) {
-        try {
-            const destinos = JSON.parse(localStorage.getItem('destinos') || '[]');
-            const destino = destinos.find(d => d.id === parseInt(destinoId));
-            return destino ? `${destino.cidade}, ${destino.pais}` : 'Destino não encontrado';
-        } catch {
-            return 'Destino não encontrado';
-        }
-    },
-
-    // Get first activities for dashboard
-    getFirst(quantidade = 5) {
-        loadFromLocalStorage(STORAGE_KEY, activities);
-        return activities.slice(0, quantidade);
+/**
+ * Inicializa o modelo de atividades carregando dados do localStorage
+ */
+export function init() {
+    loadFromLocalStorage(STORAGE_KEY, atividades);
+}
+/**
+ * Obtém todas as atividades
+ * @returns {Array} Lista de todas as atividades
+ */
+export function getAll() {
+    loadFromLocalStorage(STORAGE_KEY, atividades);
+    return [...atividades];
+}
+/**
+ * Obtém uma atividade pelo ID
+ * @param {number} id - ID da atividade
+ * @returns {Object|undefined} Atividade encontrada ou undefined
+ */
+export function getById(id) {
+    loadFromLocalStorage(STORAGE_KEY, atividades);
+    return atividades.find(atividade => atividade.id === parseInt(id));
+}
+/**
+ * Procura atividades com base num termo de pesquisa
+ * @param {string} termoPesquisa - Termo para pesquisar
+ * @returns {Array} Lista de atividades que correspondem à pesquisa
+ */
+export function search(termoPesquisa) {
+    loadFromLocalStorage(STORAGE_KEY, atividades);
+    if (!termoPesquisa || termoPesquisa.trim() === '') {
+        return [...atividades];
     }
-};
-
+    const termo = termoPesquisa.toLowerCase().trim();
+    return atividades.filter(atividade => 
+        atividade.nome.toLowerCase().includes(termo) ||
+        atividade.descricao.toLowerCase().includes(termo) ||
+        atividade.tipoTurismo.toLowerCase().includes(termo) ||
+        (atividade.acessibilidade && atividade.acessibilidade.some(acc => 
+            acc.toLowerCase().includes(termo)
+        ))
+    );
+}
+/**
+ * Ordena uma lista de atividades
+ * @param {Array} listaAtividades - Lista de atividades para ordenar
+ * @param {string} campo - Campo para ordenação
+ * @param {boolean} ascendente - Se true ordena ascendente, se false descendente
+ * @returns {Array} Lista ordenada de atividades
+ */
+export function sort(listaAtividades, campo, ascendente = true) {
+    const ordenada = [...listaAtividades].sort((a, b) => {
+        let valorA = '';
+        let valorB = '';
+        switch (campo) {
+            case 'act_name':
+                valorA = a.nome || '';
+                valorB = b.nome || '';
+                break;
+            case 'act_turism':
+                valorA = a.tipoTurismo || '';
+                valorB = b.tipoTurismo || '';
+                break;
+            case 'act_description':
+                valorA = a.descricao || '';
+                valorB = b.descricao || '';
+                break;
+            case 'act_destinoId':
+                valorA = a.destinoId || 0;
+                valorB = b.destinoId || 0;
+                break;
+            case 'act_acess':
+                valorA = Array.isArray(a.acessibilidade) ? a.acessibilidade.join(', ') : '';
+                valorB = Array.isArray(b.acessibilidade) ? b.acessibilidade.join(', ') : '';
+                break;
+            default:
+                valorA = a.nome || '';
+                valorB = b.nome || '';
+        }
+        if (typeof valorA === 'string') {
+            return ascendente ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
+        } else {
+            return ascendente ? valorA - valorB : valorB - valorA;
+        }
+    });
+    return ordenada;
+}
+/**
+ * Adiciona uma nova atividade
+ * @param {Object} dadosAtividade - Dados da nova atividade
+ * @returns {Object} Resultado da operação com success e data/error
+ */
+export function add(dadosAtividade) {
+    try {
+        if (!dadosAtividade.nome || !dadosAtividade.destinoId || !dadosAtividade.tipoTurismo) {
+            throw new Error('Nome, destino e tipo de turismo são obrigatórios');
+        }
+        loadFromLocalStorage(STORAGE_KEY, atividades);
+        const existente = atividades.find(atividade => 
+            atividade.nome.toLowerCase() === dadosAtividade.nome.toLowerCase() &&
+            atividade.destinoId === parseInt(dadosAtividade.destinoId)
+        );
+        if (existente) {
+            throw new Error('Esta atividade já existe para este destino');
+        }
+        const novaAtividade = {
+            id: getNextId(atividades),
+            destinoId: parseInt(dadosAtividade.destinoId),
+            tipoTurismo: dadosAtividade.tipoTurismo.trim(),
+            nome: dadosAtividade.nome.trim(),
+            foto: dadosAtividade.foto || `https://placehold.co/600x400/A0522D/FFFFFF?text=${encodeURIComponent(dadosAtividade.nome)}`,
+            descricao: dadosAtividade.descricao ? dadosAtividade.descricao.trim() : '',
+            acessibilidade: Array.isArray(dadosAtividade.acessibilidade) ? dadosAtividade.acessibilidade : [dadosAtividade.acessibilidade || 'Não especificado']
+        };
+        atividades.push(novaAtividade);
+        saveToLocalStorage(STORAGE_KEY, atividades);
+        return { success: true, data: novaAtividade };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+/**
+ * Atualiza uma atividade existente
+ * @param {number} id - ID da atividade a atualizar
+ * @param {Object} dadosAtividade - Novos dados da atividade
+ * @returns {Object} Resultado da operação com success e data/error
+ */
+export function update(id, dadosAtividade) {
+    try {
+        loadFromLocalStorage(STORAGE_KEY, atividades);
+        const indice = atividades.findIndex(atividade => atividade.id === parseInt(id));
+        if (indice === -1) {
+            throw new Error('Atividade não encontrada');
+        }
+        if (!dadosAtividade.nome || !dadosAtividade.destinoId || !dadosAtividade.tipoTurismo) {
+            throw new Error('Nome, destino e tipo de turismo são obrigatórios');
+        }
+        const existente = atividades.find(atividade => 
+            atividade.id !== parseInt(id) &&
+            atividade.nome.toLowerCase() === dadosAtividade.nome.toLowerCase() &&
+            atividade.destinoId === parseInt(dadosAtividade.destinoId)
+        );
+        if (existente) {
+            throw new Error('Esta atividade já existe para este destino');
+        }
+        atividades[indice] = {
+            ...atividades[indice],
+            destinoId: parseInt(dadosAtividade.destinoId),
+            tipoTurismo: dadosAtividade.tipoTurismo.trim(),
+            nome: dadosAtividade.nome.trim(),
+            foto: dadosAtividade.foto || atividades[indice].foto,
+            descricao: dadosAtividade.descricao ? dadosAtividade.descricao.trim() : '',
+            acessibilidade: Array.isArray(dadosAtividade.acessibilidade) ? dadosAtividade.acessibilidade : [dadosAtividade.acessibilidade || 'Não especificado']
+        };
+        saveToLocalStorage(STORAGE_KEY, atividades);
+        return { success: true, data: atividades[indice] };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+/**
+ * Remove uma atividade
+ * @param {number} id - ID da atividade a remover
+ * @returns {Object} Resultado da operação com success e data/error
+ */
+export function remove(id) {
+    try {
+        loadFromLocalStorage(STORAGE_KEY, atividades);
+        const indice = atividades.findIndex(atividade => atividade.id === parseInt(id));
+        if (indice === -1) {
+            throw new Error('Atividade não encontrada');
+        }
+        const atividadeRemovida = atividades[indice];
+        atividades.splice(indice, 1);
+        saveToLocalStorage(STORAGE_KEY, atividades);
+        return { success: true, data: atividadeRemovida };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+/**
+ * Obtém o nome do destino pelo ID
+ * @param {number} destinoId - ID do destino
+ * @returns {string} Nome do destino ou mensagem de erro
+ */
+export function getDestinationName(destinoId) {
+    try {
+        const destinos = JSON.parse(localStorage.getItem('destinos') || '[]');
+        const destino = destinos.find(d => d.id === parseInt(destinoId));
+        return destino ? `${destino.cidade}, ${destino.pais}` : 'Destino não encontrado';
+    } catch {
+        return 'Destino não encontrado';
+    }
+}
+/**
+ * Obtém as primeiras atividades para o dashboard
+ * @param {number} quantidade - Número de atividades a retornar
+ * @returns {Array} Lista das primeiras atividades
+ */
+export function getFirst(quantidade = 5) {
+    loadFromLocalStorage(STORAGE_KEY, atividades);
+    return atividades.slice(0, quantidade);
+}

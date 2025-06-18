@@ -7,24 +7,19 @@ import {
   selectOptions,
   updateTable,
 } from "./ViewHelpers.js";
-
 // Global variable to store current hotel data
 let currentHotel = null;
-
 async function initHotelView() {
   HotelModel.init();
   User.init(); // Initialize user model
-
   const urlParams = new URLSearchParams(window.location.search);
   const hotelId = Number(urlParams.get("id")) || 1;
-
   if (hotelId) {
     renderHotelDetail(hotelId);
   } else {
     renderHotelList();
   }
 }
-
 /**
  * Carrega o hotel selecionado do hotel_search.html
  * @param {number} hotelId - ID do hotel a ser carregado.
@@ -49,14 +44,11 @@ async function initHotelView() {
 function renderHotelDetail(hotelId) {
   const hotel = HotelModel.getById(hotelId);
   currentHotel = hotel; // Store hotel globally
-
   if (!hotel) {
     const corpoPrincipal =
       document.querySelector("main") ||
       document.body;
-
     corpoPrincipal.innerHTML = "";
-
     const mensagemErro = document.createElement("div");
     mensagemErro.textContent =
       "Desculpe, o hotel que procura não foi encontrado.";
@@ -64,9 +56,7 @@ function renderHotelDetail(hotelId) {
     mensagemErro.style.marginTop = "50px";
     mensagemErro.style.fontSize = "1.5rem";
     mensagemErro.style.color = "red";
-
     corpoPrincipal.appendChild(mensagemErro);
-
     document.title = "Hotel Não Encontrado";
     return;
   }
@@ -74,14 +64,12 @@ function renderHotelDetail(hotelId) {
   document.getElementById("hotel-nome").textContent = hotel.nome;
   document.getElementById("hotel-foto").src = hotel.foto;
   document.getElementById("hotel-tipo").textContent = hotel.tipo;
-
   // Set the detail section image
   const detailImage = document.querySelector(".w-32.h-32.rounded-lg.object-cover");
   if (detailImage) {
     detailImage.src = hotel.foto;
     detailImage.alt = `Logo do ${hotel.nome}`;
   }
-
   let camas = 0;
   let capacidade = 0;
   let comodidades = [];
@@ -94,22 +82,18 @@ function renderHotelDetail(hotelId) {
     acessibilidade = hotel.quartos[0].acessibilidade || [];
     preco = hotel.quartos[0].precoNoite || 0;
   }
-
   document.getElementById("hotel-camas").textContent = camas;
   document.getElementById("hotel-capacidade").textContent = capacidade;
   document.getElementById("preco-desconto").textContent = preco * 0.9 + " €";
   document.getElementById("hotel-preco").textContent = preco + " €";
   document.getElementById("hotel-preco-noite").textContent = preco + " €";
-
   renderIconsList("hotel-acessibilidade", comodidades);
   renderIconsList("hotel-acessibilidade-extra", acessibilidade);
   document
     .getElementById("fav-hotel")
     .addEventListener("click", toggleFavorito);
-    
   // Initialize favorite state
   initializeFavoriteState(hotel);
-    
   document
     .getElementById("btn-mais-hospedes")
     .addEventListener("click", aumentarHospedes);
@@ -119,35 +103,28 @@ function renderHotelDetail(hotelId) {
   document
     .getElementById("btn-reservar")
     .addEventListener("click", () => reservar(hotel));
-
   const hoje = new Date();
   const amanha = new Date(hoje);
   amanha.setDate(hoje.getDate() + 1);
   const doisDias = new Date(hoje);
   doisDias.setDate(hoje.getDate() + 2);
-
   const formatarData = (data) => {
     return data.toISOString().split("T")[0];
   };
-
   const checkIn = document.getElementById("check-in");
   const checkOut = document.getElementById("check-out");
-
   checkIn.min = formatarData(hoje);
   checkIn.value = formatarData(amanha);
   checkOut.min = formatarData(amanha);
   checkOut.value = formatarData(doisDias);
-
   checkIn.addEventListener("change", () => {
     const novaDataMin = new Date(checkIn.value);
     novaDataMin.setDate(novaDataMin.getDate() + 1);
     checkOut.min = formatarData(novaDataMin);
-
     if (new Date(checkOut.value) <= new Date(checkIn.value)) {
       checkOut.value = formatarData(novaDataMin);
     }
   });
-
   setTimeout(() => {
     if (hotel.cidade && window.L) {
       const cidades = {
@@ -178,7 +155,6 @@ function renderHotelDetail(hotelId) {
     }
   }, 500);
 }
-
 /**
  * Renderiza uma lista de ícones representando comodidades e acessibilidade de um hotel.
  * @param {string} containerId - ID do elemento onde a lista de ícones será renderizada.
@@ -235,7 +211,6 @@ function renderIconsList(containerId, lista) {
     "Piscina Acessível": "pool",
     Terraço: "roofing",
   };
-
   const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = "";
@@ -243,7 +218,6 @@ function renderIconsList(containerId, lista) {
   container.style.gridTemplateColumns =
     "repeat(auto-fit, minmax(120px, 1fr))";
   container.style.gap = "24px";
-
   for (let i = 0; i < lista.length; i++) {
     let item = lista[i];
     let div = document.createElement("div");
@@ -268,7 +242,6 @@ function renderIconsList(containerId, lista) {
     container.appendChild(div);
   }
 }
-
 /**
  * Alterna o estado de favorito de um hotel.
  * @returns {void}
@@ -283,17 +256,14 @@ function toggleFavorito() {
     window.location.href = "_login.html";
     return;
   }
-
   if (!currentHotel) {
     showToast("Erro: Hotel não encontrado", "error");
     return;
   }
-
   const favBtn = document.getElementById("fav-hotel");
   const iconElement = favBtn.querySelector(".material-symbols-outlined");
   const user = User.getUserLogged();
   const currentlyFav = favBtn.getAttribute("data-favorito") === "true";
-
   if (currentlyFav) {
     User.removeFavorite(user, currentHotel);
     favBtn.setAttribute("data-favorito", "false");
@@ -305,12 +275,10 @@ function toggleFavorito() {
     iconElement.style.fontVariationSettings = "'FILL' 1";
     showToast("Hotel adicionado aos favoritos", "success");
   }
-
   // Add scale animation
   iconElement.classList.add("scale-110");
   setTimeout(() => iconElement.classList.remove("scale-110"), 150);
 }
-
 /**
  * Aumenta o número de hóspedes no input.
  * @returns {void}
@@ -332,7 +300,6 @@ function aumentarHospedes() {
     showToast("Máximo de " + maxValue + " hóspedes permitido.");
   }
 }
-
 /**
  * Diminui o número de hóspedes no input.
  * @returns {void}
@@ -349,7 +316,6 @@ function diminuirHospedes() {
     input.value = value - 1;
   }
 }
-
 /**
  * Reserva um hotel e adiciona pontos ao utilizador
  * @param {Object} hotel - O objeto do hotel a ser reservado.
@@ -366,17 +332,13 @@ function reservar(hotel) {
   const checkIn = document.getElementById("check-in").value;
   const checkOut = document.getElementById("check-out").value;
   const hospedes = document.getElementById("hospedes").value;
-
   if (!checkIn || !checkOut) {
     showToast("Por favor, selecione as datas de check-in e check-out.", "error");
     return;
   }
-
   User.init();
-  
   if (User.isLogged()) {
     const utilizador = User.getUserLogged();
-    
     // Calculate points based on hotel price and number of nights
     let pontos = 0;
     if (checkIn && checkOut) {
@@ -387,7 +349,6 @@ function reservar(hotel) {
     } else {
       pontos = 100; // Default points if dates not available
     }
-    
     // Create reservation object for hotel
     const hotelReservation = {
       id: hotel.id,
@@ -405,14 +366,11 @@ function reservar(hotel) {
       // Add points and reservation
     User.addPontos(utilizador, pontos, `Reserva de hotel: ${hotel.nome}`);
     const adicionado = User.addReservation(utilizador, hotelReservation);
-    
     if (adicionado) {
       // Persist the change in the main users array
       User.update(utilizador.id, utilizador);
-      
       // Update session user
       sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
-      
       showToast(
         `Reserva confirmada: ${hotel.nome} de ${checkIn} a ${checkOut} para ${hospedes} hóspedes. +${pontos} pontos!`,
         "success"
@@ -424,7 +382,6 @@ function reservar(hotel) {
   } else {
     // User not logged in - offer to login
     showToast("Reserva confirmada: " + hotel.nome + " de " + checkIn + " a " + checkOut + " para " + hospedes + " hóspedes. Faça login para ganhar pontos!", "warning");
-    
     setTimeout(() => {
       const confirmLogin = confirm("Deseja fazer login para ganhar pontos e guardar esta reserva?");
       if (confirmLogin) {
@@ -433,15 +390,12 @@ function reservar(hotel) {
       }
     }, 2000);
   }
-
   //! hotel.occupy(); Este metodo só existe no modelo Hotel, não nos objetos init para consistensia de resultados está desativado
   HotelModel.update(hotel.id, hotel);
-
   setTimeout(() => {
     window.location.href = "../index.html";
   }, 3000);
 }
-
 /**
  * Initializes the favorite state of the hotel button
  * @param {Object} hotel - The hotel object
@@ -449,7 +403,6 @@ function reservar(hotel) {
 function initializeFavoriteState(hotel) {
   const favBtn = document.getElementById("fav-hotel");
   if (!favBtn) return;
-  
   // Create heart icon if it doesn't exist
   let iconElement = favBtn.querySelector(".material-symbols-outlined");
   if (!iconElement) {
@@ -458,7 +411,6 @@ function initializeFavoriteState(hotel) {
     iconElement.textContent = "favorite";
     favBtn.appendChild(iconElement);
   }
-  
   // Check if hotel is in user favorites
   if (User.isLogged()) {
     const user = User.getUserLogged();
@@ -470,7 +422,6 @@ function initializeFavoriteState(hotel) {
     iconElement.style.fontVariationSettings = "'FILL' 0";
   }
 }
-
 // Inicializar quando a página carrega
 document.addEventListener("DOMContentLoaded", () => {
   initHotelView();

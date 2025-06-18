@@ -5,12 +5,10 @@ import {
   getUserLocation,
   loadComponent,
 } from "./ViewHelpers.js";
-
 import * as HotelModel from "../models/HotelModel.js";
-import { ActivityModel } from "../models/ActivityModel.js";
+import { getAll as getAllActivities, getFirst } from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
-
 let vooShallow = {}
 let valor = 1
 const btnMais = document.getElementById("btn-mais");
@@ -19,7 +17,6 @@ const inputPessoas = document.getElementById("input-pessoas");
 const btnReservar = document.querySelector(
   "button.w-full.bg-Button-Main, button.w-full.bg-Button-Main.dark\\:bg-cyan-400"
 );
-
 if (btnMais && btnMenos && inputPessoas) {
   btnMais.onclick = function () {
     let valor = parseInt(inputPessoas.value, 10);
@@ -29,14 +26,12 @@ if (btnMais && btnMenos && inputPessoas) {
       showToast("O máximo de pessoas é 15.", "error");
     }
   };
-
   btnMenos.onclick = function () {
     let valor = parseInt(inputPessoas.value, 10);
     if (valor > 1) {
       inputPessoas.value = valor - 1;
     }
   };
-
   inputPessoas.oninput = function () {
     let valor = parseInt(inputPessoas.value, 10);
     if (isNaN(valor) || valor < 1) {
@@ -48,23 +43,16 @@ if (btnMais && btnMenos && inputPessoas) {
     }
   };
 }
-
-if (btnReservar) {
-  btnReservar.onclick = function () {
-    console.log("hello?")
+if (btnReservar) {  btnReservar.onclick = function () {
     if(User.isLogged()){
-      console.log("hello?");
       const utilizador = User.getUserLogged();
-      
       // Get points from the calculated value, not from DOM
       const pontos = vooShallow.pointsAR || 0;
-      
       // Create descriptive message for points
       let description = `Reserva de voo: ${vooShallow.destino || 'Voo'}`;
       if (vooShallow.hotel) description += ` + Hotel`;
       if (vooShallow.car) description += ` + Carro`;
       if (vooShallow.seguro) description += ` + Seguro`;
-      
       User.addPontos(utilizador, pontos, description);
       User.addReservation(utilizador, vooShallow);
       // Persist the change in the main users array
@@ -74,7 +62,6 @@ if (btnReservar) {
     }
     showToast("Viagem reservada!", "success");
     mostrarConfettiNoToast();
-
     if (
       !window.customElements ||
       !window.customElements.get("dotlottie-player")
@@ -93,10 +80,8 @@ if (btnReservar) {
     }
   };
 }
-
 function mostrarConfettiNoToast() {
   let toast = document.querySelector(".fixed.bottom-5.right-5");
-
   let confettiDiv = document.createElement("div");
   confettiDiv.style.position = "fixed";
   confettiDiv.style.right = "-50px"; /* um pouco para dentro do canto */
@@ -110,12 +95,10 @@ function mostrarConfettiNoToast() {
       <dotlottie-player src="https://lottie.host/639683f1-4beb-47c3-bda1-a0270b3a9600/Qg9ZzwHWqP.lottie" background="transparent" speed="1" style="width: 300px; height: 300px" loop autoplay></dotlottie-player>
     `;
   document.body.appendChild(confettiDiv);
-
   setTimeout(function () {
     confettiDiv.remove();
   }, 2000);
 }
-
 const favItinerary = document.getElementById("fav-itinerary");
 if (favItinerary) {
   favItinerary.style.userSelect = "none";
@@ -151,7 +134,6 @@ if (favItinerary) {
     }, 150);
   });
 }
-
 function updateFavItineraryState(flight) {
   const favItinerary = document.getElementById("fav-itinerary");
   if (!favItinerary || !flight || !flight.numeroVoo) return;
@@ -163,7 +145,6 @@ function updateFavItineraryState(flight) {
     if (icon) icon.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
   }
 }
-
 function carregarHoteis(destino) {
   try {
     HotelModel.init();
@@ -252,15 +233,12 @@ function carregarHoteis(destino) {
       });
     } else if (containerHoteis) {
       containerHoteis.innerHTML = '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhum hotel disponível para este destino.</div>';
-    }
-  } catch (erro) {
-    console.error("Erro ao carregar hoteis:", erro);
+    }  } catch (erro) {
   }
 }
-
 function carregarActividades(destino) {
   try {
-    let todasAtividades = ActivityModel.getAll();
+    let todasAtividades = getAllActivities();
     let atividadesDestino = [];
     if (destino) {
       // Tentar filtrar por cidade OU por destinoId
@@ -274,7 +252,7 @@ function carregarActividades(destino) {
         return false;
       });
     } else {
-      atividadesDestino = ActivityModel.getFirst(5);
+      atividadesDestino = getFirst(5);
     }
     const containerAtividades = document.getElementById("container-atividades");
     if (containerAtividades && atividadesDestino.length > 0) {
@@ -336,12 +314,9 @@ function carregarActividades(destino) {
       });
     } else if (containerAtividades) {
       containerAtividades.innerHTML = '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhuma atividade disponível para este destino.</div>';
-    }
-  } catch (erro) {
-    console.error("Erro ao carregar atividades:", erro);
+    }  } catch (erro) {
   }
 }
-
 function adicionarEventosCarros() {
   // Encontra a seção de carros procurando pelo texto do título
   const headings = document.querySelectorAll('h2');
@@ -352,12 +327,9 @@ function adicionarEventosCarros() {
       break;
     }
   }
-  
-  if (!carSection) {
-    console.warn('Seção de carros não encontrada');
+    if (!carSection) {
     return;
   }
-  
   // Seleciona apenas os cartões de carro dentro da seção de carros
   const carOptions = carSection.querySelectorAll(
     '.flex.items-center.justify-between.py-3.px-2.rounded-lg'
@@ -371,7 +343,6 @@ function adicionarEventosCarros() {
     'Mercedes Classe C'
   ];
   const carPrices = [24, 32, 45, 52, 68];
-  
   function setupCarCard(option, idx) {
     const icon = option.querySelector('.material-symbols-outlined.text-2xl');
     if (!icon) return;
@@ -398,12 +369,10 @@ function adicionarEventosCarros() {
       adicionarEventosCarros(); // Atualiza ícones
     };
   }
-  
   carOptions.forEach((option, idx) => {
     setupCarCard(option, idx);
   });
 }
-
 function adicionarEventoSeguro() {
   // Seleciona o botão correto pelo id
   const btnAddSeguro = document.getElementById("btn-add-seguro");
@@ -426,13 +395,11 @@ function adicionarEventoSeguro() {
     };
   }
 }
-
 function atualizarSidebarVoo(voo) {
   const sidebar = document.querySelector(
     ".bg-Background-Background.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline"
   ) || document.querySelector(".bg-Background-Background.dark\\:bg-gray-900.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline");
   if (!sidebar) return;
-
   // User info
   let user = null;
   let nivel = 'Explorador';
@@ -450,11 +417,9 @@ function atualizarSidebarVoo(voo) {
       else nivel = 'Explorador', desconto = 0;
     }
   } catch { /* fallback para anónimo */ }
-
   // Preço e pontos
   let numPessoas = voo.nPessoas || 1;
   let precoBase = voo.custo ? Math.round(parseFloat(voo.custo) * numPessoas) : 0;
-
   function parseDatePt(dateStr) {
     if (!dateStr) return null;
     const [datePart, timePart] = dateStr.split(' ');
@@ -465,7 +430,6 @@ function atualizarSidebarVoo(voo) {
     }
     return new Date(year, month - 1, day, hours, minutes);
   }
-
   let numNoites = 1;
   if (voo.partida && (voo.dataVolta || voo.chegada)) {
     const dataInicio = parseDatePt(voo.partida);
@@ -484,40 +448,31 @@ function atualizarSidebarVoo(voo) {
     }
     precoBase += quarto.precoNoite * numNoites * multiplicadorQuartos;
   }
-  
   // Fix car pricing - use car price * number of days
   if (voo.car && voo.car.preco) {
     precoBase += voo.car.preco * numNoites;
   }
-  
   if (voo.seguro) precoBase = Math.round(precoBase * 1.2);
-  
   const precoComDesconto = desconto ? Math.round(precoBase * (1 - desconto / 100)) : precoBase;
-  
   // Calculate points based on new rules
   let pointsMultiplier = 1.0; // Base: 1 point per euro for flight only
-  
   // Check what's included to determine multiplier
   const hasCar = !!(voo.car && voo.car.preco);
   const hasHotel = !!(voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0);
-  
   if (hasCar && hasHotel) {
     pointsMultiplier = 1.25; // Flight + car + hotel
   } else if (hasCar || hasHotel) {
     pointsMultiplier = 1.1; // Flight + car OR flight + hotel
   }
-  
   // Apply insurance bonus if present
   if (voo.seguro) {
     pointsMultiplier *= 1.05;
   }
-  
   const pontosAcumular = Math.round(precoComDesconto * pointsMultiplier);
   vooShallow.pointsAR = pontosAcumular;
   const tipoVoo = voo.tipo ? (voo.tipo === 'ida' ? 'Só ida' : voo.tipo === 'ida e volta' ? 'Ida e volta' : 'Multitryp') : 'Só ida';
   const dataFormatada = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);
   const descontoBadge = desconto ? `<span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded ml-2">${desconto}% desconto</span>` : '';
-
   sidebar.innerHTML = `
     <div class="flex items-center justify-between gap-2">
       <div class="flex items-baseline gap-2">
@@ -586,27 +541,22 @@ function atualizarSidebarVoo(voo) {
     };
   }  if (btnReservar) {
     btnReservar.onclick = function () {
-      
       User.init();
       if(User.isLogged()){
         const utilizador = User.getUserLogged();
-        
         // Get points from the calculated value, not from DOM
         const pontos = vooShallow.pointsAR || 0;
-        
         // Create descriptive message for points
         let description = `Reserva de voo: ${vooShallow.destino || 'Voo'}`;
         if (vooShallow.hotel) description += ` + Hotel`;
         if (vooShallow.car) description += ` + Carro`;
         if (vooShallow.seguro) description += ` + Seguro`;
-        
         User.addPontos(utilizador, pontos, description);
         User.addReservation(utilizador, vooShallow);
         // Persist the change in the main users array
         User.update(utilizador.id, utilizador);
         // Update session user
         sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
-
         mostrarConfettiNoToast();
         showToast("Viagem reservada!", "success");
         if (!window.customElements || !window.customElements.get("dotlottie-player")) {
@@ -635,7 +585,6 @@ function atualizarSidebarVoo(voo) {
     };
   }
 }
-
 document.addEventListener("DOMContentLoaded", () => {
   // Buscar o numeroVoo da query string
   User.init()
@@ -663,7 +612,6 @@ document.addEventListener("DOMContentLoaded", () => {
     adicionarEventoSeguro();
   }, 500);
 });
-
 function parseDatePt(dateStr) {
   // Aceita formatos 'dd/mm/yyyy' ou 'dd/mm/yyyy hh:mm'
   if (!dateStr) return null;
@@ -676,7 +624,6 @@ function parseDatePt(dateStr) {
   // JS: mês começa em 0
   return new Date(year, month - 1, day, hours, minutes);
 }
-
 function formatDatesForDisplayPt(dataPartida, dataRegresso) {
   const meses = [
     "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
@@ -688,7 +635,6 @@ function formatDatesForDisplayPt(dataPartida, dataRegresso) {
   const dataRegressoFormatada = `${regresso.getDate()} ${meses[regresso.getMonth()]}`;
   return `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
 }
-
 function atualizarHeroVoo(voo) {
   // Hero: cidade destino, datas, imagem
   const heroCidade = document.querySelector(
@@ -706,7 +652,6 @@ function atualizarHeroVoo(voo) {
   );
   if (heroImg && voo.imagem) heroImg.src = voo.imagem;
 }
-
 function getLogoCompanhia(nome) {
   try {
     const companhias = JSON.parse(localStorage.getItem("companhiasAereas")) || [];
@@ -716,7 +661,6 @@ function getLogoCompanhia(nome) {
     return null;
   }
 }
-
 function atualizarItinerarioVoo(voo) {
   // Itinerário principal
   const itinerarioDiv = document.querySelector(
@@ -745,15 +689,12 @@ function atualizarItinerarioVoo(voo) {
       : `<span class='font-semibold'>${voo.companhia}</span>`;
   }
 }
-
 // Disable automatic header loading since we handle it manually
 window.skipAutoHeaderLoad = true;
-
 window.onload = function () {
   // Manually load header and footer since we're using window.onload
   loadComponent("../html/_header.html", "header-placeholder");
   loadComponent("../html/_footer.html", "footer-placeholder");
-  
   adicionarEventosCarros();
   adicionarEventoSeguro();
 };

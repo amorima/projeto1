@@ -6,19 +6,15 @@ import {
   getVoosByDestino,
 } from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
-
 document.addEventListener("DOMContentLoaded", () => {
   // Inicialização do modelo de viagens
   User.init();
   init();
-
   const enriched = getTripsWithCoordinates();
-
   // URLs para tile layers claro e escuro
   const lightTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   const darkTileUrl =
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-
   // Criação do mapa centrado na Europa e layer inicial conforme o tema
   const map = L.map("map", { zoomControl: false }).setView([47.526, 8.2551], 5);
   const baseLayer = L.tileLayer(
@@ -27,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
       : lightTileUrl,
     { attribution: "&copy; OpenStreetMap - ESMAD - P.PORTO" }
   ).addTo(map);
-
   // Observa alterações na classe 'dark' para alternar o tile layer
   new MutationObserver((mutations) => {
     for (const m of mutations) {
@@ -41,7 +36,6 @@ document.addEventListener("DOMContentLoaded", () => {
   panel.className =
     "fixed top-24 left-0 bottom-0 w-0 overflow-hidden transition-all duration-300 ease-in-out " +
     "shadow-md z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans custom-scrollbar";
-
   // Adicionando estilo personalizado para a barra de rolagem
   const styleElement = document.createElement("style");
   styleElement.textContent = `
@@ -60,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   `;
   document.head.appendChild(styleElement);
-
   // Certifica que o painel está acima do mapa
   document.getElementById("map").style.zIndex = "10";
   /**
@@ -71,16 +64,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Buscar informações adicionais
     const reviews = getReviewsByDestino(trip.destino);
     const voos = getVoosByDestino(trip.destino);
-
     // Calcular média das avaliações
     const avaliacoes = reviews.map((review) => review.avaliacao);
     const mediaAvaliacoes = avaliacoes.length
       ? (avaliacoes.reduce((a, b) => a + b, 0) / avaliacoes.length).toFixed(1)
       : "0.0";
-
     // Obter usuário atual (se logado)
     const currentUser = User.getUserLogged();
-
     // Montar o conteúdo do painel
     panel.innerHTML = `
       <div class="relative">
@@ -92,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <!-- Cabeçalho com informações básicas do destino -->
       <div class="p-4 border-b border-gray-200 dark:border-gray-700">
         <h2 class="text-2xl font-bold">${trip.destino}</h2>
-        
         <!-- Exibição da classificação média -->
         <div class="flex items-center mt-3">
           <div class="flex gap-1 mr-2" id="rating"></div>
@@ -102,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
           } ${reviews.length === 1 ? "avaliação" : "avaliações"})</span>
         </div>
       </div>
-      
       <!-- Seção de voos disponíveis -->
       <div class="p-4 border-b border-gray-200 dark:border-gray-700">
         <h3 class="text-lg font-semibold mb-3">Voos disponíveis</h3>
@@ -127,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 1; i <= 5; i++) {
       const star = document.createElement("span");
       star.className = "material-symbols-outlined text-yellow-400";
-
       // Configurar FILL para estrelas cheias e metade
       if (
         i <= Math.floor(mediaEstrelas) ||
@@ -150,13 +137,10 @@ document.addEventListener("DOMContentLoaded", () => {
         star.textContent = "star_border";
         // Não aplicamos FILL em estrelas vazias
       }
-
       ratingDiv.appendChild(star);
     }
-
     // Preencher a seção de voos disponíveis
     const voosContainer = panel.querySelector("#voos-disponiveis");
-
     if (voos.length === 0) {
       voosContainer.innerHTML =
         '<p class="text-gray-500 dark:text-gray-400 italic">Nenhum voo disponível para este destino.</p>';
@@ -214,10 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
         voosContainer.appendChild(vooElement);
       });
     }
-
     // Preencher a seção de avaliações
     const reviewsContainer = panel.querySelector("#reviews-container");
-
     if (reviews.length === 0) {
       reviewsContainer.innerHTML =
         '<p class="text-gray-500 dark:text-gray-400 italic">Nenhuma avaliação disponível para este destino.</p>';
@@ -226,7 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Criar elemento de revisão
         const reviewElement = document.createElement("div");
         reviewElement.className = "bg-gray-50 dark:bg-gray-900 rounded-lg p-3";
-
         // Determinar tipo de usuário baseado na pontuação de avaliação
         let userType = "Aventureiro"
         if(User.getUserByName(review.nomePessoa)){
@@ -245,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           userType = "Explorador";
         }
-
         // Tentar obter a imagem do usuário, se disponível
         const userImage = User.getUserImage(review.nomePessoa);
         let htmlAdd = "";
@@ -283,16 +263,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 <span class="mx-2 text-gray-500 dark:text-gray-400">•</span>
                 <span class="text-sm text-Main-Primary">${userType}</span>
               </div>
-              
               <div class="flex items-center my-1">
                 ${generateStars(review.avaliacao)}
                 <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">${new Date(
                   review.data
                 ).toLocaleDateString("pt-PT")}</span>
               </div>
-              
               <p class="text-sm mt-1">${review.comentario}</p>
-              
               <div class="mt-2 flex items-center">
                 <button class="review-reply-btn text-sm text-Main-Primary hover:underline" data-review-id="${
                   review.id
@@ -300,7 +277,6 @@ document.addEventListener("DOMContentLoaded", () => {
                   Responder
                 </button>
               </div>
-              
               ${
                 review.respostas && review.respostas.length > 0
                   ? `<div class="mt-3 ml-5 space-y-3 border-l-2 border-gray-200 dark:border-gray-700 pl-3">
@@ -327,11 +303,9 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
         `;
-
         reviewsContainer.appendChild(reviewElement);
       });
     }
-
     // Funcionalidade para adicionar nova avaliação
     const addReviewBtn = panel.querySelector("#add-review");
     addReviewBtn.addEventListener("click", () => {
@@ -411,12 +385,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           });
         });
-
         // Close modal logic
         modal.querySelector('#close-review-modal').onclick = () => modal.remove();
         modal.querySelector('#cancel-review').onclick = () => modal.remove();
         modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-
         // Submit review
         modal.querySelector('#review-form').onsubmit = (e) => {
           e.preventDefault();
@@ -438,7 +410,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
       }
     });
-
     // Funcionalidade para responder às avaliações
     const replyButtons = panel.querySelectorAll(".review-reply-btn");
     replyButtons.forEach((btn) => {
@@ -470,12 +441,10 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           `;
           document.body.appendChild(replyModal);
-
           // Fechar modal
           replyModal.querySelector('#close-reply-modal').onclick = () => replyModal.remove();
           replyModal.querySelector('#cancel-reply').onclick = () => replyModal.remove();
           replyModal.addEventListener('click', e => { if (e.target === replyModal) replyModal.remove(); });
-
           // Submeter resposta
           replyModal.querySelector('#reply-form').onsubmit = (e) => {
             e.preventDefault();
@@ -503,7 +472,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // Adiciona overflow-hidden imediatamente para esconder o conteúdo durante a transição
       panel.className =
         "fixed top-24 left-0 bottom-0 w-0 overflow-hidden transition-all duration-300 ease-in-out shadow-md z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans";
-
       // Limpar o conteúdo do painel depois da animação de fechamento
       setTimeout(() => {
         panel.innerHTML = ""; // Sempre limpar o conteúdo após a animação
@@ -542,10 +510,8 @@ document.addEventListener("DOMContentLoaded", () => {
           '<span class="material-symbols-outlined text-yellow-400 text-sm">star_border</span>';
       }
     }
-
     return starsHTML;
   }
-
   // Função para criar um marcador personalizado com o preço da viagem
   function criarMarcadorPreco(trip, latlng) {
     const customIcon = L.divIcon({
@@ -558,18 +524,14 @@ document.addEventListener("DOMContentLoaded", () => {
       iconSize: [60, 25],
       iconAnchor: [30, 13], // Centra o marcador na posição
     });
-
     // Cria o marcador com o ícone personalizado
     return L.marker(latlng, { icon: customIcon });
   }
-
   // Criação dos marcadores para cada viagem com coords
   enriched.forEach(({ trip, coords }) => {
     const { latitude, longitude } = coords;
-
     // Cria um marcador personalizado com o preço
     const marker = criarMarcadorPreco(trip, [latitude, longitude]).addTo(map);
-
     // Adiciona o evento de clique para mostrar o painel
     marker.on("click", () => showPanel(trip));
   });

@@ -1,12 +1,9 @@
-// ViewHelpers.js – funções de UI para as Views
-
 import {
   getUserPreference,
   setUserPreference,
   isSystemDarkTheme,
   getThemePreference,
 } from "../models/ModelHelpers.js";
-
 tailwind.config = {
   darkMode: "class",
   theme: {
@@ -62,11 +59,9 @@ tailwind.config = {
     },
   },
 };
-
 export function showCookieBanner() {
   // Só mostra se ainda não foi aceite
   if (getUserPreference("cookieAccepted") === "true") return;
-
   // Cria o banner
   const banner = document.createElement("div");
   banner.id = "cookie-banner";
@@ -75,7 +70,6 @@ export function showCookieBanner() {
     w-[95vw] max-w-xl md:max-w-3xl px-4 py-4
     bg-background-background rounded-2xl shadow-lg flex flex-col md:flex-row items-center gap-4
   `;
-
   banner.innerHTML = `
     <div id="banner" class="fixed rounded-xl border border-gray-200 bottom-0 left-0 right-0 z-50 p-4 flex items-center justify-center space-x-4 bg-white bg-opacity-50 backdrop-filter backdrop-blur-sm">
   <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white rounded-full shadow">
@@ -89,15 +83,17 @@ export function showCookieBanner() {
   >Aceitar</button>
 </div>
   `;
-
   document.body.appendChild(banner);
-
   document.getElementById("accept-cookies-btn").onclick = () => {
     setUserPreference("cookieAccepted", "true");
     banner.remove();
   };
 }
-
+/**
+ * Obtém dados de um formulário
+ * @param {string} formId - ID do formulário
+ * @returns {Object} Objeto com os dados do formulário
+ */
 export function getFormData(formId) {
   const form = document.getElementById(formId);
   const data = {};
@@ -107,9 +103,12 @@ export function getFormData(formId) {
   }
   return data;
 }
-
+/**
+ * Mostra uma notificação toast
+ * @param {string} msg - Mensagem a mostrar
+ * @param {string} type - Tipo da notificação ('success' ou 'error')
+ */
 export function showToast(msg, type = "success") {
-  /* mostra um toast com animação suave */
   const toast = document.createElement("div");
   toast.className = `fixed bottom-5 right-5 px-4 py-2 rounded shadow-lg z-50
         ${
@@ -121,44 +120,133 @@ export function showToast(msg, type = "success") {
   `;
   toast.innerText = msg;
   document.body.appendChild(toast);
-
-  /* força o reflow para ativar a transição */
   void toast.offsetWidth;
-
-  /* aplica o efeito de fade in */
   toast.classList.remove("opacity-0", "translate-y-4");
   toast.classList.add("opacity-100", "translate-y-0");
-
   setTimeout(() => {
-    /* fade out */
     toast.classList.remove("opacity-100", "translate-y-0");
     toast.classList.add("opacity-0", "translate-y-4");
     setTimeout(() => toast.remove(), 500);
   }, 3000);
 }
-
+/**
+ * Mostra um diálogo de confirmação personalizado
+ * @param {string} msg - Mensagem a mostrar
+ * @returns {Promise<boolean>} Promise que resolve para true (confirmar) ou false (cancelar)
+ */
+export function showConfirm(msg) {
+  return new Promise((resolve) => {
+    const confirmBox = document.createElement("div");
+    confirmBox.className = `
+      fixed inset-0 flex items-center justify-center z-50
+      bg-black bg-opacity-50 transition-opacity duration-200
+    `;
+    
+    confirmBox.innerHTML = `
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl max-w-md w-full mx-4 transform transition-all duration-200 scale-95">
+        <div class="flex items-center mb-4">
+          <div class="flex-shrink-0 w-10 h-10 mx-auto flex items-center justify-center bg-red-100 dark:bg-red-900 rounded-full">
+            <span class="material-symbols-outlined text-red-600 dark:text-red-400">warning</span>
+          </div>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center mb-4 font-['Space_Mono']">
+          Confirmar Ação
+        </h3>
+        <p class="text-gray-600 dark:text-gray-300 text-center mb-6 font-['IBM_Plex_Sans']">
+          ${msg}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-2">
+          <button id="cancel-btn" 
+            class="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-500 font-semibold font-['IBM_Plex_Sans'] transition-colors duration-200 order-2 sm:order-1">
+            Cancelar
+          </button>
+          <button id="confirm-btn" 
+            class="flex-1 px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold font-['IBM_Plex_Sans'] transition-colors duration-200 order-1 sm:order-2">
+            Apagar
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(confirmBox);
+    document.body.style.overflow = 'hidden';
+    
+    // Animação de entrada
+    setTimeout(() => {
+      confirmBox.classList.remove('opacity-0');
+      const dialog = confirmBox.querySelector('div');
+      dialog.classList.remove('scale-95');
+      dialog.classList.add('scale-100');
+    }, 10);
+    
+    // Event listeners
+    const confirmBtn = confirmBox.querySelector('#confirm-btn');
+    const cancelBtn = confirmBox.querySelector('#cancel-btn');
+    
+    const cleanup = () => {
+      document.body.style.overflow = '';
+      confirmBox.classList.add('opacity-0');
+      const dialog = confirmBox.querySelector('div');
+      dialog.classList.add('scale-95');
+      setTimeout(() => confirmBox.remove(), 200);
+    };
+    
+    confirmBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(true);
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(false);
+    });
+    
+    // Fechar com ESC
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') {
+        cleanup();
+        resolve(false);
+        document.removeEventListener('keydown', handleKeydown);
+      }
+    };
+    document.addEventListener('keydown', handleKeydown);
+    
+    // Fechar clicando fora
+    confirmBox.addEventListener('click', (e) => {
+      if (e.target === confirmBox) {
+        cleanup();
+        resolve(false);
+      }
+    });
+  });
+}
+/**
+ * Abre um modal
+ * @param {string} modalId - ID do modal
+ */
 export function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (!modal) return;
   modal.classList.remove("hidden");
-  // Prevent body scroll when modal is open
   document.body.style.overflow = 'hidden';
 }
-
+/**
+ * Fecha um modal
+ * @param {string} modalId - ID do modal
+ * @param {string} formId - ID do formulário (opcional)
+ * @param {string} modalTitle - Título do modal (opcional)
+ */
 export function closeModal(modalId, formId, modalTitle) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.classList.add("hidden");
   }
-  
   // Restore body scroll
   document.body.style.overflow = '';
-  
   const form = document.getElementById(formId);
   if (form) {
     form.reset();
   }
-  
   // Look for h2, h3, or any heading element and update the title
   if (modalTitle) {
     const heading = modal?.querySelector('h2, h3, h1, h4, h5, h6');
@@ -167,7 +255,6 @@ export function closeModal(modalId, formId, modalTitle) {
     }
   }
 }
-
 export function selectOptions(items, selectId) {
   const sel = document.getElementById(selectId);
   if (!sel) return;
@@ -184,7 +271,6 @@ export function selectOptions(items, selectId) {
     sel.appendChild(opt);
   });
 }
-
 export function updatePaginationControls(config) {
   const { data, rowsPerPage = 10, currentPage = 1, onPageChange } = config;
   const container = document.getElementById("pagination-controls");
@@ -212,7 +298,6 @@ export function updatePaginationControls(config) {
     )
   );
 }
-
 export function updateTable(config) {
   const {
     data,
@@ -256,11 +341,9 @@ export function updateTable(config) {
     updatePaginationControls({ data, rowsPerPage, currentPage, onPageChange });
   }
 }
-
 /* navegação dos links do footer */
 function initFooterNavigation() {
   const footerLinks = document.querySelectorAll(".footer-link");
-
   footerLinks.forEach((link) => {
     link.addEventListener("click", function (e) {
       e.preventDefault();
@@ -269,12 +352,10 @@ function initFooterNavigation() {
     });
   });
 }
-
 /* determina o caminho correto baseado na localização atual */
 function navigateToStatic(page) {
   const currentPath = window.location.pathname;
   let basePath = "";
-
   /* se estivermos no index ou root */
   if (
     currentPath.endsWith("/") ||
@@ -286,7 +367,6 @@ function navigateToStatic(page) {
     /* se estivermos numa página dentro da pasta html */
     basePath = "./";
   }
-
   /* Caso especial para login */
   if (page === "login") {
     window.location.href = basePath + "_login.html";
@@ -294,7 +374,6 @@ function navigateToStatic(page) {
     window.location.href = basePath + "static_" + page + ".html";
   }
 }
-
 // Função para carregar um componente HTML num elemento pelo seu ID
 export function loadComponent(componentPath, elementId) {
   fetch(componentPath)
@@ -310,18 +389,13 @@ export function loadComponent(componentPath, elementId) {
           const themeToggle = document.getElementById("theme-toggle");
           const profileIcon = document.getElementById("profile");
           if (themeToggle) {
-            console.log("[DEBUG ViewHelpers] Setting up theme toggle in header");
             const isDark = document.documentElement.classList.contains("dark");
             themeToggle.textContent = isDark ? "light_mode" : "dark_mode";
-            console.log("[DEBUG ViewHelpers] Initial theme state:", isDark ? "dark" : "light");
             themeToggle.addEventListener("click", () => {
-              console.log("[DEBUG ViewHelpers] Theme toggle clicked (ViewHelpers listener)");
               toggleThemeIcon(themeToggle);
             });
           } else {
-            console.log("[DEBUG ViewHelpers] Theme toggle element not found");
           }
-
           /* Executar scripts do header */
           const scripts = document.querySelectorAll(
             "#header-placeholder script"
@@ -330,58 +404,44 @@ export function loadComponent(componentPath, elementId) {
             try {
               eval(script.innerHTML);
             } catch (error) {
-              console.error("Erro ao executar script:", error);
             }
           });
-
           /* Chamar setupMenu se existir */
           if (typeof window.setupMenu === "function") {
             setTimeout(window.setupMenu, 100);
           }          /* Inicializar navbar */
-          console.log("[DEBUG ViewHelpers] About to initialize navbar");
           initNavbar();
         }, 200);
       }
-
       // Se for o footer, inicializar a navegação
       if (componentPath.includes("_footer.html")) {
         initFooterNavigation();
       }
     })
     .catch((error) => {
-      console.error(error);
     });
 }
-
 // Alterna o ícone entre dark_mode e light_mode para um elemento passado
 export function toggleThemeIcon(element) {
-  console.log("[DEBUG ViewHelpers] toggleThemeIcon called");
   if (!element) {
-    console.log("[DEBUG ViewHelpers] No element provided to toggleThemeIcon");
     return;
   }
   const html = document.documentElement;
   const isDark = html.classList.contains("dark");
-  console.log("[DEBUG ViewHelpers] Current theme before toggle:", isDark ? "dark" : "light");
-  
   if (isDark) {
     html.classList.remove("dark");
     element.textContent = "dark_mode";
     setUserPreference("theme", "light");
-    console.log("[DEBUG ViewHelpers] Switched to light theme");
   } else {
     html.classList.add("dark");
     element.textContent = "light_mode";
     setUserPreference("theme", "dark");
-    console.log("[DEBUG ViewHelpers] Switched to dark theme");
   }
 }
-
 // Aplica o tema guardado no localStorage ou a preferência do sistema ao carregar a página
 function applyStoredTheme() {
   const html = document.documentElement;
   const theme = getThemePreference();
-
   if (theme === "dark") {
     html.classList.add("dark");
   } else {
@@ -389,18 +449,13 @@ function applyStoredTheme() {
   }
 }
 applyStoredTheme();
-
 // Carregar header automaticamente se existir o placeholder
 document.addEventListener("DOMContentLoaded", () => {
   // Skip automatic loading if a view file will handle it manually
   // This prevents duplicate loading for pages like user_pro.html and _login.html
   if (window.skipAutoHeaderLoad) {
-    console.log("[DEBUG ViewHelpers] Auto header loading disabled by view");
     return;
   }
-  
-  console.log("[DEBUG ViewHelpers] Using automatic header loading");
-  
   // Determina o caminho base (root)
   let root = "/"; // Por defeito, para index.html
   if (
@@ -409,7 +464,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ) {
     root = "../";
   }
-
   if (document.getElementById("header-placeholder")) {
     loadComponent(`${root}html/_header.html`, "header-placeholder");
   }
@@ -420,7 +474,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadComponent(`${root}html/_menu.html`, "menu-placeholder");
   }
 });
-
 export function getUserLocation(callback) {
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -428,7 +481,6 @@ export function getUserLocation(callback) {
       callback({ latitude, longitude });
     },
     (error) => {
-      console.error("Erro ao obter localização:", error);
       callback(false);
     },
     {
@@ -438,7 +490,6 @@ export function getUserLocation(callback) {
     }
   );
 }
-
 export function compareLocation(userLocation, location) {
   if (
     !userLocation ||
@@ -456,11 +507,9 @@ export function compareLocation(userLocation, location) {
   );
   return distance;
 }
-
 export function closestAirport(userLocation, locationArray) {
   let closest = null;
   let minDistance = Infinity;
-
   locationArray.forEach((location) => {
     if (!location || !location.location) return;
     const distance = compareLocation(userLocation, location.location);
@@ -469,22 +518,16 @@ export function closestAirport(userLocation, locationArray) {
       closest = location;
     }
   });
-
   return closest;
 }
-
 /* Função para inicializar a navbar com informações do utilizador */
 export function initNavbar() {
-  console.log("[DEBUG ViewHelpers] initNavbar called");
   /* Pequeno delay para garantir que o UserModel foi inicializado */
   setTimeout(() => {
-    console.log("[DEBUG ViewHelpers] initNavbar timeout executing");
     /* Importar NavbarView dinamicamente para evitar dependências circulares */
     import("./NavbarView.js")
       .then((NavbarView) => {
-        console.log("[DEBUG ViewHelpers] NavbarView imported successfully");
         if (NavbarView.LoginNav) {
-          console.log("[DEBUG ViewHelpers] Calling LoginNav");
           NavbarView.LoginNav();
         }
         /* Chamar updateNavbarUser depois de LoginNav para preservar avatar */

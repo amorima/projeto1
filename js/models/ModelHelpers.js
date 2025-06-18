@@ -1,5 +1,4 @@
 // ModelHelpers.js – funções de persistência de dados
-
 // Funções para carregar e guardar arrays no localStorage
 /**
  * Carrega um array de objetos do localStorage.
@@ -26,7 +25,6 @@ export function loadFromLocalStorage(key, target) {
     }
   }
 }
-
 /**
  * Salva um array de objetos no localStorage.
  * @param {string} key - A chave do localStorage onde o array será armazenado.
@@ -43,7 +41,6 @@ export function loadFromLocalStorage(key, target) {
 export function saveToLocalStorage(key, array) {
   localStorage.setItem(key, JSON.stringify(array));
 }
-
 // Funções para gerir IDs de objetos
 /**
  * Gera o próximo ID para um array de objetos.
@@ -63,7 +60,6 @@ export function getNextId(array) {
     ? array.reduce((max, item) => Math.max(max, item.id), 0) + 1
     : 1;
 }
-
 // Funções para gerir preferências de utilizador (tema, cookies, etc.)
 /**
  * Obtém uma preferência de utilizador do localStorage.
@@ -82,7 +78,6 @@ export function getNextId(array) {
 export function getUserPreference(key, defaultValue = null) {
   return localStorage.getItem(key) || defaultValue;
 }
-
 /**
  * Guarda uma preferência de utilizador no localStorage.
  * @param {string} key - A chave da preferência a ser guardada.
@@ -98,7 +93,6 @@ export function getUserPreference(key, defaultValue = null) {
 export function setUserPreference(key, value) {
   localStorage.setItem(key, value);
 }
-
 /**
  * Verifica se o tema do sistema é escuro.
  * @returns {boolean} - Retorna true se o tema do sistema for escuro, caso contrário, retorna false.
@@ -118,7 +112,6 @@ export function isSystemDarkTheme() {
     window.matchMedia("(prefers-color-scheme: dark)").matches
   );
 }
-
 /**
  * Obtém a preferência de tema do utilizador.
  * @returns - Retorna a preferência de tema do utilizador, ou a preferência do sistema se não houver preferência guardada.
@@ -139,7 +132,6 @@ export function getThemePreference() {
   }
   return isSystemDarkTheme() ? "dark" : "light";
 }
-
 //Função de combinação
 /**
  * Combina arrays de forma recursiva, gerando todas as combinações possíveis.
@@ -168,7 +160,6 @@ export function combinar(arrays, prefix = []) {
   const [first, ...rest] = arrays;
   return first.flatMap((voo) => combinar(rest, [...prefix, voo]));
 }
-
 /**
  * Pesquisa aeroportos por cidade ou país.
  * @param {string} termo
@@ -182,14 +173,12 @@ export function combinar(arrays, prefix = []) {
 export function pesquisarAeroportos(termo) {
   const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
   const termoLower = termo.toLowerCase();
-
   return aeroportos.filter(
     (aeroporto) =>
       aeroporto.cidade.toLowerCase().includes(termoLower) ||
       (aeroporto.pais && aeroporto.pais.toLowerCase().includes(termoLower))
   );
 }
-
 /**
  * Obtém aeroportos ordenados por proximidade à localização do utilizador.
  * @param {Object} localizacaoUtilizador
@@ -199,17 +188,14 @@ export function pesquisarAeroportos(termo) {
  */
 export function obterAeroportosProximos(localizacaoUtilizador) {
   const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
-
   if (!localizacaoUtilizador) {
     return aeroportos;
   }
-
   /* Calcular distância para cada aeroporto */
   const aeroportosComDistancia = aeroportos.map((aeroporto) => {
     if (!aeroporto.location) {
       return { ...aeroporto, distancia: Infinity };
     }
-
     const distancia = Math.sqrt(
       Math.pow(
         localizacaoUtilizador.latitude - aeroporto.location.latitude,
@@ -220,10 +206,8 @@ export function obterAeroportosProximos(localizacaoUtilizador) {
           2
         )
     );
-
     return { ...aeroporto, distancia };
   });
-
   /* Ordenar por distância */
   return aeroportosComDistancia.sort((a, b) => a.distancia - b.distancia);
 }

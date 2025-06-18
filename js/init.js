@@ -1,5 +1,4 @@
 initdata();
-
 function initdata() {  // Utilizador inicial
   if (!localStorage.user) {
     const user = [
@@ -1363,9 +1362,7 @@ function initdata() {  // Utilizador inicial
             camas: 1,
             capacidade: 2,
             precoNoite: 350,
-            foto: "/img/hoteis/Amsterdao/CHotel_V_Nesplein/8.jpg",
-            foto: "/img/hoteis/Amsterdao/CHotel_V_Nesplein/9.jpg",
-            foto: "/img/hoteis/Amsterdao/CHotel_V_Nesplein/10.jpg",
+            foto: "img/hoteis/Amsterdao/CHotel_V_Nesplein/8.jpg",
             acessibilidade: ["Elevadores Disponíveis"],
             dataCheckin: "2025-07-16",
             numeroNoites: 3,
@@ -4673,7 +4670,6 @@ function initdata() {  // Utilizador inicial
     ];
     localStorage.setItem("reviews", JSON.stringify(reviews));
   }
-  
   // Newsletter subscribers
   if (!localStorage.newsletter) {
     const newsletter = [

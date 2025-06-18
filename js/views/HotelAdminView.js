@@ -1,7 +1,5 @@
 // HotelAdminView.js - Hotel admin management view (MV Pattern - Functions only)
-
-import { showToast, openModal } from './ViewHelpers.js';
-
+import { showToast, openModal, showConfirm } from './ViewHelpers.js';
 // State variables
 let allHotels = [];
 let filteredHotels = [];
@@ -11,7 +9,6 @@ let currentPage = 1;
 let itemsPerPage = 10;
 let isEditMode = false;
 let editingHotelId = null;
-
 // Initialize the hotel admin view
 export function initHotelAdminView() {
     loadHotels();
@@ -21,7 +18,6 @@ export function initHotelAdminView() {
     renderTable();
     updatePagination();
 }
-
 // Load all hotels from localStorage (init.js structure)
 function loadHotels() {
     const hotelData = localStorage.getItem("hoteis");
@@ -33,28 +29,23 @@ function loadHotels() {
         filteredHotels = [];
     }
 }
-
 // Save hotels to localStorage
 function saveHotels() {
     localStorage.setItem("hoteis", JSON.stringify(allHotels));
 }
-
 // Get next available ID
 function getNextId() {
     if (allHotels.length === 0) return 1;
     return Math.max(...allHotels.map(h => h.id)) + 1;
 }
-
 // Load destinations for the dropdown
 function loadDestinations() {
     const destinationData = localStorage.getItem("destinos");
     const destinations = destinationData ? JSON.parse(destinationData) : [];
-    
     const select = document.getElementById('destinoId');
     if (select) {
         // Clear existing options except the first
         select.innerHTML = '<option value="">Selecionar...</option>';
-        
         destinations.forEach(dest => {
             const option = document.createElement('option');
             option.value = dest.cidade; // Use cidade as value since that's what hotels store
@@ -63,7 +54,6 @@ function loadDestinations() {
         });
     }
 }
-
 // Setup event listeners
 function setupEventListeners() {
     // Add hotel button
@@ -71,7 +61,6 @@ function setupEventListeners() {
     if (addHotelBtn) {
         addHotelBtn.addEventListener('click', openAddModal);
     }
-
     // Create/Update hotel button
     const createHotelBtn = document.getElementById('create-hotel-btn');
     if (createHotelBtn) {
@@ -81,7 +70,6 @@ function setupEventListeners() {
     if (cancelHotelBtn) {
         cancelHotelBtn.addEventListener('click', closeHotelModal);
     }
-
     // Search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
@@ -90,7 +78,6 @@ function setupEventListeners() {
         });
     }
 }
-
 // Setup table sorting
 function setupTableSorting() {
     const tableHeaders = document.querySelectorAll('th[data-sort]');
@@ -101,94 +88,74 @@ function setupTableSorting() {
         });
     });
 }
-
 // Open add hotel modal
 function openAddModal() {
     isEditMode = false;
     editingHotelId = null;
-    
     // Reset form
     document.getElementById('add_hotel_form').reset();
-    
     // Update modal title and button
     const modalTitle = document.querySelector('#modal-adicionar h3');
     const createBtn = document.getElementById('create-hotel-btn');
     const createBtnText = createBtn.querySelector('span:last-child');
-    
     if (modalTitle) modalTitle.textContent = 'Adicionar Novo Hotel';
     if (createBtnText) createBtnText.textContent = 'Adicionar';
-    
     openModal('modal-adicionar');
 }
-
 // Open edit hotel modal
 function openEditModal(hotelId) {
     isEditMode = true;
     editingHotelId = hotelId;
-    
     const hotel = allHotels.find(h => h.id === hotelId);
     if (!hotel) {
         showToast('Hotel não encontrado!', 'error');
         return;
     }
-    
     // Get the first (and only) room from the quartos array
     const quarto = hotel.quartos && hotel.quartos.length > 0 ? hotel.quartos[0] : {};
       // Populate hotel form data
     document.getElementById('destinoId').value = hotel.cidade || '';
     document.getElementById('name').value = hotel.nome;
     // Note: File input cannot be pre-populated for security reasons
-    
     // Populate room form data
     document.getElementById('tipo').value = quarto.tipo || '';
     document.getElementById('camas').value = quarto.camas || 1;
     document.getElementById('capacidade').value = quarto.capacidade || 2;
     document.getElementById('precoNoite').value = quarto.precoNoite || 0;
     document.getElementById('descricao').value = quarto.descricao || '';
-    
     // Update modal title and button
     const modalTitle = document.querySelector('#modal-adicionar h3');
     const createBtn = document.getElementById('create-hotel-btn');
     const createBtnText = createBtn.querySelector('span:last-child');
-    
     if (modalTitle) modalTitle.textContent = 'Editar Hotel';
     if (createBtnText) createBtnText.textContent = 'Atualizar';
-    
     openModal('modal-adicionar');
 }
-
 // Handle form submission (create or update)
 function handleFormSubmit() {
     const form = document.getElementById('add_hotel_form');
     if (!form) return;
-    
     const formData = new FormData(form);
     const fileInput = document.getElementById('foto');
     const file = fileInput.files[0];
-    
     // Validation
     const cidade = formData.get('destinoId');
     const nome = formData.get('name');
-    
     if (!cidade || !nome) {
         showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
         return;
     }
-    
     const camas = parseInt(formData.get('camas')) || 1;
     const capacidade = parseInt(formData.get('capacidade')) || 2;
     const precoNoite = parseFloat(formData.get('precoNoite')) || 80;
-    
     if (camas < 1 || capacidade < 1) {
         showToast('O número de camas e capacidade devem ser maior que 0.', 'error');
         return;
     }
-    
     if (precoNoite < 0) {
         showToast('O preço por noite deve ser maior ou igual a 0.', 'error');
         return;
     }
-    
     // Handle file upload or use default
     const processHotelData = (fotoUrl) => {
         const hotelData = {
@@ -196,7 +163,6 @@ function handleFormSubmit() {
             nome: nome,
             foto: fotoUrl
         };
-        
         const roomData = {
             tipo: formData.get('tipo') || 'Standard',
             camas: camas,
@@ -211,7 +177,6 @@ function handleFormSubmit() {
             wifiGratis: true,
             descricao: formData.get('descricao') || ''
         };
-        
         try {
             if (isEditMode) {
                 // Update existing hotel
@@ -221,7 +186,6 @@ function handleFormSubmit() {
                     allHotels[hotelIndex].nome = hotelData.nome;
                     allHotels[hotelIndex].foto = hotelData.foto;
                     allHotels[hotelIndex].quartos = [roomData];
-                    
                     saveHotels();
                     showToast('Hotel atualizado com sucesso!', 'success');
                     refreshTable();
@@ -238,7 +202,6 @@ function handleFormSubmit() {
                     foto: hotelData.foto,
                     quartos: [roomData]
                 };
-                
                 allHotels.push(newHotel);
                 saveHotels();
                 showToast('Hotel adicionado com sucesso!', 'success');
@@ -246,11 +209,9 @@ function handleFormSubmit() {
                 closeHotelModal();
             }
         } catch (error) {
-            console.error('Error in hotel operation:', error);
             showToast('Erro interno. Tente novamente.', 'error');
         }
     };
-    
     // Process file upload or use default
     if (file) {
         const reader = new FileReader();
@@ -272,47 +233,48 @@ function handleFormSubmit() {
         processHotelData(defaultPhoto);
     }
 }
-
 // Delete hotel
 function deleteHotel(hotelId) {
-    try {
-        const hotelIndex = allHotels.findIndex(h => h.id === hotelId);
-        if (hotelIndex !== -1) {
-            allHotels.splice(hotelIndex, 1);
-            saveHotels();
-            showToast('Hotel removido com sucesso!', 'success');
-            refreshTable();
-        } else {
-            showToast('Erro ao remover hotel.', 'error');
-        }
-    } catch (error) {
-        console.error('Error deleting hotel:', error);
-        showToast('Erro interno. Tente novamente.', 'error');
-    }
+    const hotel = allHotels.find(h => h.id === hotelId);
+    const hotelName = hotel ? hotel.nome || `Hotel ID ${hotelId}` : `Hotel ID ${hotelId}`;
+    
+    showConfirm(`Tem a certeza que pretende eliminar o hotel "${hotelName}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                try {
+                    const hotelIndex = allHotels.findIndex(h => h.id === hotelId);
+                    if (hotelIndex !== -1) {
+                        allHotels.splice(hotelIndex, 1);
+                        saveHotels();
+                        showToast('Hotel removido com sucesso!', 'success');
+                        refreshTable();
+                    } else {
+                        showToast('Erro ao remover hotel.', 'error');
+                    }
+                } catch (error) {
+                    showToast('Erro interno. Tente novamente.', 'error');
+                }
+            }
+        });
 }
-
 // Handle search functionality
 function handleSearch(searchTerm) {
     const term = searchTerm.toLowerCase().trim();
-    
     if (term === '') {
         filteredHotels = [...allHotels];
     } else {
         filteredHotels = allHotels.filter(hotel => {
             const quarto = hotel.quartos && hotel.quartos.length > 0 ? hotel.quartos[0] : {};
-            
             return hotel.nome.toLowerCase().includes(term) ||
                    (hotel.cidade && hotel.cidade.toLowerCase().includes(term)) ||
                    (quarto.tipo && quarto.tipo.toLowerCase().includes(term)) ||
                    (quarto.precoNoite && quarto.precoNoite.toString().includes(term));
         });
     }
-    
     currentPage = 1;
     renderTable();
     updatePagination();
 }
-
 // Sort table
 function sortTable(column) {
     if (currentSortColumn === column) {
@@ -321,10 +283,8 @@ function sortTable(column) {
         currentSortColumn = column;
         currentSortDirection = 'asc';
     }
-    
     filteredHotels.sort((a, b) => {
         let aValue, bValue;
-        
         switch (column) {
             case 'destinoId':
                 aValue = a.cidade || '';
@@ -344,21 +304,17 @@ function sortTable(column) {
             default:
                 return 0;
         }
-        
         if (typeof aValue === 'string') {
             aValue = aValue.toLowerCase();
             bValue = bValue.toLowerCase();
         }
-        
         if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
         if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
         return 0;
     });
-    
     updateSortIcons(column, currentSortDirection);
     renderTable();
 }
-
 // Update sort icons
 function updateSortIcons(activeColumn, direction) {
     // Reset all icons
@@ -368,7 +324,6 @@ function updateSortIcons(activeColumn, direction) {
         icon.classList.remove('text-primary');
         icon.classList.add('text-gray-400');
     });
-    
     // Set active icon
     const activeIcon = document.getElementById(`sort-icon-${activeColumn}`);
     if (activeIcon) {
@@ -377,16 +332,13 @@ function updateSortIcons(activeColumn, direction) {
         activeIcon.classList.add('text-primary');
     }
 }
-
 // Render table
 function renderTable() {
     const tbody = document.getElementById('tableContent');
     if (!tbody) return;
-    
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
     const pageHotels = filteredHotels.slice(start, end);
-    
     if (pageHotels.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -397,12 +349,10 @@ function renderTable() {
         `;
         return;
     }
-    
     tbody.innerHTML = pageHotels.map(hotel => {
         // Get room details from the first (and only) room
         const quarto = hotel.quartos && hotel.quartos.length > 0 ? hotel.quartos[0] : {};
         const roomInfo = quarto.tipo ? `${quarto.tipo} - €${quarto.precoNoite}/noite` : 'N/A';
-        
         return `
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
                 <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">${hotel.cidade || 'N/A'}</td>
@@ -428,14 +378,12 @@ function renderTable() {
         `;
     }).join('');
 }
-
 // Update pagination
 function updatePagination() {
     const totalItems = filteredHotels.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const start = (currentPage - 1) * itemsPerPage + 1;
     const end = Math.min(start + itemsPerPage - 1, totalItems);
-    
     // Update info text
     const infoText = document.querySelector('#pagination-controls .text-sm');
     if (infoText) {
@@ -445,7 +393,6 @@ function updatePagination() {
             infoText.innerHTML = `A mostrar <span class="font-medium">${start}</span> a <span class="font-medium">${end}</span> de <span class="font-medium">${totalItems}</span> resultados`;
         }
     }
-    
     // Update pagination buttons
     const paginationContainer = document.querySelector('#pagination-controls .flex.items-center.gap-1');
     if (paginationContainer) {
@@ -458,16 +405,13 @@ function updatePagination() {
                 <span class="material-symbols-outlined text-lg">chevron_left</span>
             </button>
         `;
-        
         // Page numbers
         const maxVisiblePages = 5;
         let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
         let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        
         if (endPage - startPage + 1 < maxVisiblePages) {
             startPage = Math.max(1, endPage - maxVisiblePages + 1);
         }
-        
         for (let i = startPage; i <= endPage; i++) {
             paginationHTML += `
                 <button 
@@ -478,7 +422,6 @@ function updatePagination() {
                 </button>
             `;
         }
-        
         paginationHTML += `
             <button 
                 onclick="window.goToPage(${currentPage + 1})" 
@@ -488,11 +431,9 @@ function updatePagination() {
                 <span class="material-symbols-outlined text-lg">chevron_right</span>
             </button>
         `;
-        
         paginationContainer.innerHTML = paginationHTML;
     }
 }
-
 // Go to specific page
 function goToPage(page) {
     const totalPages = Math.ceil(filteredHotels.length / itemsPerPage);
@@ -502,7 +443,6 @@ function goToPage(page) {
         updatePagination();
     }
 }
-
 // Refresh table after changes
 function refreshTable() {
     loadHotels();
@@ -515,29 +455,23 @@ function refreshTable() {
         updatePagination();
     }
 }
-
 // Close modal and reset form
 function closeHotelModal() {
     const modal = document.getElementById('modal-adicionar');
     const form = document.getElementById('add_hotel_form');
-    
     if (modal) {
         modal.classList.add('hidden');
     }
-    
     if (form) {
         form.reset();
     }
-    
     isEditMode = false;
     editingHotelId = null;
 }
-
 // Export functions to global scope for onclick handlers
 window.editHotel = openEditModal;
 window.deleteHotel = deleteHotel;
 window.goToPage = goToPage;
-
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('add-hotel-btn')) {

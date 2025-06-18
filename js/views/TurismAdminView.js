@@ -1,18 +1,20 @@
 // TurismAdminView.js - Inline Tourism Types Admin Management
-
-import { openModal, closeModal, showToast } from './ViewHelpers.js';
-import { TurismModel } from '../models/TurismModel.js';
-
+import { openModal, closeModal, showToast, showConfirm } from './ViewHelpers.js';
+import { 
+    getAllTourismTypes, 
+    addTourismType, 
+    updateTourismType, 
+    deleteTourismType, 
+    searchTourismTypes 
+} from '../models/TurismModel.js';
 let currentEditType = null;
 let sortAscending = true;
-
 // Initialize the tourism admin page
 function initTurismAdmin() {
     setupEventListeners();
     loadTurismTypes();
     updateStats();
 }
-
 // Setup all event listeners
 function setupEventListeners() {
     // Add tourism form
@@ -20,19 +22,16 @@ function setupEventListeners() {
     if (addForm) {
         addForm.addEventListener('submit', handleAddTurismType);
     }
-
     // Search functionality
     const searchInput = document.getElementById('search-turism-inline');
     if (searchInput) {
         searchInput.addEventListener('input', handleSearch);
     }
-
     // Sort button
     const sortBtn = document.getElementById('sort-az-btn');
     if (sortBtn) {
         sortBtn.addEventListener('click', handleSort);
     }
-
     // Refresh button
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) {
@@ -42,18 +41,15 @@ function setupEventListeners() {
             showToast('Lista atualizada!', 'success');
         });
     }
-
     // Edit modal event listeners
     setupEditModalListeners();
 }
-
 // Setup edit modal event listeners
 function setupEditModalListeners() {
     const editForm = document.getElementById('edit-turism-inline-form');
     if (editForm) {
         editForm.addEventListener('submit', handleEditTurismType);
     }
-
     const cancelEditBtn = document.getElementById('cancel-edit-turism-inline-btn');
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener('click', () => {
@@ -62,21 +58,16 @@ function setupEditModalListeners() {
         });
     }
 }
-
 // Handle adding new tourism type
 function handleAddTurismType(event) {
     event.preventDefault();
-    
     const formData = new FormData(event.target);
     const tipoTurismo = formData.get('tipoTurismo');
-    
     if (!tipoTurismo || tipoTurismo.trim() === '') {
         showToast('Por favor, insira um tipo de turismo válido.', 'error');
         return;
     }
-
-    const result = TurismModel.add(tipoTurismo);
-    
+    const result = addTourismType(tipoTurismo);
     if (result.success) {
         showToast('Tipo de turismo adicionado com sucesso!', 'success');
         event.target.reset();
@@ -86,26 +77,20 @@ function handleAddTurismType(event) {
         showToast(result.error, 'error');
     }
 }
-
 // Handle editing tourism type
 function handleEditTurismType(event) {
     event.preventDefault();
-    
     if (!currentEditType) {
         showToast('Erro: Tipo de turismo não selecionado.', 'error');
         return;
     }
-
     const formData = new FormData(event.target);
     const newValue = formData.get('tipoTurismo');
-    
     if (!newValue || newValue.trim() === '') {
         showToast('Por favor, insira um tipo de turismo válido.', 'error');
         return;
     }
-
-    const result = TurismModel.update(currentEditType, newValue);
-    
+    const result = updateTourismType(currentEditType, newValue);
     if (result.success) {
         showToast('Tipo de turismo atualizado com sucesso!', 'success');
         closeModal('modal-edit-turism-inline');
@@ -116,18 +101,16 @@ function handleEditTurismType(event) {
         showToast(result.error, 'error');
     }
 }
-
 // Handle search functionality
 function handleSearch(event) {
     const searchTerm = event.target.value;
-    const filteredTypes = TurismModel.search(searchTerm);
+    const filteredTypes = searchTourismTypes(searchTerm);
     renderTurismTypes(filteredTypes);
     updateTypesCount(filteredTypes.length);
 }
-
 // Handle sorting
 function handleSort() {
-    const types = TurismModel.getAll();
+    const types = getAllTourismTypes();
     const sortedTypes = [...types].sort((a, b) => {
         if (sortAscending) {
             return a.localeCompare(b, 'pt', { sensitivity: 'base' });
@@ -135,14 +118,11 @@ function handleSort() {
             return b.localeCompare(a, 'pt', { sensitivity: 'base' });
         }
     });
-    
     sortAscending = !sortAscending;
-    
     // Update button text
     const sortBtn = document.getElementById('sort-az-btn');
     const icon = sortBtn.querySelector('.material-symbols-outlined');
     const text = sortBtn.querySelector('span:not(.material-symbols-outlined)');
-    
     if (sortAscending) {
         icon.textContent = 'sort_by_alpha';
         if (text) text.textContent = 'A-Z';
@@ -150,17 +130,14 @@ function handleSort() {
         icon.textContent = 'sort_by_alpha';
         if (text) text.textContent = 'Z-A';
     }
-    
     renderTurismTypes(sortedTypes);
 }
-
 // Load and render tourism types
 function loadTurismTypes() {
-    const types = TurismModel.getAll();
+    const types = getAllTourismTypes();
     renderTurismTypes(types);
     updateTypesCount(types.length);
 }
-
 // Update types count display
 function updateTypesCount(count) {
     const countElement = document.getElementById('types-count');
@@ -168,29 +145,22 @@ function updateTypesCount(count) {
         countElement.textContent = `${count} tipo${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
     }
 }
-
 // Render tourism types grid
 function renderTurismTypes(types) {
     const grid = document.getElementById('turism-types-grid');
     const emptyState = document.getElementById('empty-state');
-    
     if (!grid) return;
-
     if (types.length === 0) {
         grid.classList.add('hidden');
         if (emptyState) emptyState.classList.remove('hidden');
         return;
     }
-
     if (emptyState) emptyState.classList.add('hidden');
     grid.classList.remove('hidden');
-    
     grid.innerHTML = types.map(tipo => createTurismTypeCard(tipo)).join('');
-    
     // Add event listeners for edit and delete buttons
     setupCardEventListeners();
 }
-
 // Create individual tourism type card HTML
 function createTurismTypeCard(tipo) {
     return `
@@ -218,7 +188,6 @@ function createTurismTypeCard(tipo) {
         </div>
     `;
 }
-
 // Setup event listeners for cards
 function setupCardEventListeners() {
     // Edit buttons
@@ -228,7 +197,6 @@ function setupCardEventListeners() {
             openEditModal(tipo);
         });
     });
-
     // Delete buttons
     document.querySelectorAll('.delete-turism-card-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -237,7 +205,6 @@ function setupCardEventListeners() {
         });
     });
 }
-
 // Open edit modal for specific tourism type
 function openEditModal(tipo) {
     currentEditType = tipo;
@@ -247,30 +214,30 @@ function openEditModal(tipo) {
     }
     openModal('modal-edit-turism-inline');
 }
-
 // Handle deleting tourism type
 function handleDeleteTurismType(tipo) {
-    const result = TurismModel.delete(tipo);
-    
-    if (result.success) {
-        showToast('Tipo de turismo eliminado com sucesso!', 'success');
-        loadTurismTypes();
-        updateStats();
-    } else {
-        showToast(result.error, 'error');
-    }
+    showConfirm(`Tem a certeza que pretende eliminar o tipo de turismo "${tipo}"? Esta ação não pode ser desfeita.`)
+        .then(confirmed => {
+            if (confirmed) {
+                const result = deleteTourismType(tipo);
+                if (result.success) {
+                    showToast('Tipo de turismo eliminado com sucesso!', 'success');
+                    loadTurismTypes();
+                    updateStats();
+                } else {
+                    showToast(result.error, 'error');
+                }
+            }
+        });
 }
-
 // Update statistics display
 function updateStats() {
-    const types = TurismModel.getAll();
-    
+    const types = getAllTourismTypes();
     // Total types
     const totalElement = document.getElementById('total-types');
     if (totalElement) {
         totalElement.textContent = types.length;
     }
-
     // Most popular (just pick the first one alphabetically for demo)
     const popularElement = document.getElementById('popular-type');
     if (popularElement) {
@@ -281,7 +248,6 @@ function updateStats() {
             popularElement.textContent = '-';
         }
     }
-
     // Latest added (just pick the last one for demo)
     const latestElement = document.getElementById('latest-type');
     if (latestElement) {
@@ -292,13 +258,11 @@ function updateStats() {
         }
     }
 }
-
 // Initialize the view when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     if (document.body.querySelector('#turism-types-grid')) {
         initTurismAdmin();
     }
 });
-
 // Export functions for potential external use
 export { initTurismAdmin, loadTurismTypes, updateStats };

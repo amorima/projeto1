@@ -1,31 +1,24 @@
 // DashboardView.js - Dashboard with statistics and charts
-
 import { loadFromLocalStorage } from '../models/ModelHelpers.js';
-
 // Data storage
 let users = [];
 let newsletter = [];
 let destinos = [];
-
 // Load data from localStorage
 function loadData() {
     loadFromLocalStorage('user', users);
     loadFromLocalStorage('newsletter', newsletter);
     loadFromLocalStorage('destinos', destinos);
 }
-
 // Graph 1: Newsletter subscription ratio
 function getNewsletterStats() {
     const registeredSubscribed = users.filter(user => 
         user.preferences && user.preferences.newsletter === true
     ).length;
-
     const unregisteredSubscribed = newsletter.filter(sub => 
         !sub.username || sub.username === undefined
     ).length;
-
     const totalSubscribed = registeredSubscribed + unregisteredSubscribed;
-    
     return {
         registered: registeredSubscribed,
         unregistered: unregisteredSubscribed,
@@ -34,7 +27,6 @@ function getNewsletterStats() {
         unregisteredPercentage: totalSubscribed > 0 ? Math.round((unregisteredSubscribed / totalSubscribed) * 100) : 0
     };
 }
-
 // Graph 2: Types of reservations made
 function getReservationStats() {
     const reservationTypes = {
@@ -44,14 +36,12 @@ function getReservationStats() {
         'Voo + Seguro': 0,
         'P. Completo': 0
     };
-
     users.forEach(user => {
         if (user.reservas && Array.isArray(user.reservas)) {
             user.reservas.forEach(reserva => {
                 const hasHotel = reserva.hotel && Object.keys(reserva.hotel).length > 0;
                 const hasCar = reserva.car && Object.keys(reserva.car).length > 0;
                 const hasSeguro = reserva.seguro === true;
-
                 if (hasHotel && hasCar && hasSeguro) {
                     reservationTypes['P. Completo']++;
                 } else if (hasHotel && hasCar) {
@@ -72,14 +62,11 @@ function getReservationStats() {
             });
         }
     });
-
     return reservationTypes;
 }
-
 // Graph 3: Top 5 most liked destinations
 function getTopDestinations() {
     const destinationCount = {};
-
     // Count favorites from users
     users.forEach(user => {
         if (user.favoritos && Array.isArray(user.favoritos)) {
@@ -91,7 +78,6 @@ function getTopDestinations() {
             });
         }
     });
-
     // Convert to array and sort by count
     const sortedDestinations = Object.entries(destinationCount)
         .sort(([,a], [,b]) => b - a)
@@ -100,10 +86,8 @@ function getTopDestinations() {
             destination,
             count
         }));
-
     return sortedDestinations;
 }
-
 // Get all dashboard statistics
 function getAllStats() {
     return {
@@ -114,18 +98,13 @@ function getAllStats() {
 }// Chart 1: Newsletter Subscription Gauge
 function renderNewsletterGauge(data) {
     const containers = document.querySelectorAll('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.gap-6 .w-full.h-96');
-    console.log('Newsletter: Trying container index 0');
     const container = containers[0]; // Try first container (index 0)
     if (!container) {
-        console.error('Newsletter container not found');
         return;
     }
-    console.log('Newsletter: Using container', container);
-
     const percentage = data.registeredPercentage;
     const strokeDasharray = 2 * Math.PI * 45; // Circle circumference
     const strokeDashoffset = strokeDasharray - (strokeDasharray * percentage) / 100;
-
     container.innerHTML = `
         <div class="flex flex-col items-center justify-center h-full">
             <h3 class="text-lg font-semibold text-Text-Titles dark:text-gray-100 mb-4">Subscrições Newsletter</h3>
@@ -160,18 +139,13 @@ function renderNewsletterGauge(data) {
         </div>
     `;
 }
-
 // Chart 2: Reservation Types Bar Chart
 function renderReservationsChart(data) {
     const containers = document.querySelectorAll('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.gap-6 .w-full.h-96');
-    console.log('Reservations: Trying container index 1');
     const container = containers[1]; // Try second container (index 1)
     if (!container) {
-        console.error('Reservations container not found');
         return;
     }
-    console.log('Reservations: Using container', container);
-
     const maxValue = Math.max(...Object.values(data));
     const colors = [
         'bg-blue-500 dark:bg-blue-400',
@@ -180,7 +154,6 @@ function renderReservationsChart(data) {
         'bg-purple-500 dark:bg-purple-400',
         'bg-red-500 dark:bg-red-400'
     ];
-
     const bars = Object.entries(data).map(([type, count], index) => {
         const height = maxValue > 0 ? (count / maxValue) * 100 : 0;
         return `
@@ -196,7 +169,6 @@ function renderReservationsChart(data) {
             </div>
         `;
     }).join('');
-
     container.innerHTML = `
         <div class="flex flex-col items-center justify-center h-full">
             <h3 class="text-lg font-semibold text-Text-Titles dark:text-gray-100 mb-4">Tipos de Reservas</h3>
@@ -206,19 +178,13 @@ function renderReservationsChart(data) {
         </div>
     `;
 }
-
 // Chart 3: Top Destinations Horizontal Bar Chart
 function renderTopDestinationsChart(data) {
     const containers = document.querySelectorAll('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.gap-6 .w-full.h-96');
-    console.log('Destinations: Trying container index 2');
     const container = containers[2]; // Try third container (index 2)
     if (!container) {
-        console.error('Destinations container not found');
-        console.log('Available containers:', containers.length);
         return;
     }
-    console.log('Destinations: Using container', container);
-
     if (data.length === 0) {
         container.innerHTML = `
             <div class="flex flex-col items-center justify-center h-full">
@@ -228,7 +194,6 @@ function renderTopDestinationsChart(data) {
         `;
         return;
     }
-
     const maxValue = Math.max(...data.map(d => d.count));
     const colors = [
         'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-400 dark:to-blue-500',
@@ -237,7 +202,6 @@ function renderTopDestinationsChart(data) {
         'bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-400 dark:to-purple-500',
         'bg-gradient-to-r from-red-500 to-red-600 dark:from-red-400 dark:to-red-500'
     ];
-
     const bars = data.map((item, index) => {
         const width = maxValue > 0 ? (item.count / maxValue) * 100 : 0;
         return `
@@ -254,7 +218,6 @@ function renderTopDestinationsChart(data) {
             </div>
         `;
     }).join('');
-
     container.innerHTML = `
         <div class="flex flex-col justify-center h-full px-2">
             <h3 class="text-lg font-semibold text-Text-Titles dark:text-gray-100 mb-6 text-center">Top 5 Destinos Favoritos</h3>
@@ -264,31 +227,23 @@ function renderTopDestinationsChart(data) {
         </div>
     `;
 }
-
 // Render all charts
 function renderCharts() {
     const stats = getAllStats();
-    
     // Debug: Log all containers
     const containers = document.querySelectorAll('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.gap-6 .w-full.h-96');
-    console.log('Total containers found:', containers.length);
     containers.forEach((container, index) => {
-        console.log(`Container ${index}:`, container);
-        console.log(`Container ${index} classes:`, container.className);
     });
-    
     // Render all three charts
     renderNewsletterGauge(stats.newsletter);
     renderReservationsChart(stats.reservations);
     renderTopDestinationsChart(stats.topDestinations);
 }
-
 // Initialize dashboard
 function initDashboard() {
     loadData();
     renderCharts();
 }
-
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();

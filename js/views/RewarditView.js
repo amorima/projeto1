@@ -9,7 +9,6 @@ import {
   closestAirport,
 } from "./ViewHelpers.js";
 import * as User from "../models/UserModel.js";
-
 /* Símbolos dos níveis de utilizador */
 const levelSymbols = {
   Explorador: "explore",
@@ -18,12 +17,10 @@ const levelSymbols = {
   Globetrotter: "public",
   Embaixador: "military_tech",
 };
-
 /* Obter símbolo do nível */
 export function getLevelSymbol(level) {
   return levelSymbols[level] || "person";
 }
-
 /* Obter símbolo baseado nos pontos */
 export function getSymbolByPoints(points) {
   let level;
@@ -40,30 +37,23 @@ export function getSymbolByPoints(points) {
   }
   return getLevelSymbol(level);
 }
-
 /* Criar elemento HTML com nível e símbolo */
 export function createLevelBadge(user) {
   const badge = document.createElement("div");
   badge.className = "level-badge";
-
   const symbol = document.createElement("span");
   symbol.className = "material-symbols-outlined";
   symbol.textContent = getLevelSymbol(user.level);
-
   const levelText = document.createElement("span");
   levelText.textContent = user.level;
-
   badge.appendChild(symbol);
   badge.appendChild(levelText);
-
   return badge;
 }
-
 /* Atualizar elemento existente com novo nível */
 export function updateLevelDisplay(element, user) {
   const symbolElement = element.querySelector(".material-symbols-outlined");
   const textElement = element.querySelector(".level-text");
-
   if (symbolElement) {
     symbolElement.textContent = getLevelSymbol(user.level);
   }
@@ -71,7 +61,6 @@ export function updateLevelDisplay(element, user) {
     textElement.textContent = user.level;
   }
 }
-
 /* Obter informações do próximo nível */
 export function getNextLevelInfo(points) {
   if (points < 250) {
@@ -85,7 +74,6 @@ export function getNextLevelInfo(points) {
   }
   return { pointsNeeded: 0, nextLevel: "Máximo" };
 }
-
 /* Verificar se utilizador atingiu determinado nível */
 export function hasReachedLevel(points, targetLevel) {
   const levelThresholds = {
@@ -95,15 +83,12 @@ export function hasReachedLevel(points, targetLevel) {
     "Globetrotter": 3000,
     "Embaixador": 5000
   };
-  
   // Normalize the target level name (trim whitespace and handle variations)
   const normalizedTarget = targetLevel.trim();
-  
   // Check if the level exists in our thresholds
   if (levelThresholds.hasOwnProperty(normalizedTarget)) {
     return points >= levelThresholds[normalizedTarget];
   }
-  
   // Fallback: try to match by partial name or alternative spellings
   const levelEntries = Object.entries(levelThresholds);
   for (const [level, threshold] of levelEntries) {
@@ -112,11 +97,8 @@ export function hasReachedLevel(points, targetLevel) {
       return points >= threshold;
     }
   }
-  
-  console.warn(`Unknown level: "${targetLevel}". Available levels:`, Object.keys(levelThresholds));
   return false;
 }
-
 /* Obter nível do utilizador baseado nos pontos */
 export function getUserLevelByPoints(points) {
   if (points >= 5000) {
@@ -131,17 +113,13 @@ export function getUserLevelByPoints(points) {
     return "Explorador";
   }
 }
-
 /* Atualizar barra de progresso */
 function updateProgressBar(points) {
   const progressBar = document.getElementById("progressBar");
   const progressText = document.getElementById("progressText");
-  
   if (!progressBar) return;
-
   let progress = 0;
   let maxPoints = 0;
-
   if (points < 250) {
     progress = (points / 250) * 20; // 0-20%
     maxPoints = 250;
@@ -158,26 +136,21 @@ function updateProgressBar(points) {
     progress = 100; // 100%
     maxPoints = 5000;
   }
-
   progressBar.style.width = `${Math.min(progress, 100)}%`;
-  
   if (progressText) {
     progressText.textContent = `${points} / ${maxPoints} pontos`;
   }
 }
-
 /* Carregar informações do utilizador */
 async function loadUserInfo() {
   try {
     const { getUserLogged, isLogged } = await import("../models/UserModel.js");
-
     const userNameElement = document.getElementById("userName");
     const userLevelElement = document.getElementById("userLevel");
     const userLevelIcon = document.getElementById("userLevelIcon");
     const pointsNeededElement = document.getElementById("pointsNeeded");
     const nextLevelElement = document.getElementById("nextLevel");
     const userPointsElement = document.getElementById("userPoints");
-
     if (!isLogged()) {
       /* Utilizador não logado - manter valores por defeito */
       if (userNameElement) userNameElement.textContent = "Utilizador";
@@ -188,20 +161,16 @@ async function loadUserInfo() {
       if (userPointsElement) userPointsElement.textContent = "0";
       return;
     }
-
     const user = getUserLogged();
     const userPoints = parseInt(user.pontos) || 0;
     const userLevel = getUserLevelByPoints(userPoints);
-
     /* Atualizar nome, nível e pontos do utilizador */
     if (userNameElement) userNameElement.textContent = user.username || user.name || "Utilizador";
     if (userLevelElement) userLevelElement.textContent = userLevel;
     if (userLevelIcon) userLevelIcon.textContent = getLevelSymbol(userLevel);
     if (userPointsElement) userPointsElement.textContent = userPoints;
-
     /* Calcular pontos necessários para próximo nível */
     const nextLevelInfo = getNextLevelInfo(userPoints);
-
     if (nextLevelInfo.pointsNeeded > 0) {
       if (pointsNeededElement)
         pointsNeededElement.textContent = nextLevelInfo.pointsNeeded;
@@ -213,21 +182,16 @@ async function loadUserInfo() {
         nextLevelInfoElement.textContent =
           "Parabéns! Alcançaste o nível máximo!";
     }
-
     /* Atualizar barra de progresso */
     updateProgressBar(userPoints);
   } catch (error) {
-    console.error("Erro ao carregar informações do utilizador:", error);
   }
 }
-
 /* Marcar níveis atingidos pelo utilizador */
 async function markAchievedLevels() {
   try {
     const { getUserLogged, isLogged } = await import("../models/UserModel.js");
-
     const levelCards = document.querySelectorAll(".level-card");
-
     let userPoints = 0;
     if (isLogged()) {
       const user = getUserLogged();
@@ -236,29 +200,24 @@ async function markAchievedLevels() {
     levelCards.forEach((card) => {
       const levelNameElement = card.querySelector("h3");
       if (!levelNameElement) return;
-      
       const levelName = levelNameElement.textContent.trim();
       const checkIconContainer = card.querySelector(".absolute");
       const checkIcon = checkIconContainer?.querySelector(
         ".material-symbols-outlined"
       );
-
       if (checkIcon && hasReachedLevel(userPoints, levelName)) {
         // Update check icon
         checkIcon.textContent = "check_circle";
         checkIcon.className = "material-symbols-outlined text-green-500 text-lg";
-        
         // Update card visual state (unlocked)
         card.classList.remove("opacity-50");
         card.classList.add("ring-2", "ring-green-500");
-        
         // Update card content colors
         const mainIcon = card.querySelector(".text-center > .material-symbols-outlined");
         const title = card.querySelector("h3");
         const pointsText = card.querySelector("p.uppercase");
         const benefitTexts = card.querySelectorAll(".mt-4 p");
         const cumulativeText = card.querySelector("p.font-bold.uppercase");
-        
         if (mainIcon) {
           mainIcon.className = mainIcon.className.replace("text-gray-500 dark:text-gray-400", "text-cyan-600 dark:text-cyan-400");
         }
@@ -276,23 +235,19 @@ async function markAchievedLevels() {
         if (cumulativeText) {
           cumulativeText.className = cumulativeText.className.replace("text-gray-500 dark:text-gray-400", "text-gray-600 dark:text-gray-400");
         }
-        
       } else if (checkIcon) {
         // Update check icon
         checkIcon.textContent = "radio_button_unchecked";
         checkIcon.className = "material-symbols-outlined text-gray-400 text-lg";
-        
         // Update card visual state (locked)
         card.classList.add("opacity-50");
         card.classList.remove("ring-2", "ring-green-500");
-        
         // Update card content colors to gray
         const mainIcon = card.querySelector(".text-center > .material-symbols-outlined");
         const title = card.querySelector("h3");
         const pointsText = card.querySelector("p.uppercase");
         const benefitTexts = card.querySelectorAll(".mt-4 p");
         const cumulativeText = card.querySelector("p.font-bold.uppercase");
-        
         if (mainIcon) {
           mainIcon.className = mainIcon.className.replace("text-cyan-600 dark:text-cyan-400", "text-gray-500 dark:text-gray-400");
         }
@@ -313,20 +268,16 @@ async function markAchievedLevels() {
       }
     });
   } catch (error) {
-    console.error("Erro ao marcar níveis atingidos:", error);
   }
 }
-
 /* Função para testar com dados de utilizador */
 export function testUserData(userData) {
   /* Simular utilizador logado para testes */
   sessionStorage.setItem("loggedUser", JSON.stringify(userData));
-
   /* Recarregar informações da página */
   loadUserInfo();
   markAchievedLevels();
 }
-
 /* Inicializar página RewardIt */
 export function initRewarditPage() {
   // Aguardar que os modelos estejam carregados
@@ -337,7 +288,6 @@ export function initRewarditPage() {
     loadUserBenefits();
   }, 100);
 }
-
 /* Recarregar dados do utilizador (útil após login/logout) */
 export function refreshUserData() {
   loadUserInfo();
@@ -345,14 +295,11 @@ export function refreshUserData() {
   updateUserAvatar();
   loadUserBenefits();
 }
-
 /* Atualizar avatar do utilizador */
 async function updateUserAvatar() {
   try {
     const { getUserLogged, isLogged, getUserImage } = await import("../models/UserModel.js");
-    
     const userAvatarElement = document.getElementById("userAvatar");
-    
     if (!userAvatarElement) return;
       if (!isLogged()) {
       // Avatar padrão para utilizador não logado
@@ -362,34 +309,25 @@ async function updateUserAvatar() {
       const user = getUserLogged();
     const avatarUrl = getUserImage(user.username) || user.avatar || 
       "https://placehold.co/80x80/6b7280/ffffff?text=" + encodeURIComponent((user.username || 'U').charAt(0).toUpperCase());
-    
     userAvatarElement.src = avatarUrl;
     userAvatarElement.alt = `Avatar de ${user.username || 'Utilizador'}`;
   } catch (error) {
-    console.error("Erro ao atualizar avatar do utilizador:", error);
   }
 }
-
 /* Carregar benefícios específicos do utilizador */
 async function loadUserBenefits() {
   try {
     const { getUserLogged, isLogged } = await import("../models/UserModel.js");
-    
     const benefitsContainer = document.getElementById("userBenefits");
-    
     if (!benefitsContainer) return;
-    
     let userLevel = "Explorador";
     let userPoints = 0;
-    
     if (isLogged()) {
       const user = getUserLogged();
       userPoints = parseInt(user.pontos) || 0;
       userLevel = getUserLevelByPoints(userPoints);
     }
-    
     const benefits = getUserBenefitsByLevel(userLevel);
-    
     benefitsContainer.innerHTML = benefits.map(benefit => `
       <div class="benefit-item p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <div class="flex items-center gap-3">
@@ -401,12 +339,9 @@ async function loadUserBenefits() {
         </div>
       </div>
     `).join('');
-    
   } catch (error) {
-    console.error("Erro ao carregar benefícios do utilizador:", error);
   }
 }
-
 /* Obter benefícios baseados no nível do utilizador */
 function getUserBenefitsByLevel(level) {
   const allBenefits = {
@@ -435,15 +370,12 @@ function getUserBenefitsByLevel(level) {
       { icon: "percent", title: "Desconto 20%", description: "20% de desconto em todas as reservas" }
     ]
   };
-  
   const userBenefits = [];
   const levels = ["Explorador", "Viajante", "Aventureiro", "Globetrotter", "Embaixador"];
   const currentLevelIndex = levels.indexOf(level);
-  
   // Adicionar benefícios de todos os níveis até o atual
   for (let i = 0; i <= currentLevelIndex; i++) {
     userBenefits.push(...allBenefits[levels[i]]);
   }
-  
   return userBenefits;
 }
