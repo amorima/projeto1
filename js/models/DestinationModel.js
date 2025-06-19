@@ -78,6 +78,9 @@ export function addDestination(destinationData) {
       tiposTurismo: Array.isArray(destinationData.tiposTurismo)
         ? destinationData.tiposTurismo
         : [],
+      imagem:
+        destinationData.imagem ||
+        `/img/destinos/${destinationData.cidade}/1.jpg`,
       acessibilidade: Array.isArray(destinationData.acessibilidade)
         ? destinationData.acessibilidade
         : [],
@@ -148,6 +151,10 @@ export function updateDestination(id, destinationData) {
       acessibilidade: Array.isArray(destinationData.acessibilidade)
         ? destinationData.acessibilidade
         : [],
+      imagem:
+        destinationData.imagem ||
+        destinations[index].imagem ||
+        `/img/destinos/${destinationData.cidade}/1.jpg`,
     };
     destinations[index] = updatedDestination;
     saveToLocalStorage(STORAGE_KEY, destinations);
@@ -296,4 +303,24 @@ export function paginateDestinations(destinationsList, page = 1, limit = 10) {
       endIndex: Math.min(endIndex, destinationsList.length),
     },
   };
+}
+/**
+ * Obtém um destino pelo nome da cidade
+ * @param {string} cidadeName - Nome da cidade
+ * @returns {Object|null} Objeto do destino ou null se não encontrado
+ */
+export function getDestinationByCity(cidadeName) {
+  if (!cidadeName) return null;
+
+  loadFromLocalStorage(STORAGE_KEY, destinations);
+  const cidadeLower = cidadeName.toLowerCase().trim();
+
+  return (
+    destinations.find(
+      (dest) =>
+        dest.cidade.toLowerCase() === cidadeLower ||
+        dest.cidade.toLowerCase().includes(cidadeLower) ||
+        cidadeLower.includes(dest.cidade.toLowerCase())
+    ) || null
+  );
 }

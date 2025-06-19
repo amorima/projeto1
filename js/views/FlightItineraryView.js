@@ -12,6 +12,7 @@ import {
 } from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
+import { getDestinationByCity } from "../models/DestinationModel.js";
 let vooShallow = {};
 let valor = 1;
 const btnMais = document.getElementById("btn-mais");
@@ -757,8 +758,11 @@ function atualizarHeroVoo(voo) {
   const heroCidade = document.querySelector(
     ".flex.items-center.gap-2 > div > .text-2xl.font-bold"
   );
-  if (heroCidade)
-    heroCidade.textContent = voo.destino?.split(" - ").pop() || voo.destino;
+
+  // Extrair a cidade do destino (remove o código do aeroporto se presente)
+  const cidadeDestino = voo.destino?.split(" - ").pop() || voo.destino;
+  if (heroCidade) heroCidade.textContent = cidadeDestino;
+
   const heroDatas = document.querySelector(
     ".flex.items-center.gap-2 > div > .inline-flex .text-base"
   );
@@ -768,8 +772,30 @@ function atualizarHeroVoo(voo) {
       voo.dataVolta || voo.chegada
     );
   }
+
   const heroImg = document.querySelector(".w-full.h-full.object-cover");
-  if (heroImg && voo.imagem) heroImg.src = voo.imagem;
+  if (heroImg) {
+    // Prioriza a imagem do destino carregada pelo admin.
+    const destinoEncontrado = getDestinationByCity(cidadeDestino);
+
+    let imgSrc = "";
+    if (destinoEncontrado && destinoEncontrado.imagem) {
+      imgSrc = destinoEncontrado.imagem;
+    } else if (voo.imagem) {
+      // Fallback para a imagem do voo
+      imgSrc = voo.imagem;
+    } else {
+      // Fallback para imagem de diretório
+      imgSrc = `/img/destinos/${cidadeDestino}/1.jpg`;
+    }
+
+    heroImg.src = imgSrc;
+    // Fallback final para placeholder se a imagem falhar
+    heroImg.onerror = () => {
+      heroImg.src = "https://placehold.co/1920x480";
+      heroImg.onerror = null; // Evita loop infinito se o placeholder também falhar
+    };
+  }
 }
 function getLogoCompanhia(nome) {
   try {
