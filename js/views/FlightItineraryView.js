@@ -774,6 +774,8 @@ function atualizarHeroVoo(voo) {
   }
 
   const heroImg = document.querySelector(".w-full.h-full.object-cover");
+  const itineraryImg = document.getElementById("itinerary-card-img");
+
   if (heroImg) {
     // Prioriza a imagem do destino carregada pelo admin.
     const destinoEncontrado = getDestinationByCity(cidadeDestino);
@@ -795,6 +797,14 @@ function atualizarHeroVoo(voo) {
       heroImg.src = "https://placehold.co/1920x480";
       heroImg.onerror = null; // Evita loop infinito se o placeholder também falhar
     };
+
+    if (itineraryImg) {
+        itineraryImg.src = imgSrc;
+        itineraryImg.onerror = () => {
+            itineraryImg.src = 'https://placehold.co/200x200';
+            itineraryImg.onerror = null;
+        }
+    }
   }
 }
 function getLogoCompanhia(nome) {
@@ -858,4 +868,12 @@ window.onload = function () {
   loadComponent("../html/_footer.html", "footer-placeholder");
   adicionarEventosCarros();
   adicionarEventoSeguro();
+
+  const btnBack = document.getElementById("btn-back");
+  if(btnBack) {
+    btnBack.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.history.back();
+    });
+  }
 };
