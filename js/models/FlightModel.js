@@ -93,6 +93,15 @@ export function init() {
   if (viagens.length === 0) {
     loadSampleFlights();
   }
+  
+  // Garantir que temos a lista atualizada de aeroportos com destinos combinados
+  const aeroportosCombinados = getAirports();
+  
+  // Salvar de volta para assegurar que os aeroportos incluem todos os destinos
+  if (aeroportosCombinados.length > 0) {
+    localStorage.setItem("aeroportos", JSON.stringify(aeroportosCombinados));
+  }
+  
   loadSavedData();
   return viagens;
 }
@@ -259,7 +268,30 @@ export function deleteTrip(numeroVoo) {
 }
 /* Funcoes para gestao de origem */
 export function getAirports() {
-  return JSON.parse(localStorage.getItem("aeroportos")) || [];
+  // Obter aeroportos da localStorage
+  const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+  
+  // Obter destinos da localStorage
+  const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
+  
+  // Converter destinos para o formato de aeroporto
+  const destinosFormatados = destinos.map(dest => ({
+    codigo: dest.aeroporto,
+    cidade: dest.cidade,
+    pais: dest.pais
+  }));
+  
+  // Combinar os arrays, removendo duplicatas pelo código do aeroporto
+  const todos = [...aeroportos];
+  
+  // Adicionar apenas destinos que não existem nos aeroportos
+  destinosFormatados.forEach(dest => {
+    if (!todos.find(ap => ap.codigo === dest.codigo)) {
+      todos.push(dest);
+    }
+  });
+  
+  return todos;
 }
 /* Funcao para filtrar aeroportos por termo de pesquisa */
 export function filterAirports(searchTerm) {
@@ -413,13 +445,21 @@ export function getAccessibilityIcon(acessibilidade) {
   return "accessibility";
 }
 /* Funcao para obter viagens de uma origem especifica */
-export function getTripsFrom(filtro = "OPO - Porto", perPage = 18, page = 1) {
-  /* Filtra voos cuja origem e OPO (Porto) */
-  const Trips = viagens.filter(
-    (v) => v.origem === filtro || v.turismo === filtro
-  );
+export function getTripsFrom(filtro = "all", perPage = 18, page = 1) {
+  let Trips;
+  
+  /* Se o filtro for "all", retorna todas as viagens; caso contrário, filtra por origem ou tipo de turismo */
+  if (filtro === "all") {
+    Trips = [...viagens];
+  } else {
+    Trips = viagens.filter(
+      (v) => v.origem === filtro || v.turismo === filtro
+    );
+  }
+  
   /* Embaralha o array para mostrar viagens diferentes */
   const shuffled = Trips.sort(() => 0.5 - Math.random());
+  
   /* Retorna apenas o numero de viagens pedido para a pagina atual */
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }

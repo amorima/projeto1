@@ -67,9 +67,23 @@ export function addDestination(destinationData) {
             aeroporto: destinationData.aeroporto.toUpperCase().trim(),
             tiposTurismo: Array.isArray(destinationData.tiposTurismo) ? destinationData.tiposTurismo : [],
             acessibilidade: Array.isArray(destinationData.acessibilidade) ? destinationData.acessibilidade : []
-        };
-        destinations.push(newDestination);
+        };        destinations.push(newDestination);
         saveToLocalStorage(STORAGE_KEY, destinations);
+        
+        // Adicionar o destino à lista de aeroportos para integração
+        const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+        const novoAeroporto = {
+            codigo: newDestination.aeroporto,
+            cidade: newDestination.cidade,
+            pais: newDestination.pais
+        };
+        
+        // Verificar se já existe este aeroporto
+        if (!aeroportos.some(a => a.codigo === novoAeroporto.codigo)) {
+            aeroportos.push(novoAeroporto);
+            localStorage.setItem("aeroportos", JSON.stringify(aeroportos));
+        }
+        
         return { success: true, data: newDestination };
     } catch (error) {
         return { success: false, error: error.message };
@@ -110,9 +124,29 @@ export function updateDestination(id, destinationData) {
             aeroporto: destinationData.aeroporto.toUpperCase().trim(),
             tiposTurismo: Array.isArray(destinationData.tiposTurismo) ? destinationData.tiposTurismo : [],
             acessibilidade: Array.isArray(destinationData.acessibilidade) ? destinationData.acessibilidade : []
-        };
-        destinations[index] = updatedDestination;
+        };        destinations[index] = updatedDestination;
         saveToLocalStorage(STORAGE_KEY, destinations);
+        
+        // Atualizar o aeroporto correspondente na lista de aeroportos
+        const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+        const aeroportoIndex = aeroportos.findIndex(a => a.codigo === updatedDestination.aeroporto);
+        
+        const aeroportoAtualizado = {
+            codigo: updatedDestination.aeroporto,
+            cidade: updatedDestination.cidade,
+            pais: updatedDestination.pais
+        };
+        
+        if (aeroportoIndex >= 0) {
+            // Atualiza o aeroporto existente
+            aeroportos[aeroportoIndex] = aeroportoAtualizado;
+        } else {
+            // Adiciona um novo aeroporto se não existir
+            aeroportos.push(aeroportoAtualizado);
+        }
+        
+        localStorage.setItem("aeroportos", JSON.stringify(aeroportos));
+        
         return { success: true, data: updatedDestination };
     } catch (error) {
         return { success: false, error: error.message };
@@ -129,10 +163,24 @@ export function deleteDestination(id) {
         const index = destinations.findIndex(dest => dest.id === parseInt(id));
         if (index === -1) {
             throw new Error('Destino não encontrado');
-        }
-        const deletedDestination = destinations[index];
+        }        const deletedDestination = destinations[index];
         destinations.splice(index, 1);
         saveToLocalStorage(STORAGE_KEY, destinations);
+        
+        // Remover o aeroporto correspondente da lista de aeroportos
+        // Nota: não removemos se houver outros destinos com o mesmo código de aeroporto
+        const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
+        const codigoAeroporto = deletedDestination.aeroporto;
+        
+        // Verificar se este aeroporto é usado em outros destinos
+        const outrosDestinos = destinations.some(d => d.aeroporto === codigoAeroporto);
+        
+        if (!outrosDestinos) {
+            // Remover apenas se não for usado por outros destinos
+            const novaListaAeroportos = aeroportos.filter(a => a.codigo !== codigoAeroporto);
+            localStorage.setItem("aeroportos", JSON.stringify(novaListaAeroportos));
+        }
+        
         return { success: true, data: deletedDestination };
     } catch (error) {
         return { success: false, error: error.message };

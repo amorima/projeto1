@@ -65,9 +65,8 @@ function initView() {  getUserLocation((location) => {
   setupModalButtons();
   setupTripTypeButtons();
   initGamificationModal();
-  setupNewsletterForm();
-  if (document.querySelector(".card-viagens")) {
-    renderRandomOPOCards("card-viagens");
+  setupNewsletterForm();  if (document.querySelector(".card-viagens")) {
+    renderRandomOPOCards("card-viagens", "all");
   }
   const data = Flight.getAll();
   const config = createTableConfig(data);
@@ -794,8 +793,8 @@ function createFlight(config) {
   updateTable(config);
 }
 /* Renderizar cards na homepage */
-export function renderRandomOPOCards(containerClass) {
-  const shuffled = Flight.getTripsFrom();
+export function renderRandomOPOCards(containerClass, filtro = "OPO - Porto") {
+  const shuffled = Flight.getTripsFrom(filtro);
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
   container.innerHTML = "";
