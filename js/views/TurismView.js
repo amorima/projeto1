@@ -3,7 +3,7 @@ import { loadComponent } from "./ViewHelpers.js";
 import * as Flight from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
 /* Importa apenas a função de renderização dos cards do FlightView */
-import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
+// import { renderRandomOPOCards as _renderRandomOPOCards } from "./FlightView.js";
 /* Tradução dos tipos de turismo para apresentação nos cards */
 const TURISMO_LABELS = {
   TurismodeSolePraia: "Turismo de Sol e Praia",
@@ -180,18 +180,20 @@ function renderFilteredCardsFromList(viagens, tipoTurismo) {
         </div>
       </div>
     `;
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = cardHTML.trim();
     const card = tempDiv.firstElementChild;
     container.appendChild(card);
     // Now add the event listener to the heart icon inside this card
-    const heart = card.querySelector('.favorite-icon');
+    const heart = card.querySelector(".favorite-icon");
     if (heart) {
       // Set initial fill state based on whether this trip is a favorite
       let isFav = false;
       if (User.isLogged()) {
         const user = User.getUserLogged();
-        isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === viagem.numeroVoo);
+        isFav =
+          user.favoritos &&
+          user.favoritos.some((fav) => fav.numeroVoo === viagem.numeroVoo);
       }
       heart.setAttribute("data-favorito", isFav ? "true" : "false");
       heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
