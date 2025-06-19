@@ -799,11 +799,11 @@ function atualizarHeroVoo(voo) {
     };
 
     if (itineraryImg) {
-        itineraryImg.src = imgSrc;
-        itineraryImg.onerror = () => {
-            itineraryImg.src = 'https://placehold.co/200x200';
-            itineraryImg.onerror = null;
-        }
+      itineraryImg.src = imgSrc;
+      itineraryImg.onerror = () => {
+        itineraryImg.src = "https://placehold.co/200x200";
+        itineraryImg.onerror = null;
+      };
     }
   }
 }
@@ -870,10 +870,10 @@ window.onload = function () {
   adicionarEventoSeguro();
 
   const btnBack = document.getElementById("btn-back");
-  if(btnBack) {
+  if (btnBack) {
     btnBack.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.history.back();
+      e.preventDefault();
+      window.history.back();
     });
   }
 };
