@@ -97,18 +97,17 @@
     <div id="modal-adicionar" class="fixed inset-0 z-50 hidden">
         <!-- Overlay -->
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-        
-        <!-- Modal Container -->
-        <div class="fixed inset-0 flex items-center justify-center px-4 py-8">
-            <!-- Modal Content -->
-            <div class="relative w-full max-w-2xl p-6 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl">
+          <!-- Modal Container -->
+        <div class="fixed inset-0 flex items-center justify-center px-4 py-8">            <!-- Modal Content -->
+            <div class="relative w-full max-w-2xl max-h-[90vh] text-left align-middle transition-all transform bg-white dark:bg-gray-800 shadow-xl rounded-xl flex flex-col">
                 <!-- Header -->
-                <div class="mb-6">
+                <div class="p-6 pb-3">
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white font-['Space_Mono']">Adicionar Novo Hotel</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Preencha os dados do hotel</p>
                 </div>
                 
-                <!-- Form -->                <form id="add_hotel_form" class="space-y-4">
+                <!-- Form -->
+                <form id="add_hotel_form" class="overflow-y-auto p-6 pt-2 space-y-4 flex-grow">
                     <input type="hidden" id="id">
                     
                     <div>
@@ -193,46 +192,51 @@
                                     placeholder="150.00"
                                 />
                             </div>
-                        </div>
-
-                        <!-- Comodidades e Acessibilidade -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label for="comodidades" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comodidades</label>
-                                <div class="h-36 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 p-2">
-                                    <div id="comodidades-container" class="space-y-1"></div>
+                        </div>                        <!-- Comodidades -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comodidades</label>
+                            <div class="space-y-2">
+                                <div class="flex flex-wrap gap-2" id="selected-comodidades">
+                                    <!-- Selected amenities will appear here -->
+                                </div>
+                                <div class="flex gap-2">
+                                    <select id="comodidades-select" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
+                                        <option value="">Selecionar comodidade...</option>
+                                    </select>
+                                    <button 
+                                        type="button" 
+                                        id="add-comodidade-btn"
+                                        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
+                                    >
+                                        <span class="material-symbols-outlined text-lg">add</span>
+                                    </button>
                                 </div>
                             </div>
-
-                            <div>
-                                <label for="acessibilidades" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Acessibilidades</label>
-                                <div class="h-36 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 p-2">
-                                    <div id="acessibilidades-container" class="space-y-1"></div>
+                        </div>                        <!-- Acessibilidades -->
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Acessibilidades</label>
+                            <div class="space-y-2">
+                                <div class="flex flex-wrap gap-2" id="selected-acessibilidades">
+                                    <!-- Selected accessibility features will appear here -->
+                                </div>
+                                <div class="flex gap-2">
+                                    <select id="acessibilidades-select" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
+                                        <option value="">Selecionar acessibilidade...</option>
+                                    </select>
+                                    <button 
+                                        type="button" 
+                                        id="add-acessibilidade-btn"
+                                        class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200"
+                                    >
+                                        <span class="material-symbols-outlined text-lg">add</span>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div class="flex items-center gap-2">
-                                <input 
-                                    id="pequenoAlmoco" 
-                                    name="pequenoAlmoco"
-                                    type="checkbox" 
-                                    class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                                />
-                                <label for="pequenoAlmoco" class="text-sm text-gray-700 dark:text-gray-300">Pequeno Almoço Incluído</label>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <input 
-                                    id="wifiGratis" 
-                                    name="wifiGratis"
-                                    type="checkbox" 
-                                    checked
-                                    class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                                />
-                                <label for="wifiGratis" class="text-sm text-gray-700 dark:text-gray-300">WiFi Grátis</label>
-                            </div>
+                        </div>                        
+                        <!-- Campos ocultos para manter compatibilidade com o código JavaScript existente -->
+                        <div style="display: none;">
+                            <input type="checkbox" id="pequenoAlmoco" name="pequenoAlmoco">
+                            <input type="checkbox" id="wifiGratis" name="wifiGratis" checked>
                         </div>
 
                         <div class="mt-4">
@@ -244,24 +248,26 @@
                                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                 placeholder="Descrição do quarto..."
                             ></textarea>
-                        </div>
-                    </div>
+                        </div>                    </div>
                 </form>
 
-                <!-- Actions -->
-                <div class="flex gap-3 mt-6">                    <button 
-                        id="cancel-hotel-btn"
-                        class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors duration-200"
-                    >
-                        Cancelar
-                    </button>
-                    <button 
-                        id="create-hotel-btn"
-                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors duration-200"
-                    >
-                        <span class="material-symbols-outlined text-lg">add</span>
-                        <span>Adicionar</span>
-                    </button>
+                <!-- Actions - fixed at bottom -->
+                <div class="p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <div class="flex gap-3">
+                        <button 
+                            id="cancel-hotel-btn"
+                            class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-lg transition-colors duration-200"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            id="create-hotel-btn"
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors duration-200"
+                        >
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            <span>Adicionar</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

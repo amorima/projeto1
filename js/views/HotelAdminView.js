@@ -1,4 +1,3 @@
-// HotelAdminView.js - Hotel admin management view (MV Pattern - Functions only)
 import { showToast, openModal, showConfirm } from "./ViewHelpers.js";
 // State variables
 let allHotels = [];
@@ -9,6 +8,8 @@ let currentPage = 1;
 let itemsPerPage = 10;
 let isEditMode = false;
 let editingHotelId = null;
+let selectedComodidades = [];
+let selectedAcessibilidades = [];
 // Initialize the hotel admin view
 export function initHotelAdminView() {
   loadHotels();
@@ -59,6 +60,7 @@ function loadDestinations() {
 }
 
 // Carregar comodidades para o dropdown
+/* Carregar comodidades para o select do formulário */
 function loadComodidades() {
   // Lista padrão de comodidades se não existir na localStorage
   let comodidades = localStorage.getItem("comodidades");
@@ -74,32 +76,32 @@ function loadComodidades() {
       "Vista para o mar",
       "Vista para a cidade",
       "Serviço de quarto",
+      "WiFi Grátis",
+      "Pequeno-almoço incluído",
     ]);
     localStorage.setItem("comodidades", comodidades);
   }
 
   const comodidadesList = JSON.parse(comodidades);
-  const container = document.getElementById("comodidades-container");
-  if (container) {
-    container.innerHTML = "";
-    comodidadesList.forEach((comodidade, index) => {
-      container.innerHTML += `
-                <div class="flex items-center">
-                    <input 
-                        id="comodidade-${index}" 
-                        name="comodidades"
-                        type="checkbox" 
-                        value="${comodidade}"
-                        class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                    />
-                    <label for="comodidade-${index}" class="ml-2 text-sm text-gray-700 dark:text-gray-300">${comodidade}</label>
-                </div>
-            `;
+  const select = document.getElementById("comodidades-select");
+
+  if (select) {
+    select.innerHTML = '<option value="">Selecionar comodidade...</option>';
+    comodidadesList.forEach((comodidade) => {
+      const option = document.createElement("option");
+      option.value = comodidade;
+      option.textContent = comodidade;
+      select.appendChild(option);
     });
   }
+
+  // Limpar seleções antigas ao abrir o modal
+  selectedComodidades = [];
+  updateSelectedComodidades();
 }
 
 // Carregar acessibilidades para o dropdown
+/* Carregar acessibilidades para o select do formulário */
 function loadAcessibilidades() {
   // Lista padrão de acessibilidades se não existir na localStorage
   let acessibilidades = localStorage.getItem("acessibilidade");
@@ -118,24 +120,21 @@ function loadAcessibilidades() {
   }
 
   const acessibilidadesList = JSON.parse(acessibilidades);
-  const container = document.getElementById("acessibilidades-container");
-  if (container) {
-    container.innerHTML = "";
-    acessibilidadesList.forEach((acessibilidade, index) => {
-      container.innerHTML += `
-                <div class="flex items-center">
-                    <input 
-                        id="acessibilidade-${index}" 
-                        name="acessibilidades"
-                        type="checkbox" 
-                        value="${acessibilidade}"
-                        class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                    />
-                    <label for="acessibilidade-${index}" class="ml-2 text-sm text-gray-700 dark:text-gray-300">${acessibilidade}</label>
-                </div>
-            `;
+  const select = document.getElementById("acessibilidades-select");
+
+  if (select) {
+    select.innerHTML = '<option value="">Selecionar acessibilidade...</option>';
+    acessibilidadesList.forEach((acessibilidade) => {
+      const option = document.createElement("option");
+      option.value = acessibilidade;
+      option.textContent = acessibilidade;
+      select.appendChild(option);
     });
   }
+
+  // Limpar seleções antigas ao abrir o modal
+  selectedAcessibilidades = [];
+  updateSelectedAcessibilidades();
 }
 
 // Setup event listeners
@@ -149,7 +148,8 @@ function setupEventListeners() {
   const createHotelBtn = document.getElementById("create-hotel-btn");
   if (createHotelBtn) {
     createHotelBtn.addEventListener("click", handleFormSubmit);
-  } // Cancel button
+  }
+  // Cancel button
   const cancelHotelBtn = document.getElementById("cancel-hotel-btn");
   if (cancelHotelBtn) {
     cancelHotelBtn.addEventListener("click", closeHotelModal);
@@ -160,6 +160,20 @@ function setupEventListeners() {
     searchInput.addEventListener("input", (e) => {
       handleSearch(e.target.value);
     });
+  }
+
+  // Adicionar comodidade
+  const addComodidadeBtn = document.getElementById("add-comodidade-btn");
+  if (addComodidadeBtn) {
+    addComodidadeBtn.addEventListener("click", handleAddComodidade);
+  }
+
+  // Adicionar acessibilidade
+  const addAcessibilidadeBtn = document.getElementById(
+    "add-acessibilidade-btn"
+  );
+  if (addAcessibilidadeBtn) {
+    addAcessibilidadeBtn.addEventListener("click", handleAddAcessibilidade);
   }
 }
 // Setup table sorting
@@ -176,14 +190,24 @@ function setupTableSorting() {
 function openAddModal() {
   isEditMode = false;
   editingHotelId = null;
+
   // Reset form
   document.getElementById("add_hotel_form").reset();
+
+  // Limpar seleção de comodidades e acessibilidades
+  selectedComodidades = [];
+  selectedAcessibilidades = [];
+  updateSelectedComodidades();
+  updateSelectedAcessibilidades();
+  // Os campos agora são ocultos e usam valores predefinidos
+
   // Update modal title and button
   const modalTitle = document.querySelector("#modal-adicionar h3");
   const createBtn = document.getElementById("create-hotel-btn");
   const createBtnText = createBtn.querySelector("span:last-child");
   if (modalTitle) modalTitle.textContent = "Adicionar Novo Hotel";
   if (createBtnText) createBtnText.textContent = "Adicionar";
+
   openModal("modal-adicionar");
 }
 // Open edit hotel modal
@@ -211,24 +235,18 @@ function openEditModal(hotelId) {
   document.getElementById("precoNoite").value = quarto.precoNoite || 0;
   document.getElementById("descricao").value = quarto.descricao || "";
 
-  // Configurar checkboxes de comodidades
-  const roomComodidades = quarto.comodidades || [];
-  document.querySelectorAll('input[name="comodidades"]').forEach((checkbox) => {
-    checkbox.checked = roomComodidades.includes(checkbox.value);
-  });
+  // Carregar comodidades do quarto
+  selectedComodidades = Array.isArray(quarto.comodidades)
+    ? [...quarto.comodidades]
+    : [];
+  updateSelectedComodidades();
 
-  // Configurar checkboxes de acessibilidade
-  const roomAcessibilidade = quarto.acessibilidade || [];
-  document
-    .querySelectorAll('input[name="acessibilidades"]')
-    .forEach((checkbox) => {
-      checkbox.checked = roomAcessibilidade.includes(checkbox.value);
-    });
-
-  // Configurar outras opções de quarto
-  document.getElementById("pequenoAlmoco").checked =
-    quarto.pequenoAlmocoIncluido || false;
-  document.getElementById("wifiGratis").checked = quarto.wifiGratis !== false; // Por padrão é true
+  // Carregar acessibilidades do quarto
+  selectedAcessibilidades = Array.isArray(quarto.acessibilidade)
+    ? [...quarto.acessibilidade]
+    : [];
+  updateSelectedAcessibilidades();
+  /* Campos removidos da interface, mantemos os valores padrão */
 
   // Update modal title and button
   const modalTitle = document.querySelector("#modal-adicionar h3");
@@ -269,26 +287,11 @@ function handleFormSubmit() {
   if (precoNoite < 0) {
     showToast("O preço por noite deve ser maior ou igual a 0.", "error");
     return;
-  } // Obter comodidades selecionadas
-  const selectedComodidades = [];
-  document
-    .querySelectorAll('input[name="comodidades"]:checked')
-    .forEach((checkbox) => {
-      selectedComodidades.push(checkbox.value);
-    });
+  } // As comodidades e acessibilidades já estão nas variáveis globais selectedComodidades e selectedAcessibilidades
 
-  // Obter acessibilidades selecionadas
-  const selectedAcessibilidades = [];
-  document
-    .querySelectorAll('input[name="acessibilidades"]:checked')
-    .forEach((checkbox) => {
-      selectedAcessibilidades.push(checkbox.value);
-    });
-
-  // Obter estado dos checkboxes
-  const pequenoAlmocoIncluido =
-    document.getElementById("pequenoAlmoco").checked;
-  const wifiGratis = document.getElementById("wifiGratis").checked;
+  // Obter estado dos checkboxes  /* Utilizamos valores predefinidos já que os campos foram removidos do formulário */
+  const pequenoAlmocoIncluido = false;
+  const wifiGratis = true;
 
   // Handle file upload or use default
   const processHotelData = (fotoUrl) => {
@@ -632,15 +635,109 @@ function refreshTable() {
 function closeHotelModal() {
   const modal = document.getElementById("modal-adicionar");
   const form = document.getElementById("add_hotel_form");
+
+  // Scroll to top of modal before hiding
   if (modal) {
+    const modalContent = modal.querySelector(".overflow-y-auto");
+    if (modalContent) {
+      modalContent.scrollTop = 0;
+    }
     modal.classList.add("hidden");
+
+    // Restaurar scroll da página
+    document.body.style.overflow = "";
   }
+
+  // Reset form
   if (form) {
     form.reset();
   }
+
+  // Limpar seleções
+  selectedComodidades = [];
+  selectedAcessibilidades = [];
+  updateSelectedComodidades();
+  updateSelectedAcessibilidades();
+
+  // Reset flags
   isEditMode = false;
   editingHotelId = null;
 }
+
+/* Adicionar uma comodidade selecionada */
+function handleAddComodidade() {
+  const select = document.getElementById("comodidades-select");
+  const selectedValue = select.value;
+
+  if (selectedValue && !selectedComodidades.includes(selectedValue)) {
+    selectedComodidades.push(selectedValue);
+    updateSelectedComodidades();
+    select.value = "";
+  }
+}
+
+/* Adicionar uma acessibilidade selecionada */
+function handleAddAcessibilidade() {
+  const select = document.getElementById("acessibilidades-select");
+  const selectedValue = select.value;
+
+  if (selectedValue && !selectedAcessibilidades.includes(selectedValue)) {
+    selectedAcessibilidades.push(selectedValue);
+    updateSelectedAcessibilidades();
+    select.value = "";
+  }
+}
+
+/* Atualizar a exibição de comodidades selecionadas */
+function updateSelectedComodidades() {
+  const container = document.getElementById("selected-comodidades");
+  if (!container) return;
+
+  container.innerHTML = selectedComodidades
+    .map(
+      (item) => `
+    <span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-sm">
+      ${item}
+      <button type="button" onclick="removeComodidade('${item}')" class="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </span>
+  `
+    )
+    .join("");
+}
+
+/* Atualizar a exibição de acessibilidades selecionadas */
+function updateSelectedAcessibilidades() {
+  const container = document.getElementById("selected-acessibilidades");
+  if (!container) return;
+
+  container.innerHTML = selectedAcessibilidades
+    .map(
+      (item) => `
+    <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-sm">
+      ${item}
+      <button type="button" onclick="removeAcessibilidade('${item}')" class="hover:bg-green-200 dark:hover:bg-green-800 rounded-full p-0.5">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </span>
+  `
+    )
+    .join("");
+}
+
+/* Remover uma comodidade da seleção */
+window.removeComodidade = function (item) {
+  selectedComodidades = selectedComodidades.filter((i) => i !== item);
+  updateSelectedComodidades();
+};
+
+/* Remover uma acessibilidade da seleção */
+window.removeAcessibilidade = function (item) {
+  selectedAcessibilidades = selectedAcessibilidades.filter((i) => i !== item);
+  updateSelectedAcessibilidades();
+};
+
 // Export functions to global scope for onclick handlers
 window.editHotel = openEditModal;
 window.deleteHotel = deleteHotel;
