@@ -44,14 +44,15 @@ window.ignoreGamificationModal = function () {
   localStorage.setItem("gamificationModalIgnored", "true");
   window.closeGamificationModal();
 };
-let filters = {}
+let filters = {};
 Flight.init();
 User.init();
 initView();
 /**
  * Inicializa a vista principal da aplicação
  */
-function initView() {  getUserLocation((location) => {
+function initView() {
+  getUserLocation((location) => {
     if (!location) return;
     const aeroportos = Flight.getAeroportosComCoordenadas();
     const closest = closestAirport(location, aeroportos);
@@ -65,7 +66,8 @@ function initView() {  getUserLocation((location) => {
   setupModalButtons();
   setupTripTypeButtons();
   initGamificationModal();
-  setupNewsletterForm();  if (document.querySelector(".card-viagens")) {
+  setupNewsletterForm();
+  if (document.querySelector(".card-viagens")) {
     /* Obtém a localização do utilizador e mostra voos da origem mais próxima */
     getUserLocation((location) => {
       if (location) {
@@ -224,9 +226,15 @@ function abrirModalOrigem() {
             }</p>          </div>
         </div>
       `;
-      li.addEventListener("click", () => {        // Check if we're updating a multitrip segment
-        if (window.currentSegmentId && window.currentSegmentField === 'origem') {
-          Flight.updateMultitripSegment(window.currentSegmentId, { origem: aeroporto });
+      li.addEventListener("click", () => {
+        // Check if we're updating a multitrip segment
+        if (
+          window.currentSegmentId &&
+          window.currentSegmentField === "origem"
+        ) {
+          Flight.updateMultitripSegment(window.currentSegmentId, {
+            origem: aeroporto,
+          });
           renderMultitripSegments(); // Re-render segments to update display
           // Clear segment selection state
           window.currentSegmentId = null;
@@ -269,11 +277,17 @@ function abrirModalOrigem() {
 }
 function updateOriginButton(aeroporto) {
   // Check if we're updating a multitrip segment
-  if (window.currentSegmentId && window.currentSegmentField === 'origem') {
-    Flight.updateMultitripSegment(window.currentSegmentId, { origem: aeroporto });
-    const segmentElement = document.getElementById(`segment-${window.currentSegmentId}-origem`);
+  if (window.currentSegmentId && window.currentSegmentField === "origem") {
+    Flight.updateMultitripSegment(window.currentSegmentId, {
+      origem: aeroporto,
+    });
+    const segmentElement = document.getElementById(
+      `segment-${window.currentSegmentId}-origem`
+    );
     if (segmentElement) {
-      segmentElement.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+      segmentElement.textContent = `${aeroporto.codigo || "XXX"} - ${
+        aeroporto.cidade
+      }`;
     }
     // Clear the current segment tracking
     window.currentSegmentId = null;
@@ -281,7 +295,9 @@ function updateOriginButton(aeroporto) {
   } else {
     // Regular origin button update
     const btnOrigem = document.querySelector("#btn-open p");
-    btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+    btnOrigem.textContent = `${aeroporto.codigo || "XXX"} - ${
+      aeroporto.cidade
+    }`;
   }
 }
 function fecharModalOrigem() {
@@ -317,9 +333,16 @@ function abrirModalDestino() {
             }</p>
           </div>
         </div>
-      `;      li.addEventListener("click", () => {        // Check if we're updating a multitrip segment
-        if (window.currentSegmentId && window.currentSegmentField === 'destino') {
-          Flight.updateMultitripSegment(window.currentSegmentId, { destino: aeroporto });
+      `;
+      li.addEventListener("click", () => {
+        // Check if we're updating a multitrip segment
+        if (
+          window.currentSegmentId &&
+          window.currentSegmentField === "destino"
+        ) {
+          Flight.updateMultitripSegment(window.currentSegmentId, {
+            destino: aeroporto,
+          });
           renderMultitripSegments(); // Re-render segments to update display
           // Clear segment selection state
           window.currentSegmentId = null;
@@ -352,11 +375,17 @@ function abrirModalDestino() {
 }
 function updateDestinationButton(aeroporto) {
   // Check if we're updating a multitrip segment
-  if (window.currentSegmentId && window.currentSegmentField === 'destino') {
-    Flight.updateMultitripSegment(window.currentSegmentId, { destino: aeroporto });
-    const segmentElement = document.getElementById(`segment-${window.currentSegmentId}-destino`);
+  if (window.currentSegmentId && window.currentSegmentField === "destino") {
+    Flight.updateMultitripSegment(window.currentSegmentId, {
+      destino: aeroporto,
+    });
+    const segmentElement = document.getElementById(
+      `segment-${window.currentSegmentId}-destino`
+    );
     if (segmentElement) {
-      segmentElement.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+      segmentElement.textContent = `${aeroporto.codigo || "XXX"} - ${
+        aeroporto.cidade
+      }`;
     }
     // Clear the current segment tracking
     window.currentSegmentId = null;
@@ -364,7 +393,9 @@ function updateDestinationButton(aeroporto) {
   } else {
     // Regular destination button update
     const btnDestino = document.querySelector("#btn-destino p");
-    btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
+    btnDestino.textContent = `${aeroporto.codigo || "XXX"} - ${
+      aeroporto.cidade
+    }`;
   }
 }
 function fecharModalDestino() {
@@ -648,20 +679,20 @@ function fecharModalTipoTurismo() {
 }
 /* Setup trip type buttons functionality */
 function setupTripTypeButtons() {
-  const btnTipoViagem = document.getElementById('btn-tipo-viagem');
-  const multitripContainer = document.getElementById('multitrip-container');
-  const btnAddSegment = document.getElementById('btn-add-segment');
+  const btnTipoViagem = document.getElementById("btn-tipo-viagem");
+  const multitripContainer = document.getElementById("multitrip-container");
+  const btnAddSegment = document.getElementById("btn-add-segment");
   if (!btnTipoViagem) return;
   // Set default trip type
-  Flight.setTripType('ida-volta');
+  Flight.setTripType("ida-volta");
   // Trip type button handler - opens modal
-  btnTipoViagem.addEventListener('click', (e) => {
+  btnTipoViagem.addEventListener("click", (e) => {
     e.preventDefault();
     abrirModalTipoViagem();
   });
   // Add segment button handler
   if (btnAddSegment) {
-    btnAddSegment.addEventListener('click', (e) => {
+    btnAddSegment.addEventListener("click", (e) => {
       e.preventDefault();
       Flight.addMultitripSegment();
       renderMultitripSegments();
@@ -675,31 +706,36 @@ function abrirModalTipoViagem() {
   modal.classList.remove("hidden");
   modal.classList.add("flex");
   // Add event listeners for trip type options
-  const options = modal.querySelectorAll('.trip-type-option');
-  options.forEach(option => {
-    option.addEventListener('click', (e) => {
+  const options = modal.querySelectorAll(".trip-type-option");
+  options.forEach((option) => {
+    option.addEventListener("click", (e) => {
       e.preventDefault();
       const tripType = option.dataset.type;
       Flight.setTripType(tripType);
       // Update UI
-      const textoTipoViagem = document.getElementById('texto-tipo-viagem');
+      const textoTipoViagem = document.getElementById("texto-tipo-viagem");
       if (textoTipoViagem) {
-        const tripTypeText = tripType === 'so-ida' ? 'Só Ida' : 
-                            tripType === 'ida-volta' ? 'Ida e Volta' : 
-                            tripType === 'multitrip' ? 'Multitrip' : 'Ida e Volta';
+        const tripTypeText =
+          tripType === "so-ida"
+            ? "Só Ida"
+            : tripType === "ida-volta"
+            ? "Ida e Volta"
+            : tripType === "multitrip"
+            ? "Multitrip"
+            : "Ida e Volta";
         textoTipoViagem.textContent = tripTypeText;
       }
       // Show/hide multitrip container
-      const multitripContainer = document.getElementById('multitrip-container');
+      const multitripContainer = document.getElementById("multitrip-container");
       if (multitripContainer) {
-        if (tripType === 'multitrip') {
-          multitripContainer.classList.remove('hidden');
+        if (tripType === "multitrip") {
+          multitripContainer.classList.remove("hidden");
           if (Flight.getMultitripSegments().length === 0) {
             Flight.addMultitripSegment();
           }
           renderMultitripSegments();
         } else {
-          multitripContainer.classList.add('hidden');
+          multitripContainer.classList.add("hidden");
         }
       }
       fecharModalTipoViagem();
@@ -725,45 +761,64 @@ function fecharModalTipoViagem() {
   }
 }
 function renderMultitripSegments() {
-  const segmentsContainer = document.getElementById('multitrip-segments');
+  const segmentsContainer = document.getElementById("multitrip-segments");
   if (!segmentsContainer) return;
   const segments = Flight.getMultitripSegments();
-  segmentsContainer.innerHTML = '';
+  segmentsContainer.innerHTML = "";
   segments.forEach((segment, index) => {
-    const segmentDiv = document.createElement('div');
-    segmentDiv.className = 'flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
+    const segmentDiv = document.createElement("div");
+    segmentDiv.className =
+      "flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg";
     segmentDiv.innerHTML = `
-      <span class="font-medium text-Main-Primary dark:text-cyan-400">${index + 1}.</span>      <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentOriginModal(${segment.id})">
+      <span class="font-medium text-Main-Primary dark:text-cyan-400">${
+        index + 1
+      }.</span>      <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentOriginModal(${
+      segment.id
+    })">
         <span class="text-sm text-gray-500 dark:text-gray-400">Origem</span>
-        <div class="font-medium" id="segment-${segment.id}-origem">${segment.origem ? `${segment.origem.codigo || 'XXX'} - ${segment.origem.cidade}` : 'Selecionar'}</div>
+        <div class="font-medium" id="segment-${segment.id}-origem">${
+      segment.origem
+        ? `${segment.origem.codigo || "XXX"} - ${segment.origem.cidade}`
+        : "Selecionar"
+    }</div>
       </button>
       <span class="material-symbols-outlined text-gray-400">arrow_forward</span>
-      <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentDestinationModal(${segment.id})">
+      <button type="button" class="flex-1 text-left px-3 py-2 bg-white dark:bg-gray-800 rounded border hover:bg-gray-50 dark:hover:bg-gray-600" onclick="openSegmentDestinationModal(${
+        segment.id
+      })">
         <span class="text-sm text-gray-500 dark:text-gray-400">Destino</span>
-        <div class="font-medium" id="segment-${segment.id}-destino">${segment.destino ? `${segment.destino.codigo || 'XXX'} - ${segment.destino.cidade}` : 'Selecionar'}</div>
+        <div class="font-medium" id="segment-${segment.id}-destino">${
+      segment.destino
+        ? `${segment.destino.codigo || "XXX"} - ${segment.destino.cidade}`
+        : "Selecionar"
+    }</div>
       </button>
-      ${segments.length > 1 ? `<button type="button" onclick="removeMultitripSegment(${segment.id})" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+      ${
+        segments.length > 1
+          ? `<button type="button" onclick="removeMultitripSegment(${segment.id})" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
         <span class="material-symbols-outlined">delete</span>
-      </button>` : ''}
+      </button>`
+          : ""
+      }
     `;
     segmentsContainer.appendChild(segmentDiv);
   });
 }
 // Global functions for multitrip segment management
-window.removeMultitripSegment = function(segmentId) {
+window.removeMultitripSegment = function (segmentId) {
   Flight.removeMultitripSegment(segmentId);
   renderMultitripSegments();
 };
-window.openSegmentOriginModal = function(segmentId) {
+window.openSegmentOriginModal = function (segmentId) {
   // Store current segment ID for modal
   window.currentSegmentId = segmentId;
-  window.currentSegmentField = 'origem';
+  window.currentSegmentField = "origem";
   abrirModalOrigem();
 };
-window.openSegmentDestinationModal = function(segmentId) {
+window.openSegmentDestinationModal = function (segmentId) {
   // Store current segment ID for modal
   window.currentSegmentId = segmentId;
-  window.currentSegmentField = 'destino';
+  window.currentSegmentField = "destino";
   abrirModalDestino();
 };
 /* Funcoes de tabela e formulario */
@@ -812,9 +867,11 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
   /* Se não for especificada uma origem, tenta usar a origem do formulário */
   if (filtro === null) {
     const origemSelecionada = Flight.getSelectedOrigin();
-    filtro = origemSelecionada ? `${origemSelecionada.codigo} - ${origemSelecionada.cidade}` : "all";
+    filtro = origemSelecionada
+      ? `${origemSelecionada.codigo} - ${origemSelecionada.cidade}`
+      : "all";
   }
-  
+
   const shuffled = Flight.getTripsFrom(filtro);
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
@@ -864,18 +921,20 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
         </div>
       </div>
     `;
-    const tempDiv = document.createElement('div');
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = cardHTML;
     const card = tempDiv.firstElementChild;
     container.appendChild(card);
     // Now add the event listener to the heart icon inside this card
-    const heart = card.querySelector('.favorite-icon');
+    const heart = card.querySelector(".favorite-icon");
     if (heart) {
       // Set initial fill state based on whether this trip is a favorite
       let isFav = false;
       if (User.isLogged()) {
         const user = User.getUserLogged();
-        isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === viagem.numeroVoo);
+        isFav =
+          user.favoritos &&
+          user.favoritos.some((fav) => fav.numeroVoo === viagem.numeroVoo);
       }
       heart.setAttribute("data-favorito", isFav ? "true" : "false");
       heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
@@ -933,24 +992,24 @@ function handlePlanItFormSubmit(e) {
   // Build search data using Flight model
   const searchData = Flight.buildSearchData();
   // Save to sessionStorage
-  sessionStorage.setItem('planit_search', JSON.stringify(searchData));
+  sessionStorage.setItem("planit_search", JSON.stringify(searchData));
   // Redirect to flight search page
-  window.location.href = 'html/flight_search.html';
+  window.location.href = "html/flight_search.html";
 }
 // Adiciona listener ao submit do formulário principal
 // (garante que funciona para submit por enter ou botão)
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   User.init(); // Inicializa o UserModel
-  const form = document.querySelector('section form');
+  const form = document.querySelector("section form");
   if (form) {
-    form.addEventListener('submit', handlePlanItFormSubmit);
+    form.addEventListener("submit", handlePlanItFormSubmit);
   }
 });
 /* Setup newsletter form submission handling */
 function setupNewsletterForm() {
   const newsletterForm = document.getElementById("newsletter-form");
   if (!newsletterForm) return;
-  newsletterForm.addEventListener("submit", function(e) {
+  newsletterForm.addEventListener("submit", function (e) {
     e.preventDefault();
     const emailInput = document.getElementById("newsletter-email");
     const email = emailInput.value.trim();

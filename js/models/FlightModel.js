@@ -18,15 +18,15 @@ let datesTravelers = {
 let selectedAccessibilities = [];
 let selectedTourismType = null;
 /* Multitrip data */
-let tripType = 'ida-volta'; // 'ida', 'ida-volta', 'multitrip'
+let tripType = "ida-volta"; // 'ida', 'ida-volta', 'multitrip'
 let multitripSegments = [
   {
     origem: null,
     destino: null,
     dataPartida: "",
-    id: 1
-  }
-]
+    id: 1,
+  },
+];
 /* Array de tipos de turismo - dados estáticos */
 const tourismTypes = [
   {
@@ -93,15 +93,15 @@ export function init() {
   if (viagens.length === 0) {
     loadSampleFlights();
   }
-  
+
   // Garantir que temos a lista atualizada de aeroportos com destinos combinados
   const aeroportosCombinados = getAirports();
-  
+
   // Salvar de volta para assegurar que os aeroportos incluem todos os destinos
   if (aeroportosCombinados.length > 0) {
     localStorage.setItem("aeroportos", JSON.stringify(aeroportosCombinados));
   }
-  
+
   loadSavedData();
   return viagens;
 }
@@ -118,7 +118,7 @@ function loadSampleFlights() {
       direto: true,
       custo: "89",
       imagem: "../img/destinos/Lisboa/lisboa-1.jpg",
-      dataVolta: "18/01/2025 18:30"
+      dataVolta: "18/01/2025 18:30",
     },
     {
       numeroVoo: "TP456",
@@ -130,7 +130,7 @@ function loadSampleFlights() {
       direto: true,
       custo: "156",
       imagem: "../img/destinos/Madrid/madrid-1.jpg",
-      dataVolta: "20/01/2025 16:45"
+      dataVolta: "20/01/2025 16:45",
     },
     {
       numeroVoo: "FR789",
@@ -142,7 +142,7 @@ function loadSampleFlights() {
       direto: true,
       custo: "78",
       imagem: "../img/destinos/Londres/londres-1.jpg",
-      dataVolta: "22/01/2025 14:20"
+      dataVolta: "22/01/2025 14:20",
     },
     {
       numeroVoo: "AF321",
@@ -154,7 +154,7 @@ function loadSampleFlights() {
       direto: true,
       custo: "198",
       imagem: "../img/destinos/Paris/paris-1.jpg",
-      dataVolta: "25/01/2025 11:30"
+      dataVolta: "25/01/2025 11:30",
     },
     {
       numeroVoo: "LH567",
@@ -166,7 +166,7 @@ function loadSampleFlights() {
       direto: false,
       custo: "234",
       imagem: "../img/destinos/Roma/roma-1.jpg",
-      dataVolta: "26/01/2025 09:20"
+      dataVolta: "26/01/2025 09:20",
     },
     {
       numeroVoo: "KL890",
@@ -178,8 +178,8 @@ function loadSampleFlights() {
       direto: true,
       custo: "167",
       imagem: "../img/destinos/Amsterdao/amsterdao-1.jpg",
-      dataVolta: "27/01/2025 15:45"
-    }
+      dataVolta: "27/01/2025 15:45",
+    },
   ];
   viagens = sampleFlights;
   saveToLocalStorage("viagens", viagens);
@@ -270,27 +270,27 @@ export function deleteTrip(numeroVoo) {
 export function getAirports() {
   // Obter aeroportos da localStorage
   const aeroportos = JSON.parse(localStorage.getItem("aeroportos")) || [];
-  
+
   // Obter destinos da localStorage
   const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
-  
+
   // Converter destinos para o formato de aeroporto
-  const destinosFormatados = destinos.map(dest => ({
+  const destinosFormatados = destinos.map((dest) => ({
     codigo: dest.aeroporto,
     cidade: dest.cidade,
-    pais: dest.pais
+    pais: dest.pais,
   }));
-  
+
   // Combinar os arrays, removendo duplicatas pelo código do aeroporto
   const todos = [...aeroportos];
-  
+
   // Adicionar apenas destinos que não existem nos aeroportos
-  destinosFormatados.forEach(dest => {
-    if (!todos.find(ap => ap.codigo === dest.codigo)) {
+  destinosFormatados.forEach((dest) => {
+    if (!todos.find((ap) => ap.codigo === dest.codigo)) {
       todos.push(dest);
     }
   });
-  
+
   return todos;
 }
 /* Funcao para filtrar aeroportos por termo de pesquisa */
@@ -447,19 +447,17 @@ export function getAccessibilityIcon(acessibilidade) {
 /* Funcao para obter viagens de uma origem especifica */
 export function getTripsFrom(filtro = "all", perPage = 18, page = 1) {
   let Trips;
-  
+
   /* Se o filtro for "all", retorna todas as viagens; caso contrário, filtra por origem ou tipo de turismo */
   if (filtro === "all") {
     Trips = [...viagens];
   } else {
-    Trips = viagens.filter(
-      (v) => v.origem === filtro || v.turismo === filtro
-    );
+    Trips = viagens.filter((v) => v.origem === filtro || v.turismo === filtro);
   }
-  
+
   /* Embaralha o array para mostrar viagens diferentes */
   const shuffled = Trips.sort(() => 0.5 - Math.random());
-  
+
   /* Retorna apenas o numero de viagens pedido para a pagina atual */
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
@@ -702,7 +700,7 @@ export function getByNumeroVoo(numeroVoo) {
 /* Multitrip functions */
 export function setTripType(type) {
   tripType = type;
-  if (type === 'multitrip' && multitripSegments.length === 1) {
+  if (type === "multitrip" && multitripSegments.length === 1) {
     // Add a second segment for multitrip
     addMultitripSegment();
   }
@@ -715,14 +713,14 @@ export function addMultitripSegment() {
     origem: null,
     destino: null,
     dataPartida: "",
-    id: multitripSegments.length + 1
+    id: multitripSegments.length + 1,
   };
   multitripSegments.push(newSegment);
   return newSegment;
 }
 export function removeMultitripSegment(segmentId) {
   if (multitripSegments.length > 1) {
-    multitripSegments = multitripSegments.filter(seg => seg.id !== segmentId);
+    multitripSegments = multitripSegments.filter((seg) => seg.id !== segmentId);
     // Renumber IDs
     multitripSegments.forEach((seg, index) => {
       seg.id = index + 1;
@@ -730,7 +728,7 @@ export function removeMultitripSegment(segmentId) {
   }
 }
 export function updateMultitripSegment(segmentId, data) {
-  const segment = multitripSegments.find(seg => seg.id === segmentId);
+  const segment = multitripSegments.find((seg) => seg.id === segmentId);
   if (segment) {
     Object.assign(segment, data);
   }
@@ -744,8 +742,8 @@ export function clearMultitripSegments() {
       origem: null,
       destino: null,
       dataPartida: "",
-      id: 1
-    }
+      id: 1,
+    },
   ];
 }
 /* Function to build search data for sessionStorage */
@@ -761,7 +759,7 @@ export function buildSearchData() {
     bebes: datesTravelers.bebes,
     tipoTurismo: selectedTourismType,
     acessibilidade: selectedAccessibilities,
-    multitripSegments: tripType === 'multitrip' ? multitripSegments : null
+    multitripSegments: tripType === "multitrip" ? multitripSegments : null,
   };
   return data;
 }
@@ -771,27 +769,43 @@ export function filterFlights(searchData) {
   if (!searchData) return flights;
   // Filter by origin
   if (searchData.origem && searchData.origem.cidade) {
-    flights = flights.filter(flight => 
-      flight.origem && flight.origem.toLowerCase().includes(searchData.origem.cidade.toLowerCase())
+    flights = flights.filter(
+      (flight) =>
+        flight.origem &&
+        flight.origem
+          .toLowerCase()
+          .includes(searchData.origem.cidade.toLowerCase())
     );
   }
   // Filter by destination
   if (searchData.destino && searchData.destino.cidade) {
-    flights = flights.filter(flight => 
-      flight.destino && flight.destino.toLowerCase().includes(searchData.destino.cidade.toLowerCase())
+    flights = flights.filter(
+      (flight) =>
+        flight.destino &&
+        flight.destino
+          .toLowerCase()
+          .includes(searchData.destino.cidade.toLowerCase())
     );
   }
   // Filter by tourism type
-  if (searchData.tipoTurismo && searchData.tipoTurismo.nome && searchData.tipoTurismo.nome !== 'Nenhum') {
-    flights = flights.filter(flight => 
-      flight.tipoTurismo && flight.tipoTurismo.toLowerCase().includes(searchData.tipoTurismo.nome.toLowerCase())
+  if (
+    searchData.tipoTurismo &&
+    searchData.tipoTurismo.nome &&
+    searchData.tipoTurismo.nome !== "Nenhum"
+  ) {
+    flights = flights.filter(
+      (flight) =>
+        flight.tipoTurismo &&
+        flight.tipoTurismo
+          .toLowerCase()
+          .includes(searchData.tipoTurismo.nome.toLowerCase())
     );
   }
   // Filter by accessibility (if flight has accessibility info)
   if (searchData.acessibilidade && searchData.acessibilidade.length > 0) {
-    flights = flights.filter(flight => {
+    flights = flights.filter((flight) => {
       if (!flight.acessibilidade) return true; // If no accessibility info, include flight
-      return searchData.acessibilidade.some(acc => 
+      return searchData.acessibilidade.some((acc) =>
         flight.acessibilidade.toLowerCase().includes(acc.toLowerCase())
       );
     });
@@ -799,7 +813,7 @@ export function filterFlights(searchData) {
   // Filter by date (if departure date is specified)
   if (searchData.dataPartida) {
     const searchDate = new Date(searchData.dataPartida);
-    flights = flights.filter(flight => {
+    flights = flights.filter((flight) => {
       if (!flight.partida) return true;
       const flightDate = parseFlightDate(flight.partida);
       return flightDate >= searchDate;
@@ -814,8 +828,8 @@ function parseFlightDate(dateStr) {
   // If it's already a Date object
   if (dateStr instanceof Date) return dateStr;
   // If it's in DD/MM/YYYY format
-  if (dateStr.includes('/')) {
-    const [day, month, year] = dateStr.split('/');
+  if (dateStr.includes("/")) {
+    const [day, month, year] = dateStr.split("/");
     return new Date(year, month - 1, day);
   }
   // Try to parse as ISO date or other standard format
@@ -885,14 +899,14 @@ export function resetState() {
   };
   selectedAccessibilities = [];
   selectedTourismType = null;
-  tripType = 'ida-volta';
+  tripType = "ida-volta";
   multitripSegments = [
     {
       origem: null,
       destino: null,
       dataPartida: "",
-      id: 1
-    }
+      id: 1,
+    },
   ];
 }
 /**
@@ -903,37 +917,37 @@ export function resetState() {
 export function getAeroportosComCoordenadas() {
   /* Aeroportos básicos da localStorage */
   const aeroportosBase = JSON.parse(localStorage.getItem("aeroportos")) || [];
-  
+
   /* Coordenadas padrão de alguns aeroportos principais */
   const coordenadasPadrao = {
-    "OPO": { latitude: 41.248, longitude: -8.681 },
-    "LIS": { latitude: 38.774, longitude: -9.134 },
-    "MAD": { latitude: 40.416, longitude: -3.703 },
-    "BCN": { latitude: 41.297, longitude: 2.083 },
-    "PAR": { latitude: 49.009, longitude: 2.547 },
-    "LON": { latitude: 51.471, longitude: -0.461 },
-    "AMS": { latitude: 52.310, longitude: 4.768 },
-    "ROM": { latitude: 41.804, longitude: 12.250 },
-    "BER": { latitude: 52.366, longitude: 13.503 }
+    OPO: { latitude: 41.248, longitude: -8.681 },
+    LIS: { latitude: 38.774, longitude: -9.134 },
+    MAD: { latitude: 40.416, longitude: -3.703 },
+    BCN: { latitude: 41.297, longitude: 2.083 },
+    PAR: { latitude: 49.009, longitude: 2.547 },
+    LON: { latitude: 51.471, longitude: -0.461 },
+    AMS: { latitude: 52.31, longitude: 4.768 },
+    ROM: { latitude: 41.804, longitude: 12.25 },
+    BER: { latitude: 52.366, longitude: 13.503 },
   };
-  
+
   /* Adiciona coordenadas aos aeroportos que não têm */
-  return aeroportosBase.map(aeroporto => {
+  return aeroportosBase.map((aeroporto) => {
     if (aeroporto.location) return aeroporto;
-    
+
     /* Extrair código do aeroporto */
     let codigo = "";
     if (aeroporto.codigo) {
       codigo = aeroporto.codigo.split(" ")[0];
     }
-    
+
     /* Adicionar coordenadas padrão se disponíveis, ou uma estimativa */
     return {
       ...aeroporto,
-      location: coordenadasPadrao[codigo] || { 
-        latitude: 41.0 + Math.random() * 10, 
-        longitude: -5.0 + Math.random() * 15 
-      }
+      location: coordenadasPadrao[codigo] || {
+        latitude: 41.0 + Math.random() * 10,
+        longitude: -5.0 + Math.random() * 15,
+      },
     };
   });
 }
