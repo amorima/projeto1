@@ -193,7 +193,49 @@
                                     placeholder="150.00"
                                 />
                             </div>
-                        </div>                        <div class="mt-4">
+                        </div>
+
+                        <!-- Comodidades e Acessibilidade -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label for="comodidades" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comodidades</label>
+                                <div class="h-36 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 p-2">
+                                    <div id="comodidades-container" class="space-y-1"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="acessibilidades" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Acessibilidades</label>
+                                <div class="h-36 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 p-2">
+                                    <div id="acessibilidades-container" class="space-y-1"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                            <div class="flex items-center gap-2">
+                                <input 
+                                    id="pequenoAlmoco" 
+                                    name="pequenoAlmoco"
+                                    type="checkbox" 
+                                    class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                />
+                                <label for="pequenoAlmoco" class="text-sm text-gray-700 dark:text-gray-300">Pequeno Almoço Incluído</label>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <input 
+                                    id="wifiGratis" 
+                                    name="wifiGratis"
+                                    type="checkbox" 
+                                    checked
+                                    class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                                />
+                                <label for="wifiGratis" class="text-sm text-gray-700 dark:text-gray-300">WiFi Grátis</label>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
                             <label for="descricao" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
                             <textarea 
                                 id="descricao" 

@@ -6,11 +6,14 @@ import {
   loadComponent,
 } from "./ViewHelpers.js";
 import * as HotelModel from "../models/HotelModel.js";
-import { getAll as getAllActivities, getFirst } from "../models/ActivityModel.js";
+import {
+  getAll as getAllActivities,
+  getFirst,
+} from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
-let vooShallow = {}
-let valor = 1
+let vooShallow = {};
+let valor = 1;
 const btnMais = document.getElementById("btn-mais");
 const btnMenos = document.getElementById("btn-menos");
 const inputPessoas = document.getElementById("input-pessoas");
@@ -43,13 +46,14 @@ if (btnMais && btnMenos && inputPessoas) {
     }
   };
 }
-if (btnReservar) {  btnReservar.onclick = function () {
-    if(User.isLogged()){
+if (btnReservar) {
+  btnReservar.onclick = function () {
+    if (User.isLogged()) {
       const utilizador = User.getUserLogged();
       // Get points from the calculated value, not from DOM
       const pontos = vooShallow.pointsAR || 0;
       // Create descriptive message for points
-      let description = `Reserva de voo: ${vooShallow.destino || 'Voo'}`;
+      let description = `Reserva de voo: ${vooShallow.destino || "Voo"}`;
       if (vooShallow.hotel) description += ` + Hotel`;
       if (vooShallow.car) description += ` + Carro`;
       if (vooShallow.seguro) description += ` + Seguro`;
@@ -109,12 +113,16 @@ if (favItinerary) {
     const icon = favItinerary.querySelector("span");
     if (!User.isLogged()) {
       showToast("Faça login para adicionar aos favoritos");
-      window.location.href = "_login.html?redirect=" + encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href =
+        "_login.html?redirect=" +
+        encodeURIComponent(window.location.pathname + window.location.search);
       return;
     }
     const user = User.getUserLogged();
     // Check if this flight is already a favorite
-    const isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === vooShallow.numeroVoo);
+    const isFav =
+      user.favoritos &&
+      user.favoritos.some((fav) => fav.numeroVoo === vooShallow.numeroVoo);
     if (isFav) {
       User.removeFavorite(user, vooShallow);
       favItinerary.setAttribute("data-favorito", "false");
@@ -139,10 +147,13 @@ function updateFavItineraryState(flight) {
   if (!favItinerary || !flight || !flight.numeroVoo) return;
   if (User.isLogged()) {
     const user = User.getUserLogged();
-    const isFav = user.favoritos && user.favoritos.some(fav => fav.numeroVoo === flight.numeroVoo);
+    const isFav =
+      user.favoritos &&
+      user.favoritos.some((fav) => fav.numeroVoo === flight.numeroVoo);
     favItinerary.setAttribute("data-favorito", isFav ? "true" : "false");
     const icon = favItinerary.querySelector("span");
-    if (icon) icon.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+    if (icon)
+      icon.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
   }
 }
 function carregarHoteis(destino) {
@@ -154,8 +165,10 @@ function carregarHoteis(destino) {
       // fallback: tentar por destinoId se não encontrar por cidade
       if (!hoteis.length) {
         // procurar destinoId pelo nome da cidade
-        const destinos = JSON.parse(localStorage.getItem('destinos') || '[]');
-        const destinoObj = destinos.find(d => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase());
+        const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
+        const destinoObj = destinos.find(
+          (d) => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase()
+        );
         if (destinoObj && destinoObj.id) {
           hoteis = HotelModel.getHotelsFrom(destinoObj.id);
         }
@@ -173,7 +186,11 @@ function carregarHoteis(destino) {
         const divInfo = document.createElement("div");
         divInfo.className = "flex items-center gap-3";
         const imgHotel = document.createElement("img");
-        imgHotel.src = hotel.foto || "https://placehold.co/60x40";
+        // Usar a foto do hotel se disponível, ou a foto do quarto como fallback
+        const quarto =
+          hotel.quartos && hotel.quartos.length > 0 ? hotel.quartos[0] : {};
+        imgHotel.src =
+          hotel.foto || quarto.foto || "https://placehold.co/60x40";
         imgHotel.alt = hotel.nome;
         imgHotel.className = "w-16 h-10 object-cover rounded-lg";
         const divNomeInfo = document.createElement("div");
@@ -210,8 +227,11 @@ function carregarHoteis(destino) {
         const spanAdicionar = document.createElement("span");
         // Icon style changes if selected
         const isSelected = vooShallow.hotel && vooShallow.hotel.id === hotel.id;
-        spanAdicionar.className =
-          `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400`;
+        spanAdicionar.className = `material-symbols-outlined text-2xl ${
+          isSelected
+            ? "text-cyan-700 dark:text-cyan-400"
+            : "text-gray-400 dark:text-gray-300"
+        } hover:text-cyan-700 dark:hover:text-cyan-400`;
         spanAdicionar.textContent = isSelected ? "check_circle" : "add_circle";
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
@@ -232,9 +252,10 @@ function carregarHoteis(destino) {
         containerHoteis.appendChild(divHotel);
       });
     } else if (containerHoteis) {
-      containerHoteis.innerHTML = '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhum hotel disponível para este destino.</div>';
-    }  } catch (erro) {
-  }
+      containerHoteis.innerHTML =
+        '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhum hotel disponível para este destino.</div>';
+    }
+  } catch (erro) {}
 }
 function carregarActividades(destino) {
   try {
@@ -242,13 +263,24 @@ function carregarActividades(destino) {
     let atividadesDestino = [];
     if (destino) {
       // Tentar filtrar por cidade OU por destinoId
-      const destinos = JSON.parse(localStorage.getItem('destinos') || '[]');
-      const destinoObj = destinos.find(d => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase());
-      atividadesDestino = todasAtividades.filter(a => {
+      const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
+      const destinoObj = destinos.find(
+        (d) => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase()
+      );
+      atividadesDestino = todasAtividades.filter((a) => {
         // Match por nome da cidade (caso antigo)
-        if (typeof a.destino === 'string' && a.destino.toLowerCase() === destino.toLowerCase()) return true;
+        if (
+          typeof a.destino === "string" &&
+          a.destino.toLowerCase() === destino.toLowerCase()
+        )
+          return true;
         // Match por destinoId (caso novo)
-        if ((a.destinoId || a.destino) && destinoObj && (a.destinoId === destinoObj.id || a.destino === destinoObj.id)) return true;
+        if (
+          (a.destinoId || a.destino) &&
+          destinoObj &&
+          (a.destinoId === destinoObj.id || a.destino === destinoObj.id)
+        )
+          return true;
         return false;
       });
     } else {
@@ -276,9 +308,21 @@ function carregarActividades(destino) {
         divDetalhes.className =
           "flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300";
         let icone = "tour";
-        if (atividade.tipoTurismo && atividade.tipoTurismo.includes("Gastronomic")) icone = "restaurant";
-        else if (atividade.tipoTurismo && atividade.tipoTurismo.includes("Cultural")) icone = "museum";
-        else if (atividade.tipoTurismo && atividade.tipoTurismo.includes("Nature")) icone = "park";
+        if (
+          atividade.tipoTurismo &&
+          atividade.tipoTurismo.includes("Gastronomic")
+        )
+          icone = "restaurant";
+        else if (
+          atividade.tipoTurismo &&
+          atividade.tipoTurismo.includes("Cultural")
+        )
+          icone = "museum";
+        else if (
+          atividade.tipoTurismo &&
+          atividade.tipoTurismo.includes("Nature")
+        )
+          icone = "park";
         const spanTipo = document.createElement("span");
         spanTipo.className = "flex items-center gap-1";
         spanTipo.innerHTML = `<span class="material-symbols-outlined text-sm">${icone}</span>${atividade.tipoTurismo}`;
@@ -291,13 +335,21 @@ function carregarActividades(destino) {
         divBotoes.className = "flex items-center gap-3";
         const spanAdicionar = document.createElement("span");
         // Check if selected
-        let isSelected = Array.isArray(vooShallow.atividade) && vooShallow.atividade.some(a => a.id === atividade.id);
-        spanAdicionar.className = `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400`;
+        let isSelected =
+          Array.isArray(vooShallow.atividade) &&
+          vooShallow.atividade.some((a) => a.id === atividade.id);
+        spanAdicionar.className = `material-symbols-outlined text-2xl ${
+          isSelected
+            ? "text-cyan-700 dark:text-cyan-400"
+            : "text-gray-400 dark:text-gray-300"
+        } hover:text-cyan-700 dark:hover:text-cyan-400`;
         spanAdicionar.textContent = isSelected ? "check_circle" : "add_circle";
         spanAdicionar.onclick = function (e) {
           e.stopPropagation();
           if (!Array.isArray(vooShallow.atividade)) vooShallow.atividade = [];
-          const idx = vooShallow.atividade.findIndex(a => a.id === atividade.id);
+          const idx = vooShallow.atividade.findIndex(
+            (a) => a.id === atividade.id
+          );
           if (idx !== -1) {
             vooShallow.atividade.splice(idx, 1);
             showToast("Atividade removida!", "info");
@@ -313,50 +365,55 @@ function carregarActividades(destino) {
         containerAtividades.appendChild(divAtividade);
       });
     } else if (containerAtividades) {
-      containerAtividades.innerHTML = '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhuma atividade disponível para este destino.</div>';
-    }  } catch (erro) {
-  }
+      containerAtividades.innerHTML =
+        '<div class="text-gray-500 dark:text-gray-300 text-center py-4">Nenhuma atividade disponível para este destino.</div>';
+    }
+  } catch (erro) {}
 }
 function adicionarEventosCarros() {
   // Encontra a seção de carros procurando pelo texto do título
-  const headings = document.querySelectorAll('h2');
+  const headings = document.querySelectorAll("h2");
   let carSection = null;
   for (let heading of headings) {
-    if (heading.textContent.includes('Aluguer de Carro')) {
+    if (heading.textContent.includes("Aluguer de Carro")) {
       carSection = heading.nextElementSibling;
       break;
     }
   }
-    if (!carSection) {
+  if (!carSection) {
     return;
   }
   // Seleciona apenas os cartões de carro dentro da seção de carros
   const carOptions = carSection.querySelectorAll(
-    '.flex.items-center.justify-between.py-3.px-2.rounded-lg'
+    ".flex.items-center.justify-between.py-3.px-2.rounded-lg"
   );
   // Lista de nomes dos carros na ordem dos cartões
   const carNames = [
-    'Ford Fiesta',
-    'Volkswagen Golf',
-    'Hyundai Tucson',
-    'Peugeot 5008',
-    'Mercedes Classe C'
+    "Ford Fiesta",
+    "Volkswagen Golf",
+    "Hyundai Tucson",
+    "Peugeot 5008",
+    "Mercedes Classe C",
   ];
   const carPrices = [24, 32, 45, 52, 68];
   function setupCarCard(option, idx) {
-    const icon = option.querySelector('.material-symbols-outlined.text-2xl');
+    const icon = option.querySelector(".material-symbols-outlined.text-2xl");
     if (!icon) return;
     // Verifica se este carro está selecionado
     const isSelected = vooShallow.car && vooShallow.car.nome === carNames[idx];
-    icon.textContent = isSelected ? 'check_circle' : 'add_circle';
-    icon.className = `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400`;
+    icon.textContent = isSelected ? "check_circle" : "add_circle";
+    icon.className = `material-symbols-outlined text-2xl ${
+      isSelected
+        ? "text-cyan-700 dark:text-cyan-400"
+        : "text-gray-400 dark:text-gray-300"
+    } hover:text-cyan-700 dark:hover:text-cyan-400`;
     option.onclick = function (e) {
       // Evita conflito com outros botões internos
-      if (e.target.tagName === 'SPAN' && e.target !== icon) return;
+      if (e.target.tagName === "SPAN" && e.target !== icon) return;
       if (isSelected) {
         delete vooShallow.car;
         atualizarSidebarVoo(vooShallow);
-        showToast('Carro removido!', 'info');
+        showToast("Carro removido!", "info");
       } else {
         vooShallow.car = {
           nome: carNames[idx],
@@ -364,7 +421,7 @@ function adicionarEventosCarros() {
           // Adicione outros dados se necessário
         };
         atualizarSidebarVoo(vooShallow);
-        showToast('Carro adicionado!', 'success');
+        showToast("Carro adicionado!", "success");
       }
       adicionarEventosCarros(); // Atualiza ícones
     };
@@ -379,8 +436,11 @@ function adicionarEventoSeguro() {
   if (btnAddSeguro) {
     const isSelected = !!vooShallow.seguro;
     btnAddSeguro.textContent = isSelected ? "check_circle" : "add_circle";
-    btnAddSeguro.className =
-      `material-symbols-outlined text-2xl ${isSelected ? 'text-cyan-700 dark:text-cyan-400' : 'text-gray-400 dark:text-gray-300'} hover:text-cyan-700 dark:hover:text-cyan-400 cursor-pointer`;
+    btnAddSeguro.className = `material-symbols-outlined text-2xl ${
+      isSelected
+        ? "text-cyan-700 dark:text-cyan-400"
+        : "text-gray-400 dark:text-gray-300"
+    } hover:text-cyan-700 dark:hover:text-cyan-400 cursor-pointer`;
     btnAddSeguro.onclick = function () {
       if (vooShallow.seguro) {
         delete vooShallow.seguro;
@@ -396,37 +456,46 @@ function adicionarEventoSeguro() {
   }
 }
 function atualizarSidebarVoo(voo) {
-  const sidebar = document.querySelector(
-    ".bg-Background-Background.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline"
-  ) || document.querySelector(".bg-Background-Background.dark\\:bg-gray-900.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline");
+  const sidebar =
+    document.querySelector(
+      ".bg-Background-Background.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline"
+    ) ||
+    document.querySelector(
+      ".bg-Background-Background.dark\\:bg-gray-900.rounded-2xl.shadow-md.p-6.sticky.top-\\[120px\\].flex.flex-col.space-y-6.outline"
+    );
   if (!sidebar) return;
   // User info
   let user = null;
-  let nivel = 'Explorador';
+  let nivel = "Explorador";
   let pontos = 0;
   let desconto = 0;
   try {
-    const users = JSON.parse(localStorage.getItem('user'));
+    const users = JSON.parse(localStorage.getItem("user"));
     if (Array.isArray(users) && users.length > 0) {
-      user = users.find(u => u.private === false) || users[0];
+      user = users.find((u) => u.private === false) || users[0];
       pontos = parseInt(user.pontos, 10) || 0;
-      if (pontos >= 5000) nivel = 'Embaixador', desconto = 20;
-      else if (pontos >= 3000) nivel = 'Globetrotter', desconto = 15;
-      else if (pontos >= 1500) nivel = 'Aventureiro', desconto = 10;
-      else if (pontos >= 250) nivel = 'Viajante', desconto = 5;
-      else nivel = 'Explorador', desconto = 0;
+      if (pontos >= 5000) (nivel = "Embaixador"), (desconto = 20);
+      else if (pontos >= 3000) (nivel = "Globetrotter"), (desconto = 15);
+      else if (pontos >= 1500) (nivel = "Aventureiro"), (desconto = 10);
+      else if (pontos >= 250) (nivel = "Viajante"), (desconto = 5);
+      else (nivel = "Explorador"), (desconto = 0);
     }
-  } catch { /* fallback para anónimo */ }
+  } catch {
+    /* fallback para anónimo */
+  }
   // Preço e pontos
   let numPessoas = voo.nPessoas || 1;
-  let precoBase = voo.custo ? Math.round(parseFloat(voo.custo) * numPessoas) : 0;
+  let precoBase = voo.custo
+    ? Math.round(parseFloat(voo.custo) * numPessoas)
+    : 0;
   function parseDatePt(dateStr) {
     if (!dateStr) return null;
-    const [datePart, timePart] = dateStr.split(' ');
-    const [day, month, year] = datePart.split('/').map(Number);
-    let hours = 0, minutes = 0;
+    const [datePart, timePart] = dateStr.split(" ");
+    const [day, month, year] = datePart.split("/").map(Number);
+    let hours = 0,
+      minutes = 0;
     if (timePart) {
-      [hours, minutes] = timePart.split(':').map(Number);
+      [hours, minutes] = timePart.split(":").map(Number);
     }
     return new Date(year, month - 1, day, hours, minutes);
   }
@@ -435,7 +504,10 @@ function atualizarSidebarVoo(voo) {
     const dataInicio = parseDatePt(voo.partida);
     const dataFim = parseDatePt(voo.dataVolta || voo.chegada);
     if (dataInicio && dataFim && !isNaN(dataInicio) && !isNaN(dataFim)) {
-      numNoites = Math.max(1, Math.round((dataFim - dataInicio) / (1000 * 60 * 60 * 24)));
+      numNoites = Math.max(
+        1,
+        Math.round((dataFim - dataInicio) / (1000 * 60 * 60 * 24))
+      );
     } else {
       numNoites = 1;
     }
@@ -453,12 +525,18 @@ function atualizarSidebarVoo(voo) {
     precoBase += voo.car.preco * numNoites;
   }
   if (voo.seguro) precoBase = Math.round(precoBase * 1.2);
-  const precoComDesconto = desconto ? Math.round(precoBase * (1 - desconto / 100)) : precoBase;
+  const precoComDesconto = desconto
+    ? Math.round(precoBase * (1 - desconto / 100))
+    : precoBase;
   // Calculate points based on new rules
   let pointsMultiplier = 1.0; // Base: 1 point per euro for flight only
   // Check what's included to determine multiplier
   const hasCar = !!(voo.car && voo.car.preco);
-  const hasHotel = !!(voo.hotel && voo.hotel.quartos && voo.hotel.quartos.length > 0);
+  const hasHotel = !!(
+    voo.hotel &&
+    voo.hotel.quartos &&
+    voo.hotel.quartos.length > 0
+  );
   if (hasCar && hasHotel) {
     pointsMultiplier = 1.25; // Flight + car + hotel
   } else if (hasCar || hasHotel) {
@@ -470,9 +548,20 @@ function atualizarSidebarVoo(voo) {
   }
   const pontosAcumular = Math.round(precoComDesconto * pointsMultiplier);
   vooShallow.pointsAR = pontosAcumular;
-  const tipoVoo = voo.tipo ? (voo.tipo === 'ida' ? 'Só ida' : voo.tipo === 'ida e volta' ? 'Ida e volta' : 'Multitryp') : 'Só ida';
-  const dataFormatada = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);
-  const descontoBadge = desconto ? `<span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded ml-2">${desconto}% desconto</span>` : '';
+  const tipoVoo = voo.tipo
+    ? voo.tipo === "ida"
+      ? "Só ida"
+      : voo.tipo === "ida e volta"
+      ? "Ida e volta"
+      : "Multitryp"
+    : "Só ida";
+  const dataFormatada = formatDatesForDisplayPt(
+    voo.partida,
+    voo.dataVolta || voo.chegada
+  );
+  const descontoBadge = desconto
+    ? `<span class="inline-block bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 text-xs font-bold px-2 py-1 rounded ml-2">${desconto}% desconto</span>`
+    : "";
   sidebar.innerHTML = `
     <div class="flex items-center justify-between gap-2">
       <div class="flex items-baseline gap-2">
@@ -500,7 +589,9 @@ function atualizarSidebarVoo(voo) {
     </ul>
     <div class="flex items-center justify-between gap-2 mt-6">
       <button id="btn-menos" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700"><span class="material-symbols-outlined">remove</span></button>
-      <input id="input-pessoas" class="appearance-none w-32 sm:w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700" value="${voo.nPessoas ? voo.nPessoas : 1}" />
+      <input id="input-pessoas" class="appearance-none w-32 sm:w-40 text-center bg-white dark:bg-gray-800 border border-Components-Limit-Color rounded-lg p-2 text-Text-Body dark:text-gray-200 outline outline-1 outline-gray-200 dark:outline-gray-700" value="${
+        voo.nPessoas ? voo.nPessoas : 1
+      }" />
       <button id="btn-mais" type="button" class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition outline outline-1 outline-gray-200 dark:outline-gray-700"><span class="material-symbols-outlined">add</span></button>
     </div>
     <button class="w-full bg-Button-Main dark:bg-cyan-400 text-white dark:text-gray-900 font-bold py-3 rounded-lg hover:bg-cyan-700 dark:hover:bg-cyan-500 transition outline outline-1 outline-gray-200 dark:outline-gray-700 mt-2">Reservar</button>
@@ -509,7 +600,9 @@ function atualizarSidebarVoo(voo) {
   const btnMais = document.getElementById("btn-mais");
   const btnMenos = document.getElementById("btn-menos");
   const inputPessoas = document.getElementById("input-pessoas");
-  const btnReservar = sidebar.querySelector("button.w-full.bg-Button-Main, button.w-full.bg-Button-Main.dark\\:bg-cyan-400");
+  const btnReservar = sidebar.querySelector(
+    "button.w-full.bg-Button-Main, button.w-full.bg-Button-Main.dark\\:bg-cyan-400"
+  );
   if (btnMais && btnMenos && inputPessoas) {
     btnMais.onclick = function () {
       let valor = parseInt(inputPessoas.value, 10);
@@ -539,15 +632,16 @@ function atualizarSidebarVoo(voo) {
       vooShallow.nPessoas = valor;
       atualizarSidebarVoo(vooShallow);
     };
-  }  if (btnReservar) {
+  }
+  if (btnReservar) {
     btnReservar.onclick = function () {
       User.init();
-      if(User.isLogged()){
+      if (User.isLogged()) {
         const utilizador = User.getUserLogged();
         // Get points from the calculated value, not from DOM
         const pontos = vooShallow.pointsAR || 0;
         // Create descriptive message for points
-        let description = `Reserva de voo: ${vooShallow.destino || 'Voo'}`;
+        let description = `Reserva de voo: ${vooShallow.destino || "Voo"}`;
         if (vooShallow.hotel) description += ` + Hotel`;
         if (vooShallow.car) description += ` + Carro`;
         if (vooShallow.seguro) description += ` + Seguro`;
@@ -559,27 +653,32 @@ function atualizarSidebarVoo(voo) {
         sessionStorage.setItem("loggedUser", JSON.stringify(utilizador));
         mostrarConfettiNoToast();
         showToast("Viagem reservada!", "success");
-        if (!window.customElements || !window.customElements.get("dotlottie-player")) {
-        let script = document.createElement("script");
-        script.type = "module";
-        script.src = "https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs";
-        script.onload = function () { };
-        document.body.appendChild(script);
-        setTimeout(mostrarConfettiNoToast, 3000);
-        setTimeout(() => {
-          window.location.href = "/index.html";
-        }, 3000);
+        if (
+          !window.customElements ||
+          !window.customElements.get("dotlottie-player")
+        ) {
+          let script = document.createElement("script");
+          script.type = "module";
+          script.src =
+            "https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs";
+          script.onload = function () {};
+          document.body.appendChild(script);
+          setTimeout(mostrarConfettiNoToast, 3000);
+          setTimeout(() => {
+            window.location.href = "/index.html";
+          }, 3000);
+        } else {
+          mostrarConfettiNoToast();
+          setTimeout(() => {
+            window.location.href = "/index.html";
+          }, 3000);
+        }
       } else {
-        mostrarConfettiNoToast();
-        setTimeout(() => {
-          window.location.href = "/index.html";
-        }, 3000);
-      }
-      }else{
         // Se o utilizador não estiver logado, redirecionar para login
         showToast("Por favor, faça login para reservar.", "warning");
         setTimeout(() => {
-          window.location.href = "_login.html?redirect=flight_itinerary.html?id=" + voo.numeroVoo;
+          window.location.href =
+            "_login.html?redirect=flight_itinerary.html?id=" + voo.numeroVoo;
         }, 3000);
       }
     };
@@ -587,7 +686,7 @@ function atualizarSidebarVoo(voo) {
 }
 document.addEventListener("DOMContentLoaded", () => {
   // Buscar o numeroVoo da query string
-  User.init()
+  User.init();
   const params = new URLSearchParams(window.location.search);
   const numeroVoo = params.get("id");
   let destinoVoo = null;
@@ -596,13 +695,15 @@ document.addEventListener("DOMContentLoaded", () => {
     FlightModel.init();
     voo = FlightModel.getByNumeroVoo(numeroVoo);
     if (voo) {
-      vooShallow = {...voo}
+      vooShallow = { ...voo };
       destinoVoo = voo.destino;
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
       atualizarSidebarVoo(voo);
       // Atualiza o estado do favorito usando vooShallow se possível, senão voo
-      updateFavItineraryState(vooShallow && vooShallow.numeroVoo ? vooShallow : voo);
+      updateFavItineraryState(
+        vooShallow && vooShallow.numeroVoo ? vooShallow : voo
+      );
     }
   }
   carregarHoteis(destinoVoo);
@@ -615,24 +716,40 @@ document.addEventListener("DOMContentLoaded", () => {
 function parseDatePt(dateStr) {
   // Aceita formatos 'dd/mm/yyyy' ou 'dd/mm/yyyy hh:mm'
   if (!dateStr) return null;
-  const [datePart, timePart] = dateStr.split(' ');
-  const [day, month, year] = datePart.split('/').map(Number);
-  let hours = 0, minutes = 0;
+  const [datePart, timePart] = dateStr.split(" ");
+  const [day, month, year] = datePart.split("/").map(Number);
+  let hours = 0,
+    minutes = 0;
   if (timePart) {
-    [hours, minutes] = timePart.split(':').map(Number);
+    [hours, minutes] = timePart.split(":").map(Number);
   }
   // JS: mês começa em 0
   return new Date(year, month - 1, day, hours, minutes);
 }
 function formatDatesForDisplayPt(dataPartida, dataRegresso) {
   const meses = [
-    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
   ];
   const partida = parseDatePt(dataPartida);
   const regresso = parseDatePt(dataRegresso);
-  if (!partida || !regresso || isNaN(partida) || isNaN(regresso)) return '';
-  const dataPartidaFormatada = `${partida.getDate()} ${meses[partida.getMonth()]}`;
-  const dataRegressoFormatada = `${regresso.getDate()} ${meses[regresso.getMonth()]}`;
+  if (!partida || !regresso || isNaN(partida) || isNaN(regresso)) return "";
+  const dataPartidaFormatada = `${partida.getDate()} ${
+    meses[partida.getMonth()]
+  }`;
+  const dataRegressoFormatada = `${regresso.getDate()} ${
+    meses[regresso.getMonth()]
+  }`;
   return `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
 }
 function atualizarHeroVoo(voo) {
@@ -640,22 +757,27 @@ function atualizarHeroVoo(voo) {
   const heroCidade = document.querySelector(
     ".flex.items-center.gap-2 > div > .text-2xl.font-bold"
   );
-  if (heroCidade) heroCidade.textContent = voo.destino?.split(" - ").pop() || voo.destino;
+  if (heroCidade)
+    heroCidade.textContent = voo.destino?.split(" - ").pop() || voo.destino;
   const heroDatas = document.querySelector(
     ".flex.items-center.gap-2 > div > .inline-flex .text-base"
   );
   if (heroDatas) {
-    heroDatas.textContent = formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada);
+    heroDatas.textContent = formatDatesForDisplayPt(
+      voo.partida,
+      voo.dataVolta || voo.chegada
+    );
   }
-  const heroImg = document.querySelector(
-    ".w-full.h-full.object-cover"
-  );
+  const heroImg = document.querySelector(".w-full.h-full.object-cover");
   if (heroImg && voo.imagem) heroImg.src = voo.imagem;
 }
 function getLogoCompanhia(nome) {
   try {
-    const companhias = JSON.parse(localStorage.getItem("companhiasAereas")) || [];
-    const comp = companhias.find(c => c.nome.toLowerCase() === nome.toLowerCase());
+    const companhias =
+      JSON.parse(localStorage.getItem("companhiasAereas")) || [];
+    const comp = companhias.find(
+      (c) => c.nome.toLowerCase() === nome.toLowerCase()
+    );
     return comp ? comp.logo : null;
   } catch {
     return null;
@@ -670,18 +792,31 @@ function atualizarItinerarioVoo(voo) {
   const img = itinerarioDiv.querySelector("img");
   if (img && voo.imagem) img.src = voo.imagem;
   // Conteúdo à esquerda
-  const conteudo = itinerarioDiv.querySelector(".flex.flex-col.gap-2.text-left.flex-1");
+  const conteudo = itinerarioDiv.querySelector(
+    ".flex.flex-col.gap-2.text-left.flex-1"
+  );
   if (conteudo) {
     conteudo.innerHTML = `
       <span class='font-bold text-lg'>${voo.origem} → ${voo.destino}</span>
-      <span class='text-gray-500'>${formatDatesForDisplayPt(voo.partida, voo.dataVolta || voo.chegada)}</span>
-      <span class='text-gray-700 dark:text-gray-300'>Companhia: <b>${voo.companhia}</b></span>
-      <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${voo.numeroVoo}</b></span>
-      <span class='text-gray-700 dark:text-gray-300'>${voo.direto === 'S' ? 'Direto' : 'Com escalas'}</span>
+      <span class='text-gray-500'>${formatDatesForDisplayPt(
+        voo.partida,
+        voo.dataVolta || voo.chegada
+      )}</span>
+      <span class='text-gray-700 dark:text-gray-300'>Companhia: <b>${
+        voo.companhia
+      }</b></span>
+      <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${
+        voo.numeroVoo
+      }</b></span>
+      <span class='text-gray-700 dark:text-gray-300'>${
+        voo.direto === "S" ? "Direto" : "Com escalas"
+      }</span>
     `;
   }
   // Imagem da companhia aérea à direita
-  const companhiaDiv = itinerarioDiv.querySelector(".pl-4.flex-shrink-0.flex.items-center");
+  const companhiaDiv = itinerarioDiv.querySelector(
+    ".pl-4.flex-shrink-0.flex.items-center"
+  );
   if (companhiaDiv) {
     const logo = getLogoCompanhia(voo.companhia);
     companhiaDiv.innerHTML = logo
