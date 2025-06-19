@@ -45,10 +45,10 @@ function loadDestinations() {
     const select = document.getElementById('destinoId');
     if (select) {
         // Clear existing options except the first
-        select.innerHTML = '<option value="">Selecionar...</option>';
-        destinations.forEach(dest => {
+        select.innerHTML = '<option value="">Selecionar...</option>';        destinations.forEach(dest => {
             const option = document.createElement('option');
-            option.value = dest.cidade; // Use cidade as value since that's what hotels store
+            option.value = dest.id; // Armazenar o ID do destino para referência
+            option.setAttribute('data-cidade', dest.cidade); // Armazenar a cidade como atributo de dados
             option.textContent = `${dest.cidade}, ${dest.pais}`;
             select.appendChild(option);
         });
@@ -112,9 +112,8 @@ function openEditModal(hotelId) {
         return;
     }
     // Get the first (and only) room from the quartos array
-    const quarto = hotel.quartos && hotel.quartos.length > 0 ? hotel.quartos[0] : {};
-      // Populate hotel form data
-    document.getElementById('destinoId').value = hotel.cidade || '';
+    const quarto = hotel.quartos && hotel.quartos.length > 0 ? hotel.quartos[0] : {};    // Populate hotel form data
+    document.getElementById('destinoId').value = hotel.destinoId || '';
     document.getElementById('name').value = hotel.nome;
     // Note: File input cannot be pre-populated for security reasons
     // Populate room form data
@@ -134,17 +133,21 @@ function openEditModal(hotelId) {
 // Handle form submission (create or update)
 function handleFormSubmit() {
     const form = document.getElementById('add_hotel_form');
-    if (!form) return;
-    const formData = new FormData(form);
+    if (!form) return;    const formData = new FormData(form);
     const fileInput = document.getElementById('foto');
     const file = fileInput.files[0];
     // Validation
-    const cidade = formData.get('destinoId');
+    const destinoId = formData.get('destinoId');
     const nome = formData.get('name');
-    if (!cidade || !nome) {
+    if (!destinoId || !nome) {
         showToast('Por favor, preencha todos os campos obrigatórios.', 'error');
         return;
     }
+    
+    // Obter a cidade a partir do elemento select
+    const selectDestino = document.getElementById('destinoId');
+    const selectedOption = selectDestino.options[selectDestino.selectedIndex];
+    const cidade = selectedOption ? selectedOption.getAttribute('data-cidade') : '';
     const camas = parseInt(formData.get('camas')) || 1;
     const capacidade = parseInt(formData.get('capacidade')) || 2;
     const precoNoite = parseFloat(formData.get('precoNoite')) || 80;
@@ -156,9 +159,9 @@ function handleFormSubmit() {
         showToast('O preço por noite deve ser maior ou igual a 0.', 'error');
         return;
     }
-    // Handle file upload or use default
-    const processHotelData = (fotoUrl) => {
+    // Handle file upload or use default    const processHotelData = (fotoUrl) => {
         const hotelData = {
+            destinoId: Number(destinoId), // Armazenar o ID do destino como número
             cidade: cidade,
             nome: nome,
             foto: fotoUrl
@@ -178,10 +181,10 @@ function handleFormSubmit() {
             descricao: formData.get('descricao') || ''
         };
         try {
-            if (isEditMode) {
-                // Update existing hotel
+            if (isEditMode) {                // Update existing hotel
                 const hotelIndex = allHotels.findIndex(h => h.id === editingHotelId);
                 if (hotelIndex !== -1) {
+                    allHotels[hotelIndex].destinoId = hotelData.destinoId;
                     allHotels[hotelIndex].cidade = hotelData.cidade;
                     allHotels[hotelIndex].nome = hotelData.nome;
                     allHotels[hotelIndex].foto = hotelData.foto;
@@ -193,10 +196,10 @@ function handleFormSubmit() {
                 } else {
                     showToast('Erro ao atualizar hotel.', 'error');
                 }
-            } else {
-                // Create new hotel
+            } else {                // Create new hotel
                 const newHotel = {
                     id: getNextId(),
+                    destinoId: hotelData.destinoId,
                     cidade: hotelData.cidade,
                     nome: hotelData.nome,
                     foto: hotelData.foto,

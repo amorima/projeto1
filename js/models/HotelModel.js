@@ -115,11 +115,40 @@ export function remove(id) {
  * limitados a 10 por página, e retorna a segunda página de resultados.
  */
 export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
-  // Filtra hoteis cuja origem é OPO (Porto)
-  const Hotels = hoteis.filter((h) => h.destinoId === destinoId);
+  // Filtra hoteis por destino ID
+  let Hotels;
+  
+  if (destinoId === "all") {
+    // Se o destinoId for "all", retorna todos os hotéis
+    Hotels = [...hoteis];
+  } else {
+    destinoId = Number(destinoId);
+    // Filtra os hotéis que têm o destinoId correspondente
+    Hotels = hoteis.filter((h) => {
+      // Tenta encontrar hotéis com o destinoId específico
+      // Se o hotel não tiver destinoId, tenta verificar pela cidade usando os dados de destino
+      if (h.destinoId === destinoId) {
+        return true;
+      }
+      
+      // Tentativa de verificação adicional para hotéis sem destinoId
+      const destinos = getDestinations();
+      const destino = destinos.find(d => d.id === destinoId);
+      if (destino && h.cidade === destino.cidade) {
+        // Atualizar o hotel com o destinoId correto para futuras consultas
+        h.destinoId = destinoId;
+        saveToLocalStorage("hoteis", hoteis);
+        return true;
+      }
+      
+      return false;
+    });
+  }
+  
   // Embaralha o array
   const shuffled = Hotels.sort(() => 0.5 - Math.random());
-  // Retorna os primeiros 'count' voos
+  
+  // Retorna os hotéis para a página atual
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
 /* === FUNCOES PARA PESQUISA DE HOTÉIS === */
@@ -227,13 +256,27 @@ export function getSearchData() {
 }
 /* Filtrar hotéis baseado nos dados de pesquisa */
 export function filterHotelsBySearchData(searchData) {
-  let hotels = getAll();
-  // Filtrar por destino (cidade)
+  let hotels = getAll();  // Filtrar por destino (cidade ou destinoId)
   if (searchData.destination) {
+    const destinoId = searchData.destination.id;
     const cidadeDestino = searchData.destination.cidade;
-    hotels = hotels.filter(hotel => 
-      hotel.cidade && hotel.cidade.toLowerCase() === cidadeDestino.toLowerCase()
-    );
+    
+    hotels = hotels.filter(hotel => {
+      // Verificar pelo destinoId (mais preciso)
+      if (hotel.destinoId && hotel.destinoId === destinoId) {
+        return true;
+      }
+      
+      // Verificar pela cidade como fallback
+      if (hotel.cidade && hotel.cidade.toLowerCase() === cidadeDestino.toLowerCase()) {
+        // Atualizar o hotel com o ID correto do destino para futuras buscas
+        hotel.destinoId = destinoId;
+        saveToLocalStorage("hoteis", hoteis);
+        return true;
+      }
+      
+      return false;
+    });
   }
   // Filtrar por capacidade baseado no número de hóspedes
   if (searchData.guests) {
