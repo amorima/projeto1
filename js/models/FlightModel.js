@@ -643,8 +643,13 @@ export function getTripsWithCoordinates() {
   const aps = getAeroportos();
   return viagens
     .map((trip) => {
+      /* Extrair nome da cidade do destino (formato: "XXX - Cidade") */
+      const cidadeDestino = trip.destino.includes(" - ")
+        ? trip.destino.split(" - ")[1]
+        : trip.destino;
+
       const ap = aps.find(
-        (a) => a.cidade.toLowerCase() === trip.destino.toLowerCase()
+        (a) => a.cidade.toLowerCase() === cidadeDestino.toLowerCase()
       );
       if (ap?.location) return { trip, coords: ap.location };
       return null;
@@ -658,8 +663,13 @@ export function getTripsWithCoordinates() {
  */
 export function getReviewsByDestino(destino) {
   const reviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+  /* Extrair nome da cidade do destino (formato: "XXX - Cidade") */
+  const cidadeDestino = destino.includes(" - ")
+    ? destino.split(" - ")[1]
+    : destino;
+
   return reviews.filter(
-    (review) => review.destino.toLowerCase() === destino.toLowerCase()
+    (review) => review.destino.toLowerCase() === cidadeDestino.toLowerCase()
   );
 }
 /**
@@ -688,9 +698,17 @@ export function getAllCompanhiasAereas() {
  * @returns {Array} - Array de voos disponíveis para o destino
  */
 export function getVoosByDestino(destino) {
-  return viagens.filter(
-    (viagem) => viagem.destino.toLowerCase() === destino.toLowerCase()
-  );
+  /* Extrair nome da cidade do destino (formato: "XXX - Cidade") */
+  const cidadeDestino = destino.includes(" - ")
+    ? destino.split(" - ")[1]
+    : destino;
+
+  return viagens.filter((viagem) => {
+    const cidadeViagem = viagem.destino.includes(" - ")
+      ? viagem.destino.split(" - ")[1]
+      : viagem.destino;
+    return cidadeViagem.toLowerCase() === cidadeDestino.toLowerCase();
+  });
 }
 /**
  * Obtém uma viagem pelo número do voo
@@ -771,30 +789,43 @@ export function filterFlights(searchData) {
   let flights = [...viagens];
   if (!searchData) return flights;
 
-  /* Debug - vamos ver o que recebemos */
-  console.log("Dados de pesquisa:", searchData);
-  console.log(
-    "Voos disponíveis:",
-    flights.map((f) => ({ origem: f.origem, destino: f.destino }))
-  );
-
   // Filter by origin
   if (searchData.origem) {
     flights = flights.filter((flight) => {
       if (!flight.origem) return false;
 
-      /* Obter a cidade da origem selecionada */
+      /* Se temos código do aeroporto, usar correspondência exata */
+      if (searchData.origem.codigo) {
+        const codigoOrigem = searchData.origem.codigo.toLowerCase();
+        return flight.origem
+          .toLowerCase()
+          .startsWith(codigoOrigem.toLowerCase() + " -");
+      }
+
+      /* Caso contrário, usar correspondência por cidade */
       const cidadeOrigem = searchData.origem.cidade || searchData.origem;
-      const codigoOrigem = searchData.origem.codigo || "";
-
-      /* Verificar se a origem do voo contém a cidade ou código */
       const origemVoo = flight.origem.toLowerCase();
-      const cidadeMatch =
-        cidadeOrigem && origemVoo.includes(cidadeOrigem.toLowerCase());
-      const codigoMatch =
-        codigoOrigem && origemVoo.includes(codigoOrigem.toLowerCase());
+      return origemVoo.includes(cidadeOrigem.toLowerCase());
+    });
+  }
 
-      return cidadeMatch || codigoMatch;
+  // Filter by destination
+  if (searchData.destino) {
+    flights = flights.filter((flight) => {
+      if (!flight.destino) return false;
+
+      /* Se temos código do aeroporto, usar correspondência exata */
+      if (searchData.destino.codigo) {
+        const codigoDestino = searchData.destino.codigo.toLowerCase();
+        return flight.destino
+          .toLowerCase()
+          .startsWith(codigoDestino.toLowerCase() + " -");
+      }
+
+      /* Caso contrário, usar correspondência por cidade */
+      const cidadeDestino = searchData.destino.cidade || searchData.destino;
+      const destinoVoo = flight.destino.toLowerCase();
+      return destinoVoo.includes(cidadeDestino.toLowerCase());
     });
   }
 

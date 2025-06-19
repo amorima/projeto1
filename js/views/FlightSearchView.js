@@ -115,15 +115,10 @@ function renderFlightCards(maxCards = 18) {
   const searchData = sessionStorage.getItem("planit_search");
   let flights = Flight.getAll();
 
-  console.log("Todos os voos:", flights.length);
-  console.log("Filtros atuais:", filters);
-
   // Apply search filters from PlanIt form if available
   if (searchData) {
     const parsedSearchData = JSON.parse(searchData);
-    console.log("Dados de pesquisa do sessionStorage:", parsedSearchData);
     flights = Flight.filterFlights(parsedSearchData);
-    console.log("Voos após filtro PlanIt:", flights.length);
   }
   // Apply additional UI filters
   flights = flights.filter((flight) => {
@@ -135,12 +130,15 @@ function renderFlightCards(maxCards = 18) {
       filters.origem !== "Origem" &&
       flight.origem
     ) {
-      /* Simplificar a verificação - verificar se contém a string */
+      /* Usar correspondência exata por código do aeroporto */
       const filtroOrigem = filters.origem.trim().toLowerCase();
       const origemVoo = flight.origem.trim().toLowerCase();
 
-      const origemMatch =
-        origemVoo.includes(filtroOrigem) || filtroOrigem.includes(origemVoo);
+      /* Extrair código do aeroporto do filtro */
+      const codigoFiltro = filtroOrigem.split(" - ")[0];
+
+      /* Verificar se o voo começa com o mesmo código */
+      const origemMatch = origemVoo.startsWith(codigoFiltro + " -");
       match = match && origemMatch;
     }
     // Destino filter (from UI)
@@ -151,13 +149,15 @@ function renderFlightCards(maxCards = 18) {
       filters.destino !== "Destino" &&
       flight.destino
     ) {
-      /* Simplificar a verificação - verificar se contém a string */
+      /* Usar correspondência exata por código do aeroporto */
       const filtroDestino = filters.destino.trim().toLowerCase();
       const destinoVoo = flight.destino.trim().toLowerCase();
 
-      const destinoMatch =
-        destinoVoo.includes(filtroDestino) ||
-        filtroDestino.includes(destinoVoo);
+      /* Extrair código do aeroporto do filtro */
+      const codigoFiltro = filtroDestino.split(" - ")[0];
+
+      /* Verificar se o voo começa com o mesmo código */
+      const destinoMatch = destinoVoo.startsWith(codigoFiltro + " -");
       match = match && destinoMatch;
     }
     // Date filters (from UI)
