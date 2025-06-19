@@ -6,10 +6,7 @@ import {
   loadComponent,
 } from "./ViewHelpers.js";
 import * as HotelModel from "../models/HotelModel.js";
-import {
-  getAll as getAllActivities,
-  getFirst,
-} from "../models/ActivityModel.js";
+import * as ActivityModel from "../models/ActivityModel.js";
 import * as FlightModel from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
 import { getDestinationByCity } from "../models/DestinationModel.js";
@@ -162,13 +159,16 @@ function carregarHoteis(destino) {
     HotelModel.init();
     let hoteis = [];
     if (destino) {
-      hoteis = HotelModel.getHoteisByCidade(destino);
+      // Extract city name if in "XXX - City" format
+      const cidadeNome = destino.includes(" - ") ? destino.split(" - ").pop() : destino;
+      
+      hoteis = HotelModel.getHoteisByCidade(cidadeNome);
       // fallback: tentar por destinoId se não encontrar por cidade
       if (!hoteis.length) {
         // procurar destinoId pelo nome da cidade
         const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
         const destinoObj = destinos.find(
-          (d) => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase()
+          (d) => d.cidade && d.cidade.toLowerCase() === cidadeNome.toLowerCase()
         );
         if (destinoObj && destinoObj.id) {
           hoteis = HotelModel.getHotelsFrom(destinoObj.id);
@@ -260,32 +260,38 @@ function carregarHoteis(destino) {
 }
 function carregarActividades(destino) {
   try {
-    let todasAtividades = getAllActivities();
+    ActivityModel.init(); // Initialize the model first
+    let todasAtividades = ActivityModel.getAll();
     let atividadesDestino = [];
     if (destino) {
-      // Tentar filtrar por cidade OU por destinoId
+      // Extract city name if in "XXX - City" format
+      const cidadeNome = destino.includes(" - ") ? destino.split(" - ").pop() : destino;
+      
+      // Get the destination object to find its ID
       const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
       const destinoObj = destinos.find(
-        (d) => d.cidade && d.cidade.toLowerCase() === destino.toLowerCase()
+        (d) => d.cidade && d.cidade.toLowerCase() === cidadeNome.toLowerCase()
       );
-      atividadesDestino = todasAtividades.filter((a) => {
-        // Match por nome da cidade (caso antigo)
-        if (
-          typeof a.destino === "string" &&
-          a.destino.toLowerCase() === destino.toLowerCase()
-        )
-          return true;
-        // Match por destinoId (caso novo)
-        if (
-          (a.destinoId || a.destino) &&
-          destinoObj &&
-          (a.destinoId === destinoObj.id || a.destino === destinoObj.id)
-        )
-          return true;
-        return false;
-      });
+      
+      if (destinoObj) {
+        // Filter activities by destinoId
+        atividadesDestino = todasAtividades.filter((a) => 
+          a.destinoId === destinoObj.id
+        );
+      } else {
+        // Fallback: try to match by string comparison for older data
+        atividadesDestino = todasAtividades.filter((a) => {
+          // Match por nome da cidade (caso antigo)
+          if (
+            typeof a.destino === "string" &&
+            a.destino.toLowerCase() === cidadeNome.toLowerCase()
+          )
+            return true;
+          return false;
+        });
+      }
     } else {
-      atividadesDestino = getFirst(5);
+      atividadesDestino = ActivityModel.getFirst(5);
     }
     const containerAtividades = document.getElementById("container-atividades");
     if (containerAtividades && atividadesDestino.length > 0) {
@@ -690,14 +696,14 @@ document.addEventListener("DOMContentLoaded", () => {
   User.init();
   const params = new URLSearchParams(window.location.search);
   const numeroVoo = params.get("id");
-  let destinoVoo = null;
-  let voo = null;
+  let destinoVoo = null;  let voo = null;
   if (numeroVoo) {
     FlightModel.init();
     voo = FlightModel.getByNumeroVoo(numeroVoo);
     if (voo) {
       vooShallow = { ...voo };
-      destinoVoo = voo.destino;
+      // Extract city name from "XXX - City" format for loading activities and hotels
+      destinoVoo = voo.destino?.includes(" - ") ? voo.destino.split(" - ").pop() : voo.destino;
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
       atualizarSidebarVoo(voo);
@@ -775,20 +781,25 @@ function atualizarHeroVoo(voo) {
 
   const heroImg = document.querySelector(".w-full.h-full.object-cover");
   const itineraryImg = document.getElementById("itinerary-card-img");
-
   if (heroImg) {
+    // Extract clean city name from "XXX - City" format
+    const cleanCityName = voo.destino?.includes(" - ") 
+      ? voo.destino.split(" - ").pop() 
+      : voo.destino;
+    
     // Prioriza a imagem do destino carregada pelo admin.
-    const destinoEncontrado = getDestinationByCity(cidadeDestino);
+    const destinoEncontrado = getDestinationByCity(cleanCityName);
 
     let imgSrc = "";
     if (destinoEncontrado && destinoEncontrado.imagem) {
+      // Admin-created destination with custom image (including base64)
       imgSrc = destinoEncontrado.imagem;
     } else if (voo.imagem) {
       // Fallback para a imagem do voo
       imgSrc = voo.imagem;
     } else {
       // Fallback para imagem de diretório
-      imgSrc = `/img/destinos/${cidadeDestino}/1.jpg`;
+      imgSrc = `img/destinos/${cleanCityName}/1.jpg`;
     }
 
     heroImg.src = imgSrc;
@@ -830,10 +841,13 @@ function atualizarItinerarioVoo(voo) {
   // Conteúdo à esquerda
   const conteudo = itinerarioDiv.querySelector(
     ".flex.flex-col.gap-2.text-left.flex-1"
-  );
-  if (conteudo) {
+  );  if (conteudo) {
+    // Extract city names for display
+    const origemCidade = voo.origem?.includes(" - ") ? voo.origem.split(" - ").pop() : voo.origem;
+    const destinoCidade = voo.destino?.includes(" - ") ? voo.destino.split(" - ").pop() : voo.destino;
+    
     conteudo.innerHTML = `
-      <span class='font-bold text-lg'>${voo.origem} → ${voo.destino}</span>
+      <span class='font-bold text-lg'>${origemCidade} → ${destinoCidade}</span>
       <span class='text-gray-500'>${formatDatesForDisplayPt(
         voo.partida,
         voo.dataVolta || voo.chegada

@@ -875,9 +875,12 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
   const shuffled = Flight.getTripsFrom(filtro);
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
-  container.innerHTML = "";
-  shuffled.forEach((viagem) => {
-    const cidade = viagem.destino || "Destino";
+  container.innerHTML = "";  shuffled.forEach((viagem) => {
+    // Extract only the city name from "XXX - City" format
+    const destinoCompleto = viagem.destino || "Destino";
+    const cidade = destinoCompleto.includes(" - ") 
+      ? destinoCompleto.split(" - ")[1] 
+      : destinoCompleto;
     const formatarData = (dataStr) => {
       if (!dataStr) return "";
       const [dia, mes, anoHora] = dataStr.split("/");

@@ -357,7 +357,30 @@ function createFlight() {
     try {
         const form = document.getElementById('add_flight_form');
         const formData = new FormData(form);
-          const flightData = {
+        
+        // Extract city name from destination (format: "XXX - CityName")
+        const destinoCompleto = formData.get('to');
+        const cityName = destinoCompleto.includes(' - ') 
+            ? destinoCompleto.split(' - ')[1] 
+            : destinoCompleto;
+        
+        // Try to get the actual destination image from localStorage
+        let imagemUrl = `/img/destinos/${cityName}/1.jpg`; // Default fallback
+        
+        try {
+            const destinosData = localStorage.getItem('destinos');
+            if (destinosData) {
+                const destinos = JSON.parse(destinosData);
+                const destinoEncontrado = destinos.find(dest => dest.cidade === cityName);
+                if (destinoEncontrado && destinoEncontrado.imagem) {
+                    imagemUrl = destinoEncontrado.imagem;
+                }
+            }
+        } catch (error) {
+            console.log('Could not load destination image, using default path');
+        }
+        
+        const flightData = {
             numeroVoo: formData.get('name'),
             origem: formData.get('from'),
             destino: formData.get('to'),
@@ -366,7 +389,7 @@ function createFlight() {
             chegada: '', // Could be calculated or left empty
             direto: formData.get('direct') === 'Sim' ? 'S' : 'N',
             custo: parseFloat(formData.get('custo')) || 0,
-            imagem: 'https://placehold.co/413x327', // Default placeholder
+            imagem: imagemUrl, // Use actual destination image or default path
             dataVolta: '' // Default empty
         };
         // Validation
@@ -434,7 +457,30 @@ function updateFlight() {
     try {
         const form = document.getElementById('add_flight_form');
         const formData = new FormData(form);
-          const flightData = {
+        
+        // Extract city name from destination (format: "XXX - CityName")
+        const destinoCompleto = formData.get('to');
+        const cityName = destinoCompleto.includes(' - ') 
+            ? destinoCompleto.split(' - ')[1] 
+            : destinoCompleto;
+        
+        // Try to get the actual destination image from localStorage
+        let imagemUrl = `/img/destinos/${cityName}/1.jpg`; // Default fallback
+        
+        try {
+            const destinosData = localStorage.getItem('destinos');
+            if (destinosData) {
+                const destinos = JSON.parse(destinosData);
+                const destinoEncontrado = destinos.find(dest => dest.cidade === cityName);
+                if (destinoEncontrado && destinoEncontrado.imagem) {
+                    imagemUrl = destinoEncontrado.imagem;
+                }
+            }
+        } catch (error) {
+            console.log('Could not load destination image, using default path');
+        }
+        
+        const flightData = {
             numeroVoo: formData.get('name'),
             origem: formData.get('from'),
             destino: formData.get('to'),
@@ -443,7 +489,7 @@ function updateFlight() {
             chegada: '', // Keep existing or empty
             direto: formData.get('direct') === 'Sim' ? 'S' : 'N',
             custo: parseFloat(formData.get('custo')) || 0,
-            imagem: 'https://placehold.co/413x327', // Keep existing or default
+            imagem: imagemUrl, // Use actual destination image or default path
             dataVolta: '' // Keep existing or empty
         };
         // Validation
