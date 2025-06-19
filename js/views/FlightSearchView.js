@@ -48,11 +48,11 @@ function preencherCamposPesquisa() {
       ? `${dados.destino.codigo || "XXX"} - ${dados.destino.cidade}`
       : dados.destino;
     destinoDiv.textContent = destinoText;
-  }
-  // Datas e viajantes
-  const datasDiv = document.querySelectorAll("form > div")[1];
-  if (datasDiv && dados.dataPartida) {
-    const datasP = datasDiv.querySelector("p");
+  } // Datas e viajantes
+  const btnDatas = document.getElementById("btn-datas");
+  if (btnDatas && dados.dataPartida) {
+    /* Seleciona especificamente os elementos dentro do botão btn-datas */
+    const datasP = btnDatas.querySelector("div:first-child p");
     const dataText =
       dados.tripType === "ida"
         ? dados.dataPartida
@@ -60,7 +60,8 @@ function preencherCamposPesquisa() {
         ? "Multitrip"
         : `${dados.dataPartida} - ${dados.dataRegresso || ""}`;
     if (datasP) datasP.textContent = dataText;
-    const viajantesP = datasDiv.querySelectorAll("p")[1];
+
+    const viajantesP = btnDatas.querySelector("div:nth-child(2) p");
     const viajantes =
       (dados.adultos || 1) + (dados.criancas || 0) + (dados.bebes || 0);
     if (viajantesP)

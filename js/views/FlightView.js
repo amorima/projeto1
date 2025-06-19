@@ -535,10 +535,17 @@ function updateDatesButton(
   const travelersText =
     totalTravelers === 1 ? "1 Viajante" : `${totalTravelers} Viajantes`;
   const btnDatas = document.getElementById("btn-datas");
-  const textoDatas = btnDatas.querySelector("div:first-child p");
-  const textoViajantesElemento = btnDatas.querySelector("div:nth-child(2) p");
-  textoDatas.textContent = formattedDates;
-  textoViajantesElemento.textContent = travelersText;
+
+  /* Verifica se os elementos existem antes de alterar */
+  const textoDatas = btnDatas?.querySelector("div:first-child p");
+  const textoViajantesElemento = btnDatas?.querySelector("div:nth-child(2) p");
+
+  if (textoDatas) {
+    textoDatas.textContent = formattedDates;
+  }
+  if (textoViajantesElemento) {
+    textoViajantesElemento.textContent = travelersText;
+  }
 }
 function fecharModalDatas() {
   deixarScroll(); /* Deixar scroll da pagina voltar */
@@ -875,11 +882,12 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
   const shuffled = Flight.getTripsFrom(filtro);
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
-  container.innerHTML = "";  shuffled.forEach((viagem) => {
+  container.innerHTML = "";
+  shuffled.forEach((viagem) => {
     // Extract only the city name from "XXX - City" format
     const destinoCompleto = viagem.destino || "Destino";
-    const cidade = destinoCompleto.includes(" - ") 
-      ? destinoCompleto.split(" - ")[1] 
+    const cidade = destinoCompleto.includes(" - ")
+      ? destinoCompleto.split(" - ")[1]
       : destinoCompleto;
     const formatarData = (dataStr) => {
       if (!dataStr) return "";
