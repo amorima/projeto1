@@ -23,6 +23,7 @@ function preencherCamposPesquisa() {
   const params = sessionStorage.getItem("planit_search");
   if (!params) return null;
   const dados = JSON.parse(params);
+
   // Origem
   const origemBtn = document.querySelector("#btn-open p");
   if (origemBtn && dados.origem) {
@@ -30,7 +31,10 @@ function preencherCamposPesquisa() {
       ? `${dados.origem.codigo || "XXX"} - ${dados.origem.cidade}`
       : dados.origem;
     origemBtn.textContent = origemText;
+    /* Atualizar filtro global */
+    filters.origem = origemText;
   }
+
   // Destino
   const destinoBtn = document.querySelector("#btn-destino p");
   if (destinoBtn && dados.destino) {
@@ -38,7 +42,10 @@ function preencherCamposPesquisa() {
       ? `${dados.destino.codigo || "XXX"} - ${dados.destino.cidade}`
       : dados.destino;
     destinoBtn.textContent = destinoText;
+    /* Atualizar filtro global */
+    filters.destino = destinoText;
   }
+
   // Caso o destino seja um div (como no HTML), procurar pelo texto
   const destinoDiv =
     document.querySelector('div[aria-label="destino"] p') ||
@@ -48,6 +55,10 @@ function preencherCamposPesquisa() {
       ? `${dados.destino.codigo || "XXX"} - ${dados.destino.cidade}`
       : dados.destino;
     destinoDiv.textContent = destinoText;
+    /* Atualizar filtro global se não foi feito antes */
+    if (!filters.destino) {
+      filters.destino = destinoText;
+    }
   } // Datas e viajantes
   const btnDatas = document.getElementById("btn-datas");
   if (btnDatas && dados.dataPartida) {
@@ -68,7 +79,15 @@ function preencherCamposPesquisa() {
       viajantesP.textContent = `${viajantes} Viajante${
         viajantes > 1 ? "s" : ""
       }`;
+
+    /* Atualizar filtros globais */
+    filters.dataPartida = dados.dataPartida || "";
+    filters.dataRegresso = dados.dataRegresso || "";
+    filters.adultos = dados.adultos || 1;
+    filters.criancas = dados.criancas || 0;
+    filters.bebes = dados.bebes || 0;
   }
+
   // Tipo de turismo
   const tipoTurismoP = document.getElementById("texto-tipo-turismo");
   if (tipoTurismoP && dados.tipoTurismo) {
@@ -76,6 +95,8 @@ function preencherCamposPesquisa() {
       ? dados.tipoTurismo.nome
       : dados.tipoTurismo;
     tipoTurismoP.textContent = tipoText !== "Nenhum" ? tipoText : "Nenhum";
+    /* Atualizar filtro global */
+    filters.tipoTurismo = tipoText;
   } // Acessibilidade - Don't set directly here, let the DOMContentLoaded handler set it properly
   // The accessibility button will be updated after processing the indices
 
@@ -119,10 +140,11 @@ function renderFlightCards(maxCards = 18) {
   if (searchData) {
     const parsedSearchData = JSON.parse(searchData);
     flights = Flight.filterFlights(parsedSearchData);
-  }
-  // Apply additional UI filters
+  } // Apply additional UI filters
   flights = flights.filter((flight) => {
-    let match = true; // Origem filter (from UI)
+    let match = true;
+
+    // Origem filter (from UI)
     if (
       filters.origem &&
       filters.origem !== "Qualquer" &&
@@ -141,6 +163,7 @@ function renderFlightCards(maxCards = 18) {
       const origemMatch = origemVoo.startsWith(codigoFiltro + " -");
       match = match && origemMatch;
     }
+
     // Destino filter (from UI)
     if (
       filters.destino &&
@@ -463,17 +486,20 @@ document.addEventListener("DOMContentLoaded", () => {
   Flight.init();
   User.init();
   // Fill search fields from sessionStorage
-  const planitFilter = preencherCamposPesquisa();
-  // Update filters from search data or UI
+  const planitFilter = preencherCamposPesquisa(); // Update filters from search data or UI
   if (planitFilter) {
-    // Update filters from search data
+    // Update filters from search data - usar formato completo "CÓDIGO - Cidade"
     filters.origem =
       planitFilter.origem && planitFilter.origem.cidade
-        ? planitFilter.origem.cidade
+        ? `${planitFilter.origem.codigo || "XXX"} - ${
+            planitFilter.origem.cidade
+          }`
         : "";
     filters.destino =
       planitFilter.destino && planitFilter.destino.cidade
-        ? planitFilter.destino.cidade
+        ? `${planitFilter.destino.codigo || "XXX"} - ${
+            planitFilter.destino.cidade
+          }`
         : "";
     filters.tipoTurismo =
       planitFilter.tipoTurismo && planitFilter.tipoTurismo.nome
