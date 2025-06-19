@@ -53,7 +53,7 @@ initView();
  */
 function initView() {  getUserLocation((location) => {
     if (!location) return;
-    const aeroportos = Flight.getAirports();
+    const aeroportos = Flight.getAeroportosComCoordenadas();
     const closest = closestAirport(location, aeroportos);
     const btnOpenElement = document.querySelector("#btn-open p");
     if (btnOpenElement && closest) {
@@ -66,7 +66,22 @@ function initView() {  getUserLocation((location) => {
   setupTripTypeButtons();
   initGamificationModal();
   setupNewsletterForm();  if (document.querySelector(".card-viagens")) {
-    renderRandomOPOCards("card-viagens", "all");
+    /* Obtém a localização do utilizador e mostra voos da origem mais próxima */
+    getUserLocation((location) => {
+      if (location) {
+        const aeroportos = Flight.getAeroportosComCoordenadas();
+        const closest = closestAirport(location, aeroportos);
+        if (closest) {
+          const origemProxima = `${closest.codigo} - ${closest.cidade}`;
+          renderRandomOPOCards("card-viagens", origemProxima);
+        } else {
+          renderRandomOPOCards("card-viagens");
+        }
+      } else {
+        /* Sem localização, usa comportamento padrão */
+        renderRandomOPOCards("card-viagens");
+      }
+    });
   }
   const data = Flight.getAll();
   const config = createTableConfig(data);
@@ -793,7 +808,13 @@ function createFlight(config) {
   updateTable(config);
 }
 /* Renderizar cards na homepage */
-export function renderRandomOPOCards(containerClass, filtro = "OPO - Porto") {
+export function renderRandomOPOCards(containerClass, filtro = null) {
+  /* Se não for especificada uma origem, tenta usar a origem do formulário */
+  if (filtro === null) {
+    const origemSelecionada = Flight.getSelectedOrigin();
+    filtro = origemSelecionada ? `${origemSelecionada.codigo} - ${origemSelecionada.cidade}` : "all";
+  }
+  
   const shuffled = Flight.getTripsFrom(filtro);
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;

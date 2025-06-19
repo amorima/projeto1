@@ -895,3 +895,45 @@ export function resetState() {
     }
   ];
 }
+/**
+ * Retorna todos os aeroportos com coordenadas geográficas
+ * @returns {Array<{cidade:string,location:{latitude:number,longitude:number}}>}
+ * - Array de objetos com a cidade e as coordenadas (latitude, longitude)
+ */
+export function getAeroportosComCoordenadas() {
+  /* Aeroportos básicos da localStorage */
+  const aeroportosBase = JSON.parse(localStorage.getItem("aeroportos")) || [];
+  
+  /* Coordenadas padrão de alguns aeroportos principais */
+  const coordenadasPadrao = {
+    "OPO": { latitude: 41.248, longitude: -8.681 },
+    "LIS": { latitude: 38.774, longitude: -9.134 },
+    "MAD": { latitude: 40.416, longitude: -3.703 },
+    "BCN": { latitude: 41.297, longitude: 2.083 },
+    "PAR": { latitude: 49.009, longitude: 2.547 },
+    "LON": { latitude: 51.471, longitude: -0.461 },
+    "AMS": { latitude: 52.310, longitude: 4.768 },
+    "ROM": { latitude: 41.804, longitude: 12.250 },
+    "BER": { latitude: 52.366, longitude: 13.503 }
+  };
+  
+  /* Adiciona coordenadas aos aeroportos que não têm */
+  return aeroportosBase.map(aeroporto => {
+    if (aeroporto.location) return aeroporto;
+    
+    /* Extrair código do aeroporto */
+    let codigo = "";
+    if (aeroporto.codigo) {
+      codigo = aeroporto.codigo.split(" ")[0];
+    }
+    
+    /* Adicionar coordenadas padrão se disponíveis, ou uma estimativa */
+    return {
+      ...aeroporto,
+      location: coordenadasPadrao[codigo] || { 
+        latitude: 41.0 + Math.random() * 10, 
+        longitude: -5.0 + Math.random() * 15 
+      }
+    };
+  });
+}
