@@ -6,15 +6,39 @@ import {
   getVoosByDestino,
 } from "../models/FlightModel.js";
 import * as User from "../models/UserModel.js";
+import { showToast } from "./ViewHelpers.js";
 document.addEventListener("DOMContentLoaded", () => {
+  // Check if key HTML elements exist
+  const mapElement = document.getElementById("map");
+  const panelElement = document.getElementById("slide-panel");
+  const headerElement = document.getElementById("header-placeholder");
+  
+  if (!mapElement || !panelElement) {
+    return;
+  }
+
+  // Declare enriched variable to be accessible throughout the function
+  let enriched = [];
+  
   // Inicialização do modelo de viagens
-  User.init();
-  init();
-  const enriched = getTripsWithCoordinates();
+  try {
+    User.init();
+    init();
+    enriched = getTripsWithCoordinates();
+  } catch (error) {
+    return;
+  }
+  
   // URLs para tile layers claro e escuro
   const lightTileUrl = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
   const darkTileUrl =
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+  
+  // Check if Leaflet is available
+  if (typeof L === 'undefined') {
+    return;
+  }
+  
   // Criação do mapa centrado na Europa e layer inicial conforme o tema
   const map = L.map("map", { zoomControl: false }).setView([47.526, 8.2551], 5);
   const baseLayer = L.tileLayer(
@@ -23,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       : lightTileUrl,
     { attribution: "&copy; OpenStreetMap - ESMAD - P.PORTO" }
   ).addTo(map);
+  
   // Observa alterações na classe 'dark' para alternar o tile layer
   new MutationObserver((mutations) => {
     for (const m of mutations) {
@@ -31,11 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
         baseLayer.setUrl(isDark ? darkTileUrl : lightTileUrl);
       }
     }
-  }).observe(document.documentElement, { attributes: true }); // Configuração do painel deslizante usando classes Tailwind
+  }).observe(document.documentElement, { attributes: true });
+  
+  // Configuração do painel deslizante usando classes Tailwind
   const panel = document.getElementById("slide-panel");
+  
+  if (!panel) {
+    return;
+  }
+  
   panel.className =
     "fixed top-24 left-0 bottom-0 w-0 overflow-hidden transition-all duration-300 ease-in-out " +
     "shadow-md z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans custom-scrollbar";
+    
   // Adicionando estilo personalizado para a barra de rolagem
   const styleElement = document.createElement("style");
   styleElement.textContent = `
@@ -54,8 +87,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   `;
   document.head.appendChild(styleElement);
+  
   // Certifica que o painel está acima do mapa
-  document.getElementById("map").style.zIndex = "10";
+  if (!mapElement) {
+    return;
+  }
+  
+  mapElement.style.zIndex = "10";
+  
   /**
    * Preenche o painel com os dados da viagem e anima a sua aparição.
    * Exibe informações detalhadas sobre o destino, voos disponíveis e avaliações dos usuários.
@@ -64,13 +103,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Buscar informações adicionais
     const reviews = getReviewsByDestino(trip.destino);
     const voos = getVoosByDestino(trip.destino);
-    // Calcular média das avaliações
-    const avaliacoes = reviews.map((review) => review.avaliacao);
+    
+    // Calcular média das avaliações - filtrar apenas avaliações válidas
+    const avaliacoes = reviews.map((review) => review.avaliacao).filter(rating => rating && rating > 0);
     const mediaAvaliacoes = avaliacoes.length
       ? (avaliacoes.reduce((a, b) => a + b, 0) / avaliacoes.length).toFixed(1)
       : "0.0";
+    
     // Obter usuário atual (se logado)
     const currentUser = User.getUserLogged();
+    
     // Montar o conteúdo do painel
     panel.innerHTML = `
       <div class="relative">
@@ -79,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }" class="w-full h-48 object-cover"/>
         <button id="close-panel" class="absolute top-2 right-2 text-2xl bg-black bg-opacity-50 text-white rounded-full w-8 h-8 flex items-center justify-center">✕</button>
       </div>
-        <!-- Cabeçalho com informações básicas do destino -->
+      <!-- Cabeçalho com informações básicas do destino -->
       <div class="p-4 border-b border-gray-200 dark:border-gray-700">
         <h2 class="text-2xl font-bold">${trip.destino}</h2>
         <!-- Exibição da classificação média -->
@@ -96,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <h3 class="text-lg font-semibold mb-3">Voos disponíveis</h3>
         <div class="space-y-4" id="voos-disponiveis"></div>
       </div>
-        <!-- Seção de avaliações -->
+      <!-- Seção de avaliações -->
       <div class="p-4 border-b border-gray-200 dark:border-gray-700">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-lg font-mono font-semibold"><span class="font-bold font-['Space_Mono']">Review</span><span class="font-['Space_Mono'] italic">It</span></h3>
@@ -106,12 +148,11 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
         <div id="reviews-container" class="space-y-4"></div>
       </div>
-    `; // Geração de estrelas da avaliação média
+    `;
+
+    // Geração de estrelas da avaliação média
     const ratingDiv = panel.querySelector("#rating");
-    const mediaEstrelas =
-      parseFloat(
-        mediaAvaliacoes
-      ); /* Lógica revista para exibir as estrelas corretamente */
+    const mediaEstrelas = parseFloat(mediaAvaliacoes);
     for (let i = 1; i <= 5; i++) {
       const star = document.createElement("span");
       star.className = "material-symbols-outlined text-yellow-400";
@@ -135,10 +176,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         // Estrela vazia: todos os outros casos
         star.textContent = "star_border";
-        // Não aplicamos FILL em estrelas vazias
+        star.style.fontVariationSettings = "'FILL' 0";
       }
       ratingDiv.appendChild(star);
     }
+    
     // Preencher a seção de voos disponíveis
     const voosContainer = panel.querySelector("#voos-disponiveis");
     if (voos.length === 0) {
@@ -193,13 +235,15 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         // Adiciona evento de clique para redirecionar
         vooElement.addEventListener("click", () => {
-          window.location.href = `flight_itinerary.html?id=${encodeURIComponent(voo.numeroVoo)}`;
+          window.location.href = `flight_itinerary.html?id=${voo.numeroVoo}`;
         });
         voosContainer.appendChild(vooElement);
       });
     }
+    
     // Preencher a seção de avaliações
     const reviewsContainer = panel.querySelector("#reviews-container");
+    
     if (reviews.length === 0) {
       reviewsContainer.innerHTML =
         '<p class="text-gray-500 dark:text-gray-400 italic">Nenhuma avaliação disponível para este destino.</p>';
@@ -208,51 +252,43 @@ document.addEventListener("DOMContentLoaded", () => {
         // Criar elemento de revisão
         const reviewElement = document.createElement("div");
         reviewElement.className = "bg-gray-50 dark:bg-gray-900 rounded-lg p-3";
+        
         // Determinar tipo de usuário baseado na pontuação de avaliação
         let userType = "Aventureiro"
         if(User.getUserByName(review.nomePessoa)){
-          const user = User.getUserByName(review.nomePessoa);
-          if (user.pontos >= 5000) {
-            userType = "Embaixador";
-          } else if (user.pontos >= 3000) {
-            userType = "Globetrotter";
-          } else if (user.pontos >= 1500) {
-            userType = "Aventureiro";
-          } else if (user.pontos >= 250) {
-            userType = "Viajante";
-          } else {
-            userType = "Explorador";
+          const userPoints = User.getUserByName(review.nomePessoa).pontos;
+          if (userPoints >= 2000) {
+            userType = "Explorador Elite";
+          } else if (userPoints >= 1000) {
+            userType = "Viajante Experiente";
+          } else if (userPoints >= 500) {
+            userType = "Descobridor";
           }
         } else {
-          userType = "Explorador";
+          userType = "Viajante";
         }
+        
         // Tentar obter a imagem do usuário, se disponível
         const userImage = User.getUserImage(review.nomePessoa);
         let htmlAdd = "";
+        
         // Corrigir caminho do avatar como no NavbarView.js
         let avatarPath = null;
         if (userImage) {
-          if (userImage.startsWith("data:")) {
-            avatarPath = userImage;
+          if (userImage.startsWith("/")) {
+            avatarPath = ".." + userImage;
           } else if (userImage.startsWith("../")) {
             avatarPath = userImage;
           } else {
-            avatarPath = `..${userImage}`;
+            avatarPath = "../" + userImage;
           }
-          htmlAdd = `
-            <div class="flex-shrink-0">
-              <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl">
-                <img src="${avatarPath}" alt="${review.nomePessoa}" class="w-10 h-10 rounded-full object-cover"></img>
-              </div>
-            </div>`
+          htmlAdd = `<img src="${avatarPath}" alt="${review.nomePessoa}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">`;
         } else {
-          htmlAdd = `
-            <div class="flex-shrink-0">
-              <div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-xl">
-                ${review.nomePessoa.charAt(0)}
-              </div>
-            </div>`
+          htmlAdd = `<div class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+            <span class="text-gray-600 dark:text-gray-300 text-sm font-semibold">${review.nomePessoa.charAt(0)}</span>
+          </div>`;
         }
+        
         // Gerar HTML da revisão
         reviewElement.innerHTML = `
           <div class="flex items-start">
@@ -306,17 +342,25 @@ document.addEventListener("DOMContentLoaded", () => {
         reviewsContainer.appendChild(reviewElement);
       });
     }
+    
     // Funcionalidade para adicionar nova avaliação
     const addReviewBtn = panel.querySelector("#add-review");
+    
     addReviewBtn.addEventListener("click", () => {
       if (!currentUser) {
         window.location.href = "_login.html?redirect=explore.html";
       } else {
+        // Verificar se já existe um modal
+        const existingModal = document.getElementById("review-modal");
+        if (existingModal) {
+          existingModal.remove();
+        }
+        
         // Criar modal para adicionar avaliação
-        if (document.getElementById("review-modal")) return; // Evita múltiplos modais
         const modal = document.createElement("div");
         modal.id = "review-modal";
         modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
+        
         modal.innerHTML = `
           <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 w-full max-w-md relative">
             <button id="close-review-modal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl">&times;</button>
@@ -339,10 +383,17 @@ document.addEventListener("DOMContentLoaded", () => {
             </form>
           </div>
         `;
-        document.body.appendChild(modal);        // Star rating logic
+        
+        document.body.appendChild(modal);
+        
+        // Verify modal was added and check computed styles
+        const addedModal = document.getElementById("review-modal");
+        
+        // Star rating logic
         let selectedRating = 0;
         const stars = modal.querySelectorAll('#star-input span');
-        stars.forEach(star => {
+        
+        stars.forEach((star, index) => {
           star.addEventListener('mouseenter', () => {
             const val = +star.dataset.value;
             stars.forEach((s, i) => {
@@ -357,6 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
               }
             });
           });
+          
           star.addEventListener('mouseleave', () => {
             stars.forEach((s, i) => {
               if (i < selectedRating) {
@@ -370,6 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
               }
             });
           });
+          
           star.addEventListener('click', () => {
             selectedRating = +star.dataset.value;
             stars.forEach((s, i) => {
@@ -385,42 +438,133 @@ document.addEventListener("DOMContentLoaded", () => {
             });
           });
         });
+        
         // Close modal logic
-        modal.querySelector('#close-review-modal').onclick = () => modal.remove();
-        modal.querySelector('#cancel-review').onclick = () => modal.remove();
-        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        const closeModalBtn = modal.querySelector('#close-review-modal');
+        const cancelBtn = modal.querySelector('#cancel-review');
+        
+        if (closeModalBtn) {
+          closeModalBtn.onclick = () => {
+            modal.remove();
+          };
+        }
+        
+        if (cancelBtn) {
+          cancelBtn.onclick = () => {
+            modal.remove();
+          };
+        }
+        
+        modal.addEventListener('click', e => { 
+          if (e.target === modal) {
+            modal.remove();
+          }
+        });
+        
         // Submit review
-        modal.querySelector('#review-form').onsubmit = (e) => {
+        const reviewForm = modal.querySelector('#review-form');
+        
+        if (!reviewForm) {
+          return;
+        }
+        
+        reviewForm.onsubmit = (e) => {
           e.preventDefault();
-          const comment = modal.querySelector('#review-comment').value.trim();
-          if (!selectedRating || !comment) {
-            alert('Por favor, preencha todos os campos e selecione uma classificação.');
+          
+          const commentTextarea = modal.querySelector('#review-comment');
+          
+          if (!commentTextarea) {
             return;
           }
+          
+          const comment = commentTextarea.value.trim();
+          
+          if (!selectedRating || !comment) {
+            showToast('Por favor, preencha todos os campos e selecione uma classificação.', 'error');
+            return;
+          }
+          
+          // Check if user already reviewed this destination (for points logic only)
+          const existingReviews = getReviewsByDestino(trip.destino);
+          
+          const userAlreadyReviewed = existingReviews.some(review => 
+            review.nomePessoa === currentUser.username
+          );
+          
+          // Note: We no longer prevent multiple reviews, just track for points
+          const isFirstReview = !userAlreadyReviewed;
+          
           // Adiciona o comentário usando a função do UserModel
           try {
+            // Extract city name from destination format "XXX - City" to match getReviewsByDestino logic
+            const cidadeDestino = trip.destino.includes(" - ") 
+              ? trip.destino.split(" - ")[1] 
+              : trip.destino;
+            
+            const reviewData = { 
+              comentario: comment, 
+              avaliacao: selectedRating, 
+              data: new Date().toISOString(),
+              nomePessoa: currentUser.username
+            };
+            
+            // Create a place object with just the city name to match how getReviewsByDestino works
+            const placeForReview = { 
+              destino: cidadeDestino,
+              name: cidadeDestino
+            };
+            
             // O addComment espera (user, place, comment). Vamos passar um objeto com rating e texto.
-            User.addComment(currentUser, trip, { texto: comment, avaliacao: selectedRating, data: new Date().toISOString() });
+            const result = User.addComment(currentUser, placeForReview, reviewData);
+            
+            // Award 20 points only for first review on this destination
+            if (isFirstReview) {
+              User.addPontos(currentUser, 20, `Primeira avaliação para ${cidadeDestino}`);
+              User.update(currentUser.id, currentUser);
+              
+              // Update session storage
+              sessionStorage.setItem("loggedUser", JSON.stringify(currentUser));
+              
+              // Show toast notification for points awarded
+              showToast(`Parabéns! Ganhou 20 pontos pela sua primeira avaliação em ${cidadeDestino}!`, "success");
+            } else {
+              showToast("Avaliação adicionada com sucesso!", "success");
+            }
+            
             modal.remove();
+            
+            // Debug: Check if the new review is in the data before refreshing
+            const updatedReviews = getReviewsByDestino(trip.destino);
+            
+            // Check if our new review is in the list
+            const ourNewReview = updatedReviews.find(r => r.id === result.id);
+            
             // Atualiza painel para mostrar nova avaliação
             showPanel(trip);
           } catch (err) {
-            alert('Erro ao adicionar avaliação: ' + err.message);
+            showToast('Erro ao adicionar avaliação: ' + err.message, 'error');
           }
         };
       }
     });
+    
     // Funcionalidade para responder às avaliações
     const replyButtons = panel.querySelectorAll(".review-reply-btn");
+    
     replyButtons.forEach((btn) => {
       btn.addEventListener("click", () => {
         if (!currentUser) {
-          alert("Por favor, faça login para responder a esta avaliação");
+          showToast("Por favor, faça login para responder a esta avaliação", "error");
           window.location.href = "_login.html?redirect=explore.html";
         } else {
           const reviewId = btn.dataset.reviewId;
+          
           // Modal para resposta
-          if (document.getElementById("reply-modal")) return;
+          const existingReplyModal = document.getElementById("reply-modal");
+          if (existingReplyModal) {
+            existingReplyModal.remove();
+          }
+          
           const replyModal = document.createElement("div");
           replyModal.id = "reply-modal";
           replyModal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40";
@@ -440,34 +584,53 @@ document.addEventListener("DOMContentLoaded", () => {
               </form>
             </div>
           `;
+          
           document.body.appendChild(replyModal);
+          
           // Fechar modal
-          replyModal.querySelector('#close-reply-modal').onclick = () => replyModal.remove();
-          replyModal.querySelector('#cancel-reply').onclick = () => replyModal.remove();
-          replyModal.addEventListener('click', e => { if (e.target === replyModal) replyModal.remove(); });
+          replyModal.querySelector('#close-reply-modal').onclick = () => {
+            replyModal.remove();
+          };
+          replyModal.querySelector('#cancel-reply').onclick = () => {
+            replyModal.remove();
+          };
+          replyModal.addEventListener('click', e => { 
+            if (e.target === replyModal) {
+              replyModal.remove();
+            }
+          });
+          
           // Submeter resposta
           replyModal.querySelector('#reply-form').onsubmit = (e) => {
             e.preventDefault();
+            
             const comment = replyModal.querySelector('#reply-comment').value.trim();
+            
             if (!comment) {
-              alert('Por favor, escreva a sua resposta.');
+              showToast('Por favor, escreva a sua resposta.', 'error');
               return;
             }
+            
             try {
-              User.addReplyToReview(reviewId, {
+              const replyData = {
                 nomePessoa: currentUser.username,
                 comentario: comment,
                 data: new Date().toISOString()
-              });
+              };
+              
+              const result = User.addReplyToReview(reviewId, replyData);
+              
               replyModal.remove();
               showPanel(trip);
             } catch (err) {
-              alert('Erro ao adicionar resposta: ' + err.message);
+              showToast('Erro ao adicionar resposta: ' + err.message, 'error');
             }
           };
         }
       });
-    }); // Fechar painel ao clicar no botão
+    });
+
+    // Fechar painel ao clicar no botão
     panel.querySelector("#close-panel").onclick = () => {
       // Adiciona overflow-hidden imediatamente para esconder o conteúdo durante a transição
       panel.className =
@@ -477,20 +640,22 @@ document.addEventListener("DOMContentLoaded", () => {
         panel.innerHTML = ""; // Sempre limpar o conteúdo após a animação
       }, 300); // tempo correspondente à duração da transição
     };
+    
     // Animação de abertura
     panel.classList.remove("w-0");
     panel.classList.remove("overflow-hidden"); // Remove a classe overflow-hidden
     panel.className =
       "fixed top-24 left-0 bottom-0 w-full sm:w-96 overflow-auto transition-all duration-300 ease-in-out shadow-md z-50 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-sans custom-scrollbar";
   }
+  
   /**
    * Função auxiliar para gerar as estrelas de avaliação
    * @param {number} rating - Valor da avaliação (1-5)
    * @returns {string} HTML com as estrelas
-   */ function generateStars(rating) {
+   */
+  function generateStars(rating) {
     let starsHTML = "";
-    const fullStars =
-      Math.floor(rating); /* Lógica revista para exibir estrelas corretamente */
+    const fullStars = Math.floor(rating);
     for (let i = 1; i <= 5; i++) {
       if (i <= fullStars) {
         // Estrela cheia: posição menor ou igual à parte inteira
@@ -512,6 +677,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return starsHTML;
   }
+  
   // Função para criar um marcador personalizado com o preço da viagem
   function criarMarcadorPreco(trip, latlng) {
     const customIcon = L.divIcon({
@@ -527,12 +693,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cria o marcador com o ícone personalizado
     return L.marker(latlng, { icon: customIcon });
   }
+  
   // Criação dos marcadores para cada viagem com coords
-  enriched.forEach(({ trip, coords }) => {
+  enriched.forEach(({ trip, coords }, index) => {
     const { latitude, longitude } = coords;
     // Cria um marcador personalizado com o preço
     const marker = criarMarcadorPreco(trip, [latitude, longitude]).addTo(map);
     // Adiciona o evento de clique para mostrar o painel
-    marker.on("click", () => showPanel(trip));
+    marker.on("click", () => {
+      showPanel(trip);
+    });
   });
 });
