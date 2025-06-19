@@ -76,11 +76,9 @@ function preencherCamposPesquisa() {
       ? dados.tipoTurismo.nome
       : dados.tipoTurismo;
     tipoTurismoP.textContent = tipoText !== "Nenhum" ? tipoText : "Nenhum";
-  }
-  // Acessibilidade
-  const acessibilidadeP = document.getElementById("texto-acessibilidade");
-  if (acessibilidadeP && dados.acessibilidade)
-    acessibilidadeP.textContent = dados.acessibilidade;
+  }  // Acessibilidade - Don't set directly here, let the DOMContentLoaded handler set it properly
+  // The accessibility button will be updated after processing the indices
+  
   // Tipo de viagem
   const tipoViagemP = document.getElementById("texto-tipo-viagem");
   if (tipoViagemP && dados.tripType) {
@@ -482,10 +480,39 @@ document.addEventListener("DOMContentLoaded", () => {
     filters.tipoTurismo =
       planitFilter.tipoTurismo && planitFilter.tipoTurismo.nome
         ? planitFilter.tipoTurismo.nome
-        : "";
-    filters.acessibilidade = Array.isArray(planitFilter.acessibilidade)
-      ? planitFilter.acessibilidade.join(", ")
-      : "";
+        : "";    // Handle accessibility data - could be names (strings) or indices (numbers)
+    if (Array.isArray(planitFilter.acessibilidade) && planitFilter.acessibilidade.length > 0) {
+      const allAccessibilities = Flight.getAccessibilities();
+      let accessibilityIndices = [];
+      
+      // Check if the data contains indices (numbers) or names (strings)
+      if (typeof planitFilter.acessibilidade[0] === 'number') {
+        // Data already contains indices
+        accessibilityIndices = planitFilter.acessibilidade;
+      } else {
+        // Data contains accessibility names, convert to indices
+        planitFilter.acessibilidade.forEach(accName => {
+          const index = allAccessibilities.findIndex(acc => acc === accName);
+          if (index !== -1) {
+            accessibilityIndices.push(index);
+          }
+        });
+      }
+      
+      // Set the selected accessories in FlightModel
+      Flight.clearSelectedAccessibilities(); // Clear current selection
+      accessibilityIndices.forEach(index => Flight.toggleAccessibility(index));
+      Flight.confirmAccessibilities(); // Save to localStorage
+      
+      // Get the actual accessibility names for filters
+      const accessibilityNames = accessibilityIndices.map(index => allAccessibilities[index]).filter(name => name);
+      filters.acessibilidade = accessibilityNames.join(", ");
+      
+      // Update accessibility button to show the correct text
+      updateAccessibilityButton();
+    } else {
+      filters.acessibilidade = "";
+    }
     filters.dataPartida = planitFilter.dataPartida || "";
     filters.dataRegresso = planitFilter.dataRegresso || "";
     filters.adultos = planitFilter.adultos || 1;
@@ -503,8 +530,7 @@ document.addEventListener("DOMContentLoaded", () => {
         criancas,
         bebes
       );
-    }
-  } else {
+    }  } else {
     // Fallback to reading from UI elements
     filters.origem =
       document.querySelector("#btn-open p")?.textContent.trim() || "";
@@ -522,10 +548,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const dt = Flight.getDatesTravelers();
       filters.dataPartida = dt.dataPartida;
       filters.dataRegresso = dt.dataRegresso;
-      filters.adultos = dt.adultos;
-      filters.criancas = dt.criancas;
+      filters.adultos = dt.adultos;      filters.criancas = dt.criancas;
       filters.bebes = dt.bebes;
     }
+    // Update accessibility button to reflect any saved selections
+    updateAccessibilityButton();
   }
   // Render initial flight cards with any available filters
   renderFlightCards();

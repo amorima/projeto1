@@ -398,6 +398,9 @@ export function confirmAccessibilities() {
     JSON.stringify(selectedAccessibilities)
   );
 }
+export function clearSelectedAccessibilities() {
+  selectedAccessibilities = [];
+}
 export function getSelectedAccessibilities() {
   return selectedAccessibilities;
 }
