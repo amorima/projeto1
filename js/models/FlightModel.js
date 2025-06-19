@@ -770,25 +770,52 @@ export function buildSearchData() {
 export function filterFlights(searchData) {
   let flights = [...viagens];
   if (!searchData) return flights;
+
+  /* Debug - vamos ver o que recebemos */
+  console.log("Dados de pesquisa:", searchData);
+  console.log(
+    "Voos disponíveis:",
+    flights.map((f) => ({ origem: f.origem, destino: f.destino }))
+  );
+
   // Filter by origin
-  if (searchData.origem && searchData.origem.cidade) {
-    flights = flights.filter(
-      (flight) =>
-        flight.origem &&
-        flight.origem
-          .toLowerCase()
-          .includes(searchData.origem.cidade.toLowerCase())
-    );
+  if (searchData.origem) {
+    flights = flights.filter((flight) => {
+      if (!flight.origem) return false;
+
+      /* Obter a cidade da origem selecionada */
+      const cidadeOrigem = searchData.origem.cidade || searchData.origem;
+      const codigoOrigem = searchData.origem.codigo || "";
+
+      /* Verificar se a origem do voo contém a cidade ou código */
+      const origemVoo = flight.origem.toLowerCase();
+      const cidadeMatch =
+        cidadeOrigem && origemVoo.includes(cidadeOrigem.toLowerCase());
+      const codigoMatch =
+        codigoOrigem && origemVoo.includes(codigoOrigem.toLowerCase());
+
+      return cidadeMatch || codigoMatch;
+    });
   }
+
   // Filter by destination
-  if (searchData.destino && searchData.destino.cidade) {
-    flights = flights.filter(
-      (flight) =>
-        flight.destino &&
-        flight.destino
-          .toLowerCase()
-          .includes(searchData.destino.cidade.toLowerCase())
-    );
+  if (searchData.destino) {
+    flights = flights.filter((flight) => {
+      if (!flight.destino) return false;
+
+      /* Obter a cidade do destino selecionado */
+      const cidadeDestino = searchData.destino.cidade || searchData.destino;
+      const codigoDestino = searchData.destino.codigo || "";
+
+      /* Verificar se o destino do voo contém a cidade ou código */
+      const destinoVoo = flight.destino.toLowerCase();
+      const cidadeMatch =
+        cidadeDestino && destinoVoo.includes(cidadeDestino.toLowerCase());
+      const codigoMatch =
+        codigoDestino && destinoVoo.includes(codigoDestino.toLowerCase());
+
+      return cidadeMatch || codigoMatch;
+    });
   }
   // Filter by tourism type
   if (

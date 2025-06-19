@@ -76,9 +76,9 @@ function preencherCamposPesquisa() {
       ? dados.tipoTurismo.nome
       : dados.tipoTurismo;
     tipoTurismoP.textContent = tipoText !== "Nenhum" ? tipoText : "Nenhum";
-  }  // Acessibilidade - Don't set directly here, let the DOMContentLoaded handler set it properly
+  } // Acessibilidade - Don't set directly here, let the DOMContentLoaded handler set it properly
   // The accessibility button will be updated after processing the indices
-  
+
   // Tipo de viagem
   const tipoViagemP = document.getElementById("texto-tipo-viagem");
   if (tipoViagemP && dados.tripType) {
@@ -114,15 +114,20 @@ function renderFlightCards(maxCards = 18) {
   // Get search data from sessionStorage if available
   const searchData = sessionStorage.getItem("planit_search");
   let flights = Flight.getAll();
+
+  console.log("Todos os voos:", flights.length);
+  console.log("Filtros atuais:", filters);
+
   // Apply search filters from PlanIt form if available
   if (searchData) {
     const parsedSearchData = JSON.parse(searchData);
+    console.log("Dados de pesquisa do sessionStorage:", parsedSearchData);
     flights = Flight.filterFlights(parsedSearchData);
+    console.log("Voos após filtro PlanIt:", flights.length);
   }
   // Apply additional UI filters
   flights = flights.filter((flight) => {
-    let match = true;
-    // Origem filter (from UI)
+    let match = true; // Origem filter (from UI)
     if (
       filters.origem &&
       filters.origem !== "Qualquer" &&
@@ -130,14 +135,12 @@ function renderFlightCards(maxCards = 18) {
       filters.origem !== "Origem" &&
       flight.origem
     ) {
-      const origemCidade = flight.origem.split("-").pop().trim().toLowerCase();
-      const origemCodigo = flight.origem.split("-")[0].trim().toLowerCase();
+      /* Simplificar a verificação - verificar se contém a string */
       const filtroOrigem = filters.origem.trim().toLowerCase();
+      const origemVoo = flight.origem.trim().toLowerCase();
+
       const origemMatch =
-        origemCidade.includes(filtroOrigem) ||
-        origemCodigo.includes(filtroOrigem) ||
-        filtroOrigem.includes(origemCidade) ||
-        filtroOrigem.includes(origemCodigo);
+        origemVoo.includes(filtroOrigem) || filtroOrigem.includes(origemVoo);
       match = match && origemMatch;
     }
     // Destino filter (from UI)
@@ -148,18 +151,13 @@ function renderFlightCards(maxCards = 18) {
       filters.destino !== "Destino" &&
       flight.destino
     ) {
-      const destinoCidade = flight.destino
-        .split("-")
-        .pop()
-        .trim()
-        .toLowerCase();
-      const destinoCodigo = flight.destino.split("-")[0].trim().toLowerCase();
+      /* Simplificar a verificação - verificar se contém a string */
       const filtroDestino = filters.destino.trim().toLowerCase();
+      const destinoVoo = flight.destino.trim().toLowerCase();
+
       const destinoMatch =
-        destinoCidade.includes(filtroDestino) ||
-        destinoCodigo.includes(filtroDestino) ||
-        filtroDestino.includes(destinoCidade) ||
-        filtroDestino.includes(destinoCodigo);
+        destinoVoo.includes(filtroDestino) ||
+        filtroDestino.includes(destinoVoo);
       match = match && destinoMatch;
     }
     // Date filters (from UI)
@@ -480,34 +478,41 @@ document.addEventListener("DOMContentLoaded", () => {
     filters.tipoTurismo =
       planitFilter.tipoTurismo && planitFilter.tipoTurismo.nome
         ? planitFilter.tipoTurismo.nome
-        : "";    // Handle accessibility data - could be names (strings) or indices (numbers)
-    if (Array.isArray(planitFilter.acessibilidade) && planitFilter.acessibilidade.length > 0) {
+        : ""; // Handle accessibility data - could be names (strings) or indices (numbers)
+    if (
+      Array.isArray(planitFilter.acessibilidade) &&
+      planitFilter.acessibilidade.length > 0
+    ) {
       const allAccessibilities = Flight.getAccessibilities();
       let accessibilityIndices = [];
-      
+
       // Check if the data contains indices (numbers) or names (strings)
-      if (typeof planitFilter.acessibilidade[0] === 'number') {
+      if (typeof planitFilter.acessibilidade[0] === "number") {
         // Data already contains indices
         accessibilityIndices = planitFilter.acessibilidade;
       } else {
         // Data contains accessibility names, convert to indices
-        planitFilter.acessibilidade.forEach(accName => {
-          const index = allAccessibilities.findIndex(acc => acc === accName);
+        planitFilter.acessibilidade.forEach((accName) => {
+          const index = allAccessibilities.findIndex((acc) => acc === accName);
           if (index !== -1) {
             accessibilityIndices.push(index);
           }
         });
       }
-      
+
       // Set the selected accessories in FlightModel
       Flight.clearSelectedAccessibilities(); // Clear current selection
-      accessibilityIndices.forEach(index => Flight.toggleAccessibility(index));
+      accessibilityIndices.forEach((index) =>
+        Flight.toggleAccessibility(index)
+      );
       Flight.confirmAccessibilities(); // Save to localStorage
-      
+
       // Get the actual accessibility names for filters
-      const accessibilityNames = accessibilityIndices.map(index => allAccessibilities[index]).filter(name => name);
+      const accessibilityNames = accessibilityIndices
+        .map((index) => allAccessibilities[index])
+        .filter((name) => name);
       filters.acessibilidade = accessibilityNames.join(", ");
-      
+
       // Update accessibility button to show the correct text
       updateAccessibilityButton();
     } else {
@@ -530,7 +535,8 @@ document.addEventListener("DOMContentLoaded", () => {
         criancas,
         bebes
       );
-    }  } else {
+    }
+  } else {
     // Fallback to reading from UI elements
     filters.origem =
       document.querySelector("#btn-open p")?.textContent.trim() || "";
@@ -548,7 +554,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const dt = Flight.getDatesTravelers();
       filters.dataPartida = dt.dataPartida;
       filters.dataRegresso = dt.dataRegresso;
-      filters.adultos = dt.adultos;      filters.criancas = dt.criancas;
+      filters.adultos = dt.adultos;
+      filters.criancas = dt.criancas;
       filters.bebes = dt.bebes;
     }
     // Update accessibility button to reflect any saved selections
@@ -740,7 +747,10 @@ function abrirModalOrigem() {
       `;
       li.addEventListener("click", () => {
         Flight.setOrigin(aeroporto);
-        filters.origem = aeroporto.cidade; // Corrigido: salva a cidade do aeroporto
+        /* Atualizar o filtro com o formato completo "CÓDIGO - Cidade" */
+        filters.origem = `${aeroporto.codigo || ""} - ${
+          aeroporto.cidade || ""
+        }`;
         updateOriginButton(aeroporto);
         fecharModalOrigem();
       });
@@ -817,7 +827,10 @@ function abrirModalDestino() {
       `;
       li.addEventListener("click", () => {
         Flight.setDestination(aeroporto);
-        filters.destino = aeroporto.cidade; // Corrigido: salva a cidade do aeroporto
+        /* Atualizar o filtro com o formato completo "CÓDIGO - Cidade" */
+        filters.destino = `${aeroporto.codigo || ""} - ${
+          aeroporto.cidade || ""
+        }`;
         updateDestinationButton(aeroporto);
         fecharModalDestino();
       });
