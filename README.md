@@ -28,13 +28,15 @@ Para além disso, incorporamos mecânicas de **gamificação** para tornar a exp
 
 ## 🚀 Funcionalidades Principais
 
-* **Pesquisa Inteligente:** Encontre voos, alojamento, transportes e pontos de interesse com filtros avançados.
-* **Recomendações Personalizadas:** Sugestões adaptadas ao teu perfil e tipo de turismo.
-* **Filtros de Acessibilidade e Inclusão:** Planeie viagens tendo em conta necessidades específicas (mobilidade reduzida, segurança, etc.).
-* **Planeamento de Itinerários:** Organize o número de locais a visitar e guarde os seus planos.
-* **Sistema de Gamificação:** Ganhe pontos, suba de nível, complete desafios e personalize o seu perfil.
-* **Comunidade:** Participe em mecanismos de discussão e partilhe experiências com outros viajantes.
-* **Perfil de Utilizador:** Gestão de dados pessoais, planeamentos guardados e progresso no sistema de pontos.
+* **Pesquisa de Voos:** Sistema completo de pesquisa e reserva de voos com múltiplas companhias aéreas.
+* **Reserva de Alojamento:** Explore e reserve hotéis em destinos europeus com filtros personalizados.
+* **Aluguer de Automóveis:** Serviço integrado de aluguer de carros para maior autonomia nas viagens.
+* **Descoberta de Atividades:** Catálogo de experiências e atividades turísticas organizadas por destino.
+* **Tipos de Turismo:** Especialização em diferentes modalidades como turismo cultural, bem-estar e eco-turismo.
+* **Sistema de Gamificação (RewardIt):** Ganhe pontos, medalhas e recompensas através das suas viagens e atividades.
+* **Painel Administrativo:** Interface completa para gestão de utilizadores, destinos, voos, hotéis e atividades.
+* **Modo Escuro/Claro:** Interface adaptável com suporte completo para preferências visuais.
+* **Design Responsivo:** Experiência otimizada para dispositivos móveis, tablets e computadores.
 
 ## 🛠️ Tecnologias Utilizadas
 
@@ -46,11 +48,19 @@ Este projeto foi construído com as seguintes tecnologias principais:
 * **Gestão de Projeto:** Notion, GitHub Projects
 * **Controlo de Versão:** Git & GitHub
 
-## 📜 Licença
+## 🔑 Informações de Estágio
 
-Distribuído sob a Licença MIT. Vê o ficheiro `LICENSE` para mais informações.
+Para testar a plataforma, utilize os seguintes acessos:
 
-## 📧 Contacto
+### Perfil de Utilizador
+* **Email:** 40240119@esmad.ipp.pt
+* **Palavra-passe:** 40240119
+
+### Perfil de Administrador
+* **Email:** 40240137@esmad.ipp.pt
+* **Palavra-passe:** 40240137
+
+## 👌O grupo
 
 * **António Amorim:** [GitHub](https://github.com/amorima)
 * **Gabriel Paiva:** [GitHub](https://github.com/Gabriel-S-Paiva)
@@ -62,11 +72,7 @@ Link do Projeto: [https://github.com/amorima/projeto1/](https://github.com/amori
 
 * Escola Superior de Media Artes e Design (ESMAD)
 * Politécnico do Porto (P.PORTO)
-* Prof. Doutor Mário Pinto
-* Prof. Doutor Ricardo Queirós 
+
+* Prof. Doutor Mário Pinto [GitHub](https://github.com/amorima)
+* Prof. Doutor Ricardo Queirós [GitHub](https://github.com/mariopinto18)
 * Prof. António Machado
-* [Google Fonts](https://fonts.google.com/) (para IBM Plex Sans e Space Mono)
-* [Material Symbols](https://fonts.google.com/icons) (para iconografia)
-
-
-
