@@ -257,15 +257,17 @@ document.addEventListener("DOMContentLoaded", () => {
         let userType = "Aventureiro"
         if(User.getUserByName(review.nomePessoa)){
           const userPoints = User.getUserByName(review.nomePessoa).pontos;
-          if (userPoints >= 2000) {
-            userType = "Explorador Elite";
-          } else if (userPoints >= 1000) {
-            userType = "Viajante Experiente";
-          } else if (userPoints >= 500) {
-            userType = "Descobridor";
+          if (userPoints >= 5000) {
+            userType = "Embaixador";
+          } else if (userPoints >= 3000) {
+            userType = "Globetrotter";
+          } else if (userPoints >= 1500) {
+            userType = "Aventureiro";
+          } else if (userPoints >= 250) {
+            userType = "Viajante";
           }
         } else {
-          userType = "Viajante";
+          userType = "Explorador";
         }
         
         // Tentar obter a imagem do usuário, se disponível
