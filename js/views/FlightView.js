@@ -242,7 +242,8 @@ function abrirModalOrigem() {
         } else {
           // Regular origin selection
           Flight.setOrigin(aeroporto);
-          filters.origem = aeroporto.cidade;
+          /* Manter consistência com o formato usado na pesquisa */
+          filters.origem = `${aeroporto.codigo || "XXX"} - ${aeroporto.cidade}`;
           updateOriginButton(aeroporto);
         }
         fecharModalOrigem();
@@ -350,7 +351,10 @@ function abrirModalDestino() {
         } else {
           // Regular destination selection
           Flight.setDestination(aeroporto);
-          filters.destino = aeroporto.cidade;
+          /* Manter consistência com o formato usado na pesquisa */
+          filters.destino = `${aeroporto.codigo || "XXX"} - ${
+            aeroporto.cidade
+          }`;
           updateDestinationButton(aeroporto);
         }
         fecharModalDestino();

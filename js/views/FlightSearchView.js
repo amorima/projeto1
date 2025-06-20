@@ -142,9 +142,7 @@ function renderFlightCards(maxCards = 18) {
     flights = Flight.filterFlights(parsedSearchData);
   } // Apply additional UI filters
   flights = flights.filter((flight) => {
-    let match = true;
-
-    // Origem filter (from UI)
+    let match = true; /* Filtragem por origem (da interface) */
     if (
       filters.origem &&
       filters.origem !== "Qualquer" &&
@@ -152,19 +150,30 @@ function renderFlightCards(maxCards = 18) {
       filters.origem !== "Origem" &&
       flight.origem
     ) {
-      /* Usar correspondência exata por código do aeroporto */
       const filtroOrigem = filters.origem.trim().toLowerCase();
       const origemVoo = flight.origem.trim().toLowerCase();
 
-      /* Extrair código do aeroporto do filtro */
-      const codigoFiltro = filtroOrigem.split(" - ")[0];
+      /* Tentar correspondência exata primeiro */
+      let origemMatch = origemVoo === filtroOrigem;
 
-      /* Verificar se o voo começa com o mesmo código */
-      const origemMatch = origemVoo.startsWith(codigoFiltro + " -");
+      /* Se não funcionar, tentar por código de aeroporto */
+      if (!origemMatch && filtroOrigem.includes(" - ")) {
+        const codigoFiltro = filtroOrigem.split(" - ")[0];
+        origemMatch = origemVoo.startsWith(codigoFiltro + " -");
+      }
+
+      /* Se ainda não funcionar, tentar por cidade */
+      if (!origemMatch) {
+        const cidadeFiltro = filtroOrigem.includes(" - ")
+          ? filtroOrigem.split(" - ")[1]
+          : filtroOrigem;
+        origemMatch = origemVoo.includes(cidadeFiltro);
+      }
+
       match = match && origemMatch;
     }
 
-    // Destino filter (from UI)
+    /* Filtragem por destino (da interface) */
     if (
       filters.destino &&
       filters.destino !== "Qualquer" &&
@@ -172,17 +181,28 @@ function renderFlightCards(maxCards = 18) {
       filters.destino !== "Destino" &&
       flight.destino
     ) {
-      /* Usar correspondência exata por código do aeroporto */
       const filtroDestino = filters.destino.trim().toLowerCase();
       const destinoVoo = flight.destino.trim().toLowerCase();
 
-      /* Extrair código do aeroporto do filtro */
-      const codigoFiltro = filtroDestino.split(" - ")[0];
+      /* Tentar correspondência exata primeiro */
+      let destinoMatch = destinoVoo === filtroDestino;
 
-      /* Verificar se o voo começa com o mesmo código */
-      const destinoMatch = destinoVoo.startsWith(codigoFiltro + " -");
+      /* Se não funcionar, tentar por código de aeroporto */
+      if (!destinoMatch && filtroDestino.includes(" - ")) {
+        const codigoFiltro = filtroDestino.split(" - ")[0];
+        destinoMatch = destinoVoo.startsWith(codigoFiltro + " -");
+      }
+
+      /* Se ainda não funcionar, tentar por cidade */
+      if (!destinoMatch) {
+        const cidadeFiltro = filtroDestino.includes(" - ")
+          ? filtroDestino.split(" - ")[1]
+          : filtroDestino;
+        destinoMatch = destinoVoo.includes(cidadeFiltro);
+      }
+
       match = match && destinoMatch;
-    }    // Date filters (from UI)
+    } // Date filters (from UI)
     if (filters.dataPartida && flight.partida) {
       const filtroData = new Date(filters.dataPartida);
       const dataVoo = new Date(
@@ -199,10 +219,14 @@ function renderFlightCards(maxCards = 18) {
     }
 
     // Tourism type filter (from UI)
-    if (filters.tipoTurismo && filters.tipoTurismo.trim() !== "" && filters.tipoTurismo !== "Nenhum") {
+    if (
+      filters.tipoTurismo &&
+      filters.tipoTurismo.trim() !== "" &&
+      filters.tipoTurismo !== "Nenhum"
+    ) {
       if (flight.turismo && Array.isArray(flight.turismo)) {
         const filterTourism = filters.tipoTurismo.toLowerCase();
-        const hasTourismMatch = flight.turismo.some(turismo => 
+        const hasTourismMatch = flight.turismo.some((turismo) =>
           turismo.toLowerCase().includes(filterTourism)
         );
         if (!hasTourismMatch) match = false;
@@ -213,41 +237,54 @@ function renderFlightCards(maxCards = 18) {
     }
 
     // Accessibility filter (from UI) - match against destination accessibility
-    if (filters.acessibilidade && 
-        ((typeof filters.acessibilidade === 'string' && filters.acessibilidade.trim() !== "" && filters.acessibilidade !== "Nenhum") ||
-         (Array.isArray(filters.acessibilidade) && filters.acessibilidade.length > 0))) {
-      
+    if (
+      filters.acessibilidade &&
+      ((typeof filters.acessibilidade === "string" &&
+        filters.acessibilidade.trim() !== "" &&
+        filters.acessibilidade !== "Nenhum") ||
+        (Array.isArray(filters.acessibilidade) &&
+          filters.acessibilidade.length > 0))
+    ) {
       // Get destination data to check accessibility
       const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
-      
+
       // Extract city name from flight destination (e.g., "LIS - Lisboa" -> "Lisboa")
       const destinoCity = flight.destino ? flight.destino.split(" - ")[1] : "";
-      
+
       if (destinoCity) {
         // Find the destination data
-        const destinoData = destinos.find(dest => 
-          dest.cidade && dest.cidade.toLowerCase() === destinoCity.toLowerCase()
+        const destinoData = destinos.find(
+          (dest) =>
+            dest.cidade &&
+            dest.cidade.toLowerCase() === destinoCity.toLowerCase()
         );
-        
+
         if (destinoData && destinoData.acessibilidade) {
           // Handle both string and array cases for filters.acessibilidade
           let filterAccessibilities = [];
-          if (typeof filters.acessibilidade === 'string') {
-            filterAccessibilities = filters.acessibilidade.split(',').map(acc => acc.trim().toLowerCase());
+          if (typeof filters.acessibilidade === "string") {
+            filterAccessibilities = filters.acessibilidade
+              .split(",")
+              .map((acc) => acc.trim().toLowerCase());
           } else if (Array.isArray(filters.acessibilidade)) {
-            filterAccessibilities = filters.acessibilidade.map(acc => acc.toString().toLowerCase());
+            filterAccessibilities = filters.acessibilidade.map((acc) =>
+              acc.toString().toLowerCase()
+            );
           }
-          
-          const destinoAccessibilities = Array.isArray(destinoData.acessibilidade) 
-            ? destinoData.acessibilidade 
+
+          const destinoAccessibilities = Array.isArray(
+            destinoData.acessibilidade
+          )
+            ? destinoData.acessibilidade
             : [destinoData.acessibilidade];
-          
-          const hasMatchingAccessibility = filterAccessibilities.some(filterAcc => 
-            destinoAccessibilities.some(destAcc => 
-              destAcc.toLowerCase().includes(filterAcc)
-            )
+
+          const hasMatchingAccessibility = filterAccessibilities.some(
+            (filterAcc) =>
+              destinoAccessibilities.some((destAcc) =>
+                destAcc.toLowerCase().includes(filterAcc)
+              )
           );
-          
+
           if (!hasMatchingAccessibility) match = false;
         } else {
           // If destination has no accessibility info and we're filtering for accessibility, exclude it
@@ -831,7 +868,8 @@ function abrirModalOrigem() {
             }</p>
           </div>
         </div>
-      `;      li.addEventListener("click", () => {
+      `;
+      li.addEventListener("click", () => {
         Flight.setOrigin(aeroporto);
         /* Atualizar o filtro com o formato completo "CÓDIGO - Cidade" */
         filters.origem = `${aeroporto.codigo || ""} - ${
@@ -912,7 +950,8 @@ function abrirModalDestino() {
             }</p>
           </div>
         </div>
-      `;      li.addEventListener("click", () => {
+      `;
+      li.addEventListener("click", () => {
         Flight.setDestination(aeroporto);
         /* Atualizar o filtro com o formato completo "CÓDIGO - Cidade" */
         filters.destino = `${aeroporto.codigo || ""} - ${
@@ -1002,7 +1041,7 @@ function abrirModalDatas() {
   inputDataRegresso.min = hoje;
   inputDataPartida.addEventListener("change", (e) => {
     inputDataRegresso.min = e.target.value;
-  });  /* Botao confirmar */
+  }); /* Botao confirmar */
   document.getElementById("confirmar-datas").addEventListener("click", () => {
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
@@ -1160,19 +1199,20 @@ function abrirModalAcessibilidade() {
     const termoPesquisa = e.target.value.toLowerCase();
     const filteredAccessibilities = Flight.filterAccessibilities(termoPesquisa);
     mostrarAcessibilidades(filteredAccessibilities);
-  });  document
+  });
+  document
     .getElementById("confirmar-acessibilidade")
     .addEventListener("click", () => {
       Flight.confirmAccessibilities();
       updateAccessibilityButton();
-      
+
       // Convert indices to actual accessibility names for filtering
       const selectedIndices = Flight.getSelectedAccessibilities();
       const allAccessibilities = Flight.getAccessibilities();
       const selectedNames = selectedIndices
-        .map(index => allAccessibilities[index])
-        .filter(name => name); // Remove any undefined names
-      
+        .map((index) => allAccessibilities[index])
+        .filter((name) => name); // Remove any undefined names
+
       filters.acessibilidade = selectedNames.join(", ");
       fecharModalAcessibilidade();
       /* Re-render flights with new filters */
@@ -1219,7 +1259,8 @@ function abrirModalTipoTurismo() {
             ${tipo.nome}
           </div>
         </div>
-      `;      card.addEventListener("click", () => {
+      `;
+      card.addEventListener("click", () => {
         Flight.setTourismType(tipo);
         filters.tipoTurismo = tipo.nome; // Store the name instead of the object
         updateTourismButton(tipo);
