@@ -52,13 +52,23 @@ initView();
  * Inicializa a vista principal da aplicação
  */
 function initView() {
+  /* Carregar dados guardados primeiro */
+  loadSavedFormData();
+
   getUserLocation((location) => {
     if (!location) return;
+
+    /* Verificar se já existe uma origem selecionada manualmente */
+    const origemJaSelecionada = Flight.getSelectedOrigin();
+    if (origemJaSelecionada) return;
+
     const aeroportos = Flight.getAeroportosComCoordenadas();
     const closest = closestAirport(location, aeroportos);
     const btnOpenElement = document.querySelector("#btn-open p");
     if (btnOpenElement && closest) {
       btnOpenElement.innerText = `${closest.codigo} - ${closest.cidade}`;
+      /* Guardar aeroporto mais próximo no localStorage */
+      Flight.setOrigin(closest);
     }
   });
   showCookieBanner();
@@ -95,6 +105,7 @@ function initView() {
       createFlight(config);
     });
   }
+  loadSavedFormData();
 }
 /**
  * Inicializa o slider de destinos
@@ -1041,4 +1052,26 @@ function setupNewsletterForm() {
       showToast(result.message, "error");
     }
   });
+}
+/**
+ * Carrega dados guardados nos botões do formulário
+ */
+function loadSavedFormData() {
+  /* Carregar origem guardada */
+  const origemSelecionada = Flight.getSelectedOrigin();
+  if (origemSelecionada) {
+    const btnOrigem = document.querySelector("#btn-open p");
+    if (btnOrigem) {
+      btnOrigem.textContent = `${origemSelecionada.codigo} - ${origemSelecionada.cidade}`;
+    }
+  }
+
+  /* Carregar destino guardado */
+  const destinoSelecionado = Flight.getSelectedDestination();
+  if (destinoSelecionado) {
+    const btnDestino = document.querySelector("#btn-destino p");
+    if (btnDestino) {
+      btnDestino.textContent = `${destinoSelecionado.codigo} - ${destinoSelecionado.cidade}`;
+    }
+  }
 }
