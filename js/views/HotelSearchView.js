@@ -2,7 +2,7 @@ import {
   showCookieBanner,
   openModal,
   closeModal,
-  showToast
+  showToast,
 } from "./ViewHelpers.js";
 import HotelModel from "../models/HotelModel.js";
 import * as User from "../models/UserModel.js";
@@ -57,7 +57,7 @@ function getAcessibilidadeIcon(label) {
  * Esta função itera sobre a lista de hotéis e cria cartões para cada um, exibindo informações como nome, localização, preço, acessibilidade e imagem.
  * Inclui também a funcionalidade de favoritar/desfavoritar hotéis.
  * Os cartões são renderizados dentro de um contêiner com a classe `.card-hoteis`.
- * Se a lista de hotéis filtrados for fornecida, ela será usada; caso contrário, a função usará `HotelModel.getAll()` para obter todos os hotéis disponíveis. 
+ * Se a lista de hotéis filtrados for fornecida, ela será usada; caso contrário, a função usará `HotelModel.getAll()` para obter todos os hotéis disponíveis.
  * A função também adiciona ícones de acessibilidade como "pills" sobre a imagem do hotel, e implementa a funcionalidade de favoritar/desfavoritar os hotéis clicando no ícone de coração.
  * @example
  * renderHotelCards();
@@ -77,10 +77,12 @@ function renderHotelCards(filteredHotels = null) {
       ? quarto.acessibilidade
       : quarto.acessibilidade
       ? [quarto.acessibilidade]
-      : [];    const imagem = (quarto.foto && quarto.foto !== 'undefined') 
-      ? quarto.foto 
-      : (hotel.foto && hotel.foto !== 'undefined') 
-        ? hotel.foto 
+      : []; // Usar a imagem do hotel para o card, com fallback para a imagem do quarto ou uma imagem padrão
+    const imagem =
+      hotel.foto && hotel.foto !== "undefined"
+        ? hotel.foto
+        : quarto.foto && quarto.foto !== "undefined"
+        ? quarto.foto
         : "https://placehold.co/413x327";
     const preco = quarto.precoNoite ? quarto.precoNoite + " €" : "-";
     const nome = hotel.nome || hotel.titulo || "Hotel";
@@ -150,12 +152,12 @@ function renderHotelCards(filteredHotels = null) {
           >favorite</span>
         </div>
       </div>
-    `;  
+    `;
   });
   // Ativar toggle de favorito
   container.querySelectorAll(".favorite-icon").forEach((heart) => {
     const hotelId = heart.getAttribute("data-hotel-id");
-    const hotel = hotels.find(h => h.id == hotelId);
+    const hotel = hotels.find((h) => h.id == hotelId);
     // Verificar se hotel está nos favoritos do utilizador
     if (User.isLogged()) {
       const user = User.getUserLogged();
@@ -328,7 +330,7 @@ function setupModalButtons() {
   if (btnDestino) {
     btnDestino.addEventListener("click", abrirModalDestino);
   }
-  // Botão para abrir modal de datas  
+  // Botão para abrir modal de datas
   const btnDatas = document.getElementById("btn-datas-hotel");
   if (btnDatas) {
     btnDatas.addEventListener("click", abrirModalDatas);
@@ -367,7 +369,7 @@ function abrirModalDestino() {
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-      // Carregar lista de destinos
+    // Carregar lista de destinos
     const lista = document.getElementById("lista-destinos-hotel");
     if (lista) {
       const destinos = HotelModel.getDestinations();
@@ -392,7 +394,8 @@ function renderDestinationList(destinos, lista) {
   lista.innerHTML = "";
   destinos.forEach((destino) => {
     const li = document.createElement("li");
-    li.className = "p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors";
+    li.className =
+      "p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors";
     li.innerHTML = `
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">flight_takeoff</span>
@@ -414,7 +417,9 @@ function updateDestinationButton() {
   const texto = document.getElementById("texto-destino-hotel");
   const destino = HotelModel.getSelectedDestination();
   if (texto) {
-    texto.textContent = destino ? `${destino.cidade} (${destino.aeroporto})` : "Destino";
+    texto.textContent = destino
+      ? `${destino.cidade} (${destino.aeroporto})`
+      : "Destino";
   }
 }
 function fecharModalDestino() {
@@ -436,7 +441,7 @@ function abrirModalDatas() {
       confirmar.addEventListener("click", () => {
         const checkin = document.getElementById("data-checkin").value;
         const checkout = document.getElementById("data-checkout").value;
-          if (checkin && checkout) {
+        if (checkin && checkout) {
           HotelModel.setDates(checkin, checkout);
           updateDatesButton();
           fecharModalDatas();
@@ -475,10 +480,16 @@ function abrirModalHospedes() {
     const confirmar = document.getElementById("confirmar-hospedes-hotel");
     if (confirmar) {
       confirmar.addEventListener("click", () => {
-        const adultos = parseInt(document.getElementById("contador-adultos-hotel").textContent);
-        const criancas = parseInt(document.getElementById("contador-criancas-hotel").textContent);
-        const quartos = parseInt(document.getElementById("contador-quartos-hotel").textContent);
-          HotelModel.setGuests(adultos, criancas, quartos);
+        const adultos = parseInt(
+          document.getElementById("contador-adultos-hotel").textContent
+        );
+        const criancas = parseInt(
+          document.getElementById("contador-criancas-hotel").textContent
+        );
+        const quartos = parseInt(
+          document.getElementById("contador-quartos-hotel").textContent
+        );
+        HotelModel.setGuests(adultos, criancas, quartos);
         updateGuestsButton();
         fecharModalHospedes();
       });
@@ -538,7 +549,7 @@ function abrirModalAcessibilidade() {
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-      // Carregar lista de acessibilidades
+    // Carregar lista de acessibilidades
     const lista = document.getElementById("lista-acessibilidades-hotel");
     if (lista) {
       const acessibilidades = HotelModel.getAccessibilities();
@@ -575,14 +586,18 @@ function renderAccessibilityList(acessibilidades, lista) {
     const li = document.createElement("li");
     const isSelected = selectedAccessibilities.includes(index);
     const icon = getAcessibilidadeIcon(acessibilidade);
-    li.className = `p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900' : ''}`;
+    li.className = `p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors ${
+      isSelected ? "bg-blue-50 dark:bg-blue-900" : ""
+    }`;
     li.innerHTML = `
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400">${icon}</span>
           <span class="text-gray-900 dark:text-white">${acessibilidade}</span>
         </div>
-        <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 ${isSelected ? '' : 'opacity-0'}">check</span>
+        <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 ${
+          isSelected ? "" : "opacity-0"
+        }">check</span>
       </div>
     `;
     li.addEventListener("click", () => {

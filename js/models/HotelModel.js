@@ -9,19 +9,21 @@ let hoteis = [];
 let selectedDestination = null;
 let hotelDates = {
   checkin: "",
-  checkout: ""
+  checkout: "",
 };
 let hotelGuests = {
   adultos: 2,
   criancas: 0,
-  quartos: 1
+  quartos: 1,
 };
 let selectedAccessibilities = [];
 /* função para iniciar o modelo com dados da localStorage */
 export function init() {
   hoteis = localStorage.hoteis ? loadFromLocalStorage("hoteis", hoteis) : [];
   // Carregar acessibilidades selecionadas se existirem
-  const savedAccessibilities = localStorage.getItem("acessibilidadesSelecionadasHotel");
+  const savedAccessibilities = localStorage.getItem(
+    "acessibilidadesSelecionadasHotel"
+  );
   if (savedAccessibilities) {
     selectedAccessibilities = JSON.parse(savedAccessibilities);
   }
@@ -37,7 +39,39 @@ export function getFirst(quantidade = 5) {
 }
 /* obter hoteis por cidade */
 export function getHoteisByCidade(cidade) {
-  return hoteis.filter((hotel) => hotel.cidade === cidade);
+  // Obter os destinos para fazer correspondência com o nome da cidade
+  const destinos = getDestinations();
+  const destinoObj = destinos.find(
+    (d) => d.cidade && d.cidade.toLowerCase() === cidade.toLowerCase()
+  );
+  const destinoId = destinoObj ? destinoObj.id : null;
+
+  // Filtrar hotéis que correspondem à cidade ou ao ID do destino
+  return hoteis.filter((hotel) => {
+    // Verificar se o hotel tem a cidade especificada
+    if (hotel.cidade && hotel.cidade.toLowerCase() === cidade.toLowerCase()) {
+      // Se o hotel não tiver destinoId mas temos o ID, atualiza-o
+      if (destinoId && !hotel.destinoId) {
+        hotel.destinoId = destinoId;
+        // Salva a atualização
+        saveToLocalStorage("hoteis", hoteis);
+      }
+      return true;
+    }
+
+    // Verificar se o hotel tem o mesmo destinoId
+    if (destinoId && hotel.destinoId === destinoId) {
+      // Se o hotel não tem cidade definida, atualiza-a
+      if (!hotel.cidade || hotel.cidade === "") {
+        hotel.cidade = cidade;
+        // Salva a atualização
+        saveToLocalStorage("hoteis", hoteis);
+      }
+      return true;
+    }
+
+    return false;
+  });
 }
 /* obter um hotel por id */
 export function getById(id) {
@@ -115,11 +149,40 @@ export function remove(id) {
  * limitados a 10 por página, e retorna a segunda página de resultados.
  */
 export function getHotelsFrom(destinoId, perPage = 18, page = 1) {
-  // Filtra hoteis cuja origem é OPO (Porto)
-  const Hotels = hoteis.filter((h) => h.destinoId === destinoId);
+  // Filtra hoteis por destino ID
+  let Hotels;
+
+  if (destinoId === "all") {
+    // Se o destinoId for "all", retorna todos os hotéis
+    Hotels = [...hoteis];
+  } else {
+    destinoId = Number(destinoId);
+    // Filtra os hotéis que têm o destinoId correspondente
+    Hotels = hoteis.filter((h) => {
+      // Tenta encontrar hotéis com o destinoId específico
+      // Se o hotel não tiver destinoId, tenta verificar pela cidade usando os dados de destino
+      if (h.destinoId === destinoId) {
+        return true;
+      }
+
+      // Tentativa de verificação adicional para hotéis sem destinoId
+      const destinos = getDestinations();
+      const destino = destinos.find((d) => d.id === destinoId);
+      if (destino && h.cidade === destino.cidade) {
+        // Atualizar o hotel com o destinoId correto para futuras consultas
+        h.destinoId = destinoId;
+        saveToLocalStorage("hoteis", hoteis);
+        return true;
+      }
+
+      return false;
+    });
+  }
+
   // Embaralha o array
   const shuffled = Hotels.sort(() => 0.5 - Math.random());
-  // Retorna os primeiros 'count' voos
+
+  // Retorna os hotéis para a página atual
   return shuffled.slice(perPage * (page - 1), perPage * page);
 }
 /* === FUNCOES PARA PESQUISA DE HOTÉIS === */
@@ -129,10 +192,11 @@ export function getDestinations() {
 }
 export function filterDestinations(searchTerm) {
   const destinations = getDestinations();
-  return destinations.filter((destino) =>
-    destino.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    destino.aeroporto.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    destino.pais.toLowerCase().includes(searchTerm.toLowerCase())
+  return destinations.filter(
+    (destino) =>
+      destino.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      destino.aeroporto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      destino.pais.toLowerCase().includes(searchTerm.toLowerCase())
   );
 }
 export function setDestination(destino) {
@@ -153,16 +217,22 @@ export function getDatesText() {
   if (!hotelDates.checkin || !hotelDates.checkout) {
     return { checkin: "Check-in", checkout: "Check-out" };
   }
-  const checkinFormatted = new Date(hotelDates.checkin).toLocaleDateString('pt-PT', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-  const checkoutFormatted = new Date(hotelDates.checkout).toLocaleDateString('pt-PT', {
-    day: '2-digit',
-    month: '2-digit', 
-    year: 'numeric'
-  });
+  const checkinFormatted = new Date(hotelDates.checkin).toLocaleDateString(
+    "pt-PT",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }
+  );
+  const checkoutFormatted = new Date(hotelDates.checkout).toLocaleDateString(
+    "pt-PT",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }
+  );
   return { checkin: checkinFormatted, checkout: checkoutFormatted };
 }
 /* Funcoes para gestao de hospedes */
@@ -176,11 +246,11 @@ export function getGuests() {
 }
 export function getGuestsText() {
   const { adultos, criancas, quartos } = hotelGuests;
-  let texto = `${adultos} adulto${adultos > 1 ? 's' : ''}`;
+  let texto = `${adultos} adulto${adultos > 1 ? "s" : ""}`;
   if (criancas > 0) {
-    texto += `, ${criancas} criança${criancas > 1 ? 's' : ''}`;
+    texto += `, ${criancas} criança${criancas > 1 ? "s" : ""}`;
   }
-  texto += `, ${quartos} quarto${quartos > 1 ? 's' : ''}`;
+  texto += `, ${quartos} quarto${quartos > 1 ? "s" : ""}`;
   return texto;
 }
 /* Funcoes para gestao de acessibilidade */
@@ -222,47 +292,63 @@ export function getSearchData() {
     destination: selectedDestination,
     dates: hotelDates,
     guests: hotelGuests,
-    accessibilities: selectedAccessibilities
+    accessibilities: selectedAccessibilities,
   };
 }
 /* Filtrar hotéis baseado nos dados de pesquisa */
 export function filterHotelsBySearchData(searchData) {
-  let hotels = getAll();
-  // Filtrar por destino (cidade)
+  let hotels = getAll(); // Filtrar por destino (cidade ou destinoId)
   if (searchData.destination) {
+    const destinoId = searchData.destination.id;
     const cidadeDestino = searchData.destination.cidade;
-    hotels = hotels.filter(hotel => 
-      hotel.cidade && hotel.cidade.toLowerCase() === cidadeDestino.toLowerCase()
-    );
+
+    hotels = hotels.filter((hotel) => {
+      // Verificar pelo destinoId (mais preciso)
+      if (hotel.destinoId && hotel.destinoId === destinoId) {
+        return true;
+      }
+
+      // Verificar pela cidade como fallback
+      if (
+        hotel.cidade &&
+        hotel.cidade.toLowerCase() === cidadeDestino.toLowerCase()
+      ) {
+        // Atualizar o hotel com o ID correto do destino para futuras buscas
+        hotel.destinoId = destinoId;
+        saveToLocalStorage("hoteis", hoteis);
+        return true;
+      }
+
+      return false;
+    });
   }
   // Filtrar por capacidade baseado no número de hóspedes
   if (searchData.guests) {
-    const totalHospedes = searchData.guests.adultos + searchData.guests.criancas;
-    hotels = hotels.filter(hotel => {
+    const totalHospedes =
+      searchData.guests.adultos + searchData.guests.criancas;
+    hotels = hotels.filter((hotel) => {
       if (!hotel.quartos || hotel.quartos.length === 0) return false;
       // Verificar se algum quarto tem capacidade suficiente
-      return hotel.quartos.some(quarto => 
-        quarto.capacidade >= totalHospedes
-      );
+      return hotel.quartos.some((quarto) => quarto.capacidade >= totalHospedes);
     });
   }
   // Filtrar por acessibilidades selecionadas
   if (searchData.accessibilities && searchData.accessibilities.length > 0) {
     const accessibilityList = getAccessibilities();
-    const selectedAccessibilityTexts = searchData.accessibilities.map(index => 
-      accessibilityList[index]
-    ).filter(Boolean);
+    const selectedAccessibilityTexts = searchData.accessibilities
+      .map((index) => accessibilityList[index])
+      .filter(Boolean);
     if (selectedAccessibilityTexts.length > 0) {
-      hotels = hotels.filter(hotel => {
+      hotels = hotels.filter((hotel) => {
         if (!hotel.quartos || hotel.quartos.length === 0) return false;
         // Verificar se algum quarto tem pelo menos uma das acessibilidades selecionadas
-        return hotel.quartos.some(quarto => {
+        return hotel.quartos.some((quarto) => {
           if (!quarto.acessibilidade) return false;
-          const quartoAccessibilities = Array.isArray(quarto.acessibilidade) 
-            ? quarto.acessibilidade 
+          const quartoAccessibilities = Array.isArray(quarto.acessibilidade)
+            ? quarto.acessibilidade
             : [quarto.acessibilidade];
-          return selectedAccessibilityTexts.some(selectedAcc =>
-            quartoAccessibilities.some(quartoAcc => 
+          return selectedAccessibilityTexts.some((selectedAcc) =>
+            quartoAccessibilities.some((quartoAcc) =>
               quartoAcc.toLowerCase().includes(selectedAcc.toLowerCase())
             )
           );
@@ -271,18 +357,24 @@ export function filterHotelsBySearchData(searchData) {
     }
   }
   // Filtrar por datas (verificar disponibilidade)
-  if (searchData.dates && searchData.dates.checkin && searchData.dates.checkout) {
+  if (
+    searchData.dates &&
+    searchData.dates.checkin &&
+    searchData.dates.checkout
+  ) {
     const checkinDate = new Date(searchData.dates.checkin);
     const checkoutDate = new Date(searchData.dates.checkout);
-    hotels = hotels.filter(hotel => {
+    hotels = hotels.filter((hotel) => {
       if (!hotel.quartos || hotel.quartos.length === 0) return true; // Se não há quartos definidos, considera disponível
       // Verificar se algum quarto está disponível nas datas selecionadas
-      return hotel.quartos.some(quarto => {
+      return hotel.quartos.some((quarto) => {
         // Se não há data de check-in definida no quarto, considera disponível
         if (!quarto.dataCheckin) return true;
         const quartoCheckin = new Date(quarto.dataCheckin);
         const quartoCheckout = new Date(quartoCheckin);
-        quartoCheckout.setDate(quartoCheckout.getDate() + (quarto.numeroNoites || 1));
+        quartoCheckout.setDate(
+          quartoCheckout.getDate() + (quarto.numeroNoites || 1)
+        );
         // Verificar se as datas não se sobrepõem
         return checkoutDate <= quartoCheckin || checkinDate >= quartoCheckout;
       });
@@ -392,5 +484,5 @@ export default {
   getAccessibilitiesText,
   getSearchData,
   filterHotelsBySearchData,
-  clearSearchFilters
+  clearSearchFilters,
 };
