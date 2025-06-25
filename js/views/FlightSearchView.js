@@ -248,20 +248,27 @@ function createFlightCard(flight) {
   /* Determinar se é voo direto ou com escalas (para tooltip ou informação adicional) */
   const tipoVooText = flight.direto
     ? "Direto"
-    : `${flight.segmentos && flight.segmentos.length ? flight.segmentos.length - 1 : 0} escala${
-        flight.segmentos && flight.segmentos.length > 2 ? "s" : ""
-      }`;
+    : `${
+        flight.segmentos && flight.segmentos.length
+          ? flight.segmentos.length - 1
+          : 0
+      } escala${flight.segmentos && flight.segmentos.length > 2 ? "s" : ""}`;
 
   /* Formatação de tipos de turismo */
-  const turismoTags = Array.isArray(flight.turismo) && flight.turismo.length > 0
-    ? flight.turismo
-        .filter(tipo => tipo && typeof tipo === 'string') /* Filtrar tipos válidos */
-        .map(
-          (tipo) =>
-            `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${traduzirTipoTurismo(tipo.trim())}</span>`
-        )
-        .join("")
-    : "";
+  const turismoTags =
+    Array.isArray(flight.turismo) && flight.turismo.length > 0
+      ? flight.turismo
+          .filter(
+            (tipo) => tipo && typeof tipo === "string"
+          ) /* Filtrar tipos válidos */
+          .map(
+            (tipo) =>
+              `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${traduzirTipoTurismo(
+                tipo.trim()
+              )}</span>`
+          )
+          .join("")
+      : "";
 
   /* Formatação das datas baseada no tipo de viagem */
   let datasText = "";
@@ -1132,28 +1139,28 @@ function fecharModalTipoTurismo() {
 /* Função para traduzir tipos de turismo */
 function traduzirTipoTurismo(tipo) {
   const traducoes = {
-    'Turismo Cultural': 'Turismo Cultural',
-    'Turismo Gastronómico': 'Turismo Gastronómico', 
-    'Turismo Urbano': 'Turismo Urbano',
-    'Turismo de Aventura': 'Turismo de Aventura',
-    'Turismo Rural': 'Turismo Rural',
-    'Turismo de Praia': 'Turismo de Praia',
-    'Turismo de Montanha': 'Turismo de Montanha',
-    'Turismo de Bem-estar': 'Turismo de Bem-estar',
-    'Turismo Ecológico': 'Turismo Ecológico',
-    'Turismo Religioso': 'Turismo Religioso',
-    'Turismo de Negócios': 'Turismo de Negócios',
-    'TurismoCultural': 'Turismo Cultural',
-    'TurismoGastronomico': 'Turismo Gastronómico',
-    'TurismoUrbano': 'Turismo Urbano',
-    'TurismoAventura': 'Turismo de Aventura',
-    'TurismoRural': 'Turismo Rural',
-    'TurismoPraia': 'Turismo de Praia',
-    'TurismoMontanha': 'Turismo de Montanha',
-    'TurismoBem-estar': 'Turismo de Bem-estar',
-    'TurismoEcologico': 'Turismo Ecológico',
-    'TurismoReligioso': 'Turismo Religioso',
-    'Turismodenegocios': 'Turismo de Negócios'
+    "Turismo Cultural": "Turismo Cultural",
+    "Turismo Gastronómico": "Turismo Gastronómico",
+    "Turismo Urbano": "Turismo Urbano",
+    "Turismo de Aventura": "Turismo de Aventura",
+    "Turismo Rural": "Turismo Rural",
+    "Turismo de Praia": "Turismo de Praia",
+    "Turismo de Montanha": "Turismo de Montanha",
+    "Turismo de Bem-estar": "Turismo de Bem-estar",
+    "Turismo Ecológico": "Turismo Ecológico",
+    "Turismo Religioso": "Turismo Religioso",
+    "Turismo de Negócios": "Turismo de Negócios",
+    TurismoCultural: "Turismo Cultural",
+    TurismoGastronomico: "Turismo Gastronómico",
+    TurismoUrbano: "Turismo Urbano",
+    TurismoAventura: "Turismo de Aventura",
+    TurismoRural: "Turismo Rural",
+    TurismoPraia: "Turismo de Praia",
+    TurismoMontanha: "Turismo de Montanha",
+    "TurismoBem-estar": "Turismo de Bem-estar",
+    TurismoEcologico: "Turismo Ecológico",
+    TurismoReligioso: "Turismo Religioso",
+    Turismodenegocios: "Turismo de Negócios",
   };
   return traducoes[tipo] || tipo;
 }
