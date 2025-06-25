@@ -576,6 +576,15 @@ function atualizarSidebarVoo(voo) {
       default:
         tipoVoo = "Ida e volta";
     }
+  } else {
+    /* Se não tiver tipoViagem, verificar o tipo de pesquisa para determinar */
+    const searchData = sessionStorage.getItem("planit_search");
+    if (searchData) {
+      const parsedData = JSON.parse(searchData);
+      if (parsedData.tripType === "so-ida") {
+        tipoVoo = "Só ida";
+      }
+    }
   }
   const dataFormatada = formatDatesForDisplayPt(
     voo.partida,

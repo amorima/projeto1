@@ -1177,6 +1177,23 @@ export function searchFlightsAdvanced(searchCriteria) {
     );
   }
 
+  /* Filtro por tipo de viagem */
+  if (searchCriteria.tripType) {
+    results = results.filter((flight) => {
+      if (searchCriteria.tripType === "so-ida") {
+        /* Para só ida, aceitar voos sem tipoViagem ou com tipoViagem "ida" */
+        return !flight.tipoViagem || flight.tipoViagem === "ida";
+      } else if (searchCriteria.tripType === "ida-volta") {
+        /* Para ida e volta, aceitar apenas voos com tipoViagem "ida-volta" */
+        return flight.tipoViagem === "ida-volta";
+      } else if (searchCriteria.tripType === "multitrip") {
+        /* Para multitrip, aceitar voos com tipoViagem "multidestino" */
+        return flight.tipoViagem === "multidestino";
+      }
+      return true;
+    });
+  }
+
   return results;
 }
 

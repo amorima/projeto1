@@ -192,7 +192,7 @@ function renderFlightCards(maxCards = 18) {
 }
 
 function renderCards(flights) {
-  const container = document.querySelector(".cards-container");
+  const container = document.querySelector(".card-viagens");
   if (!container) return;
 
   container.innerHTML = "";
@@ -220,31 +220,68 @@ function createFlightCard(flight) {
   cardElement.className =
     "bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow";
 
-  /* Determinar se é voo direto ou com escalas */
+  /* Determinar o tipo de viagem */
+  let tipoViagemText;
+  if (flight.tipoViagem === "ida") {
+    tipoViagemText = "Ida";
+  } else if (flight.tipoViagem === "ida-volta") {
+    tipoViagemText = "Ida e Volta";
+  } else if (flight.tipoViagem === "multidestino") {
+    tipoViagemText = "Multi-destino";
+  } else {
+    /* Se não tiver tipoViagem definido, verificar o tipo de pesquisa */
+    const searchData = sessionStorage.getItem("planit_search");
+    if (searchData) {
+      const parsedData = JSON.parse(searchData);
+      if (parsedData.tripType === "so-ida") {
+        tipoViagemText = "Ida";
+      } else if (parsedData.tripType === "multitrip") {
+        tipoViagemText = "Multi-destino";
+      } else {
+        tipoViagemText = "Ida e Volta";
+      }
+    } else {
+      tipoViagemText = "Ida";
+    }
+  }
+
+  /* Determinar se é voo direto ou com escalas (para tooltip ou informação adicional) */
   const tipoVooText = flight.direto
     ? "Direto"
-    : `${flight.segmentos.length - 1} escala${
-        flight.segmentos.length > 2 ? "s" : ""
+    : `${flight.segmentos && flight.segmentos.length ? flight.segmentos.length - 1 : 0} escala${
+        flight.segmentos && flight.segmentos.length > 2 ? "s" : ""
       }`;
 
   /* Formatação de tipos de turismo */
-  const turismoTags = Array.isArray(flight.turismo)
+  const turismoTags = Array.isArray(flight.turismo) && flight.turismo.length > 0
     ? flight.turismo
+        .filter(tipo => tipo && typeof tipo === 'string') /* Filtrar tipos válidos */
         .map(
           (tipo) =>
-            `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${tipo}</span>`
+            `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${traduzirTipoTurismo(tipo.trim())}</span>`
         )
         .join("")
     : "";
 
+  /* Formatação das datas baseada no tipo de viagem */
+  let datasText = "";
+  if (flight.tipoViagem === "ida-volta" && flight.dataVolta) {
+    datasText = `${flight.partida} - ${flight.dataVolta}`;
+  } else {
+    datasText = `${flight.partida} - ${flight.chegada}`;
+  }
+
   cardElement.innerHTML = `
     <div class="relative">
       <img src="${flight.imagem}" alt="${flight.destino}" class="w-full h-48 object-cover">
-      <div class="absolute top-2 right-2 flex flex-wrap gap-1">
-        ${turismoTags}
-      </div>
       <div class="absolute top-2 left-2">
-        <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoVooText}</span>
+        <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoViagemText}</span>
+      </div>
+      <div class="absolute top-2 right-2">
+        <span class="bg-Main-Primary bg-opacity-80 text-white text-xs px-2 py-1 rounded" title="Tipo de voo">${tipoVooText}</span>
+      </div>
+      <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
+        ${turismoTags}
       </div>
     </div>
     <div class="p-4">
@@ -255,7 +292,7 @@ function createFlightCard(flight) {
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
         <span class="material-symbols-outlined text-sm">schedule</span>
-        <span>${flight.partida} - ${flight.chegada}</span>
+        <span>${datasText}</span>
       </div>
       <div class="flex justify-between items-center">
         <div class="text-2xl font-bold text-Main-Primary dark:text-cyan-400">
@@ -482,8 +519,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render initial flight cards with any available filters
   renderFlightCards();
   // Setup filters and modal buttons
-  setupFlightFilters();
-  setupModalButtons();
+  setupFilterEventListeners();
+  /* setupModalButtons(); - Event listeners dos modais já estão configurados individualmente */
   setupTripTypeButtons(); // Setup multitrip functionality
   // Prevent default form submission to avoid page reload
   const form = document.querySelector("form");
@@ -1091,4 +1128,32 @@ function fecharModalTipoTurismo() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
   pesquisaInput.value = "";
+}
+/* Função para traduzir tipos de turismo */
+function traduzirTipoTurismo(tipo) {
+  const traducoes = {
+    'Turismo Cultural': 'Turismo Cultural',
+    'Turismo Gastronómico': 'Turismo Gastronómico', 
+    'Turismo Urbano': 'Turismo Urbano',
+    'Turismo de Aventura': 'Turismo de Aventura',
+    'Turismo Rural': 'Turismo Rural',
+    'Turismo de Praia': 'Turismo de Praia',
+    'Turismo de Montanha': 'Turismo de Montanha',
+    'Turismo de Bem-estar': 'Turismo de Bem-estar',
+    'Turismo Ecológico': 'Turismo Ecológico',
+    'Turismo Religioso': 'Turismo Religioso',
+    'Turismo de Negócios': 'Turismo de Negócios',
+    'TurismoCultural': 'Turismo Cultural',
+    'TurismoGastronomico': 'Turismo Gastronómico',
+    'TurismoUrbano': 'Turismo Urbano',
+    'TurismoAventura': 'Turismo de Aventura',
+    'TurismoRural': 'Turismo Rural',
+    'TurismoPraia': 'Turismo de Praia',
+    'TurismoMontanha': 'Turismo de Montanha',
+    'TurismoBem-estar': 'Turismo de Bem-estar',
+    'TurismoEcologico': 'Turismo Ecológico',
+    'TurismoReligioso': 'Turismo Religioso',
+    'Turismodenegocios': 'Turismo de Negócios'
+  };
+  return traducoes[tipo] || tipo;
 }
