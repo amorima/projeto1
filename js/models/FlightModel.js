@@ -1536,3 +1536,327 @@ export function flightPassesPorCidade(flight, cidade) {
 
   return origemMatch || destinoMatch || segmentosMatch;
 }
+
+/* Função para construir viagens inteligentes baseadas no tipo de pesquisa */
+export function buildTripCombinations(searchCriteria) {
+  const allFlights = viagens;
+  const trips = [];
+
+  console.log("🔍 Debug - buildTripCombinations called with:", searchCriteria);
+  console.log("✈️ Debug - Total flights available:", allFlights.length);
+  console.log("📋 Debug - First 3 flights:", allFlights.slice(0, 3));
+
+  if (!searchCriteria) {
+    console.log("⚠️ No search criteria provided, returning all flights");
+    return allFlights;
+  }
+
+  if (searchCriteria.tripType === "so-ida") {
+    console.log("🔀 Debug - Processing so-ida trip type");
+    console.log(
+      "🎯 Debug - Search criteria: origem=",
+      searchCriteria.origem,
+      "destino=",
+      searchCriteria.destino,
+      "data=",
+      searchCriteria.dataPartida
+    );
+    if (searchCriteria.dataRegresso) {
+      console.log(
+        "🚫 Debug - IGNORING return date for one-way trip:",
+        searchCriteria.dataRegresso
+      );
+    }
+
+    /* Para só ida: procurar voos únicos que correspondam aos critérios, ignorando COMPLETAMENTE a data de regresso */
+    const outboundFlights = allFlights.filter((flight) => {
+      const originMatch = matchesOriginDestination(
+        flight,
+        searchCriteria.origem,
+        searchCriteria.destino
+      );
+      /* Para só ida, usar apenas a data de partida, não a de regresso */
+      const dateMatch = matchesDate(flight, searchCriteria.dataPartida);
+      console.log(
+        `✈️ Flight ${flight.numeroVoo} (${flight.origem} → ${flight.destino} ${flight.partida}): originMatch=${originMatch}, dateMatch=${dateMatch}`
+      );
+      return originMatch && dateMatch;
+    });
+
+    console.log("✅ Debug - Outbound flights found:", outboundFlights.length);
+
+    /* Cada voo de ida é uma viagem completa */
+    outboundFlights.forEach((flight) => {
+      trips.push({
+        ...flight,
+        tripType: "so-ida",
+        segments: [flight],
+        totalCost: flight.custo,
+      });
+    });
+  } else if (searchCriteria.tripType === "ida-volta") {
+    console.log("🔄 Debug - Processing ida-volta trip type");
+    console.log(
+      "🎯 Debug - Search criteria: origem=",
+      searchCriteria.origem,
+      "destino=",
+      searchCriteria.destino
+    );
+    console.log(
+      "📅 Debug - Dates: partida=",
+      searchCriteria.dataPartida,
+      "regresso=",
+      searchCriteria.dataRegresso
+    );
+
+    /* Para ida e volta, ambas as datas são obrigatórias */
+    if (!searchCriteria.dataPartida || !searchCriteria.dataRegresso) {
+      console.log(
+        "⚠️ Debug - Missing dates for round trip, treating as flexible search"
+      );
+    }
+
+    /* Para ida e volta: combinar voos de ida com voos de volta */
+    const outboundFlights = allFlights.filter((flight) => {
+      const match =
+        matchesOriginDestination(
+          flight,
+          searchCriteria.origem,
+          searchCriteria.destino
+        ) && matchesDate(flight, searchCriteria.dataPartida);
+      if (match) {
+        console.log(
+          `✈️ Outbound match: ${flight.numeroVoo} (${flight.origem} → ${flight.destino} ${flight.partida})`
+        );
+      }
+      return match;
+    });
+
+    const returnFlights = allFlights.filter((flight) => {
+      const match =
+        matchesOriginDestination(
+          flight,
+          searchCriteria.destino,
+          searchCriteria.origem
+        ) && matchesDate(flight, searchCriteria.dataRegresso);
+      if (match) {
+        console.log(
+          `✈️ Return match: ${flight.numeroVoo} (${flight.origem} → ${flight.destino} ${flight.partida})`
+        );
+      }
+      return match;
+    });
+
+    console.log(
+      "📊 Debug - Found:",
+      outboundFlights.length,
+      "outbound flights and",
+      returnFlights.length,
+      "return flights"
+    );
+
+    /* Combinar cada voo de ida com cada voo de volta */
+    outboundFlights.forEach((outbound) => {
+      returnFlights.forEach((returnFlight) => {
+        trips.push({
+          numeroVoo: `${outbound.numeroVoo}-${returnFlight.numeroVoo}`,
+          origem: outbound.origem,
+          destino: outbound.destino,
+          partida: outbound.partida,
+          chegada: returnFlight.chegada,
+          dataVolta: returnFlight.partida,
+          companhia: outbound.companhia,
+          imagem: outbound.imagem,
+          turismo: outbound.turismo,
+          tripType: "ida-volta",
+          segments: [outbound, returnFlight],
+          totalCost: outbound.custo + returnFlight.custo,
+          custo: outbound.custo + returnFlight.custo,
+          direto: outbound.direto && returnFlight.direto,
+        });
+      });
+    });
+
+    console.log(
+      "🔗 Debug - Total ida-volta combinations created:",
+      trips.length
+    );
+  } else if (searchCriteria.tripType === "multitrip") {
+    /* Para multi-destino: usar segmentos existentes se disponíveis */
+    if (
+      searchCriteria.multitripSegments &&
+      searchCriteria.multitripSegments.length > 0
+    ) {
+      /* Construir viagens multi-destino baseadas nos segmentos definidos */
+      const multiTripFlights = buildMultiTripFromSegments(
+        searchCriteria.multitripSegments,
+        allFlights
+      );
+      trips.push(...multiTripFlights);
+    }
+  }
+
+  console.log("🎉 Debug - Final trips array:", trips.length, "trips found");
+  console.log("📋 Debug - First trip example:", trips[0]);
+  return trips;
+}
+
+/* Função auxiliar para verificar correspondência origem-destino */
+function matchesOriginDestination(flight, searchOrigin, searchDestination) {
+  if (!searchOrigin && !searchDestination) {
+    console.log("🔍 No origin/destination criteria, returning true");
+    return true;
+  }
+
+  const flightOrigin = extractCityFromLocation(flight.origem);
+  const flightDestination = extractCityFromLocation(flight.destino);
+
+  console.log(`🔍 Matching flight: ${flight.origem} → ${flight.destino}`);
+  console.log(`🔍 Extracted: ${flightOrigin} → ${flightDestination}`);
+  console.log(`🎯 Search for: ${searchOrigin} → ${searchDestination}`);
+
+  let originMatch = true;
+  let destinationMatch = true;
+
+  if (searchOrigin) {
+    const searchOriginCity =
+      typeof searchOrigin === "object"
+        ? searchOrigin.cidade || searchOrigin.codigo
+        : searchOrigin;
+    originMatch = flightOrigin
+      .toLowerCase()
+      .includes(searchOriginCity.toLowerCase());
+    console.log(
+      `🔍 Origin match: ${flightOrigin} includes ${searchOriginCity}? ${originMatch}`
+    );
+  }
+
+  if (searchDestination) {
+    const searchDestinationCity =
+      typeof searchDestination === "object"
+        ? searchDestination.cidade || searchDestination.codigo
+        : searchDestination;
+    destinationMatch = flightDestination
+      .toLowerCase()
+      .includes(searchDestinationCity.toLowerCase());
+    console.log(
+      `🔍 Destination match: ${flightDestination} includes ${searchDestinationCity}? ${destinationMatch}`
+    );
+  }
+
+  const finalMatch = originMatch && destinationMatch;
+  console.log(`🎯 Final match result: ${finalMatch}`);
+  return finalMatch;
+}
+
+/* Função auxiliar para verificar correspondência de data */
+function matchesDate(flight, searchDate) {
+  if (!searchDate) {
+    console.log("📅 No date criteria provided, returning true");
+    return true;
+  }
+
+  try {
+    const flightDate = parseFlightDate(flight.partida);
+    const searchDateObj = new Date(searchDate);
+
+    console.log(
+      `📅 Comparing dates: flight=${
+        flight.partida
+      } (parsed: ${flightDate.toDateString()}) vs search=${searchDate} (parsed: ${searchDateObj.toDateString()})`
+    );
+
+    /* Comparar apenas a data (ignorar horário) */
+    const match = flightDate.toDateString() === searchDateObj.toDateString();
+    console.log(`📅 Date match result: ${match}`);
+    return match;
+  } catch (e) {
+    console.log(`📅 Error parsing dates: ${e.message}, returning true`);
+    return true; /* Se não conseguir processar a data, incluir o voo */
+  }
+}
+
+/* Função auxiliar para extrair cidade de uma localização */
+function extractCityFromLocation(location) {
+  if (!location) return "";
+
+  /* Formato esperado: "LHR - Londres" */
+  const parts = location.split(" - ");
+  return parts.length > 1 ? parts[1] : location;
+}
+
+/* Função auxiliar para construir viagens multi-destino */
+function buildMultiTripFromSegments(segments, allFlights) {
+  const trips = [];
+
+  /* Para cada combinação de segmentos, procurar voos correspondentes */
+  segments.forEach((segment, index) => {
+    const segmentFlights = allFlights.filter(
+      (flight) =>
+        matchesOriginDestination(flight, segment.origem, segment.destino) &&
+        matchesDate(flight, segment.dataPartida)
+    );
+
+    if (segmentFlights.length > 0) {
+      segmentFlights.forEach((flight) => {
+        trips.push({
+          ...flight,
+          tripType: "multitrip",
+          segmentIndex: index,
+          segments: [flight],
+          totalCost: flight.custo,
+        });
+      });
+    }
+  });
+
+  return trips;
+}
+
+/* Função de teste para debug - verificar dados iniciais */
+export function debugFlightData() {
+  console.log("🔧 DEBUG FLIGHT DATA:");
+  console.log("📊 Total flights in viagens array:", viagens.length);
+
+  if (viagens.length > 0) {
+    console.log(
+      "🌍 Sample origins:",
+      viagens.slice(0, 5).map((v) => v.origem)
+    );
+    console.log(
+      "🎯 Sample destinations:",
+      viagens.slice(0, 5).map((v) => v.destino)
+    );
+    console.log(
+      "📅 Sample dates:",
+      viagens.slice(0, 5).map((v) => v.partida)
+    );
+    console.log(
+      "💰 Sample costs:",
+      viagens.slice(0, 5).map((v) => v.custo)
+    );
+
+    /* Verificar cidades únicas */
+    const uniqueOrigins = [
+      ...new Set(viagens.map((v) => extractCityFromLocation(v.origem))),
+    ];
+    const uniqueDestinations = [
+      ...new Set(viagens.map((v) => extractCityFromLocation(v.destino))),
+    ];
+
+    console.log("🏙️ Unique origin cities:", uniqueOrigins.slice(0, 10));
+    console.log(
+      "🏙️ Unique destination cities:",
+      uniqueDestinations.slice(0, 10)
+    );
+  } else {
+    console.log("⚠️ No flights found in viagens array!");
+  }
+
+  /* Verificar estado atual dos parâmetros de pesquisa */
+  console.log("🔍 Current search state:");
+  console.log("  - tripType:", tripType);
+  console.log("  - selectedOrigin:", selectedOrigin);
+  console.log("  - selectedDestination:", selectedDestination);
+  console.log("  - datesTravelers:", datesTravelers);
+}

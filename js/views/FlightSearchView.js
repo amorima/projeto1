@@ -17,6 +17,7 @@ let filters = {
   maxPrice: Infinity,
   sortDate: "",
   sortPrice: "",
+  tripType: "so-ida", // Default to one-way
 };
 // Preenche os campos do topo da página de pesquisa com os dados vindos do sessionStorage
 function preencherCamposPesquisa() {
@@ -81,8 +82,11 @@ function preencherCamposPesquisa() {
       }`;
 
     /* Atualizar filtros globais */
+    filters.tripType = dados.tripType || "so-ida";
     filters.dataPartida = dados.dataPartida || "";
-    filters.dataRegresso = dados.dataRegresso || "";
+    /* Para "só ida", não passar data de regresso mesmo que preenchida */
+    filters.dataRegresso =
+      dados.tripType === "so-ida" ? "" : dados.dataRegresso || "";
     filters.adultos = dados.adultos || 1;
     filters.criancas = dados.criancas || 0;
     filters.bebes = dados.bebes || 0;
@@ -130,15 +134,38 @@ function preencherCamposPesquisa() {
  * @param {number} maxCards - Número máximo de cards a renderizar (default: 18).
  */
 function renderFlightCards(maxCards = 18) {
+  console.log("🚀 renderFlightCards called with maxCards:", maxCards);
+
+  /* Chamar função de debug para verificar dados */
+  Flight.debugFlightData();
+
   /* Obter dados de pesquisa do sessionStorage se disponível */
   const searchData = sessionStorage.getItem("planit_search");
-  let flights = Flight.getAll();
+  let trips = [];
+
+  console.log("🔍 Debug - SearchData from sessionStorage:", searchData);
 
   /* Aplicar filtros de pesquisa do formulário PlanIt se disponível */
   if (searchData) {
     const parsedSearchData = JSON.parse(searchData);
-    /* Usar a nova função de pesquisa avançada que considera escalas */
-    flights = Flight.searchFlightsAdvanced(parsedSearchData);
+    console.log("📋 Debug - Parsed SearchData:", parsedSearchData);
+    /* Usar a nova função de construção de viagens inteligentes */
+    trips = Flight.buildTripCombinations(parsedSearchData);
+    console.log("✈️ Debug - Trips after buildTripCombinations:", trips.length);
+  } else {
+    console.log(
+      "⚠️ No search data found, showing all flights as individual trips"
+    );
+    /* Se não há critérios de pesquisa, mostrar voos individuais como viagens de ida */
+    const allFlights = Flight.getAll();
+    console.log("📊 Debug - All flights:", allFlights.length);
+    trips = allFlights.map((flight) => ({
+      ...flight,
+      tripType: "so-ida",
+      segments: [flight],
+      totalCost: flight.custo,
+    }));
+    console.log("🎫 Debug - Trips from all flights:", trips.length);
   }
 
   /* Aplicar filtros da interface (UI) - preço, ordenação, etc */
@@ -149,10 +176,10 @@ function renderFlightCards(maxCards = 18) {
     sortPrice: filters.sortPrice || undefined,
   };
 
-  flights = Flight.applyUIFilters(flights, uiFilters);
+  trips = Flight.applyUIFilters(trips, uiFilters);
 
   /* Aplicar filtros adicionais específicos da interface */
-  flights = flights.filter((flight) => {
+  trips = trips.filter((trip) => {
     let match = true;
 
     /* Filtro por origem específica da interface */
@@ -161,11 +188,11 @@ function renderFlightCards(maxCards = 18) {
       filters.origem !== "Qualquer" &&
       filters.origem !== "Nenhum" &&
       filters.origem !== "Origem" &&
-      flight.origem
+      trip.origem
     ) {
       const filtroOrigem = filters.origem.trim().toLowerCase();
-      const origemVoo = flight.origem.trim().toLowerCase();
-      match = match && origemVoo.includes(filtroOrigem);
+      const origemTrip = trip.origem.trim().toLowerCase();
+      match = match && origemTrip.includes(filtroOrigem);
     }
 
     /* Filtro por destino específico da interface */
@@ -174,33 +201,33 @@ function renderFlightCards(maxCards = 18) {
       filters.destino !== "Qualquer" &&
       filters.destino !== "Nenhum" &&
       filters.destino !== "Destino" &&
-      flight.destino
+      trip.destino
     ) {
       const filtroDestino = filters.destino.trim().toLowerCase();
       /* Usar a função utilitária para verificar se passa pela cidade */
-      match = match && Flight.flightPassesPorCidade(flight, filtroDestino);
+      match = match && Flight.flightPassesPorCidade(trip, filtroDestino);
     }
 
     return match;
   });
 
   /* Limitar número de resultados */
-  flights = flights.slice(0, maxCards);
+  trips = trips.slice(0, maxCards);
 
   /* Renderizar os cards */
-  renderCards(flights);
+  renderCards(trips);
 }
 
-function renderCards(flights) {
+function renderCards(trips) {
   const container = document.querySelector(".card-viagens");
   if (!container) return;
 
   container.innerHTML = "";
 
-  if (flights.length === 0) {
+  if (trips.length === 0) {
     container.innerHTML = `
       <div class="col-span-full text-center py-12">
-        <p class="text-gray-500 dark:text-gray-400 text-lg">Nenhum voo encontrado para os critérios selecionados.</p>
+        <p class="text-gray-500 dark:text-gray-400 text-lg">Nenhuma viagem encontrada para os critérios selecionados.</p>
         <button onclick="clearAllFilters()" class="mt-4 px-6 py-2 bg-Main-Primary text-white rounded-lg hover:bg-Main-Dark transition-colors">
           Limpar filtros
         </button>
@@ -209,27 +236,27 @@ function renderCards(flights) {
     return;
   }
 
-  flights.forEach((flight) => {
-    const card = createFlightCard(flight);
+  trips.forEach((trip) => {
+    const card = createFlightCard(trip);
     container.appendChild(card);
   });
 }
 
-function createFlightCard(flight) {
+function createFlightCard(trip) {
   const cardElement = document.createElement("div");
   cardElement.className =
     "bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow";
 
   /* Determinar o tipo de viagem */
   let tipoViagemText;
-  if (flight.tipoViagem === "ida") {
+  if (trip.tripType === "so-ida") {
     tipoViagemText = "Ida";
-  } else if (flight.tipoViagem === "ida-volta") {
+  } else if (trip.tripType === "ida-volta") {
     tipoViagemText = "Ida e Volta";
-  } else if (flight.tipoViagem === "multidestino") {
+  } else if (trip.tripType === "multitrip") {
     tipoViagemText = "Multi-destino";
   } else {
-    /* Se não tiver tipoViagem definido, verificar o tipo de pesquisa */
+    /* Fallback baseado na pesquisa */
     const searchData = sessionStorage.getItem("planit_search");
     if (searchData) {
       const parsedData = JSON.parse(searchData);
@@ -245,22 +272,18 @@ function createFlightCard(flight) {
     }
   }
 
-  /* Determinar se é voo direto ou com escalas (para tooltip ou informação adicional) */
-  const tipoVooText = flight.direto
+  /* Determinar se é voo direto ou com escalas */
+  const tipoVooText = trip.direto
     ? "Direto"
     : `${
-        flight.segmentos && flight.segmentos.length
-          ? flight.segmentos.length - 1
-          : 0
-      } escala${flight.segmentos && flight.segmentos.length > 2 ? "s" : ""}`;
+        trip.segmentos && trip.segmentos.length ? trip.segmentos.length - 1 : 0
+      } escala${trip.segmentos && trip.segmentos.length > 2 ? "s" : ""}`;
 
   /* Formatação de tipos de turismo */
   const turismoTags =
-    Array.isArray(flight.turismo) && flight.turismo.length > 0
-      ? flight.turismo
-          .filter(
-            (tipo) => tipo && typeof tipo === "string"
-          ) /* Filtrar tipos válidos */
+    Array.isArray(trip.turismo) && trip.turismo.length > 0
+      ? trip.turismo
+          .filter((tipo) => tipo && typeof tipo === "string")
           .map(
             (tipo) =>
               `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${traduzirTipoTurismo(
@@ -272,15 +295,26 @@ function createFlightCard(flight) {
 
   /* Formatação das datas baseada no tipo de viagem */
   let datasText = "";
-  if (flight.tipoViagem === "ida-volta" && flight.dataVolta) {
-    datasText = `${flight.partida} - ${flight.dataVolta}`;
+  if (
+    trip.tripType === "ida-volta" &&
+    trip.segments &&
+    trip.segments.length >= 2
+  ) {
+    const outbound = trip.segments[0];
+    const returnFlight = trip.segments[1];
+    datasText = `${outbound.partida} - ${returnFlight.partida}`;
+  } else if (trip.dataVolta) {
+    datasText = `${trip.partida} - ${trip.dataVolta}`;
   } else {
-    datasText = `${flight.partida} - ${flight.chegada}`;
+    datasText = `${trip.partida} - ${trip.chegada}`;
   }
+
+  /* Usar custo total da viagem */
+  const custoDisplay = trip.totalCost || trip.custo;
 
   cardElement.innerHTML = `
     <div class="relative">
-      <img src="${flight.imagem}" alt="${flight.destino}" class="w-full h-48 object-cover">
+      <img src="${trip.imagem}" alt="${trip.destino}" class="w-full h-48 object-cover">
       <div class="absolute top-2 left-2">
         <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoViagemText}</span>
       </div>
@@ -292,10 +326,10 @@ function createFlightCard(flight) {
       </div>
     </div>
     <div class="p-4">
-      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">${flight.destino}</h3>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">${trip.destino}</h3>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
         <span class="material-symbols-outlined text-sm">flight_takeoff</span>
-        <span>${flight.origem} → ${flight.destino}</span>
+        <span>${trip.origem} → ${trip.destino}</span>
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
         <span class="material-symbols-outlined text-sm">schedule</span>
@@ -303,9 +337,9 @@ function createFlightCard(flight) {
       </div>
       <div class="flex justify-between items-center">
         <div class="text-2xl font-bold text-Main-Primary dark:text-cyan-400">
-          €${flight.custo}
+          €${custoDisplay}
         </div>
-        <a href="flight_itinerary.html?id=${flight.numeroVoo}" 
+        <a href="flight_itinerary.html?id=${trip.numeroVoo}" 
            class="bg-Main-Primary hover:bg-Main-Dark text-white px-4 py-2 rounded-lg transition-colors">
           Ver detalhes
         </a>
@@ -318,6 +352,9 @@ function createFlightCard(flight) {
 
 /* Função para limpar todos os filtros */
 function clearAllFilters() {
+  console.log("🧹 clearAllFilters called - starting filter cleanup");
+  console.log("🧹 Current filters before clearing:", filters);
+
   filters = {
     origem: "",
     destino: "",
@@ -334,18 +371,33 @@ function clearAllFilters() {
     sortPrice: "",
   };
 
+  console.log("🧹 Filters reset to:", filters);
+
   /* Limpar campos da interface */
   const minPriceInput = document.getElementById("min-price");
   const maxPriceInput = document.getElementById("max-price");
   const sortDateSelect = document.getElementById("sort-date");
   const sortPriceSelect = document.getElementById("sort-price");
 
-  if (minPriceInput) minPriceInput.value = "";
-  if (maxPriceInput) maxPriceInput.value = "";
-  if (sortDateSelect) sortDateSelect.value = "";
-  if (sortPriceSelect) sortPriceSelect.value = "";
+  if (minPriceInput) {
+    minPriceInput.value = "";
+    console.log("🧹 Cleared min price input");
+  }
+  if (maxPriceInput) {
+    maxPriceInput.value = "";
+    console.log("🧹 Cleared max price input");
+  }
+  if (sortDateSelect) {
+    sortDateSelect.value = "";
+    console.log("🧹 Cleared sort date select");
+  }
+  if (sortPriceSelect) {
+    sortPriceSelect.value = "";
+    console.log("🧹 Cleared sort price select");
+  }
 
   /* Re-renderizar com todos os voos */
+  console.log("🧹 Calling renderFlightCards to refresh display");
   renderFlightCards();
 }
 
@@ -411,6 +463,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /* Export para outras partes da aplicação, se necessário */
 export { renderFlightCards, clearAllFilters };
+
+/* Tornar clearAllFilters disponível globalmente para onclick */
+window.clearAllFilters = clearAllFilters;
 // --- Inicialização principal ---
 function pararScroll() {
   document.body.classList.add("modal-aberto");
@@ -481,7 +536,9 @@ document.addEventListener("DOMContentLoaded", () => {
       filters.acessibilidade = "";
     }
     filters.dataPartida = planitFilter.dataPartida || "";
-    filters.dataRegresso = planitFilter.dataRegresso || "";
+    /* Para "só ida", não usar data de regresso mesmo que esteja no filtro */
+    filters.dataRegresso =
+      planitFilter.tripType === "so-ida" ? "" : planitFilter.dataRegresso || "";
     filters.adultos = planitFilter.adultos || 1;
     filters.criancas = planitFilter.criancas || 0;
     filters.bebes = planitFilter.bebes || 0;
@@ -515,7 +572,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof Flight !== "undefined" && Flight.getDatesTravelers) {
       const dt = Flight.getDatesTravelers();
       filters.dataPartida = dt.dataPartida;
-      filters.dataRegresso = dt.dataRegresso;
+      /* Para "só ida", não usar data de regresso */
+      filters.dataRegresso = dt.tripType === "so-ida" ? "" : dt.dataRegresso;
       filters.adultos = dt.adultos;
       filters.criancas = dt.criancas;
       filters.bebes = dt.bebes;
@@ -883,17 +941,38 @@ function abrirModalDatas() {
   document.getElementById("confirmar-datas").addEventListener("click", () => {
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
-    if (dataPartida && dataRegresso) {
+    const tripType = filters.tripType || "so-ida"; // Default to one-way if not set
+
+    console.log("🎯 Debug - Modal confirmar datas:", {
+      dataPartida,
+      dataRegresso,
+      tripType,
+    });
+
+    /* Para "só ida", só precisa de data de partida. Para "ida e volta", precisa de ambas */
+    const requiredFieldsFilled =
+      tripType === "so-ida" ? dataPartida : dataPartida && dataRegresso;
+
+    if (requiredFieldsFilled) {
+      /* Para "só ida", limpar data de regresso */
+      const finalDataRegresso = tripType === "so-ida" ? "" : dataRegresso;
+
       Flight.setDatesTravelers(
         dataPartida,
-        dataRegresso,
+        finalDataRegresso,
         adultos,
         criancas,
         bebes
       );
-      updateDatesButton(dataPartida, dataRegresso, adultos, criancas, bebes);
+      updateDatesButton(
+        dataPartida,
+        finalDataRegresso,
+        adultos,
+        criancas,
+        bebes
+      );
       filters.dataPartida = dataPartida;
-      filters.dataRegresso = dataRegresso;
+      filters.dataRegresso = finalDataRegresso;
       filters.adultos = adultos;
       filters.criancas = criancas;
       filters.bebes = bebes;
