@@ -121,7 +121,9 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Lisboa/lisboa-1.jpg",
       dataVolta: "18/01/2025 18:30",
       turismo: ["Turismo Cultural", "Turismo Urbano"],
+      tipoViagem: "ida-volta" /* ida, ida-volta, multitrip */,
       segmentos: [
+        /* Segmento de ida */
         {
           numeroVoo: "TP123",
           origem: "OPO - Porto",
@@ -129,6 +131,17 @@ function loadSampleFlights() {
           companhia: "TAP Air Portugal",
           partida: "15/01/2025 08:30",
           chegada: "15/01/2025 09:45",
+          tipo: "ida",
+        },
+        /* Segmento de volta */
+        {
+          numeroVoo: "TP124",
+          origem: "LIS - Lisboa",
+          destino: "OPO - Porto",
+          companhia: "TAP Air Portugal",
+          partida: "18/01/2025 18:30",
+          chegada: "18/01/2025 19:45",
+          tipo: "volta",
         },
       ],
     },
@@ -144,7 +157,9 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Madrid/madrid-1.jpg",
       dataVolta: "20/01/2025 16:45",
       turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      tipoViagem: "ida-volta",
       segmentos: [
+        /* Segmento de ida */
         {
           numeroVoo: "TP456",
           origem: "LIS - Lisboa",
@@ -152,6 +167,17 @@ function loadSampleFlights() {
           companhia: "TAP Air Portugal",
           partida: "16/01/2025 10:15",
           chegada: "16/01/2025 12:30",
+          tipo: "ida",
+        },
+        /* Segmento de volta */
+        {
+          numeroVoo: "TP457",
+          origem: "MAD - Madrid",
+          destino: "LIS - Lisboa",
+          companhia: "TAP Air Portugal",
+          partida: "20/01/2025 16:45",
+          chegada: "20/01/2025 18:00",
+          tipo: "volta",
         },
       ],
     },
@@ -168,7 +194,9 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Roma/roma-1.jpg",
       dataVolta: "26/01/2025 09:20",
       turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      tipoViagem: "ida-volta",
       segmentos: [
+        /* Segmentos de ida (com escala) */
         {
           numeroVoo: "LH567",
           origem: "OPO - Porto",
@@ -176,6 +204,7 @@ function loadSampleFlights() {
           companhia: "Lufthansa",
           partida: "19/01/2025 12:15",
           chegada: "19/01/2025 15:30",
+          tipo: "ida",
         },
         {
           numeroVoo: "LH568",
@@ -184,6 +213,17 @@ function loadSampleFlights() {
           companhia: "Lufthansa",
           partida: "19/01/2025 16:45",
           chegada: "19/01/2025 18:45",
+          tipo: "ida",
+        },
+        /* Segmentos de volta (direto) */
+        {
+          numeroVoo: "LH569",
+          origem: "ROM - Roma",
+          destino: "OPO - Porto",
+          companhia: "Lufthansa",
+          partida: "26/01/2025 09:20",
+          chegada: "26/01/2025 12:35",
+          tipo: "volta",
         },
       ],
     },
@@ -199,7 +239,9 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Londres/londres-1.jpg",
       dataVolta: "22/01/2025 14:20",
       turismo: ["Turismo Cultural", "Turismo Urbano"],
+      tipoViagem: "ida-volta",
       segmentos: [
+        /* Segmento de ida */
         {
           numeroVoo: "FR789",
           origem: "OPO - Porto",
@@ -207,6 +249,17 @@ function loadSampleFlights() {
           companhia: "Ryanair",
           partida: "17/01/2025 06:00",
           chegada: "17/01/2025 08:15",
+          tipo: "ida",
+        },
+        /* Segmento de volta */
+        {
+          numeroVoo: "FR790",
+          origem: "LON - Londres",
+          destino: "OPO - Porto",
+          companhia: "Ryanair",
+          partida: "22/01/2025 14:20",
+          chegada: "22/01/2025 16:35",
+          tipo: "volta",
         },
       ],
     },
@@ -222,7 +275,9 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Paris/paris-1.jpg",
       dataVolta: "25/01/2025 11:30",
       turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      tipoViagem: "ida-volta",
       segmentos: [
+        /* Segmento de ida */
         {
           numeroVoo: "AF321",
           origem: "LIS - Lisboa",
@@ -230,6 +285,17 @@ function loadSampleFlights() {
           companhia: "Air France",
           partida: "18/01/2025 14:40",
           chegada: "18/01/2025 18:55",
+          tipo: "ida",
+        },
+        /* Segmento de volta */
+        {
+          numeroVoo: "AF322",
+          origem: "PAR - Paris",
+          destino: "LIS - Lisboa",
+          companhia: "Air France",
+          partida: "25/01/2025 11:30",
+          chegada: "25/01/2025 13:45",
+          tipo: "volta",
         },
       ],
     },
@@ -245,7 +311,9 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Amsterdao/amsterdao-1.jpg",
       dataVolta: "27/01/2025 15:45",
       turismo: ["Turismo Cultural", "Turismo Urbano"],
+      tipoViagem: "ida-volta",
       segmentos: [
+        /* Segmento de ida */
         {
           numeroVoo: "KL890",
           origem: "LIS - Lisboa",
@@ -253,6 +321,17 @@ function loadSampleFlights() {
           companhia: "KLM",
           partida: "20/01/2025 07:30",
           chegada: "20/01/2025 11:10",
+          tipo: "ida",
+        },
+        /* Segmento de volta */
+        {
+          numeroVoo: "KL891",
+          origem: "AMS - Amsterdão",
+          destino: "LIS - Lisboa",
+          companhia: "KLM",
+          partida: "27/01/2025 15:45",
+          chegada: "27/01/2025 18:00",
+          tipo: "volta",
         },
       ],
     },
@@ -273,7 +352,8 @@ function loadSampleFlights() {
         flight.imagem,
         flight.dataVolta,
         flight.segmentos,
-        flight.turismo
+        flight.turismo,
+        flight.tipoViagem
       )
   );
 
@@ -1140,6 +1220,7 @@ class Trip {
   imagem = "";
   dataVolta = "";
   turismo = [];
+  tipoViagem = "ida-volta"; /* ida, ida-volta, multitrip */
 
   constructor(
     numeroVoo,
@@ -1153,7 +1234,8 @@ class Trip {
     imagem,
     dataVolta,
     segmentos = null,
-    turismo = []
+    turismo = [],
+    tipoViagem = "ida-volta"
   ) {
     this.numeroVoo = numeroVoo;
     this.origem = origem;
@@ -1166,6 +1248,7 @@ class Trip {
     this.imagem = imagem;
     this.dataVolta = dataVolta;
     this.turismo = Array.isArray(turismo) ? turismo : [];
+    this.tipoViagem = tipoViagem || "ida-volta";
 
     /* Se não foram fornecidos segmentos, criar um segmento direto */
     if (!segmentos || segmentos.length === 0) {
