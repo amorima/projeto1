@@ -177,8 +177,8 @@ function renderFlightCards(maxCards = 18) {
       flight.destino
     ) {
       const filtroDestino = filters.destino.trim().toLowerCase();
-      /* Usar o novo método para verificar se passa pela cidade */
-      match = match && flight.passaPorCidade(filtroDestino);
+      /* Usar a função utilitária para verificar se passa pela cidade */
+      match = match && Flight.flightPassesPorCidade(flight, filtroDestino);
     }
 
     return match;

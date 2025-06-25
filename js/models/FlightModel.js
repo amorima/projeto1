@@ -1013,9 +1013,11 @@ export function filterFlights(searchData) {
       }
 
       /* Se temos apenas string, comparar diretamente */
-      const origemPesquisa = (
-        searchData.origem.cidade || searchData.origem
-      ).toLowerCase();
+      let origemPesquisa = searchData.origem.cidade || searchData.origem;
+      if (typeof origemPesquisa !== "string") {
+        return true; /* Se não conseguir processar, inclui o voo */
+      }
+      origemPesquisa = origemPesquisa.toLowerCase();
       return origemVoo.includes(origemPesquisa);
     });
   }
@@ -1034,9 +1036,11 @@ export function filterFlights(searchData) {
       }
 
       /* Se temos apenas string, comparar diretamente */
-      const destinoPesquisa = (
-        searchData.destino.cidade || searchData.destino
-      ).toLowerCase();
+      let destinoPesquisa = searchData.destino.cidade || searchData.destino;
+      if (typeof destinoPesquisa !== "string") {
+        return true; /* Se não conseguir processar, inclui o voo */
+      }
+      destinoPesquisa = destinoPesquisa.toLowerCase();
       return destinoVoo.includes(destinoPesquisa);
     });
   }
@@ -1082,10 +1086,25 @@ export function searchFlightsAdvanced(searchCriteria) {
   /* Filtro por origem */
   if (searchCriteria.origem) {
     results = results.filter((flight) => {
-      const origemPesquisa = searchCriteria.origem.toLowerCase();
+      /* Extrair string da origem (pode ser objeto ou string) */
+      let origemPesquisa = searchCriteria.origem;
+      if (typeof origemPesquisa === "object" && origemPesquisa.codigo) {
+        origemPesquisa = origemPesquisa.codigo;
+      }
+      if (typeof origemPesquisa === "object" && origemPesquisa.cidade) {
+        origemPesquisa = origemPesquisa.cidade;
+      }
+      if (typeof origemPesquisa !== "string") {
+        return true; /* Se não conseguir processar, inclui o voo */
+      }
+
+      origemPesquisa = origemPesquisa.toLowerCase();
       return (
         flight.origem.toLowerCase().includes(origemPesquisa) ||
-        flight.segmentos[0].origem.toLowerCase().includes(origemPesquisa)
+        (flight.segmentos &&
+          flight.segmentos.length > 0 &&
+          flight.segmentos[0].origem &&
+          flight.segmentos[0].origem.toLowerCase().includes(origemPesquisa))
       );
     });
   }
@@ -1093,7 +1112,19 @@ export function searchFlightsAdvanced(searchCriteria) {
   /* Filtro por destino (considera destino final e escalas) */
   if (searchCriteria.destino) {
     results = results.filter((flight) => {
-      const destinoPesquisa = searchCriteria.destino.toLowerCase();
+      /* Extrair string do destino (pode ser objeto ou string) */
+      let destinoPesquisa = searchCriteria.destino;
+      if (typeof destinoPesquisa === "object" && destinoPesquisa.codigo) {
+        destinoPesquisa = destinoPesquisa.codigo;
+      }
+      if (typeof destinoPesquisa === "object" && destinoPesquisa.cidade) {
+        destinoPesquisa = destinoPesquisa.cidade;
+      }
+      if (typeof destinoPesquisa !== "string") {
+        return true; /* Se não conseguir processar, inclui o voo */
+      }
+
+      destinoPesquisa = destinoPesquisa.toLowerCase();
 
       /* Verifica destino final */
       const destinoFinalMatch = flight.destino
@@ -1101,9 +1132,13 @@ export function searchFlightsAdvanced(searchCriteria) {
         .includes(destinoPesquisa);
 
       /* Verifica escalas */
-      const escalaMatch = flight.segmentos.some((seg) =>
-        seg.destino.toLowerCase().includes(destinoPesquisa)
-      );
+      const escalaMatch =
+        flight.segmentos &&
+        flight.segmentos.length > 0 &&
+        flight.segmentos.some(
+          (seg) =>
+            seg.destino && seg.destino.toLowerCase().includes(destinoPesquisa)
+        );
 
       return destinoFinalMatch || escalaMatch;
     });
@@ -1458,4 +1493,29 @@ export function validateFlightData(flightData) {
     isValid: errors.length === 0,
     errors: errors,
   };
+}
+
+/* Função utilitária para verificar se um voo passa por uma cidade */
+export function flightPassesPorCidade(flight, cidade) {
+  if (!flight || !cidade) return false;
+
+  const cidadeLower = cidade.toLowerCase();
+
+  /* Verificar origem e destino principal */
+  const origemMatch =
+    flight.origem && flight.origem.toLowerCase().includes(cidadeLower);
+  const destinoMatch =
+    flight.destino && flight.destino.toLowerCase().includes(cidadeLower);
+
+  /* Verificar segmentos se existirem */
+  let segmentosMatch = false;
+  if (flight.segmentos && Array.isArray(flight.segmentos)) {
+    segmentosMatch = flight.segmentos.some(
+      (seg) =>
+        (seg.origem && seg.origem.toLowerCase().includes(cidadeLower)) ||
+        (seg.destino && seg.destino.toLowerCase().includes(cidadeLower))
+    );
+  }
+
+  return origemMatch || destinoMatch || segmentosMatch;
 }
