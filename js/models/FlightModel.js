@@ -108,6 +108,7 @@ export function init() {
 /* Load sample flight data for testing */
 function loadSampleFlights() {
   const sampleFlights = [
+    /* Voos diretos */
     {
       numeroVoo: "TP123",
       origem: "OPO - Porto",
@@ -119,6 +120,15 @@ function loadSampleFlights() {
       custo: "89",
       imagem: "../img/destinos/Lisboa/lisboa-1.jpg",
       dataVolta: "18/01/2025 18:30",
+      turismo: ["Turismo Cultural", "Turismo Urbano"],
+      segmentos: [{
+        numeroVoo: "TP123",
+        origem: "OPO - Porto",
+        destino: "LIS - Lisboa",
+        companhia: "TAP Air Portugal",
+        partida: "15/01/2025 08:30",
+        chegada: "15/01/2025 09:45"
+      }]
     },
     {
       numeroVoo: "TP456",
@@ -131,6 +141,47 @@ function loadSampleFlights() {
       custo: "156",
       imagem: "../img/destinos/Madrid/madrid-1.jpg",
       dataVolta: "20/01/2025 16:45",
+      turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      segmentos: [{
+        numeroVoo: "TP456",
+        origem: "LIS - Lisboa",
+        destino: "MAD - Madrid",
+        companhia: "TAP Air Portugal",
+        partida: "16/01/2025 10:15",
+        chegada: "16/01/2025 12:30"
+      }]
+    },
+    /* Voo com uma escala */
+    {
+      numeroVoo: "LH567",
+      origem: "OPO - Porto",
+      destino: "ROM - Roma",
+      companhia: "Lufthansa",
+      partida: "19/01/2025 12:15",
+      chegada: "19/01/2025 18:45",
+      direto: false,
+      custo: "234",
+      imagem: "../img/destinos/Roma/roma-1.jpg",
+      dataVolta: "26/01/2025 09:20",
+      turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      segmentos: [
+        {
+          numeroVoo: "LH567",
+          origem: "OPO - Porto",
+          destino: "FRA - Frankfurt",
+          companhia: "Lufthansa",
+          partida: "19/01/2025 12:15",
+          chegada: "19/01/2025 15:30"
+        },
+        {
+          numeroVoo: "LH568",
+          origem: "FRA - Frankfurt",
+          destino: "ROM - Roma",
+          companhia: "Lufthansa",
+          partida: "19/01/2025 16:45",
+          chegada: "19/01/2025 18:45"
+        }
+      ]
     },
     {
       numeroVoo: "FR789",
@@ -143,6 +194,15 @@ function loadSampleFlights() {
       custo: "78",
       imagem: "../img/destinos/Londres/londres-1.jpg",
       dataVolta: "22/01/2025 14:20",
+      turismo: ["Turismo Cultural", "Turismo Urbano"],
+      segmentos: [{
+        numeroVoo: "FR789",
+        origem: "OPO - Porto",
+        destino: "LON - Londres",
+        companhia: "Ryanair",
+        partida: "17/01/2025 06:00",
+        chegada: "17/01/2025 08:15"
+      }]
     },
     {
       numeroVoo: "AF321",
@@ -155,18 +215,15 @@ function loadSampleFlights() {
       custo: "198",
       imagem: "../img/destinos/Paris/paris-1.jpg",
       dataVolta: "25/01/2025 11:30",
-    },
-    {
-      numeroVoo: "LH567",
-      origem: "OPO - Porto",
-      destino: "ROM - Roma",
-      companhia: "Lufthansa",
-      partida: "19/01/2025 12:15",
-      chegada: "19/01/2025 16:45",
-      direto: false,
-      custo: "234",
-      imagem: "../img/destinos/Roma/roma-1.jpg",
-      dataVolta: "26/01/2025 09:20",
+      turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      segmentos: [{
+        numeroVoo: "AF321",
+        origem: "LIS - Lisboa",
+        destino: "PAR - Paris",
+        companhia: "Air France",
+        partida: "18/01/2025 14:40",
+        chegada: "18/01/2025 18:55"
+      }]
     },
     {
       numeroVoo: "KL890",
@@ -179,9 +236,36 @@ function loadSampleFlights() {
       custo: "167",
       imagem: "../img/destinos/Amsterdao/amsterdao-1.jpg",
       dataVolta: "27/01/2025 15:45",
-    },
+      turismo: ["Turismo Cultural", "Turismo Urbano"],
+      segmentos: [{
+        numeroVoo: "KL890",
+        origem: "LIS - Lisboa",
+        destino: "AMS - Amsterdão",
+        companhia: "KLM",
+        partida: "20/01/2025 07:30",
+        chegada: "20/01/2025 11:10"
+      }]
+    }
   ];
-  viagens = sampleFlights;
+  
+  /* Converter para objetos Trip para garantir consistência */
+  viagens = sampleFlights.map(flight => 
+    new Trip(
+      flight.numeroVoo,
+      flight.origem,
+      flight.destino,
+      flight.companhia,
+      flight.partida,
+      flight.chegada,
+      flight.direto,
+      flight.custo,
+      flight.imagem,
+      flight.dataVolta,
+      flight.segmentos,
+      flight.turismo
+    )
+  );
+  
   saveToLocalStorage("viagens", viagens);
 }
 /* Carregar dados guardados na localStorage */
@@ -224,10 +308,12 @@ export function add(
   direto,
   custo,
   imagem,
-  dataVolta
+  dataVolta,
+  segmentos = null,
+  turismo = []
 ) {
   if (viagens.some((v) => v.numeroVoo === numeroVoo)) {
-    throw Error(`Flight "${numeroVoo}" already exists!`);
+    throw Error(`Voo "${numeroVoo}" já existe!`);
   } else {
     viagens.push(
       new Trip(
@@ -240,7 +326,9 @@ export function add(
         direto,
         custo,
         imagem,
-        dataVolta
+        dataVolta,
+        segmentos,
+        turismo
       )
     );
     saveToLocalStorage("viagens", viagens);
@@ -864,47 +952,141 @@ export function filterFlights(searchData) {
   }
   return flights;
 }
+/* Função de pesquisa robusta que considera escalas e multi-destinos */
+export function searchFlightsAdvanced(searchCriteria) {
+  let results = [...viagens];
+  
+  /* Filtro por origem */
+  if (searchCriteria.origem) {
+    results = results.filter(flight => {
+      const origemPesquisa = searchCriteria.origem.toLowerCase();
+      return flight.origem.toLowerCase().includes(origemPesquisa) ||
+             flight.segmentos[0].origem.toLowerCase().includes(origemPesquisa);
+    });
+  }
+  
+  /* Filtro por destino (considera destino final e escalas) */
+  if (searchCriteria.destino) {
+    results = results.filter(flight => {
+      const destinoPesquisa = searchCriteria.destino.toLowerCase();
+      
+      /* Verifica destino final */
+      const destinoFinalMatch = flight.destino.toLowerCase().includes(destinoPesquisa);
+      
+      /* Verifica escalas */
+      const escalaMatch = flight.segmentos.some(seg => 
+        seg.destino.toLowerCase().includes(destinoPesquisa)
+      );
+      
+      return destinoFinalMatch || escalaMatch;
+    });
+  }
+  
+  /* Filtro por tipo de turismo */
+  if (searchCriteria.tipoTurismo && searchCriteria.tipoTurismo !== "Nenhum") {
+    results = results.filter(flight =>
+      flight.turismo && flight.turismo.some(tipo =>
+        tipo.toLowerCase().includes(searchCriteria.tipoTurismo.toLowerCase())
+      )
+    );
+  }
+  
+  /* Filtro por voo direto */
+  if (searchCriteria.apenasVoosDiretos) {
+    results = results.filter(flight => flight.direto === true);
+  }
+  
+  /* Filtro por data de partida */
+  if (searchCriteria.dataPartida) {
+    const dataLimite = new Date(searchCriteria.dataPartida);
+    results = results.filter(flight => {
+      const dataVoo = parseFlightDate(flight.partida);
+      return dataVoo >= dataLimite;
+    });
+  }
+  
+  /* Filtro por preço máximo */
+  if (searchCriteria.precoMaximo) {
+    results = results.filter(flight => 
+      parseFloat(flight.custo) <= parseFloat(searchCriteria.precoMaximo)
+    );
+  }
+  
+  return results;
+}
+
+/* Função específica para encontrar voos com escalas entre duas cidades */
+export function findFlightsWithStops(origem, destino, maxEscalas = 2) {
+  const viagensComEscalas = [];
+  
+  viagens.forEach(flight => {
+    /* Verifica se a viagem conecta origem e destino */
+    const origemMatch = flight.origem.toLowerCase().includes(origem.toLowerCase());
+    const destinoMatch = flight.destino.toLowerCase().includes(destino.toLowerCase());
+    
+    if (origemMatch && destinoMatch) {
+      const numEscalas = flight.segmentos.length - 1;
+      if (numEscalas <= maxEscalas) {
+        viagensComEscalas.push({
+          ...flight,
+          numEscalas: numEscalas,
+          escalas: flight.segmentos.slice(0, -1).map(seg => seg.destino)
+        });
+      }
+    }
+  });
+  
+  return viagensComEscalas;
+}
 /* Helper function to parse flight dates */
 function parseFlightDate(dateStr) {
-  // Handle different date formats that might be in the flight data
+  /* Tratamento de diferentes formatos de data nos dados dos voos */
   if (!dateStr) return new Date();
-  // If it's already a Date object
   if (dateStr instanceof Date) return dateStr;
-  // If it's in DD/MM/YYYY format
+  
+  /* Formato DD/MM/YYYY HH:MM */
   if (dateStr.includes("/")) {
-    const [day, month, year] = dateStr.split("/");
-    return new Date(year, month - 1, day);
+    const [datePart, timePart] = dateStr.split(" ");
+    const [day, month, year] = datePart.split("/");
+    const [hour, minute] = timePart ? timePart.split(":") : ["0", "0"];
+    return new Date(year, month - 1, day, hour, minute);
   }
-  // Try to parse as ISO date or other standard format
+  
+  /* Formato ISO ou outro formato padrão */
   return new Date(dateStr);
 }
 /**
  * CLASSE QUE MODELA UMA VIAGEM NA APLICAÇÃO
  * @class Trip
- * @property {string} numeroVoo - Número do voo
- * @property {string} origem - Cidade de origem do voo
- * @property {string} destino - Cidade de destino do voo
- * @property {string} companhia - Companhia aérea do voo
- * @property {string} partida - Data e hora de partida do voo
- * @property {string} chegada - Data e hora de chegada do voo
- * @property {string} direto - Indica se o voo é direto (sim/não)
- * @property {number} custo - Custo do voo
- * @property {string} imagem - URL da imagem do voo
- * @property {string} dataVolta - Data de volta do voo (se aplicável)
+ * @property {string} numeroVoo - Número único do voo
+ * @property {string} origem - Aeroporto de origem (formato: "CODE - Cidade")
+ * @property {string} destino - Aeroporto de destino final (formato: "CODE - Cidade")
+ * @property {Array} segmentos - Array de segmentos de voo (para escalas)
+ * @property {string} companhia - Companhia aérea principal
+ * @property {string} partida - Data e hora de partida do primeiro segmento
+ * @property {string} chegada - Data e hora de chegada do último segmento
+ * @property {boolean} direto - Indica se o voo é direto (sem escalas)
+ * @property {number} custo - Custo total do voo
+ * @property {string} imagem - URL da imagem do destino
+ * @property {string} dataVolta - Data de volta (se aplicável)
+ * @property {Array} turismo - Tipos de turismo do destino
  * @description
- * Esta classe representa uma viagem na aplicação, contendo informações como número do voo, origem, destino, companhia aérea, horários de partida e chegada, se é um voo direto, custo, imagem e data de volta (se aplicável).
+ * Classe que representa uma viagem com suporte a escalas e multi-segmentos
  */
 class Trip {
   numeroVoo = "";
   origem = "";
   destino = "";
+  segmentos = [];
   companhia = "";
   partida = "";
   chegada = "";
-  direto = "";
+  direto = true;
   custo = 0;
   imagem = "";
   dataVolta = "";
+  turismo = [];
+  
   constructor(
     numeroVoo,
     origem,
@@ -915,7 +1097,9 @@ class Trip {
     direto,
     custo,
     imagem,
-    dataVolta
+    dataVolta,
+    segmentos = null,
+    turismo = []
   ) {
     this.numeroVoo = numeroVoo;
     this.origem = origem;
@@ -923,10 +1107,45 @@ class Trip {
     this.companhia = companhia;
     this.partida = partida;
     this.chegada = chegada;
-    this.direto = direto;
+    this.direto = direto === true || direto === "S" || direto === "Sim";
     this.custo = custo;
     this.imagem = imagem;
     this.dataVolta = dataVolta;
+    this.turismo = Array.isArray(turismo) ? turismo : [];
+    
+    /* Se não foram fornecidos segmentos, criar um segmento direto */
+    if (!segmentos || segmentos.length === 0) {
+      this.segmentos = [{
+        numeroVoo: this.numeroVoo,
+        origem: this.origem,
+        destino: this.destino,
+        companhia: this.companhia,
+        partida: this.partida,
+        chegada: this.chegada
+      }];
+    } else {
+      this.segmentos = segmentos;
+      /* Atualizar direto baseado no número de segmentos */
+      this.direto = segmentos.length === 1;
+    }
+  }
+  
+  /* Método para obter todas as cidades da rota */
+  getCidadesRota() {
+    const cidades = [this.origem];
+    this.segmentos.forEach(seg => {
+      if (!cidades.includes(seg.destino)) {
+        cidades.push(seg.destino);
+      }
+    });
+    return cidades;
+  }
+  
+  /* Método para verificar se a viagem passa por uma cidade */
+  passaPorCidade(cidade) {
+    return this.getCidadesRota().some(c => 
+      c.toLowerCase().includes(cidade.toLowerCase())
+    );
   }
 }
 /* Reset all state variables to their default values */
