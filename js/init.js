@@ -2338,6 +2338,195 @@ function initdata() {
   if (!localStorage.viagens) {
     console.log("📊 Carregando dados de viagens...");
     const viagens = [
+      /* Cenários de teste para Porto → Londres */
+
+      /* CENÁRIO 1: SÓ IDA - Turismo Cultural + Acesso Sem Degraus */
+      {
+        numeroVoo: "BA2025",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "British Airways",
+        partida: "15/07/2025 09:30",
+        chegada: "15/07/2025 11:45",
+        direto: true,
+        custo: 185,
+        imagem: "/img/destinos/Londres/1.jpg",
+        turismo: ["Turismo Cultural"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Acesso Sem Degraus", "Elevadores Disponíveis"],
+        segmentos: [
+          {
+            numeroVoo: "BA2025",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "British Airways",
+            partida: "15/07/2025 09:30",
+            chegada: "15/07/2025 11:45",
+            tipo: "ida",
+          },
+        ],
+      },
+
+      /* CENÁRIO 2: SÓ IDA - Turismo Urbano + Transporte Acessível */
+      {
+        numeroVoo: "TP1205",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "TAP Air Portugal",
+        partida: "20/07/2025 14:15",
+        chegada: "20/07/2025 16:30",
+        direto: true,
+        custo: 165,
+        imagem: "/img/destinos/Londres/2.jpg",
+        turismo: ["Turismo Urbano"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Transporte Acessível", "Casas de Banho Adaptadas"],
+        segmentos: [
+          {
+            numeroVoo: "TP1205",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "TAP Air Portugal",
+            partida: "20/07/2025 14:15",
+            chegada: "20/07/2025 16:30",
+            tipo: "ida",
+          },
+        ],
+      },
+
+      /* CENÁRIO 3: IDA E VOLTA - Turismo Cultural + Gastronómico */
+      {
+        numeroVoo: "EZY4080",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "easyJet",
+        partida: "25/07/2025 07:45",
+        chegada: "25/07/2025 10:00",
+        direto: true,
+        custo: 140,
+        imagem: "/img/destinos/Londres/3.jpg",
+        dataVolta: "30/07/2025 18:20",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+        tipoViagem: "ida-volta",
+        acessibilidade: [
+          "Elevadores Disponíveis",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+        segmentos: [
+          {
+            numeroVoo: "EZY4080",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "easyJet",
+            partida: "25/07/2025 07:45",
+            chegada: "25/07/2025 10:00",
+            tipo: "ida",
+          },
+          {
+            numeroVoo: "EZY4081",
+            origem: "LHR - Londres",
+            destino: "OPO - Porto",
+            companhia: "easyJet",
+            partida: "30/07/2025 18:20",
+            chegada: "30/07/2025 20:35",
+            tipo: "volta",
+          },
+        ],
+      },
+
+      /* Voos de regresso individuais para ida e volta */
+      {
+        numeroVoo: "EZY4081",
+        origem: "LHR - Londres",
+        destino: "OPO - Porto",
+        companhia: "easyJet",
+        partida: "30/07/2025 18:20",
+        chegada: "30/07/2025 20:35",
+        direto: true,
+        custo: 140,
+        imagem: "/img/destinos/Porto/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+        tipoViagem: "volta",
+        acessibilidade: [
+          "Elevadores Disponíveis",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+        segmentos: [
+          {
+            numeroVoo: "EZY4081",
+            origem: "LHR - Londres",
+            destino: "OPO - Porto",
+            companhia: "easyJet",
+            partida: "30/07/2025 18:20",
+            chegada: "30/07/2025 20:35",
+            tipo: "volta",
+          },
+        ],
+      },
+
+      /* CENÁRIO 4: MULTIVIAGEM - Porto → Londres → Paris → Porto */
+      {
+        numeroVoo: "MULTI001",
+        origem: "OPO - Porto",
+        destino: "CDG - Paris",
+        companhia: "Multi-Airlines",
+        partida: "05/08/2025 08:00",
+        chegada: "05/08/2025 18:30",
+        direto: false,
+        custo: 295,
+        imagem: "/img/destinos/Paris/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+        tipoViagem: "multitrip",
+        acessibilidade: ["Transporte Acessível", "Elevadores Disponíveis"],
+        segmentos: [
+          {
+            numeroVoo: "VS8901",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "Virgin Atlantic",
+            partida: "05/08/2025 08:00",
+            chegada: "05/08/2025 10:15",
+            tipo: "conexao",
+          },
+          {
+            numeroVoo: "AF1234",
+            origem: "LHR - Londres",
+            destino: "CDG - Paris",
+            companhia: "Air France",
+            partida: "05/08/2025 16:00",
+            chegada: "05/08/2025 18:30",
+            tipo: "final",
+          },
+        ],
+      },
+
+      /* Voos adicionais para outras combinações de teste */
+      {
+        numeroVoo: "RY3456",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "Ryanair",
+        partida: "18/07/2025 06:30",
+        chegada: "18/07/2025 08:45",
+        direto: true,
+        custo: 89,
+        imagem: "/img/destinos/Londres/4.jpg",
+        turismo: ["Compras"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Acesso Sem Degraus"],
+        segmentos: [
+          {
+            numeroVoo: "RY3456",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "Ryanair",
+            partida: "18/07/2025 06:30",
+            chegada: "18/07/2025 08:45",
+            tipo: "ida",
+          },
+        ],
+      },
+
       {
         numeroVoo: "TP2456",
         origem: "OPO - Porto",

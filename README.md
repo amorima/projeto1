@@ -76,3 +76,153 @@ Link do Projeto: [https://github.com/amorima/projeto1/](https://github.com/amori
 * Prof. Doutor Mário Pinto [GitHub](https://github.com/amorima)
 * Prof. Doutor Ricardo Queirós [GitHub](https://github.com/mariopinto18)
 * Prof. António Machado
+
+# 🧪 Cenários de Teste: Porto → Londres
+
+## 📋 **Dados Adicionados ao Sistema**
+
+Foram adicionados voos específicos para testar todos os tipos de viagem entre Porto (OPO) e Londres (LHR).
+
+---
+
+## 🎯 **CENÁRIO 1: SÓ IDA - Turismo Cultural**
+
+### **Pesquisa:**
+- **Origem:** Porto (OPO)
+- **Destino:** Londres (LHR)
+- **Tipo:** Só ida
+- **Data de Partida:** 15/07/2025
+- **Tipo de Turismo:** Turismo Cultural
+- **Acessibilidade:** Acesso Sem Degraus
+
+### **Resultado Esperado:**
+- ✈️ **Voo:** BA2025 - British Airways
+- 🕘 **Partida:** 15/07/2025 às 09:30
+- 🕐 **Chegada:** 15/07/2025 às 11:45
+- 💰 **Preço:** €185
+- ♿ **Acessibilidade:** Acesso Sem Degraus, Elevadores Disponíveis
+
+---
+
+## 🎯 **CENÁRIO 2: SÓ IDA - Turismo Urbano**
+
+### **Pesquisa:**
+- **Origem:** Porto (OPO)
+- **Destino:** Londres (LHR)
+- **Tipo:** Só ida
+- **Data de Partida:** 20/07/2025
+- **Tipo de Turismo:** Turismo Urbano
+- **Acessibilidade:** Transporte Acessível
+
+### **Resultado Esperado:**
+- ✈️ **Voo:** TP1205 - TAP Air Portugal
+- 🕐 **Partida:** 20/07/2025 às 14:15
+- 🕔 **Chegada:** 20/07/2025 às 16:30
+- 💰 **Preço:** €165
+- ♿ **Acessibilidade:** Transporte Acessível, Casas de Banho Adaptadas
+
+---
+
+## 🎯 **CENÁRIO 3: IDA E VOLTA - Turismo Cultural + Gastronómico**
+
+### **Pesquisa:**
+- **Origem:** Porto (OPO)
+- **Destino:** Londres (LHR)
+- **Tipo:** Ida e volta
+- **Data de Partida:** 25/07/2025
+- **Data de Regresso:** 30/07/2025
+- **Tipo de Turismo:** Turismo Cultural, Turismo Gastronómico
+- **Acessibilidade:** Elevadores Disponíveis
+
+### **Resultado Esperado:**
+- ✈️ **Voo de Ida:** EZY4080 - easyJet
+- 🕘 **Partida:** 25/07/2025 às 07:45
+- 🕙 **Chegada:** 25/07/2025 às 10:00
+- ✈️ **Voo de Volta:** EZY4081 - easyJet
+- 🕕 **Partida:** 30/07/2025 às 18:20
+- 🕗 **Chegada:** 30/07/2025 às 20:35
+- 💰 **Preço Total:** €280 (€140 + €140)
+- ♿ **Acessibilidade:** Elevadores Disponíveis, Aluguer de Equipamento de Mobilidade
+
+---
+
+## 🎯 **CENÁRIO 4: SÓ IDA - Compras (Preço Baixo)**
+
+### **Pesquisa:**
+- **Origem:** Porto (OPO)
+- **Destino:** Londres (LHR)
+- **Tipo:** Só ida
+- **Data de Partida:** 18/07/2025
+- **Tipo de Turismo:** Compras
+- **Acessibilidade:** Acesso Sem Degraus
+- **Filtro de Preço:** Máximo €100
+
+### **Resultado Esperado:**
+- ✈️ **Voo:** RY3456 - Ryanair
+- 🕕 **Partida:** 18/07/2025 às 06:30
+- 🕗 **Chegada:** 18/07/2025 às 08:45
+- 💰 **Preço:** €89
+- ♿ **Acessibilidade:** Acesso Sem Degraus
+
+---
+
+## 🎯 **CENÁRIO 5: MULTIVIAGEM - Porto → Londres → Paris**
+
+### **Pesquisa:**
+- **Origem:** Porto (OPO)
+- **Destino Final:** Paris (CDG)
+- **Tipo:** Multiviagem
+- **Data:** 05/08/2025
+- **Escala:** Londres (LHR)
+- **Tipo de Turismo:** Turismo Cultural, Turismo Urbano
+- **Acessibilidade:** Transporte Acessível
+
+### **Resultado Esperado:**
+- ✈️ **Segmento 1:** VS8901 - Virgin Atlantic (Porto → Londres)
+- 🕘 **Partida:** 05/08/2025 às 08:00
+- 🕙 **Chegada:** 05/08/2025 às 10:15
+- ✈️ **Segmento 2:** AF1234 - Air France (Londres → Paris)
+- 🕓 **Partida:** 05/08/2025 às 16:00
+- 🕕 **Chegada:** 05/08/2025 às 18:30
+- 💰 **Preço Total:** €295
+- ♿ **Acessibilidade:** Transporte Acessível, Elevadores Disponíveis
+
+---
+
+## 🧪 **Como Testar:**
+
+### **1. Limpar dados anteriores:**
+```javascript
+// Na consola do browser:
+localStorage.clear();
+location.reload();
+```
+
+### **2. Fazer as pesquisas na página:**
+1. Aceder à página de pesquisa de voos
+2. Selecionar "Porto" como origem e "Londres" como destino
+3. Configurar cada cenário conforme descrito
+4. Verificar se os resultados coincidem com os esperados
+
+### **3. Verificar funcionalidades:**
+- ✅ Filtros de tipo de turismo
+- ✅ Filtros de acessibilidade
+- ✅ Filtros de preço
+- ✅ Ordenação por data/preço
+- ✅ Botão "Limpar filtros"
+- ✅ Diferentes tipos de viagem
+
+---
+
+## 🎉 **Resultados de Teste Esperados:**
+
+- **SÓ IDA sem filtros:** 4 voos disponíveis
+- **IDA E VOLTA:** 1 combinação completa disponível
+- **MULTIVIAGEM:** 1 rota com escala disponível
+- **Filtros funcionais:** Resultados reduzem conforme filtros aplicados
+- **Datas específicas:** Apenas voos da data selecionada aparecem
+- **Sem datas:** Todos os voos da rota aparecem
+
+---
+
+*📝 Nota: Estes dados foram especificamente criados para demonstrar todas as funcionalidades do sistema de pesquisa de voos.*

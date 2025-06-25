@@ -355,6 +355,16 @@ function clearAllFilters() {
   console.log("🧹 clearAllFilters called - starting filter cleanup");
   console.log("🧹 Current filters before clearing:", filters);
 
+  /* Limpar sessionStorage e localStorage */
+  sessionStorage.removeItem("planit_search");
+  localStorage.removeItem("origemSelecionada");
+  localStorage.removeItem("destinoSelecionado");
+  localStorage.removeItem("datasViajantes");
+  localStorage.removeItem("acessibilidadesSelecionadas");
+  localStorage.removeItem("tipoTurismoSelecionado");
+  console.log("🧹 Cleared sessionStorage and localStorage form data");
+
+  /* Reset dos filtros */
   filters = {
     origem: "",
     destino: "",
@@ -369,11 +379,55 @@ function clearAllFilters() {
     maxPrice: Infinity,
     sortDate: "",
     sortPrice: "",
+    tripType: "so-ida",
   };
 
   console.log("🧹 Filters reset to:", filters);
 
-  /* Limpar campos da interface */
+  /* Limpar campos principais do formulário */
+  const origemBtn = document.querySelector("#btn-open p");
+  if (origemBtn) {
+    origemBtn.textContent = "Origem";
+    console.log("🧹 Cleared origem button");
+  }
+
+  const destinoBtn = document.querySelector("#btn-destino p");
+  if (destinoBtn) {
+    destinoBtn.textContent = "Destino";
+    console.log("🧹 Cleared destino button");
+  }
+
+  /* Limpar datas e viajantes */
+  const btnDatas = document.getElementById("btn-datas");
+  if (btnDatas) {
+    const datasP = btnDatas.querySelector("div:first-child p");
+    if (datasP) {
+      datasP.textContent = "Datas";
+      console.log("🧹 Cleared dates text");
+    }
+
+    const viajantesP = btnDatas.querySelector("div:nth-child(2) p");
+    if (viajantesP) {
+      viajantesP.textContent = "1 Viajante";
+      console.log("🧹 Cleared travelers text");
+    }
+  }
+
+  /* Limpar tipo de turismo */
+  const tipoTurismoP = document.getElementById("texto-tipo-turismo");
+  if (tipoTurismoP) {
+    tipoTurismoP.textContent = "Tipo de Turismo";
+    console.log("🧹 Cleared tourism type text");
+  }
+
+  /* Limpar acessibilidade */
+  const acessibilidadeP = document.getElementById("texto-acessibilidade");
+  if (acessibilidadeP) {
+    acessibilidadeP.textContent = "Acessibilidade";
+    console.log("🧹 Cleared accessibility text");
+  }
+
+  /* Limpar campos de filtros de preço e ordenação */
   const minPriceInput = document.getElementById("min-price");
   const maxPriceInput = document.getElementById("max-price");
   const sortDateSelect = document.getElementById("sort-date");
@@ -446,6 +500,73 @@ function setupFilterEventListeners() {
   }
 }
 
+/* Funcionalidade para refinar pesquisa */
+function setupSearchRefinement() {
+  const form = document.querySelector("section form");
+  const btnOrigem = document.getElementById("btn-open");
+  const btnDestino = document.getElementById("btn-destino");
+  const btnDatas = document.getElementById("btn-datas");
+
+  /* Event listeners para os botões do formulário */
+  if (btnOrigem) {
+    btnOrigem.addEventListener("click", (e) => {
+      e.preventDefault();
+      showToast(
+        "Para refinar a pesquisa, use o botão 'Limpar filtros' e faça uma nova pesquisa na página inicial.",
+        "info"
+      );
+    });
+  }
+
+  if (btnDestino) {
+    btnDestino.addEventListener("click", (e) => {
+      e.preventDefault();
+      showToast(
+        "Para refinar a pesquisa, use o botão 'Limpar filtros' e faça uma nova pesquisa na página inicial.",
+        "info"
+      );
+    });
+  }
+
+  if (btnDatas) {
+    btnDatas.addEventListener("click", (e) => {
+      e.preventDefault();
+      showToast(
+        "Para refinar a pesquisa, use o botão 'Limpar filtros' e faça uma nova pesquisa na página inicial.",
+        "info"
+      );
+    });
+  }
+
+  /* Capturar todos os botões PlanIt pela estrutura do HTML */
+  const planItButtons = document.querySelectorAll("button");
+  planItButtons.forEach((button) => {
+    const spans = button.querySelectorAll("span");
+    let hasFirstSpan = false;
+    let hasSecondSpan = false;
+
+    spans.forEach((span) => {
+      if (
+        span.textContent.includes("Plan") ||
+        span.textContent.includes("Pronto")
+      ) {
+        hasFirstSpan = true;
+      }
+      if (span.textContent.includes("It")) {
+        hasSecondSpan = true;
+      }
+    });
+
+    if (hasFirstSpan && hasSecondSpan) {
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        /* Redirecionar para a página inicial */
+        window.location.href = "../index.html";
+      });
+    }
+  });
+}
+
 /* Inicialização da página de pesquisa de voos */
 document.addEventListener("DOMContentLoaded", function () {
   Flight.init();
@@ -456,6 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* Configurar event listeners */
   setupFilterEventListeners();
+  setupSearchRefinement(); /* Adicionar esta linha */
 
   /* Renderizar cards iniciais */
   renderFlightCards();
