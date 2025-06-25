@@ -979,6 +979,12 @@ export function clearMultitripSegments() {
 }
 /* Function to build search data for sessionStorage */
 export function buildSearchData() {
+  /* Obter destinos multitrip se disponível */
+  const multitripDestinations =
+    typeof getMultitripDestinations === "function"
+      ? getMultitripDestinations()
+      : [];
+
   const data = {
     tripType: tripType,
     origem: selectedOrigin,
@@ -990,7 +996,8 @@ export function buildSearchData() {
     bebes: datesTravelers.bebes,
     tipoTurismo: selectedTourismType,
     acessibilidade: selectedAccessibilities,
-    multitripSegments: tripType === "multitrip" ? multitripSegments : null,
+    multitripDestinations:
+      tripType === "multitrip" ? multitripDestinations : null,
   };
   return data;
 }

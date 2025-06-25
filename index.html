@@ -63,15 +63,32 @@
         </div>
         <p id="texto-tipo-viagem" class="justify-start px-9 text-white dark:text-gray-100 text-xl font-semibold font-['IBM_Plex_Sans']">Ida e Volta</p>      </button>
       
-      <!-- Multitrip Segments Container (hidden by default) -->
+      <!-- Multitrip Destinations Container (hidden by default) -->
       <div id="multitrip-container" class="w-full col-span-full hidden bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
-        <h3 class="text-lg font-semibold mb-4 text-Main-Primary dark:text-cyan-400">Segmentos da Viagem</h3>
-        <div id="multitrip-segments" class="space-y-3">
-          <!-- Segments will be added dynamically -->
+        <h3 class="text-lg font-semibold mb-4 text-Main-Primary dark:text-cyan-400">Destinos da Viagem</h3>
+        
+        <!-- Input para adicionar destinos -->
+        <div class="relative mb-4">
+          <input 
+            type="text" 
+            id="multitrip-input" 
+            placeholder="Escreva o nome de um destino..."
+            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-Main-Primary dark:bg-gray-700 dark:text-white"
+            autocomplete="off"
+          >
+          <div id="multitrip-suggestions" class="absolute top-full left-0 right-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg mt-1 max-h-40 overflow-y-auto z-10 hidden"></div>
         </div>
-        <button type="button" id="btn-add-segment" class="mt-3 px-4 py-2 bg-Main-Primary dark:bg-cyan-400 text-white dark:text-gray-900 rounded-lg font-medium hover:bg-cyan-700 dark:hover:bg-cyan-500 transition">
-          + Adicionar Segmento
-        </button>
+        
+        <!-- Pills dos destinos selecionados -->
+        <div id="multitrip-pills" class="flex flex-wrap gap-2 min-h-[2.5rem] p-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+          <div class="text-gray-500 dark:text-gray-400 text-sm flex items-center" id="multitrip-placeholder">
+            Adicione destinos para criar a sua rota...
+          </div>
+        </div>
+        
+        <p class="text-xs text-gray-600 dark:text-gray-400 mt-2">
+          💡 Pode arrastar os destinos para reordenar a rota. O primeiro destino será a origem e o último o destino final.
+        </p>
       </div>
       
           <!-- Botão com animação -->
@@ -716,6 +733,7 @@
 
   <!-- Carregamento dos scripts organizados -->
   <script type="module" src="./js/views/FlightView.js"></script>
+  <script src="./js/views/MultitripView.js"></script>
   <script src="./js/init.js"></script>
 
 </body>

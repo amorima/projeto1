@@ -120,9 +120,15 @@ function preencherCamposPesquisa() {
   // Show/hide multitrip container based on trip type
   const multitripContainer = document.getElementById("multitrip-container");
   if (multitripContainer) {
-    if (dados.tripType === "multitrip" && dados.multitripSegments) {
+    if (dados.tripType === "multitrip") {
       multitripContainer.classList.remove("hidden");
-      renderMultitripSegments();
+      /* Carregar destinos multitrip se disponível */
+      if (
+        dados.multitripDestinations &&
+        typeof setMultitripDestinations === "function"
+      ) {
+        setMultitripDestinations(dados.multitripDestinations);
+      }
     } else {
       multitripContainer.classList.add("hidden");
     }
@@ -450,6 +456,12 @@ function clearAllFilters() {
     console.log("🧹 Cleared sort price select");
   }
 
+  /* Limpar destinos multitrip */
+  if (typeof clearMultitripDestinations === "function") {
+    clearMultitripDestinations();
+    console.log("🧹 Cleared multitrip destinations");
+  }
+
   /* Re-renderizar com todos os voos */
   console.log("🧹 Calling renderFlightCards to refresh display");
   renderFlightCards();
@@ -571,6 +583,11 @@ function setupSearchRefinement() {
 document.addEventListener("DOMContentLoaded", function () {
   Flight.init();
   User.init();
+
+  /* Inicializar funcionalidade multitrip */
+  if (typeof initMultitrip === "function") {
+    initMultitrip();
+  }
 
   /* Preencher campos com dados da pesquisa */
   preencherCamposPesquisa();

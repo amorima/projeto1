@@ -4014,6 +4014,85 @@ function initdata() {
         dataVolta: "02/01/2026 08:00",
         turismo: ["Ecoturismo", "Turismocultural"],
       },
+
+      /* Viagens Multitrip para testes */
+      {
+        numeroVoo: "MULTI_EUR001",
+        origem: "OPO - Porto",
+        destino: "CDG - Paris",
+        companhia: "Multi-Airlines",
+        partida: "15/08/2025 09:00",
+        chegada: "15/08/2025 20:30",
+        direto: false,
+        custo: 420,
+        imagem: "/img/destinos/Paris/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+        tipoViagem: "multitrip",
+        multitripDestinations: [
+          { nome: "Porto", codigo: "OPO" },
+          { nome: "Londres", codigo: "LHR" },
+          { nome: "Paris", codigo: "CDG" },
+        ],
+        segmentos: [
+          {
+            numeroVoo: "TP441",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "TAP Air Portugal",
+            partida: "15/08/2025 09:00",
+            chegada: "15/08/2025 11:15",
+            tipo: "conexao",
+          },
+          {
+            numeroVoo: "BA334",
+            origem: "LHR - Londres",
+            destino: "CDG - Paris",
+            companhia: "British Airways",
+            partida: "15/08/2025 16:45",
+            chegada: "15/08/2025 20:30",
+            tipo: "final",
+          },
+        ],
+      },
+
+      {
+        numeroVoo: "MULTI_MED001",
+        origem: "LIS - Lisboa",
+        destino: "FCO - Roma",
+        companhia: "Multi-Airlines",
+        partida: "22/08/2025 08:30",
+        chegada: "22/08/2025 19:45",
+        direto: false,
+        custo: 380,
+        imagem: "/img/destinos/Roma/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+        tipoViagem: "multitrip",
+        multitripDestinations: [
+          { nome: "Lisboa", codigo: "LIS" },
+          { nome: "Madrid", codigo: "MAD" },
+          { nome: "Roma", codigo: "FCO" },
+        ],
+        segmentos: [
+          {
+            numeroVoo: "TP1013",
+            origem: "LIS - Lisboa",
+            destino: "MAD - Madrid",
+            companhia: "TAP Air Portugal",
+            partida: "22/08/2025 08:30",
+            chegada: "22/08/2025 10:45",
+            tipo: "conexao",
+          },
+          {
+            numeroVoo: "IB3246",
+            origem: "MAD - Madrid",
+            destino: "FCO - Roma",
+            companhia: "Iberia",
+            partida: "22/08/2025 15:20",
+            chegada: "22/08/2025 19:45",
+            tipo: "final",
+          },
+        ],
+      },
     ];
     localStorage.setItem("viagens", JSON.stringify(viagens));
     console.log("✅ Dados de viagens carregados:", viagens.length, "voos");

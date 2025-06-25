@@ -1026,6 +1026,12 @@ function handlePlanItFormSubmit(e) {
 // (garante que funciona para submit por enter ou botão)
 document.addEventListener("DOMContentLoaded", function () {
   User.init(); // Inicializa o UserModel
+
+  /* Inicializar funcionalidade multitrip */
+  if (typeof initMultitrip === "function") {
+    initMultitrip();
+  }
+
   const form = document.querySelector("section form");
   if (form) {
     form.addEventListener("submit", handlePlanItFormSubmit);
