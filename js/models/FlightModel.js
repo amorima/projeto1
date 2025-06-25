@@ -121,14 +121,16 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Lisboa/lisboa-1.jpg",
       dataVolta: "18/01/2025 18:30",
       turismo: ["Turismo Cultural", "Turismo Urbano"],
-      segmentos: [{
-        numeroVoo: "TP123",
-        origem: "OPO - Porto",
-        destino: "LIS - Lisboa",
-        companhia: "TAP Air Portugal",
-        partida: "15/01/2025 08:30",
-        chegada: "15/01/2025 09:45"
-      }]
+      segmentos: [
+        {
+          numeroVoo: "TP123",
+          origem: "OPO - Porto",
+          destino: "LIS - Lisboa",
+          companhia: "TAP Air Portugal",
+          partida: "15/01/2025 08:30",
+          chegada: "15/01/2025 09:45",
+        },
+      ],
     },
     {
       numeroVoo: "TP456",
@@ -142,14 +144,16 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Madrid/madrid-1.jpg",
       dataVolta: "20/01/2025 16:45",
       turismo: ["Turismo Cultural", "Turismo Gastronómico"],
-      segmentos: [{
-        numeroVoo: "TP456",
-        origem: "LIS - Lisboa",
-        destino: "MAD - Madrid",
-        companhia: "TAP Air Portugal",
-        partida: "16/01/2025 10:15",
-        chegada: "16/01/2025 12:30"
-      }]
+      segmentos: [
+        {
+          numeroVoo: "TP456",
+          origem: "LIS - Lisboa",
+          destino: "MAD - Madrid",
+          companhia: "TAP Air Portugal",
+          partida: "16/01/2025 10:15",
+          chegada: "16/01/2025 12:30",
+        },
+      ],
     },
     /* Voo com uma escala */
     {
@@ -171,7 +175,7 @@ function loadSampleFlights() {
           destino: "FRA - Frankfurt",
           companhia: "Lufthansa",
           partida: "19/01/2025 12:15",
-          chegada: "19/01/2025 15:30"
+          chegada: "19/01/2025 15:30",
         },
         {
           numeroVoo: "LH568",
@@ -179,9 +183,9 @@ function loadSampleFlights() {
           destino: "ROM - Roma",
           companhia: "Lufthansa",
           partida: "19/01/2025 16:45",
-          chegada: "19/01/2025 18:45"
-        }
-      ]
+          chegada: "19/01/2025 18:45",
+        },
+      ],
     },
     {
       numeroVoo: "FR789",
@@ -195,14 +199,16 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Londres/londres-1.jpg",
       dataVolta: "22/01/2025 14:20",
       turismo: ["Turismo Cultural", "Turismo Urbano"],
-      segmentos: [{
-        numeroVoo: "FR789",
-        origem: "OPO - Porto",
-        destino: "LON - Londres",
-        companhia: "Ryanair",
-        partida: "17/01/2025 06:00",
-        chegada: "17/01/2025 08:15"
-      }]
+      segmentos: [
+        {
+          numeroVoo: "FR789",
+          origem: "OPO - Porto",
+          destino: "LON - Londres",
+          companhia: "Ryanair",
+          partida: "17/01/2025 06:00",
+          chegada: "17/01/2025 08:15",
+        },
+      ],
     },
     {
       numeroVoo: "AF321",
@@ -216,14 +222,16 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Paris/paris-1.jpg",
       dataVolta: "25/01/2025 11:30",
       turismo: ["Turismo Cultural", "Turismo Gastronómico"],
-      segmentos: [{
-        numeroVoo: "AF321",
-        origem: "LIS - Lisboa",
-        destino: "PAR - Paris",
-        companhia: "Air France",
-        partida: "18/01/2025 14:40",
-        chegada: "18/01/2025 18:55"
-      }]
+      segmentos: [
+        {
+          numeroVoo: "AF321",
+          origem: "LIS - Lisboa",
+          destino: "PAR - Paris",
+          companhia: "Air France",
+          partida: "18/01/2025 14:40",
+          chegada: "18/01/2025 18:55",
+        },
+      ],
     },
     {
       numeroVoo: "KL890",
@@ -237,35 +245,38 @@ function loadSampleFlights() {
       imagem: "../img/destinos/Amsterdao/amsterdao-1.jpg",
       dataVolta: "27/01/2025 15:45",
       turismo: ["Turismo Cultural", "Turismo Urbano"],
-      segmentos: [{
-        numeroVoo: "KL890",
-        origem: "LIS - Lisboa",
-        destino: "AMS - Amsterdão",
-        companhia: "KLM",
-        partida: "20/01/2025 07:30",
-        chegada: "20/01/2025 11:10"
-      }]
-    }
+      segmentos: [
+        {
+          numeroVoo: "KL890",
+          origem: "LIS - Lisboa",
+          destino: "AMS - Amsterdão",
+          companhia: "KLM",
+          partida: "20/01/2025 07:30",
+          chegada: "20/01/2025 11:10",
+        },
+      ],
+    },
   ];
-  
+
   /* Converter para objetos Trip para garantir consistência */
-  viagens = sampleFlights.map(flight => 
-    new Trip(
-      flight.numeroVoo,
-      flight.origem,
-      flight.destino,
-      flight.companhia,
-      flight.partida,
-      flight.chegada,
-      flight.direto,
-      flight.custo,
-      flight.imagem,
-      flight.dataVolta,
-      flight.segmentos,
-      flight.turismo
-    )
+  viagens = sampleFlights.map(
+    (flight) =>
+      new Trip(
+        flight.numeroVoo,
+        flight.origem,
+        flight.destino,
+        flight.companhia,
+        flight.partida,
+        flight.chegada,
+        flight.direto,
+        flight.custo,
+        flight.imagem,
+        flight.dataVolta,
+        flight.segmentos,
+        flight.turismo
+      )
   );
-  
+
   saveToLocalStorage("viagens", viagens);
 }
 /* Carregar dados guardados na localStorage */
@@ -312,6 +323,27 @@ export function add(
   segmentos = null,
   turismo = []
 ) {
+  /* Validar dados antes de adicionar */
+  const dadosVoo = {
+    numeroVoo,
+    origem,
+    destino,
+    companhia,
+    partida,
+    chegada,
+    direto,
+    custo,
+    imagem,
+    dataVolta,
+    segmentos,
+    turismo,
+  };
+
+  const validacao = validateFlightData(dadosVoo);
+  if (!validacao.isValid) {
+    throw new Error("Dados inválidos: " + validacao.errors.join(", "));
+  }
+
   if (viagens.some((v) => v.numeroVoo === numeroVoo)) {
     throw Error(`Voo "${numeroVoo}" já existe!`);
   } else {
@@ -543,7 +575,17 @@ export function getTripsFrom(filtro = "all", perPage = 18, page = 1) {
   if (filtro === "all") {
     Trips = [...viagens];
   } else {
-    Trips = viagens.filter((v) => v.origem === filtro || v.turismo === filtro);
+    Trips = viagens.filter((v) => {
+      /* Filtro por origem */
+      const origemMatch = v.origem === filtro;
+
+      /* Filtro por tipo de turismo */
+      const turismoMatch =
+        Array.isArray(v.turismo) &&
+        v.turismo.some((tipo) => tipo.toLowerCase() === filtro.toLowerCase());
+
+      return origemMatch || turismoMatch;
+    });
   }
 
   /* Embaralha o array para mostrar viagens diferentes */
@@ -926,10 +968,11 @@ export function filterFlights(searchData) {
   ) {
     flights = flights.filter(
       (flight) =>
-        flight.tipoTurismo &&
-        flight.tipoTurismo
-          .toLowerCase()
-          .includes(searchData.tipoTurismo.nome.toLowerCase())
+        flight.turismo &&
+        Array.isArray(flight.turismo) &&
+        flight.turismo.some((tipo) =>
+          tipo.toLowerCase().includes(searchData.tipoTurismo.nome.toLowerCase())
+        )
     );
   }
   // Filter by accessibility (if flight has accessibility info)
@@ -955,87 +998,98 @@ export function filterFlights(searchData) {
 /* Função de pesquisa robusta que considera escalas e multi-destinos */
 export function searchFlightsAdvanced(searchCriteria) {
   let results = [...viagens];
-  
+
   /* Filtro por origem */
   if (searchCriteria.origem) {
-    results = results.filter(flight => {
+    results = results.filter((flight) => {
       const origemPesquisa = searchCriteria.origem.toLowerCase();
-      return flight.origem.toLowerCase().includes(origemPesquisa) ||
-             flight.segmentos[0].origem.toLowerCase().includes(origemPesquisa);
+      return (
+        flight.origem.toLowerCase().includes(origemPesquisa) ||
+        flight.segmentos[0].origem.toLowerCase().includes(origemPesquisa)
+      );
     });
   }
-  
+
   /* Filtro por destino (considera destino final e escalas) */
   if (searchCriteria.destino) {
-    results = results.filter(flight => {
+    results = results.filter((flight) => {
       const destinoPesquisa = searchCriteria.destino.toLowerCase();
-      
+
       /* Verifica destino final */
-      const destinoFinalMatch = flight.destino.toLowerCase().includes(destinoPesquisa);
-      
+      const destinoFinalMatch = flight.destino
+        .toLowerCase()
+        .includes(destinoPesquisa);
+
       /* Verifica escalas */
-      const escalaMatch = flight.segmentos.some(seg => 
+      const escalaMatch = flight.segmentos.some((seg) =>
         seg.destino.toLowerCase().includes(destinoPesquisa)
       );
-      
+
       return destinoFinalMatch || escalaMatch;
     });
   }
-  
+
   /* Filtro por tipo de turismo */
   if (searchCriteria.tipoTurismo && searchCriteria.tipoTurismo !== "Nenhum") {
-    results = results.filter(flight =>
-      flight.turismo && flight.turismo.some(tipo =>
-        tipo.toLowerCase().includes(searchCriteria.tipoTurismo.toLowerCase())
-      )
+    results = results.filter(
+      (flight) =>
+        flight.turismo &&
+        flight.turismo.some((tipo) =>
+          tipo.toLowerCase().includes(searchCriteria.tipoTurismo.toLowerCase())
+        )
     );
   }
-  
+
   /* Filtro por voo direto */
   if (searchCriteria.apenasVoosDiretos) {
-    results = results.filter(flight => flight.direto === true);
+    results = results.filter((flight) => flight.direto === true);
   }
-  
+
   /* Filtro por data de partida */
   if (searchCriteria.dataPartida) {
     const dataLimite = new Date(searchCriteria.dataPartida);
-    results = results.filter(flight => {
+    results = results.filter((flight) => {
       const dataVoo = parseFlightDate(flight.partida);
       return dataVoo >= dataLimite;
     });
   }
-  
+
   /* Filtro por preço máximo */
   if (searchCriteria.precoMaximo) {
-    results = results.filter(flight => 
-      parseFloat(flight.custo) <= parseFloat(searchCriteria.precoMaximo)
+    results = results.filter(
+      (flight) =>
+        parseFloat(flight.custo) <= parseFloat(searchCriteria.precoMaximo)
     );
   }
-  
+
   return results;
 }
 
 /* Função específica para encontrar voos com escalas entre duas cidades */
 export function findFlightsWithStops(origem, destino, maxEscalas = 2) {
   const viagensComEscalas = [];
-  
-  viagens.forEach(flight => {
+
+  viagens.forEach((flight) => {
     /* Verifica se a viagem conecta origem e destino */
-    const origemMatch = flight.origem.toLowerCase().includes(origem.toLowerCase());
-    const destinoMatch = flight.destino.toLowerCase().includes(destino.toLowerCase());
-    
+    const origemMatch = flight.origem
+      .toLowerCase()
+      .includes(origem.toLowerCase());
+    const destinoMatch = flight.destino
+      .toLowerCase()
+      .includes(destino.toLowerCase());
+
     if (origemMatch && destinoMatch) {
       const numEscalas = flight.segmentos.length - 1;
       if (numEscalas <= maxEscalas) {
         viagensComEscalas.push({
           ...flight,
           numEscalas: numEscalas,
-          escalas: flight.segmentos.slice(0, -1).map(seg => seg.destino)
+          escalas: flight.segmentos.slice(0, -1).map((seg) => seg.destino),
         });
       }
     }
   });
-  
+
   return viagensComEscalas;
 }
 /* Helper function to parse flight dates */
@@ -1043,7 +1097,7 @@ function parseFlightDate(dateStr) {
   /* Tratamento de diferentes formatos de data nos dados dos voos */
   if (!dateStr) return new Date();
   if (dateStr instanceof Date) return dateStr;
-  
+
   /* Formato DD/MM/YYYY HH:MM */
   if (dateStr.includes("/")) {
     const [datePart, timePart] = dateStr.split(" ");
@@ -1051,7 +1105,7 @@ function parseFlightDate(dateStr) {
     const [hour, minute] = timePart ? timePart.split(":") : ["0", "0"];
     return new Date(year, month - 1, day, hour, minute);
   }
-  
+
   /* Formato ISO ou outro formato padrão */
   return new Date(dateStr);
 }
@@ -1086,7 +1140,7 @@ class Trip {
   imagem = "";
   dataVolta = "";
   turismo = [];
-  
+
   constructor(
     numeroVoo,
     origem,
@@ -1112,38 +1166,40 @@ class Trip {
     this.imagem = imagem;
     this.dataVolta = dataVolta;
     this.turismo = Array.isArray(turismo) ? turismo : [];
-    
+
     /* Se não foram fornecidos segmentos, criar um segmento direto */
     if (!segmentos || segmentos.length === 0) {
-      this.segmentos = [{
-        numeroVoo: this.numeroVoo,
-        origem: this.origem,
-        destino: this.destino,
-        companhia: this.companhia,
-        partida: this.partida,
-        chegada: this.chegada
-      }];
+      this.segmentos = [
+        {
+          numeroVoo: this.numeroVoo,
+          origem: this.origem,
+          destino: this.destino,
+          companhia: this.companhia,
+          partida: this.partida,
+          chegada: this.chegada,
+        },
+      ];
     } else {
       this.segmentos = segmentos;
       /* Atualizar direto baseado no número de segmentos */
       this.direto = segmentos.length === 1;
     }
   }
-  
+
   /* Método para obter todas as cidades da rota */
   getCidadesRota() {
     const cidades = [this.origem];
-    this.segmentos.forEach(seg => {
+    this.segmentos.forEach((seg) => {
       if (!cidades.includes(seg.destino)) {
         cidades.push(seg.destino);
       }
     });
     return cidades;
   }
-  
+
   /* Método para verificar se a viagem passa por uma cidade */
   passaPorCidade(cidade) {
-    return this.getCidadesRota().some(c => 
+    return this.getCidadesRota().some((c) =>
       c.toLowerCase().includes(cidade.toLowerCase())
     );
   }
@@ -1212,4 +1268,111 @@ export function getAeroportosComCoordenadas() {
       },
     };
   });
+}
+
+/* SEPARAÇÃO DE FILTROS UI DOS FILTROS DE DADOS */
+
+/* Filtros aplicados pela interface do utilizador */
+export function applyUIFilters(flights, uiFilters) {
+  let filtered = [...flights];
+
+  /* Filtro por preço mínimo/máximo */
+  if (uiFilters.minPrice !== undefined && uiFilters.minPrice !== "") {
+    filtered = filtered.filter(
+      (flight) => parseFloat(flight.custo) >= parseFloat(uiFilters.minPrice)
+    );
+  }
+
+  if (uiFilters.maxPrice !== undefined && uiFilters.maxPrice !== "") {
+    filtered = filtered.filter(
+      (flight) => parseFloat(flight.custo) <= parseFloat(uiFilters.maxPrice)
+    );
+  }
+
+  /* Ordenação por data */
+  if (uiFilters.sortDate) {
+    filtered.sort((a, b) => {
+      const dateA = parseFlightDate(a.partida);
+      const dateB = parseFlightDate(b.partida);
+
+      if (uiFilters.sortDate === "recent") {
+        return dateA - dateB; /* Mais próxima primeiro */
+      } else if (uiFilters.sortDate === "oldest") {
+        return dateB - dateA; /* Mais distante primeiro */
+      }
+      return 0;
+    });
+  }
+
+  /* Ordenação por preço */
+  if (uiFilters.sortPrice) {
+    filtered.sort((a, b) => {
+      const priceA = parseFloat(a.custo);
+      const priceB = parseFloat(b.custo);
+
+      if (uiFilters.sortPrice === "price-asc") {
+        return priceA - priceB; /* Mais barato primeiro */
+      } else if (uiFilters.sortPrice === "price-desc") {
+        return priceB - priceA; /* Mais caro primeiro */
+      }
+      return 0;
+    });
+  }
+
+  return filtered;
+}
+
+/* Validação robusta de dependências entre modelos */
+export function validateFlightData(flightData) {
+  const errors = [];
+
+  /* Validação básica */
+  if (!flightData.numeroVoo) {
+    errors.push("Número do voo é obrigatório");
+  }
+
+  if (!flightData.origem || !flightData.destino) {
+    errors.push("Origem e destino são obrigatórios");
+  }
+
+  /* Validação de segmentos */
+  if (flightData.segmentos && flightData.segmentos.length > 0) {
+    flightData.segmentos.forEach((segmento, index) => {
+      if (!segmento.origem || !segmento.destino) {
+        errors.push(`Segmento ${index + 1}: origem e destino são obrigatórios`);
+      }
+
+      if (!segmento.partida || !segmento.chegada) {
+        errors.push(
+          `Segmento ${
+            index + 1
+          }: horários de partida e chegada são obrigatórios`
+        );
+      }
+    });
+
+    /* Validar continuidade entre segmentos */
+    for (let i = 1; i < flightData.segmentos.length; i++) {
+      const segmentoAnterior = flightData.segmentos[i - 1];
+      const segmentoAtual = flightData.segmentos[i];
+
+      if (segmentoAnterior.destino !== segmentoAtual.origem) {
+        errors.push(
+          `Segmento ${
+            i + 1
+          }: origem deve corresponder ao destino do segmento anterior`
+        );
+      }
+    }
+  }
+
+  /* Validação de tipos de turismo */
+  if (flightData.turismo && !Array.isArray(flightData.turismo)) {
+    errors.push("Tipos de turismo devem ser fornecidos como array");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors: errors,
+  };
 }
