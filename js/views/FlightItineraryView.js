@@ -160,8 +160,10 @@ function carregarHoteis(destino) {
     let hoteis = [];
     if (destino) {
       // Extract city name if in "XXX - City" format
-      const cidadeNome = destino.includes(" - ") ? destino.split(" - ").pop() : destino;
-      
+      const cidadeNome = destino.includes(" - ")
+        ? destino.split(" - ").pop()
+        : destino;
+
       hoteis = HotelModel.getHoteisByCidade(cidadeNome);
       // fallback: tentar por destinoId se não encontrar por cidade
       if (!hoteis.length) {
@@ -265,18 +267,20 @@ function carregarActividades(destino) {
     let atividadesDestino = [];
     if (destino) {
       // Extract city name if in "XXX - City" format
-      const cidadeNome = destino.includes(" - ") ? destino.split(" - ").pop() : destino;
-      
+      const cidadeNome = destino.includes(" - ")
+        ? destino.split(" - ").pop()
+        : destino;
+
       // Get the destination object to find its ID
       const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
       const destinoObj = destinos.find(
         (d) => d.cidade && d.cidade.toLowerCase() === cidadeNome.toLowerCase()
       );
-      
+
       if (destinoObj) {
         // Filter activities by destinoId
-        atividadesDestino = todasAtividades.filter((a) => 
-          a.destinoId === destinoObj.id
+        atividadesDestino = todasAtividades.filter(
+          (a) => a.destinoId === destinoObj.id
         );
       } else {
         // Fallback: try to match by string comparison for older data
@@ -696,14 +700,17 @@ document.addEventListener("DOMContentLoaded", () => {
   User.init();
   const params = new URLSearchParams(window.location.search);
   const numeroVoo = params.get("id");
-  let destinoVoo = null;  let voo = null;
+  let destinoVoo = null;
+  let voo = null;
   if (numeroVoo) {
     FlightModel.init();
     voo = FlightModel.getByNumeroVoo(numeroVoo);
     if (voo) {
       vooShallow = { ...voo };
       // Extract city name from "XXX - City" format for loading activities and hotels
-      destinoVoo = voo.destino?.includes(" - ") ? voo.destino.split(" - ").pop() : voo.destino;
+      destinoVoo = voo.destino?.includes(" - ")
+        ? voo.destino.split(" - ").pop()
+        : voo.destino;
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
       atualizarSidebarVoo(voo);
@@ -783,10 +790,10 @@ function atualizarHeroVoo(voo) {
   const itineraryImg = document.getElementById("itinerary-card-img");
   if (heroImg) {
     // Extract clean city name from "XXX - City" format
-    const cleanCityName = voo.destino?.includes(" - ") 
-      ? voo.destino.split(" - ").pop() 
+    const cleanCityName = voo.destino?.includes(" - ")
+      ? voo.destino.split(" - ").pop()
       : voo.destino;
-    
+
     // Prioriza a imagem do destino carregada pelo admin.
     const destinoEncontrado = getDestinationByCity(cleanCityName);
 
@@ -841,11 +848,22 @@ function atualizarItinerarioVoo(voo) {
   // Conteúdo à esquerda
   const conteudo = itinerarioDiv.querySelector(
     ".flex.flex-col.gap-2.text-left.flex-1"
-  );  if (conteudo) {
+  );
+  if (conteudo) {
     // Extract city names for display
-    const origemCidade = voo.origem?.includes(" - ") ? voo.origem.split(" - ").pop() : voo.origem;
-    const destinoCidade = voo.destino?.includes(" - ") ? voo.destino.split(" - ").pop() : voo.destino;
-    
+    const origemCidade = voo.origem?.includes(" - ")
+      ? voo.origem.split(" - ").pop()
+      : voo.origem;
+    const destinoCidade = voo.destino?.includes(" - ")
+      ? voo.destino.split(" - ").pop()
+      : voo.destino;
+
+    // Determinar se tem escalas baseado nos segmentos
+    const temEscalas = voo.segmentos && voo.segmentos.length > 1;
+    const tipoVoo = temEscalas
+      ? `Com escalas (${voo.segmentos.length} segmentos)`
+      : "Direto";
+
     conteudo.innerHTML = `
       <span class='font-bold text-lg'>${origemCidade} → ${destinoCidade}</span>
       <span class='text-gray-500'>${formatDatesForDisplayPt(
@@ -858,9 +876,14 @@ function atualizarItinerarioVoo(voo) {
       <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${
         voo.numeroVoo
       }</b></span>
-      <span class='text-gray-700 dark:text-gray-300'>${
-        voo.direto === "S" ? "Direto" : "Com escalas"
-      }</span>
+      <span class='text-gray-700 dark:text-gray-300'>${tipoVoo}</span>
+      ${
+        voo.turismo && voo.turismo.length > 0
+          ? `<span class='text-blue-600 dark:text-blue-400 text-sm'>🏷️ ${voo.turismo.join(
+              ", "
+            )}</span>`
+          : ""
+      }
     `;
   }
   // Imagem da companhia aérea à direita
