@@ -75,6 +75,10 @@ function initView() {
   initSlider();
   setupModalButtons();
   setupTripTypeButtons();
+  /* Inicializar funcionalidade multitrip */
+  if (typeof initMultitrip === 'function') {
+    initMultitrip();
+  }
   initGamificationModal();
   setupNewsletterForm();
   if (document.querySelector(".card-viagens")) {
@@ -752,12 +756,16 @@ function abrirModalTipoViagem() {
       if (multitripContainer) {
         if (tripType === "multitrip") {
           multitripContainer.classList.remove("hidden");
-          if (Flight.getMultitripSegments().length === 0) {
-            Flight.addMultitripSegment();
+          /* Inicializar o sistema de pills se não estiver inicializado */
+          if (typeof initMultitrip === 'function') {
+            initMultitrip();
           }
-          renderMultitripSegments();
         } else {
           multitripContainer.classList.add("hidden");
+          /* Limpar destinos multitrip se mudar de tipo */
+          if (typeof clearMultitripDestinations === 'function') {
+            clearMultitripDestinations();
+          }
         }
       }
       fecharModalTipoViagem();
