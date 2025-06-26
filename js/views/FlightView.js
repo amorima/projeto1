@@ -906,13 +906,21 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
   if (!container) return;
   container.innerHTML = "";
 
-  /* Aplicar exatamente a mesma lógica da pesquisa ida e volta */
-  const trips = buildIdaVoltaTripsForIndex(filtro);
+  /* Criar 6 viagens ida e volta */
+  const idaVoltaTrips = buildIdaVoltaTripsForIndex(filtro);
+  const randomIdaVolta = idaVoltaTrips
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 6);
 
-  /* Limitar a 6 cards aleatórios */
-  const randomTrips = trips.sort(() => 0.5 - Math.random()).slice(0, 6);
+  /* Criar 6 viagens só ida */
+  const soIdaTrips = buildSoIdaTripsForIndex(filtro);
+  const randomSoIda = soIdaTrips.sort(() => 0.5 - Math.random()).slice(0, 6);
 
-  randomTrips.forEach((trip) => {
+  /* Misturar os dois tipos aleatoriamente */
+  const allTrips = [...randomIdaVolta, ...randomSoIda];
+  const mixedTrips = allTrips.sort(() => 0.5 - Math.random());
+
+  mixedTrips.forEach((trip) => {
     const cardElement = createFlightCardForIndex(trip);
     container.appendChild(cardElement);
   });
@@ -971,14 +979,52 @@ function buildIdaVoltaTripsForIndex(filtro) {
   return trips;
 }
 
+/* Aplicar a mesma lógica do FlightSearchView para criar viagens só ida */
+function buildSoIdaTripsForIndex(filtro) {
+  const allFlights = Flight.getAllTrips();
+  const trips = [];
+
+  /* Filtrar voos baseado na origem */
+  let outboundFlights = allFlights;
+  if (filtro !== "all") {
+    outboundFlights = allFlights.filter((flight) => {
+      return (
+        flight.origem === filtro ||
+        flight.origem.includes(filtro.split(" - ")[0])
+      );
+    });
+  }
+
+  /* Cada voo é uma viagem só ida */
+  outboundFlights.forEach((flight) => {
+    trips.push({
+      ...flight,
+      tripType: "so-ida",
+      segments: [flight],
+      totalCost: flight.custo,
+    });
+  });
+
+  return trips;
+}
+
 /* Função adaptada do createFlightCard do FlightSearchView para o index */
 function createFlightCardForIndex(trip) {
   const cardElement = document.createElement("div");
   cardElement.className =
     "bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow";
 
-  /* Determinar o tipo de viagem - sempre ida e volta neste contexto */
-  const tipoViagemText = "Ida e Volta";
+  /* Determinar o tipo de viagem baseado no tripType */
+  let tipoViagemText;
+  if (trip.tripType === "so-ida") {
+    tipoViagemText = "Só Ida";
+  } else if (trip.tripType === "ida-volta") {
+    tipoViagemText = "Ida e Volta";
+  } else if (trip.tripType === "multitrip") {
+    tipoViagemText = "Multi-destino";
+  } else {
+    tipoViagemText = "Só Ida";
+  }
 
   /* Determinar se é voo direto ou com escalas */
   const tipoVooText = trip.direto
@@ -1001,20 +1047,27 @@ function createFlightCardForIndex(trip) {
           .join("")
       : "";
 
-  /* Formatação das datas para ida e volta */
+  /* Formatação das datas baseada no tipo de viagem */
   let datasText = "";
   let origemDestinoText = "";
   let tituloDestino = "";
 
-  if (trip.segments && trip.segments.length >= 2) {
+  if (
+    trip.tripType === "ida-volta" &&
+    trip.segments &&
+    trip.segments.length >= 2
+  ) {
+    /* Para ida e volta com segmentos */
     const outbound = trip.segments[0];
     const returnFlight = trip.segments[1];
     datasText = `${outbound.partida} - ${returnFlight.partida}`;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
-  } else if (trip.dataVolta) {
+  } else if (trip.tripType === "ida-volta" && trip.dataVolta) {
+    /* Para ida e volta sem segmentos */
     datasText = `${trip.partida} - ${trip.dataVolta}`;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
   } else {
+    /* Para só ida */
     datasText = trip.partida;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
   }
