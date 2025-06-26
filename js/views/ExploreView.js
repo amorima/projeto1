@@ -189,63 +189,96 @@ document.addEventListener("DOMContentLoaded", () => {
       voosContainer.innerHTML =
         '<p class="text-gray-500 dark:text-gray-400 italic">Nenhum voo disponível para este destino.</p>';
     } else {
-      voos.forEach((voo) => {
-        // Obter informações da companhia aérea
-        const companhia = getCompanhiaAereaByNome(voo.companhia);
-        const logoUrl = companhia?.logo || "../img/icons/ca_tap.jpg"; // Imagem padrão caso não encontre
-        const vooElement = document.createElement("div");
-        vooElement.className =
-          "bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex flex-col cursor-pointer hover:shadow-lg transition-shadow";
-        vooElement.innerHTML = `
-          <div class="flex items-center mb-2">
-            <div class="h-8 w-12 flex items-center justify-center mr-3">
-              <img src="${logoUrl}" alt="${
-          voo.companhia
-        }" class="max-h-8 max-w-12 object-contain">
-            </div>
-            <div>
-              <h4 class="font-semibold">${voo.companhia}</h4>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Voo ${
-                voo.numeroVoo
-              }</p>
-            </div>
-          </div>
-          <div class="flex justify-between items-center mb-2">
-            <div>
-              <p class="text-sm font-medium">${
-                voo.direto ? "Voo direto" : "Voo com escala"
-              }</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">${
-                voo.origem
-              } → ${voo.destino}</p>
-              ${
-                voo.segmentos && voo.segmentos.length > 1
-                  ? `<p class="text-xs text-orange-500 dark:text-orange-400">${voo.segmentos.length} segmentos</p>`
-                  : ""
+      /* Filtrar apenas voos de ida e volta */
+      const voosIdaVolta = voos.filter(
+        (voo) => voo.dataVolta && voo.tipoViagem !== "so-ida"
+      );
+
+      if (voosIdaVolta.length === 0) {
+        voosContainer.innerHTML =
+          '<p class="text-gray-500 dark:text-gray-400 italic">Nenhum voo de ida e volta disponível para este destino.</p>';
+      } else {
+        voosIdaVolta.forEach((voo) => {
+          // Obter informações da companhia aérea
+          const companhia = getCompanhiaAereaByNome(voo.companhia);
+          const logoUrl = companhia?.logo || "../img/icons/ca_tap.jpg"; // Imagem padrão caso não encontre
+
+          /* Gerar ID correto para ida e volta */
+          let flightId = voo.numeroVoo;
+          if (voo.dataVolta) {
+            if (voo.segmentos && voo.segmentos.length >= 2) {
+              /* Para ida e volta com segmentos definidos, usar ambos os números de voo */
+              const vooIda = voo.segmentos[0].numeroVoo;
+              const vooVolta = voo.segmentos[1].numeroVoo;
+              flightId = `${vooIda}-${vooVolta}`;
+            } else {
+              /* Para ida e volta sem segmentos definidos, gerar número de volta */
+              const baseNumber = voo.numeroVoo || "AF151";
+              const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
+              if (match) {
+                const [, prefix, number] = match;
+                const nextNumber = parseInt(number) + 1;
+                flightId = `${baseNumber}-${prefix}${nextNumber}`;
+              } else {
+                flightId = `${baseNumber}-${baseNumber}R`;
               }
-              <div class="mt-1">
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  <span class="font-medium">Ida:</span> ${voo.partida}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  <span class="font-medium">Volta:</span> ${
-                    voo.dataVolta || "Não definida"
-                  }
-                </p>
+            }
+          }
+
+          const vooElement = document.createElement("div");
+          vooElement.className =
+            "bg-gray-50 dark:bg-gray-900 rounded-lg p-3 flex flex-col cursor-pointer hover:shadow-lg transition-shadow";
+          vooElement.innerHTML = `
+            <div class="flex items-center mb-2">
+              <div class="h-8 w-12 flex items-center justify-center mr-3">
+                <img src="${logoUrl}" alt="${
+            voo.companhia
+          }" class="max-h-8 max-w-12 object-contain">
+              </div>
+              <div>
+                <h4 class="font-semibold">${voo.companhia}</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Voo ${
+                  voo.numeroVoo
+                }</p>
               </div>
             </div>
-            <div class="text-right">
-              <p class="font-bold text-lg">€${voo.custo}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">Ida e volta</p>
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <p class="text-sm font-medium">${
+                  voo.direto ? "Voo direto" : "Voo com escala"
+                }</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">${
+                  voo.origem
+                } → ${voo.destino}</p>
+                ${
+                  voo.segmentos && voo.segmentos.length > 1
+                    ? `<p class="text-xs text-orange-500 dark:text-orange-400">${voo.segmentos.length} segmentos</p>`
+                    : ""
+                }
+                <div class="mt-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <span class="font-medium">Ida:</span> ${voo.partida}
+                  </p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <span class="font-medium">Volta:</span> ${
+                      voo.dataVolta || "Não definida"
+                    }
+                  </p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="font-bold text-lg">€${voo.custo}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Ida e volta</p>
+              </div>
             </div>
-          </div>
-        `;
-        // Adiciona evento de clique para redirecionar
-        vooElement.addEventListener("click", () => {
-          window.location.href = `flight_itinerary.html?id=${voo.numeroVoo}`;
+          `;
+          // Adiciona evento de clique para redirecionar com ID correto
+          vooElement.addEventListener("click", () => {
+            window.location.href = `flight_itinerary.html?id=${flightId}`;
+          });
+          voosContainer.appendChild(vooElement);
         });
-        voosContainer.appendChild(vooElement);
-      });
+      }
     }
 
     // Preencher a seção de avaliações
