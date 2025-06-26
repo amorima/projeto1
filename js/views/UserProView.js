@@ -33,7 +33,7 @@ window.onload = async function () {
   /* Inicializar o modelo */
   UserModel.init();
   FlightModel.init();
-  initGamificationModal()
+  initGamificationModal();
   try {
     /* Carregar componentes de header e footer e aguardar a sua conclusão */
     await loadComponent("_header.html", "header-placeholder");
@@ -46,8 +46,7 @@ window.onload = async function () {
     setTimeout(() => {
       UserModel.initTabEvents();
     }, 100); /* Reduzido o delay, ajustar conforme necessário */
-  } catch (error) {
-  }
+  } catch (error) {}
 };
 /* Configurar listeners de eventos para interações do utilizador */
 function setupEventListeners() {
@@ -69,8 +68,7 @@ function setupEventListeners() {
         modalPontos.style.display = "block";
         modalPontos.style.zIndex = "9999";
         document.body.style.overflow = "hidden";
-      } catch (error) {
-      }
+      } catch (error) {}
     });
 
     // Close modal when clicking outside
@@ -107,7 +105,8 @@ function setupEventListeners() {
           btnCopy.innerHTML = originalText;
         }, 2000);
       }
-    });  }
+    });
+  }
   /* Formulário de definições do perfil */
   const profileForm = document.getElementById("profile-settings-form");
   if (profileForm) {
@@ -149,7 +148,7 @@ function loadUserInfo() {
   const levelIcon = getLevelSymbol(userLevel);
   document.querySelector(
     ".absolute.bottom-0.right-0 .material-symbols-outlined"
-  ).textContent = levelIcon;  /* Atualizar avatar */
+  ).textContent = levelIcon; /* Atualizar avatar */
   const avatarElement = document.getElementById("user-avatar");
   if (avatarElement) {
     if (user.avatar && user.avatar !== "") {
@@ -160,9 +159,11 @@ function loadUserInfo() {
       avatarElement.src = avatarPath;
     } else {
       /* Se não tem avatar, usar um placeholder */
-      avatarElement.src = "https://placehold.co/80x80/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
+      avatarElement.src =
+        "https://placehold.co/80x80/6b7280/ffffff?text=" +
+        encodeURIComponent(user.username.charAt(0).toUpperCase());
     }
-  }/* Atualizar navbar após carregar os dados */
+  } /* Atualizar navbar após carregar os dados */
   updateNavbarUser();
   /* Preencher informações pessoais */
   if (document.getElementById("info-username"))
@@ -194,7 +195,7 @@ function loadUserInfo() {
       const referralLink = UserModel.getReferralLink(user);
       referralLinkInput.value = referralLink;
     } catch (error) {
-      referralLinkInput.value = '';
+      referralLinkInput.value = "";
     }
   }
 }
@@ -207,7 +208,9 @@ function populateSettingsForm(user) {
       settingsAvatar.src = user.avatar;
     } else {
       /* Se não tem avatar, usar um placeholder */
-      settingsAvatar.src = "https://placehold.co/96x96/6b7280/ffffff?text=" + encodeURIComponent(user.username.charAt(0).toUpperCase());
+      settingsAvatar.src =
+        "https://placehold.co/96x96/6b7280/ffffff?text=" +
+        encodeURIComponent(user.username.charAt(0).toUpperCase());
     }
   }
   /* Campos de dados pessoais */
@@ -643,26 +646,38 @@ function openEditProfileModal() {
     <form id="edit-profile-form" class="space-y-4">
       <div>
         <label for="edit-username" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Nome de Utilizador</label>
-        <input type="text" id="edit-username" value="${user.username}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-username" value="${
+          user.username
+        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
       <div>
         <label for="edit-email" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Email</label>
-        <input type="email" id="edit-email" value="${user.email}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="email" id="edit-email" value="${
+          user.email
+        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
       <div>
         <label for="edit-phone" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Telefone</label>
-        <input type="text" id="edit-phone" value="${user.telefone || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-phone" value="${
+          user.telefone || ""
+        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
       <div>
         <label for="edit-birth" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">Data de Nascimento</label>
-        <input type="date" id="edit-birth" value="${user.dataNascimento || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="date" id="edit-birth" value="${
+          user.dataNascimento || ""
+        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
       <div>
         <label for="edit-avatar" class="block text-Text-Subtitles dark:text-gray-400 text-sm font-medium mb-1">URL do Avatar</label>
-        <input type="text" id="edit-avatar" value="${user.avatar || ''}" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
+        <input type="text" id="edit-avatar" value="${
+          user.avatar || ""
+        }" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-Text-Body dark:text-gray-300">
       </div>
       <div class="flex items-center mt-4">
-        <input type="checkbox" id="edit-private" ${user.isPrivate ? "checked" : ""} class="h-4 w-4 text-Main-Primary dark:text-cyan-600 border-gray-300 rounded">
+        <input type="checkbox" id="edit-private" ${
+          user.isPrivate ? "checked" : ""
+        } class="h-4 w-4 text-Main-Primary dark:text-cyan-600 border-gray-300 rounded">
         <label for="edit-private" class="ml-2 block text-Text-Subtitles dark:text-gray-400 text-sm font-medium">Perfil Privado</label>
       </div>
       <div class="flex justify-end gap-4 mt-6">
@@ -742,9 +757,11 @@ function handleProfileUpdate(event) {
   // Obter dados do formulário
   const formData = new FormData(event.target);
   // Password change logic (acesso direto aos inputs pelo id)
-  const currentPassword = document.getElementById("current-password")?.value || "";
+  const currentPassword =
+    document.getElementById("current-password")?.value || "";
   const newPassword = document.getElementById("new-password")?.value || "";
-  const confirmPassword = document.getElementById("confirm-password")?.value || "";
+  const confirmPassword =
+    document.getElementById("confirm-password")?.value || "";
   if (currentPassword || newPassword || confirmPassword) {
     // Só tenta alterar se algum campo de password foi preenchido
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -768,21 +785,36 @@ function handleProfileUpdate(event) {
   // Atualizar todos os campos relevantes do utilizador
   const updatedUser = {
     ...user,
-    username: formData.get("user-name-input") || formData.get("username") || user.username,
-    email: formData.get("user-email-input") || formData.get("email") || user.email,
-    telefone: formData.get("user-phone-input") || formData.get("telefone") || user.telefone,
-    dataNascimento: formData.get("user-birth-input") || formData.get("birth") || user.dataNascimento,
+    username:
+      formData.get("user-name-input") ||
+      formData.get("username") ||
+      user.username,
+    email:
+      formData.get("user-email-input") || formData.get("email") || user.email,
+    telefone:
+      formData.get("user-phone-input") ||
+      formData.get("telefone") ||
+      user.telefone,
+    dataNascimento:
+      formData.get("user-birth-input") ||
+      formData.get("birth") ||
+      user.dataNascimento,
     avatar: formData.get("settings-avatar") || user.avatar,
     isPrivate: formData.get("user-private-input") === "on" || user.isPrivate,
   };
   // Preferências (notificações/newsletter) - manter compatibilidade
   updatedUser.preferences = {
     ...user.preferences,
-    emailNotifications: document.querySelector('#settings-email-notifications')?.checked ?? user.preferences?.emailNotifications,
-    newsletter: document.querySelector('#newsletter-check')?.checked ?? user.preferences?.newsletter,
+    emailNotifications:
+      document.querySelector("#settings-email-notifications")?.checked ??
+      user.preferences?.emailNotifications,
+    newsletter:
+      document.querySelector("#newsletter-check")?.checked ??
+      user.preferences?.newsletter,
   };
   // Atualizar também user.newsletter diretamente
-  updatedUser.newsletter = document.querySelector('#newsletter-check')?.checked ?? user.newsletter;
+  updatedUser.newsletter =
+    document.querySelector("#newsletter-check")?.checked ?? user.newsletter;
   try {
     const result = UserModel.update(user.id, updatedUser);
     sessionStorage.setItem("loggedUser", JSON.stringify(updatedUser));
@@ -974,7 +1006,11 @@ function saveSpecialCode(code) {
   // Add code to user's redeemed codes
   currentUser.redeemedCodes.push(validCode);
   // Add point movement record and points
-  UserModel.addPontos(currentUser, pointsToAdd, `Código especial resgatado: ${validCode}`);
+  UserModel.addPontos(
+    currentUser,
+    pointsToAdd,
+    `Código especial resgatado: ${validCode}`
+  );
   // Update user in storage
   UserModel.update(currentUser.id, currentUser);
   // Update session storage
@@ -986,132 +1022,202 @@ function loadReservas(user) {
   const container = document.getElementById("reservas-container");
   const emptyDiv = document.getElementById("reservas-empty");
   if (!container) return;
-  // Limpa o container
+
   container.innerHTML = "";
+
   if (!user.reservas || user.reservas.length === 0) {
     if (emptyDiv) emptyDiv.classList.remove("hidden");
     return;
   } else {
     if (emptyDiv) emptyDiv.classList.add("hidden");
   }
+
   user.reservas.forEach((reserva, idx) => {
     const card = document.createElement("div");
     card.className =
-      "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl w-full mb-6 cursor-pointer hover:shadow-lg transition-shadow";
-    // Add click event based on reservation type
-    card.addEventListener("click", function(e) {
-      // Don't navigate if clicking the delete button
-      if (e.target.closest('.delete-reservation-btn')) {
+      "bg-white dark:bg-gray-900 rounded-xl shadow-lg outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-stretch p-0 relative max-w-3xl w-full mb-6 cursor-pointer hover:shadow-xl transition-shadow duration-300 overflow-hidden";
+
+    /* Click para navegar */
+    card.addEventListener("click", function (e) {
+      if (e.target.closest(".delete-reservation-btn")) {
         return;
       }
-      // Navigate based on reservation type
-      if (reserva.tipo === 'hotel') {
+      if (reserva.tipo === "hotel") {
         window.location.href = `hotel.html?id=${reserva.id}`;
       } else if (reserva.numeroVoo) {
         window.location.href = `flight_itinerary.html?id=${reserva.numeroVoo}`;
       }
     });
-    // Botão de apagar
+
+    /* Botão apagar */
     const btnDelete = document.createElement("button");
     btnDelete.className =
-      "absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-red-50 dark:hover:bg-gray-700 transition-colors z-10 flex items-center justify-center delete-reservation-btn";
+      "absolute top-3 right-3 w-9 h-9 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 z-10 flex items-center justify-center delete-reservation-btn hover:scale-110";
     btnDelete.innerHTML =
-      '<span class="material-symbols-outlined text-red-500 text-sm">delete</span>';
+      '<span class="material-symbols-outlined text-red-500 text-lg">delete</span>';
     btnDelete.dataset.reservationIndex = idx;
     card.appendChild(btnDelete);
-    // Imagem principal
+
+    /* Imagem principal */
     const img = document.createElement("img");
     img.className =
-      "h-40 w-full sm:h-48 sm:w-48 max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover flex-shrink-0";
+      "w-full sm:w-48 h-40 sm:h-full max-lg:rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none object-cover flex-shrink-0";
     img.src = reserva.imagem || "https://placehold.co/200x200";
     img.alt = "Imagem promocional";
-    card.appendChild(img);    // Área do conteúdo
+    card.appendChild(img);
+
+    /* Área do conteúdo */
     const content = document.createElement("div");
-    content.className = "flex flex-row items-center justify-between flex-1 p-4 w-full";
-    // Itinerário (lado esquerdo) - give more space for hotel reservations
+    content.className =
+      "flex flex-row items-center justify-between flex-1 p-6 w-full";
+
+    /* Conteúdo principal */
     const itinerary = document.createElement("div");
-    if (reserva.tipo === 'hotel') {
-      itinerary.className = "flex flex-col gap-2 text-left w-full"; // Full width for hotels
+    itinerary.className = "flex flex-col gap-3 text-left flex-1";
+
+    if (reserva.tipo === "hotel") {
+      /* Hotel */
+      const destinoLimpo = extrairNomeCidade(reserva.destino || "Destino");
+      itinerary.innerHTML = `
+        <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">${destinoLimpo}</span>
+        <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Hotel: ${
+          reserva.nome || "Hotel"
+        }</span>
+        ${
+          reserva.checkIn && reserva.checkOut
+            ? `<span class="text-sm font-medium text-gray-600 dark:text-gray-300">Check-in: ${reserva.checkIn} | Check-out: ${reserva.checkOut}</span>`
+            : ""
+        }
+        ${
+          reserva.hospedes
+            ? `<span class="text-sm font-light text-Main-Secondary dark:text-cyan-100">${reserva.hospedes} hóspedes</span>`
+            : ""
+        }
+      `;
     } else {
-      itinerary.className = "flex flex-col gap-2 text-left flex-1"; // Original for flights
-    }
-    // Destino em destaque
-    itinerary.innerHTML = `<span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">${reserva.destino || 'Destino'}</span>`;
-    // Display based on reservation type
-    if (reserva.tipo === 'hotel') {
-      // Hotel reservation display
-      itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Hotel: ${reserva.nome || 'Hotel'}</span>`;
-      if (reserva.checkIn && reserva.checkOut) {
-        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">Check-in: ${reserva.checkIn} | Check-out: ${reserva.checkOut}</span>`;
-      }
-        if (reserva.hospedes) {
-        itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">${reserva.hospedes} hóspedes</span>`;
-      }
-    } else {
-      // Flight reservation display (original logic)
-      if (reserva.partida && reserva.origem && reserva.chegada && reserva.destino) {
-        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.partida} (${reserva.origem}) » ${reserva.chegada} (${reserva.destino})</span>`;
+      /* Voos */
+      const destinoLimpo = extrairNomeCidade(reserva.destino || "Destino");
+      const origemLimpa = extrairNomeCidade(reserva.origem || "");
+
+      /* Determinar tipo de viagem */
+      let tipoViagem = "Só Ida";
+      let roteiro = "";
+
+      if (reserva.segments && reserva.segments.length > 1) {
+        tipoViagem = "Multi-destino";
+        const cidades = reserva.segments.map((seg) =>
+          extrairNomeCidade(seg.destino || seg.origem)
+        );
+        roteiro = cidades.join(" → ");
+      } else if (reserva.dataVolta) {
+        tipoViagem = "Ida e Volta";
+        roteiro = `${origemLimpa} ⇄ ${destinoLimpo}`;
       } else {
-        itinerary.innerHTML += `<span class="text-xs text-red-500">Faltam dados de ida</span>`;
+        roteiro = `${origemLimpa} → ${destinoLimpo}`;
       }
-      // Volta
-      if (reserva.dataVolta && reserva.destino && reserva.origem) {
-        itinerary.innerHTML += `<span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">${reserva.dataVolta} (${reserva.destino}) » ? (${reserva.origem})</span>`;
-      }
-      // Voo
-      if (reserva.numeroVoo) {
-        itinerary.innerHTML += `<span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo ${reserva.numeroVoo}</span>`;
-      }
-    }    content.appendChild(itinerary);
-    // Icon/Logo (lado direito) - only for flights, not hotels
-    if (reserva.tipo !== 'hotel') {
+
+      /* Data formatada */
+      const dataPartida = formatarDataSimples(reserva.partida);
+      const dataVolta = reserva.dataVolta
+        ? formatarDataSimples(reserva.dataVolta)
+        : "";
+
+      itinerary.innerHTML = `
+        <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">${destinoLimpo}</span>
+        <span class="text-base font-semibold text-Main-Secondary dark:text-cyan-200">${roteiro}</span>
+        <div class="flex flex-col gap-1">
+          <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <span class="material-symbols-outlined text-sm mr-1">flight_takeoff</span>
+            ${dataPartida}
+          </span>
+          ${
+            dataVolta
+              ? `<span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+              <span class="material-symbols-outlined text-sm mr-1">flight_land</span>
+              ${dataVolta}
+            </span>`
+              : ""
+          }
+        </div>
+        <span class="text-xs font-medium px-2 py-1 bg-Main-Primary/10 text-Main-Primary dark:bg-cyan-400/10 dark:text-cyan-400 rounded-full w-fit">
+          ${tipoViagem}
+        </span>
+      `;
+    }
+
+    content.appendChild(itinerary);
+
+    /* Ícone da companhia - apenas para voos de ida */
+    if (reserva.tipo !== "hotel" && !reserva.dataVolta && !reserva.segments) {
       const iconDiv = document.createElement("div");
       iconDiv.className = "pl-4 flex-shrink-0 flex items-center";
-      // Airline logo (original logic)
-      let companhiaImgSrc = "";
-      // Tenta usar um ícone da companhia se existir, senão usa um placeholder
-      if (reserva.companhia && typeof reserva.companhia === 'string') {
-        // Exemplo de correspondência simples para TAP, Ryanair, etc.
-        const companhiaMap = {
-          'TAP': '../img/icons/ca_tap.jpg',
-          'Brussels Airlines': '../img/icons/ca_brussels.png',
-          'Ryanair': '../img/icons/ca_ryanair.jpg',
-          'KLM': '../img/icons/ca_klm.png',
-          'Air France': '../img/icons/ca_air_france.jpg',
-          'Swiss': '../img/icons/ca_swiss.png',
-          'Vueling': '../img/icons/ca_vueling.png',
-          'Wizz Air': '../img/icons/ca_wizz.png',
-          'Norwegian': '../img/icons/ca_Norwegian.png',
-          'British Airways': '../img/icons/ca_british_airways.jpg',
-          'Alitalia': '../img/icons/ca_alitalia.png',
-          'Austrian': '../img/icons/ca_Austrian.png',
-          'SAS': '../img/icons/ca_sas.png',
-          'LOT': '../img/icons/ca_LOT.png',
-          'ITA': '../img/icons/ca_ITA.png',
-          'Tarom': '../img/icons/ca-tarom.jpg',
-        };
-        for (const key in companhiaMap) {
-          if (reserva.companhia.toLowerCase().includes(key.toLowerCase())) {
-            companhiaImgSrc = companhiaMap[key];
-            break;
-          }
-        }
-      }
-      if (!companhiaImgSrc) {
-        companhiaImgSrc = "https://placehold.co/64x64?text=Airline";
-      }
+
       const companhiaImg = document.createElement("img");
-      companhiaImg.className = "w-16 h-16 rounded-full object-cover";
-      companhiaImg.src = companhiaImgSrc;
+      companhiaImg.className =
+        "w-14 h-14 rounded-lg object-cover border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-1";
+      companhiaImg.src = obterLogoCompanhia(reserva.companhia);
       companhiaImg.alt = reserva.companhia || "Companhia aérea";
       iconDiv.appendChild(companhiaImg);
       content.appendChild(iconDiv);
     }
+
     card.appendChild(content);
     container.appendChild(card);
   });
-  // After loading all reservations, setup the delete button listeners
+
   setupReservationDeleteListeners();
+}
+
+/* Extrair nome da cidade removendo código do aeroporto */
+function extrairNomeCidade(destino) {
+  if (!destino) return "";
+  if (destino.includes(" - ")) {
+    return destino.split(" - ")[1];
+  }
+  return destino;
+}
+
+/* Formatar data de forma simples */
+function formatarDataSimples(data) {
+  if (!data) return "";
+  try {
+    const partes = data.split(" ");
+    return partes[0] + " às " + partes[1];
+  } catch {
+    return data;
+  }
+}
+
+/* Obter logo da companhia */
+function obterLogoCompanhia(companhia) {
+  if (!companhia) return "https://placehold.co/64x64?text=Airline";
+
+  const companhiaMap = {
+    TAP: "../img/icons/ca_tap.jpg",
+    "Brussels Airlines": "../img/icons/ca_brussels.png",
+    Ryanair: "../img/icons/ca_ryanair.jpg",
+    KLM: "../img/icons/ca_klm.png",
+    "Air France": "../img/icons/ca_air_france.jpg",
+    Swiss: "../img/icons/ca_swiss.png",
+    Vueling: "../img/icons/ca_vueling.png",
+    "Wizz Air": "../img/icons/ca_wizz.png",
+    Norwegian: "../img/icons/ca_Norwegian.png",
+    "British Airways": "../img/icons/ca_british_airways.jpg",
+    Alitalia: "../img/icons/ca_alitalia.png",
+    Austrian: "../img/icons/ca_Austrian.png",
+    SAS: "../img/icons/ca_sas.png",
+    LOT: "../img/icons/ca_LOT.png",
+    ITA: "../img/icons/ca_ITA.png",
+    Tarom: "../img/icons/ca-tarom.jpg",
+  };
+
+  for (const key in companhiaMap) {
+    if (companhia.toLowerCase().includes(key.toLowerCase())) {
+      return companhiaMap[key];
+    }
+  }
+
+  return "https://placehold.co/64x64?text=Airline";
 }
 /* Setup reservation delete listeners - should be called after loadReservas */
 function setupReservationDeleteListeners() {
@@ -1124,47 +1230,59 @@ function setupReservationDeleteListeners() {
         showToast("Erro: Utilizador não está logado", "error");
         return;
       }
-      
+
       // Get reservation index from data attribute
       const reservationIndex = parseInt(this.dataset.reservationIndex, 10);
       const reservation = user.reservas && user.reservas[reservationIndex];
-      const reservationName = reservation ? 
-        (reservation.numeroVoo || reservation.hotel?.nome || `Reserva ${reservationIndex + 1}`) :
-        `Reserva ${reservationIndex + 1}`;
-        showConfirm(`Tem a certeza que pretende cancelar a reserva "${reservationName}"? Esta ação não pode ser desfeita.`)
-        .then(confirmed => {
-          if (confirmed) {
-            // Call model function to remove reservation and subtract points
-            const result = UserModel.removeReservation(user.id, reservationIndex);
-            
-            if (result.success) {
-              // Find the parent card element
-              let reservaCard = this.parentElement;
-              while (reservaCard && !reservaCard.classList.contains('mb-6')) {
-                reservaCard = reservaCard.parentElement;
-              }
-              if (reservaCard) {
-                /* Animação de fade-out antes de remover */
-                reservaCard.style.transition = "opacity 0.3s ease";
-                reservaCard.style.opacity = "0";
-                setTimeout(() => {
-                  reservaCard.remove();
-                  /* Verificar se ainda existem reservas */
-                  const reservasContainer = document.getElementById("reservas-container");
-                  if (reservasContainer && reservasContainer.children.length === 0) {
-                    document.getElementById("reservas-empty").classList.remove("hidden");
-                  }
-                }, 300);
-              }
-              // Show success message with points info - use toast instead of alert
-              showToast(`Reserva removida! Pontos subtraídos: ${result.pointsSubtracted}. Pontos atuais: ${result.newPoints}`, "success");
-              // Reload user info to update UI
-              loadUserInfo();
-            } else {
-              showToast(`Erro ao remover reserva: ${result.message}`, "error");
+      const reservationName = reservation
+        ? reservation.numeroVoo ||
+          reservation.hotel?.nome ||
+          `Reserva ${reservationIndex + 1}`
+        : `Reserva ${reservationIndex + 1}`;
+      showConfirm(
+        `Tem a certeza que pretende cancelar a reserva "${reservationName}"? Esta ação não pode ser desfeita.`
+      ).then((confirmed) => {
+        if (confirmed) {
+          // Call model function to remove reservation and subtract points
+          const result = UserModel.removeReservation(user.id, reservationIndex);
+
+          if (result.success) {
+            // Find the parent card element
+            let reservaCard = this.parentElement;
+            while (reservaCard && !reservaCard.classList.contains("mb-6")) {
+              reservaCard = reservaCard.parentElement;
             }
+            if (reservaCard) {
+              /* Animação de fade-out antes de remover */
+              reservaCard.style.transition = "opacity 0.3s ease";
+              reservaCard.style.opacity = "0";
+              setTimeout(() => {
+                reservaCard.remove();
+                /* Verificar se ainda existem reservas */
+                const reservasContainer =
+                  document.getElementById("reservas-container");
+                if (
+                  reservasContainer &&
+                  reservasContainer.children.length === 0
+                ) {
+                  document
+                    .getElementById("reservas-empty")
+                    .classList.remove("hidden");
+                }
+              }, 300);
+            }
+            // Show success message with points info - use toast instead of alert
+            showToast(
+              `Reserva removida! Pontos subtraídos: ${result.pointsSubtracted}. Pontos atuais: ${result.newPoints}`,
+              "success"
+            );
+            // Reload user info to update UI
+            loadUserInfo();
+          } else {
+            showToast(`Erro ao remover reserva: ${result.message}`, "error");
           }
-        });
+        }
+      });
     });
   });
 }
@@ -1173,12 +1291,12 @@ function formatDateTime(dateStr) {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return "Data inválida";
   // Exemplo: 06 Mai 10:30
-  return date.toLocaleString('pt-PT', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
+  return date.toLocaleString("pt-PT", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   });
 }
 /* Remove favorite from user's favorites list */
@@ -1190,12 +1308,20 @@ function removeFavorite(favoriteIndex) {
   }
   const currentUser = UserModel.getUserLogged();
   // Check if favorites array exists and index is valid
-  if (!currentUser.favoritos || favoriteIndex < 0 || favoriteIndex >= currentUser.favoritos.length) {
+  if (
+    !currentUser.favoritos ||
+    favoriteIndex < 0 ||
+    favoriteIndex >= currentUser.favoritos.length
+  ) {
     return;
   }
   // Get the favorite to be removed for confirmation
   const favoriteToRemove = currentUser.favoritos[favoriteIndex];
-  const favoriteName = favoriteToRemove.destino || favoriteToRemove.nome || favoriteToRemove.title || "este favorito";
+  const favoriteName =
+    favoriteToRemove.destino ||
+    favoriteToRemove.nome ||
+    favoriteToRemove.title ||
+    "este favorito";
   // Confirm removal
   showToast(`Favorito ${favoriteName} removido com sucesso!`);
   try {
@@ -1241,13 +1367,15 @@ function loadFavoritos(user) {
     return;
   } else {
     if (bookmarksEmpty) bookmarksEmpty.classList.add("hidden");
-  }  user.favoritos.forEach((fav, idx) => {
+  }
+  user.favoritos.forEach((fav, idx) => {
     // Determine if it's a hotel or flight
     const isHotel = fav.id && !fav.numeroVoo && !fav.nVoo;
     const isFlight = fav.numeroVoo || fav.nVoo;
     // Render a card matching the provided HTML
     const card = document.createElement("div");
-    card.className = "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
+    card.className =
+      "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors";
     let title, subtitle, navigationUrl;
     if (isHotel) {
       title = fav.nome || "Hotel";
@@ -1255,8 +1383,12 @@ function loadFavoritos(user) {
       navigationUrl = `/html/hotel.html?id=${fav.id}`;
     } else if (isFlight) {
       title = fav.destino || fav.nome || fav.title || "Voo";
-      subtitle = `${fav.origem ? `${fav.origem} → ${fav.destino}` : ""}${fav.partida ? ` | ${fav.partida.split(' ')[0]}` : ""}${fav.companhia ? ` | ${fav.companhia}` : ""}`;
-      navigationUrl = `/html/flight_itinerary.html?id=${fav.numeroVoo || fav.nVoo || ""}`;
+      subtitle = `${fav.origem ? `${fav.origem} → ${fav.destino}` : ""}${
+        fav.partida ? ` | ${fav.partida.split(" ")[0]}` : ""
+      }${fav.companhia ? ` | ${fav.companhia}` : ""}`;
+      navigationUrl = `/html/flight_itinerary.html?id=${
+        fav.numeroVoo || fav.nVoo || ""
+      }`;
     } else {
       title = "Favorito";
       subtitle = "Tipo desconhecido";
@@ -1273,13 +1405,13 @@ function loadFavoritos(user) {
       <span class="material-symbols-outlined text-gray-400 dark:text-gray-300 hover:text-gray-600 cursor-pointer">arrow_forward</span>
     `;
     // Add click event to the heart icon for removing favorite
-    const heartIcon = card.querySelector('.favorite-heart');
-    heartIcon.addEventListener('click', function(e) {
+    const heartIcon = card.querySelector(".favorite-heart");
+    heartIcon.addEventListener("click", function (e) {
       e.stopPropagation(); // Prevent card click from triggering
       removeFavorite(idx);
     });
     // Add click event for navigation to the entire card
-    card.addEventListener('click', function() {
+    card.addEventListener("click", function () {
       window.location.href = navigationUrl;
     });
     bookmarksContainer.appendChild(card);
@@ -1309,13 +1441,18 @@ function loadPointMovements() {
       <div class="mb-4 p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium text-cyan-800 dark:text-cyan-200">Saldo Atual</span>
-          <span class="text-2xl font-bold text-cyan-800 dark:text-cyan-200">${user.pontos || 0} pontos</span>
+          <span class="text-2xl font-bold text-cyan-800 dark:text-cyan-200">${
+            user.pontos || 0
+          } pontos</span>
         </div>
       </div>
-      ${movements.length === 0 ? 
-        '<div class="text-center py-8 text-gray-500 dark:text-gray-400">Nenhum movimento de pontos encontrado</div>' :
-        `<div class="max-h-96 overflow-y-auto">
-          ${movements.map(movement => `
+      ${
+        movements.length === 0
+          ? '<div class="text-center py-8 text-gray-500 dark:text-gray-400">Nenhum movimento de pontos encontrado</div>'
+          : `<div class="max-h-96 overflow-y-auto">
+          ${movements
+            .map(
+              (movement) => `
             <div class="flex items-center justify-between py-3 border-b border-gray-100 dark:border-gray-600 last:border-b-0">
               <div class="flex-1">
                 <div class="text-sm font-medium text-gray-900 dark:text-white">
@@ -1326,19 +1463,25 @@ function loadPointMovements() {
                 </div>
               </div>
               <div class="flex flex-col items-end ml-4">
-                <span class="text-sm font-semibold ${movement.valor >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
-                  ${movement.valor >= 0 ? '+' : ''}${movement.valor} pts
+                <span class="text-sm font-semibold ${
+                  movement.valor >= 0
+                    ? "text-green-600 dark:text-green-400"
+                    : "text-red-600 dark:text-red-400"
+                }">
+                  ${movement.valor >= 0 ? "+" : ""}${movement.valor} pts
                 </span>
                 <span class="text-xs text-gray-500 dark:text-gray-400">
                   Saldo: ${movement.saldoAtual} pts
                 </span>
               </div>
             </div>
-          `).join('')}
+          `
+            )
+            .join("")}
         </div>`
       }
     </div>
-  `;  // Reattach close button event listener
+  `; // Reattach close button event listener
   const newCloseBtn = document.getElementById("close-pontos-modal");
   if (newCloseBtn) {
     newCloseBtn.addEventListener("click", function () {
@@ -1355,16 +1498,22 @@ function formatMovementDate(dateStr) {
   const now = new Date();
   const diffInHours = (now - date) / (1000 * 60 * 60);
   if (diffInHours < 24) {
-    return `Hoje às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
+    return `Hoje às ${date.toLocaleTimeString("pt-PT", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
   } else if (diffInHours < 48) {
-    return `Ontem às ${date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}`;
+    return `Ontem às ${date.toLocaleTimeString("pt-PT", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
   } else {
-    return date.toLocaleDateString('pt-PT', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleDateString("pt-PT", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }
 }

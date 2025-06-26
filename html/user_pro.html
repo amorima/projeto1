@@ -275,67 +275,65 @@
                     <h2 class="text-2xl font-semibold font-['IBM_Plex_Sans'] mb-6">As tuas reservas</h2>                    <!-- Lista de Reservas -->
                     <div class="grid grid-cols-1 gap-6" id="reservas-container">
                         <!-- Reserva 1 -->
-                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl">
-                            <button class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-red-50 dark:hover:bg-gray-700 transition-colors z-10 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-red-500 text-sm">delete</span>
+                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-stretch p-0 relative max-w-3xl hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                            <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 z-10 flex items-center justify-center hover:scale-110">
+                                <span class="material-symbols-outlined text-red-500 text-lg">delete</span>
                             </button>
                             <img
-                                class="h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover"
+                                class="w-full sm:w-48 h-40 sm:h-full max-lg:rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none object-cover"
                                 src="https://placehold.co/200x200"
                                 alt="Imagem promocional"
                             />
                             <!-- área do conteúdo -->
-                            <div class="flex flex-row items-center justify-between flex-1 p-4 w-full">
+                            <div class="flex flex-row items-center justify-between flex-1 p-6 w-full">
                                 <!-- conteúdo do itinerário -->
-                                <div class="flex flex-col gap-2 text-left flex-1">
+                                <div class="flex flex-col gap-3 text-left flex-1">
                                     <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">Londres</span>
-                                    <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
-                                        06 Mai 10:30 (OPO) » 06 Mai 13:00 (STN)
+                                    <span class="text-base font-semibold text-Main-Secondary dark:text-cyan-200">Porto ⇄ Londres</span>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                            <span class="material-symbols-outlined text-sm mr-1">flight_takeoff</span>
+                                            06/05/2025 às 10:30
+                                        </span>
+                                        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                            <span class="material-symbols-outlined text-sm mr-1">flight_land</span>
+                                            12/05/2025 às 15:20
+                                        </span>
+                                    </div>
+                                    <span class="text-xs font-medium px-2 py-1 bg-Main-Primary/10 text-Main-Primary dark:bg-cyan-400/10 dark:text-cyan-400 rounded-full w-fit">
+                                        Ida e Volta
                                     </span>
-                                    <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
-                                        12 Mai 15:20 (STN) » 12 Mai 17:50 (OPO)
-                                    </span>
-                                    <span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo OPO - LDN</span>
-                                </div>
-                                <!-- imagem da companhia aérea -->
-                                <div class="pl-4 flex-shrink-0 flex items-center">
-                                    <img
-                                        class="w-16 h-16 rounded-full"
-                                        src="../img/icons/ca_tap.jpg"
-                                        alt="Companhia aérea"
-                                    />
                                 </div>
                             </div>
                         </div>                        <!-- Reserva 2 -->
-                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-center p-0 gap-6 relative max-w-3xl">
-                            <button class="absolute top-2 right-2 w-8 h-8 bg-white dark:bg-gray-800 rounded-full shadow hover:bg-red-50 dark:hover:bg-gray-700 transition-colors z-10 flex items-center justify-center">
-                                <span class="material-symbols-outlined text-red-500 text-sm">delete</span>
+                        <div class="bg-white dark:bg-gray-900 rounded-xl shadow-lg outline outline-1 outline-gray-200 dark:outline-gray-700 flex flex-col sm:flex-row items-stretch p-0 relative max-w-3xl hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+                            <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 z-10 flex items-center justify-center hover:scale-110">
+                                <span class="material-symbols-outlined text-red-500 text-lg">delete</span>
                             </button>
                             <img
-                                class="h-40 max-lg:h-56 max-lg:w-full sm:h-full sm:w-auto max-lg:rounded-t-xl max-lg:rounded-bl-none sm:rounded-l-xl sm:rounded-tr-none object-cover"
+                                class="w-full sm:w-48 h-40 sm:h-full max-lg:rounded-t-xl sm:rounded-l-xl sm:rounded-tr-none object-cover"
                                 src="https://placehold.co/200x200"
                                 alt="Imagem promocional"
                             />
                             <!-- área do conteúdo -->
-                            <div class="flex flex-row items-center justify-between flex-1 p-4 w-full">
+                            <div class="flex flex-row items-center justify-between flex-1 p-6 w-full">
                                 <!-- conteúdo do itinerário -->
-                                <div class="flex flex-col gap-2 text-left flex-1">
+                                <div class="flex flex-col gap-3 text-left flex-1">
                                     <span class="text-3xl font-bold font-['Space_Mono'] text-Main-Primary dark:text-cyan-400">Paris</span>
-                                    <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
-                                        15 Jun 08:30 (OPO) » 15 Jun 10:45 (CDG)
+                                    <span class="text-base font-semibold text-Main-Secondary dark:text-cyan-200">Porto ⇄ Paris</span>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                            <span class="material-symbols-outlined text-sm mr-1">flight_takeoff</span>
+                                            15/06/2025 às 08:30
+                                        </span>
+                                        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                                            <span class="material-symbols-outlined text-sm mr-1">flight_land</span>
+                                            22/06/2025 às 11:30
+                                        </span>
+                                    </div>
+                                    <span class="text-xs font-medium px-2 py-1 bg-Main-Primary/10 text-Main-Primary dark:bg-cyan-400/10 dark:text-cyan-400 rounded-full w-fit">
+                                        Ida e Volta
                                     </span>
-                                    <span class="text-sm font-semibold text-Main-Secondary dark:text-cyan-200">
-                                        22 Jun 11:30 (CDG) » 22 Jun 13:45 (OPO)
-                                    </span>
-                                    <span class="text-base font-light text-Main-Secondary dark:text-cyan-100">Voo OPO - CDG</span>
-                                </div>
-                                <!-- imagem da companhia aérea -->
-                                <div class="pl-4 flex-shrink-0 flex items-center">
-                                    <img
-                                        class="w-16 h-16 rounded-full"
-                                        src="../img/icons/ca_air_france.jpg"
-                                        alt="Companhia aérea"
-                                    />
                                 </div>
                             </div>
                         </div>
