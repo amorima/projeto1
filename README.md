@@ -225,4 +225,116 @@ location.reload();
 
 ---
 
+---
+
+## 🎯 **CENÁRIO 6: MULTIVIAGEM - Porto → Londres → Paris → Roma**
+
+### **Pesquisa no Sistema:**
+- **Origem:** Porto (OPO)
+- **Escala 1:** Londres (LHR) 
+- **Escala 2:** Paris (CDG)
+- **Destino Final:** Roma (FCO)
+- **Tipo:** Multiviagem
+- **Data:** 05/08/2025
+- **Tipo de Turismo:** Turismo Cultural, Turismo Urbano
+
+### **Voos Individuais que Compõem a Viagem:**
+1. **BA2025** - Porto (OPO) → Londres (LHR)
+   - 🕘 **Partida:** 05/08/2025 às 09:30
+   - 🕙 **Chegada:** 05/08/2025 às 11:45
+   - ✈️ **Companhia:** British Airways
+   - 💰 **Preço:** €185
+
+2. **AF1234** - Londres (LHR) → Paris (CDG)
+   - 🕓 **Partida:** 05/08/2025 às 16:00
+   - 🕕 **Chegada:** 05/08/2025 às 18:30
+   - ✈️ **Companhia:** Air France
+   - 💰 **Preço:** €150
+
+3. **LH567** - Paris (CDG) → Roma (FCO)
+   - 🕗 **Partida:** 05/08/2025 às 20:00
+   - 🕘 **Chegada:** 05/08/2025 às 22:30
+   - ✈️ **Companhia:** Lufthansa
+   - 💰 **Preço:** €180
+
+### **Resultado Esperado:**
+- 🆔 **ID da Viagem:** BA2025-AF1234-LH567
+- 🗺️ **Rota Completa:** Porto → Londres → Paris → Roma
+- 💰 **Preço Total:** €515
+- 🎯 **Tipo:** Multi-destino
+- ♿ **Acessibilidade:** Transporte Acessível, Elevadores Disponíveis
+
+### **Como Testar:**
+
+#### **Método 1: URL Direta**
+```
+flight_itinerary.html?id=BA2025-AF1234-LH567
+```
+
+#### **Método 2: Através do Perfil do Utilizador**
+1. Fazer login com `40240119@esmad.ipp.pt` / `40240119`
+2. Ir para o perfil → aba "Reservas"
+3. Clicar no card da viagem multitrip "Roma"
+
+#### **Método 3: Pesquisa Multiviagem (Funcionalidade Futura)**
+*Nota: Atualmente não existe interface de pesquisa multiviagem. Os utilizadores acedem através de reservas existentes ou URLs diretas.*
+
+---
+
+## 🗺️ **AEROPORTOS DISPONÍVEIS NO SISTEMA**
+
+### **Principais Aeroportos para Testes:**
+
+| Código | Cidade | País | Nome Completo |
+|--------|--------|------|---------------|
+| **OPO** | Porto | Portugal | Aeroporto Francisco Sá Carneiro |
+| **LIS** | Lisboa | Portugal | Aeroporto Humberto Delgado |
+| **LHR** | Londres | Reino Unido | Heathrow Airport |
+| **LGW** | Londres | Reino Unido | Gatwick Airport |
+| **STN** | Londres | Reino Unido | Stansted Airport |
+| **CDG** | Paris | França | Charles de Gaulle |
+| **ORY** | Paris | França | Orly Airport |
+| **MAD** | Madrid | Espanha | Adolfo Suárez Madrid-Barajas |
+| **FCO** | Roma | Itália | Leonardo da Vinci-Fiumicino |
+| **AMS** | Amesterdão | Países Baixos | Amsterdam Airport Schiphol |
+
+### **Como Usar na Pesquisa:**
+- **No campo Origem:** Selecionar "Porto" (será automaticamente OPO)
+- **No campo Destino:** Selecionar "Londres", "Paris", "Roma", etc.
+- **Para testes específicos:** Usar os códigos nas URLs diretas
+
+---
+
+---
+
+## 🔗 **URLs DE TESTE DIRETAS**
+
+### **Viagens de Teste Rápido:**
+
+#### **Voos Únicos (Só Ida):**
+```
+flight_itinerary.html?id=BA2025    # Porto → Londres (British Airways)
+flight_itinerary.html?id=TP1205    # Porto → Londres (TAP)
+flight_itinerary.html?id=RY3456    # Porto → Londres (Ryanair)
+```
+
+#### **Viagens Ida e Volta:**
+```
+flight_itinerary.html?id=EZY4080-EZY4081    # Porto ⇄ Londres (easyJet)
+flight_itinerary.html?id=BA2025-TP1205      # Porto ⇄ Londres (Mixed)
+```
+
+#### **Viagens Multitrip:**
+```
+flight_itinerary.html?id=BA2025-AF1234-LH567    # Porto → Londres → Paris → Roma
+```
+
+### **Como Usar:**
+1. Copiar qualquer URL acima
+2. Colar na barra de endereços
+3. Verificar se mostra os dados corretos
+4. Testar funcionalidades de reserva e favoritos
+
+---
+
 *📝 Nota: Estes dados foram especificamente criados para demonstrar todas as funcionalidades do sistema de pesquisa de voos.*

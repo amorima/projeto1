@@ -123,6 +123,11 @@ function addDestination(nome, codigo) {
 
   renderPills();
   updateOriginDestination();
+
+  /* Atualizar pesquisa automaticamente se temos 2+ destinos */
+  if (multitripDestinations.length >= 2) {
+    updateSearch();
+  }
 }
 
 /* Remover destino da lista */
@@ -134,6 +139,9 @@ function removeDestination(index) {
 
     renderPills();
     updateOriginDestination();
+
+    /* Atualizar pesquisa após remoção */
+    updateSearch();
   }
 }
 
@@ -366,6 +374,27 @@ function setupTripTypeButtons() {
       }
     });
   });
+}
+
+/* Atualizar pesquisa quando destinos multitrip mudam */
+function updateSearch() {
+  console.log("🔄 Atualizando pesquisa multitrip...");
+
+  /* Verificar se a função de coleta de dados está disponível */
+  if (typeof collectCurrentSearchData === "function") {
+    const searchData = collectCurrentSearchData();
+    if (searchData) {
+      sessionStorage.setItem("planit_search", JSON.stringify(searchData));
+      console.log("💾 Dados de pesquisa atualizados:", searchData);
+
+      /* Atualizar cards se a função estiver disponível */
+      if (typeof renderFlightCards === "function") {
+        renderFlightCards();
+      }
+    }
+  } else {
+    console.log("⚠️ Função collectCurrentSearchData não disponível");
+  }
 }
 
 /* Função de teste para debugging */

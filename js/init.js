@@ -2572,6 +2572,30 @@ function initdata() {
           },
         ],
       },
+      {
+        numeroVoo: "LH567",
+        origem: "CDG - Paris",
+        destino: "FCO - Roma",
+        companhia: "Lufthansa",
+        partida: "05/08/2025 20:00",
+        chegada: "05/08/2025 22:30",
+        direto: true,
+        custo: 180,
+        imagem: "/img/destinos/Roma/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Transporte Acessível", "Elevadores Disponíveis"],
+        segmentos: [
+          {
+            numeroVoo: "LH567",
+            origem: "CDG - Paris",
+            destino: "FCO - Roma",
+            companhia: "Lufthansa",
+            partida: "05/08/2025 20:00",
+            chegada: "05/08/2025 22:30",
+          },
+        ],
+      },
 
       /* Voos adicionais para outras combinações de teste */
       {

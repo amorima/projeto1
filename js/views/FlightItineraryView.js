@@ -727,44 +727,90 @@ document.addEventListener("DOMContentLoaded", () => {
   if (numeroVoo) {
     FlightModel.init();
 
-    /* Verificar se é uma viagem ida-volta (formato: VOO1-VOO2) */
+    /* Verificar se é uma viagem com múltiplos segmentos (formato: VOO1-VOO2 ou VOO1-VOO2-VOO3-...) */
     if (numeroVoo.includes("-")) {
-      isRoundTrip = true;
-      const [vooIda, vooVolta] = numeroVoo.split("-");
+      const vooIds = numeroVoo.split("-");
 
-      /* Obter voos individuais */
-      const flightIda = FlightModel.getByNumeroVoo(vooIda);
-      const flightVolta = FlightModel.getByNumeroVoo(vooVolta);
+      if (vooIds.length === 2) {
+        /* Viagem ida-volta */
+        isRoundTrip = true;
+        const [vooIda, vooVolta] = vooIds;
 
-      if (flightIda && flightVolta) {
-        /* Criar objeto viagem ida-volta */
-        voo = {
-          numeroVoo: numeroVoo,
-          origem: flightIda.origem,
-          destino: flightIda.destino,
-          partida: flightIda.partida,
-          chegada: flightVolta.chegada,
-          dataVolta: flightVolta.partida,
-          companhia: flightIda.companhia,
-          imagem: flightIda.imagem,
-          turismo: flightIda.turismo,
-          tripType: "ida-volta",
-          tipoViagem: "ida-volta",
-          custo: flightIda.custo + flightVolta.custo,
-          segments: [flightIda, flightVolta],
-          segmentos: [
-            {
-              ...flightIda,
-              tipo: "ida",
-            },
-            {
-              ...flightVolta,
-              tipo: "volta",
-            },
-          ],
-        };
+        const flightIda = FlightModel.getByNumeroVoo(vooIda);
+        const flightVolta = FlightModel.getByNumeroVoo(vooVolta);
 
-        console.log("🔄 Viagem ida-volta criada:", voo);
+        if (flightIda && flightVolta) {
+          voo = {
+            numeroVoo: numeroVoo,
+            origem: flightIda.origem,
+            destino: flightIda.destino,
+            partida: flightIda.partida,
+            chegada: flightVolta.chegada,
+            dataVolta: flightVolta.partida,
+            companhia: flightIda.companhia,
+            imagem: flightIda.imagem,
+            turismo: flightIda.turismo,
+            tripType: "ida-volta",
+            tipoViagem: "ida-volta",
+            custo: flightIda.custo + flightVolta.custo,
+            segments: [flightIda, flightVolta],
+            segmentos: [
+              {
+                ...flightIda,
+                tipo: "ida",
+              },
+              {
+                ...flightVolta,
+                tipo: "volta",
+              },
+            ],
+          };
+
+          console.log("🔄 Viagem ida-volta criada:", voo);
+        }
+      } else if (vooIds.length > 2) {
+        /* Viagem multitrip */
+        const flights = [];
+        let custoTotal = 0;
+        let todasEncotradas = true;
+
+        /* Obter todos os voos individuais */
+        for (const vooId of vooIds) {
+          const flight = FlightModel.getByNumeroVoo(vooId);
+          if (flight) {
+            flights.push(flight);
+            custoTotal += flight.custo || 0;
+          } else {
+            todasEncotradas = false;
+            break;
+          }
+        }
+
+        if (todasEncotradas && flights.length > 0) {
+          const primeiroVoo = flights[0];
+          const ultimoVoo = flights[flights.length - 1];
+
+          voo = {
+            numeroVoo: numeroVoo,
+            origem: primeiroVoo.origem,
+            destino: ultimoVoo.destino,
+            partida: primeiroVoo.partida,
+            chegada: ultimoVoo.chegada,
+            companhia: "Multi-companhias",
+            imagem: ultimoVoo.imagem || primeiroVoo.imagem,
+            turismo: primeiroVoo.turismo,
+            tripType: "multitrip",
+            tipoViagem: "multitrip",
+            custo: custoTotal,
+            segments: flights,
+            segmentos: flights.map((flight, index) => ({
+              ...flight,
+              tipo: `segmento-${index + 1}`,
+            })),
+          };
+
+          console.log("🗺️ Viagem multitrip criada:", voo);
+        }
       }
     } else {
       /* Voo individual */
@@ -969,17 +1015,31 @@ function atualizarItinerarioVoo(voo) {
 
   /* Renderizar cards de segmentos baseado no tipo de viagem */
   if (voo.segments && voo.segments.length >= 2) {
-    /* Viagem ida-volta */
-    const vooIda = voo.segments[0];
-    const vooVolta = voo.segments[1];
+    if (voo.tripType === "multitrip" || voo.tipoViagem === "multitrip") {
+      /* Viagem multitrip */
+      voo.segments.forEach((segmento, index) => {
+        const origemCidade = segmento.origem?.includes(" - ")
+          ? segmento.origem.split(" - ").pop()
+          : segmento.origem;
+        const destinoCidade = segmento.destino?.includes(" - ")
+          ? segmento.destino.split(" - ").pop()
+          : segmento.destino;
 
-    /* Criar card de ida */
-    const cardIda = criarCardVoo(vooIda, "Ida");
-    itinerarioContainer.appendChild(cardIda);
+        const tipoSegmento = `${origemCidade} → ${destinoCidade}`;
+        const cardSegmento = criarCardVoo(segmento, tipoSegmento);
+        itinerarioContainer.appendChild(cardSegmento);
+      });
+    } else {
+      /* Viagem ida-volta */
+      const vooIda = voo.segments[0];
+      const vooVolta = voo.segments[1];
 
-    /* Criar card de volta */
-    const cardVolta = criarCardVoo(vooVolta, "Volta");
-    itinerarioContainer.appendChild(cardVolta);
+      const cardIda = criarCardVoo(vooIda, "Ida");
+      itinerarioContainer.appendChild(cardIda);
+
+      const cardVolta = criarCardVoo(vooVolta, "Volta");
+      itinerarioContainer.appendChild(cardVolta);
+    }
   } else if (voo.segmentos && voo.segmentos.length > 0) {
     /* Usar estrutura de segmentos se disponível */
     voo.segmentos.forEach((segmento, index) => {

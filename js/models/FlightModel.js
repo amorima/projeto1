@@ -1726,6 +1726,15 @@ export function buildTripCombinations(searchCriteria) {
         destinations
       );
 
+      /* Debug detalhado de cada destino */
+      destinations.forEach((dest, i) => {
+        console.log(`📍 Destino ${i + 1}:`, {
+          nome: dest.nome,
+          codigo: dest.codigo,
+          tipo: typeof dest,
+        });
+      });
+
       /* Se apenas 2 destinos, tratar como so-ida */
       if (destinations.length === 2) {
         console.log(
@@ -1752,10 +1761,19 @@ export function buildTripCombinations(searchCriteria) {
             flight.destino.includes(destino.codigo);
 
           console.log(
-            `✈️ Checking flight ${flight.numeroVoo}: ${flight.origem} → ${flight.destino}`
+            `✈️ Avaliando voo ${flight.numeroVoo}: ${flight.origem} → ${flight.destino}`
           );
           console.log(
-            `🔍 Origin match: ${originMatch}, Destination match: ${destinationMatch}`
+            `   - Origem procurada: ${origem.nome} (${origem.codigo})`
+          );
+          console.log(
+            `   - Destino procurado: ${destino.nome} (${destino.codigo})`
+          );
+          console.log(
+            `   - FlightOrigin: "${flightOrigin}", FlightDest: "${flightDestination}"`
+          );
+          console.log(
+            `   - OriginMatch: ${originMatch}, DestMatch: ${destinationMatch}`
           );
 
           return originMatch && destinationMatch;

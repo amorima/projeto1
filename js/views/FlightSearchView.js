@@ -182,11 +182,26 @@ function renderFlightCards(maxCards = 18) {
     sortPrice: filters.sortPrice || undefined,
   };
 
+  console.log("🔧 Debug - UI Filters:", uiFilters);
+  console.log("🔧 Debug - Additional filters:", {
+    origem: filters.origem,
+    destino: filters.destino,
+    tipoTurismo: filters.tipoTurismo,
+    acessibilidade: filters.acessibilidade,
+  });
+
   trips = Flight.applyUIFilters(trips, uiFilters);
+  console.log("🔧 Debug - Trips after applyUIFilters:", trips.length);
 
   /* Aplicar filtros adicionais específicos da interface */
   trips = trips.filter((trip) => {
     let match = true;
+
+    /* Para viagens multitrip, ignorar filtros de origem/destino específicos */
+    if (trip.tripType === "multitrip") {
+      console.log("🎯 Multitrip detected, skipping origin/destination filters");
+      return match; /* Para multitrip, só aplicar outros filtros se necessário */
+    }
 
     /* Filtro por origem específica da interface */
     if (
@@ -199,6 +214,9 @@ function renderFlightCards(maxCards = 18) {
       const filtroOrigem = filters.origem.trim().toLowerCase();
       const origemTrip = trip.origem.trim().toLowerCase();
       match = match && origemTrip.includes(filtroOrigem);
+      console.log(
+        `🔍 Origin filter: "${filtroOrigem}" vs "${origemTrip}" = ${match}`
+      );
     }
 
     /* Filtro por destino específico da interface */
@@ -212,10 +230,15 @@ function renderFlightCards(maxCards = 18) {
       const filtroDestino = filters.destino.trim().toLowerCase();
       /* Usar a função utilitária para verificar se passa pela cidade */
       match = match && Flight.flightPassesPorCidade(trip, filtroDestino);
+      console.log(
+        `🔍 Destination filter: "${filtroDestino}" vs trip destination = ${match}`
+      );
     }
 
     return match;
   });
+
+  console.log("🔧 Debug - Trips after additional filters:", trips.length);
 
   /* Limitar número de resultados */
   trips = trips.slice(0, maxCards);
@@ -225,12 +248,17 @@ function renderFlightCards(maxCards = 18) {
 }
 
 function renderCards(trips) {
+  console.log("🎨 renderCards called with", trips.length, "trips");
   const container = document.querySelector(".card-viagens");
-  if (!container) return;
+  if (!container) {
+    console.log("⚠️ Container .card-viagens not found!");
+    return;
+  }
 
   container.innerHTML = "";
 
   if (trips.length === 0) {
+    console.log("📭 No trips to render, showing empty state");
     container.innerHTML = `
       <div class="col-span-full text-center py-12">
         <p class="text-gray-500 dark:text-gray-400 text-lg">Nenhuma viagem encontrada para os critérios selecionados.</p>
@@ -242,10 +270,13 @@ function renderCards(trips) {
     return;
   }
 
-  trips.forEach((trip) => {
+  console.log("🎯 Rendering", trips.length, "trip cards");
+  trips.forEach((trip, index) => {
+    console.log(`🃏 Creating card ${index + 1} for trip:`, trip.numeroVoo);
     const card = createFlightCard(trip);
     container.appendChild(card);
   });
+  console.log("✅ All cards rendered successfully");
 }
 
 function createFlightCard(trip) {
@@ -427,7 +458,7 @@ function createFlightCard(trip) {
         <div class="text-2xl font-bold text-Main-Primary dark:text-cyan-400">
           €${custoDisplay}
         </div>
-        <a href="flight_itinerary.html?id=${trip.numeroVoo}" 
+        <a href="flight_itinerary.html?id=${getFlightItineraryId(trip)}" 
            class="bg-Main-Primary hover:bg-Main-Dark text-white px-4 py-2 rounded-lg transition-colors">
           Ver detalhes
         </a>
@@ -436,6 +467,23 @@ function createFlightCard(trip) {
   `;
 
   return cardElement;
+}
+
+/* Determinar ID correto para o link do itinerário */
+function getFlightItineraryId(trip) {
+  /* Para viagens multitrip, usar os números de voo dos segmentos */
+  if (
+    trip.tripType === "multitrip" &&
+    trip.segments &&
+    trip.segments.length > 0
+  ) {
+    const flightNumbers = trip.segments.map((segment) => segment.numeroVoo);
+    console.log("🔗 Creating multitrip ID from segments:", flightNumbers);
+    return flightNumbers.join("-");
+  }
+
+  /* Para outros tipos de viagem, usar o número de voo padrão */
+  return trip.numeroVoo;
 }
 
 /* Função para limpar todos os filtros */
@@ -808,11 +856,33 @@ document.addEventListener("DOMContentLoaded", () => {
   setupFilterEventListeners();
   /* setupModalButtons(); - Event listeners dos modais já estão configurados individualmente */
   setupTripTypeButtons(); // Setup multitrip functionality
+
+  /* Inicializar sistema multitrip */
+  if (typeof initMultitrip === "function") {
+    initMultitrip();
+    console.log("✅ Sistema multitrip inicializado");
+  } else {
+    console.log("⚠️ Função initMultitrip não disponível");
+  }
   // Prevent default form submission to avoid page reload
   const form = document.querySelector("form");
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+
+      /* Coletar dados do formulário atual e salvar no sessionStorage */
+      const currentSearchData = collectCurrentSearchData();
+      if (currentSearchData) {
+        sessionStorage.setItem(
+          "planit_search",
+          JSON.stringify(currentSearchData)
+        );
+        console.log(
+          "💾 Search data saved to sessionStorage:",
+          currentSearchData
+        );
+      }
+
       // Re-render cards when form is submitted
       renderFlightCards();
     });
@@ -1463,4 +1533,69 @@ function traduzirTipoTurismo(tipo) {
     Turismodenegocios: "Turismo de Negócios",
   };
   return traducoes[tipo] || tipo;
+}
+
+/* Coletar dados do formulário atual para pesquisa */
+function collectCurrentSearchData() {
+  console.log("📋 Coletando dados do formulário atual...");
+
+  /* Obter dados básicos do formulário */
+  const origem = Flight.getSelectedOrigin();
+  const destino = Flight.getSelectedDestination();
+  const datesTravelers = Flight.getDatesTravelers();
+  const tripType = Flight.getTripType();
+
+  console.log("🔍 Dados básicos coletados:", {
+    origem,
+    destino,
+    datesTravelers,
+    tripType,
+  });
+
+  /* Para multitrip, limpar filtros de origem/destino que podem interferir */
+  if (tripType === "multitrip") {
+    const multitripDestinations = getMultitripDestinations
+      ? getMultitripDestinations()
+      : [];
+    console.log("🎯 Destinos multitrip coletados:", multitripDestinations);
+
+    /* Limpar filtros que podem interferir com multitrip */
+    filters.origem = "";
+    filters.destino = "";
+    console.log("🧹 Filtros de origem/destino limpos para multitrip");
+
+    if (multitripDestinations && multitripDestinations.length >= 2) {
+      return {
+        tripType: "multitrip",
+        multitripDestinations: multitripDestinations,
+        dataPartida: datesTravelers.dataPartida,
+        adultos: datesTravelers.adultos,
+        criancas: datesTravelers.criancas,
+        bebes: datesTravelers.bebes,
+      };
+    } else {
+      console.log(
+        "⚠️ Destinos multitrip insuficientes:",
+        multitripDestinations?.length || 0
+      );
+      return null;
+    }
+  }
+
+  /* Para outros tipos de viagem */
+  if (!origem || !destino) {
+    console.log("⚠️ Origem ou destino não selecionados");
+    return null;
+  }
+
+  return {
+    tripType: tripType,
+    origem: origem,
+    destino: destino,
+    dataPartida: datesTravelers.dataPartida,
+    dataRegresso: datesTravelers.dataRegresso,
+    adultos: datesTravelers.adultos,
+    criancas: datesTravelers.criancas,
+    bebes: datesTravelers.bebes,
+  };
 }
