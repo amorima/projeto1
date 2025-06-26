@@ -902,155 +902,236 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
       : "all";
   }
 
-  const shuffled = Flight.getTripsFrom(filtro);
+  const allTrips = Flight.getTripsFrom(filtro);
+  /* Filtrar apenas viagens de ida e volta */
+  const roundTripOnly = allTrips.filter(
+    (viagem) => viagem.dataVolta && viagem.tipoViagem !== "so-ida"
+  );
+
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
   container.innerHTML = "";
-  
-  shuffled.forEach((viagem) => {
-    /* Extrair nome da cidade do destino */
-    const destinoCompleto = viagem.destino || "Destino";
-    const cidade = destinoCompleto.includes(" - ")
-      ? destinoCompleto.split(" - ")[1]
-      : destinoCompleto;
-    
-    /* Definir origem e destino para ida e volta */
-    const origemCompleta = viagem.origem || filtro;
-    const origemCidade = origemCompleta.includes(" - ")
-      ? origemCompleta.split(" - ")[1]
-      : origemCompleta;
-    
-    /* Formatação das datas para ida e volta */
+
+  roundTripOnly.forEach((viagem) => {
+    /* Normalizar os dados da viagem para usar a mesma estrutura do FlightSearchView */
+    const trip = {
+      ...viagem,
+      tripType:
+        viagem.tipoViagem || (viagem.dataVolta ? "ida-volta" : "so-ida"),
+      totalCost: viagem.custo,
+      origem: viagem.origem,
+      destino: viagem.destino,
+      partida: viagem.partida,
+      chegada: viagem.chegada,
+      dataVolta: viagem.dataVolta,
+      numeroVoo: viagem.numeroVoo,
+      imagem: viagem.imagem,
+      turismo: viagem.turismo,
+      direto: viagem.direto,
+      segmentos: viagem.segmentos,
+    };
+
+    /* Usar a mesma lógica do createFlightCard */
+    const cardElement = createFlightCardForIndex(trip);
+    container.appendChild(cardElement);
+  });
+}
+
+/* Função adaptada do createFlightCard para o index */
+function createFlightCardForIndex(trip) {
+  const cardElement = document.createElement("div");
+  cardElement.className =
+    "bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow";
+
+  /* Determinar o tipo de viagem */
+  let tipoViagemText;
+  if (trip.tripType === "so-ida") {
+    tipoViagemText = "Ida";
+  } else if (trip.tripType === "ida-volta") {
+    tipoViagemText = "Ida e Volta";
+  } else if (trip.tripType === "multitrip") {
+    tipoViagemText = "Multi-destino";
+  } else {
+    tipoViagemText = trip.dataVolta ? "Ida e Volta" : "Ida";
+  }
+
+  /* Determinar se é voo direto ou com escalas */
+  const tipoVooText = trip.direto
+    ? "Direto"
+    : `${
+        trip.segmentos && trip.segmentos.length ? trip.segmentos.length - 1 : 0
+      } escala${trip.segmentos && trip.segmentos.length > 2 ? "s" : ""}`;
+
+  /* Formatação de tipos de turismo */
+  const turismoTags =
+    Array.isArray(trip.turismo) && trip.turismo.length > 0
+      ? trip.turismo
+          .filter((tipo) => tipo && typeof tipo === "string")
+          .map(
+            (tipo) =>
+              `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${tipo
+                .replace("Turismo", "")
+                .trim()}</span>`
+          )
+          .join("")
+      : "";
+
+  /* Formatação das datas baseada no tipo de viagem */
+  let datasText = "";
+  let origemDestinoText = "";
+  let tituloDestino = "";
+
+  if (trip.tripType === "ida-volta" && trip.dataVolta) {
+    /* Para ida e volta */
     const formatarData = (dataStr) => {
       if (!dataStr) return "";
       const [dia, mes, anoHora] = dataStr.split("/");
       const [ano, hora] = anoHora.split(" ");
-      const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+      const meses = [
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Set",
+        "Out",
+        "Nov",
+        "Dez",
+      ];
       return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
     };
-    
-    const dataPartida = formatarData(viagem.partida);
-    const dataVolta = formatarData(viagem.dataVolta);
-    const datasText = dataPartida && dataVolta ? `${dataPartida} - ${dataVolta}` : dataPartida;
-    
-    /* Definir tipos de turismo */
-    const turismoTags = Array.isArray(viagem.turismo) && viagem.turismo.length > 0
-      ? viagem.turismo
-          .filter((tipo) => tipo && typeof tipo === "string")
-          .map((tipo) => `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${tipo.replace("Turismo", "").trim()}</span>`)
-          .join("")
-      : "";
-    
-    /* Tipo de voo - definir como direto ou com escalas */
-    const tipoVooText = viagem.direto ? "Direto" : "1 escala";
-    
-    const preco = viagem.custo || "-";
-    const imagem = viagem.imagem || "https://placehold.co/413x327";
-    
-    /* Gerar ID para ida e volta */
-    let nVoo = viagem.numeroVoo || "AF151";
-    if (viagem.dataVolta) {
-      if (viagem.segmentos && viagem.segmentos.length >= 2) {
-        /* Para ida e volta com segmentos definidos, usar ambos os números de voo */
-        const vooIda = viagem.segmentos[0].numeroVoo;
-        const vooVolta = viagem.segmentos[1].numeroVoo;
-        nVoo = `${vooIda}-${vooVolta}`;
-      } else {
-        /* Para ida e volta sem segmentos definidos, gerar número de volta */
-        const baseNumber = viagem.numeroVoo || "AF151";
-        const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
-        if (match) {
-          const [, prefix, number] = match;
-          const nextNumber = parseInt(number) + 1;
-          nVoo = `${baseNumber}-${prefix}${nextNumber}`;
-        } else {
-          nVoo = `${baseNumber}-${baseNumber}R`;
-        }
-      }
-    }
-    
-    const cardHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
-        <div class="relative">
-          <img src="${imagem}" alt="${cidade}" class="w-full h-48 object-cover">
-          <div class="absolute top-2 left-2 flex gap-2">
-            <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">Ida e Volta</span>
-            <span class="bg-Main-Primary bg-opacity-80 text-white text-xs px-2 py-1 rounded" title="Tipo de voo">${tipoVooText}</span>
-          </div>
-          <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
-            ${turismoTags}
-          </div>
-          <span class="absolute top-2 right-2 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
-        </div>
-        <div class="p-4">
-          <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" title="${cidade}">${cidade}</h3>
-          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-            <span class="material-symbols-outlined text-sm">flight_takeoff</span>
-            <span>${origemCidade} → ${cidade}</span>
-          </div>
-          <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-            <span class="material-symbols-outlined text-sm">schedule</span>
-            <span>${datasText}</span>
-          </div>
-          <div class="flex justify-between items-center">
-            <div class="text-2xl font-bold text-Main-Primary dark:text-cyan-400">
-              €${preco}
-            </div>
-            <a href="html/flight_itinerary.html?id=${nVoo}" 
-               class="bg-Main-Primary hover:bg-Main-Dark text-white px-4 py-2 rounded-lg transition-colors">
-              Ver detalhes
-            </a>
-          </div>
-        </div>
+
+    const dataPartida = formatarData(trip.partida);
+    const dataVolta = formatarData(trip.dataVolta);
+    datasText = `${dataPartida} - ${dataVolta}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
+  } else {
+    datasText = `${trip.partida} - ${trip.chegada}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
+  }
+
+  /* Usar custo total da viagem */
+  const custoDisplay = trip.totalCost || trip.custo;
+
+  /* Gerar ID correto baseado no tipo de viagem */
+  let flightId = getFlightItineraryIdForIndex(trip);
+
+  cardElement.innerHTML = `
+    <div class="relative">
+      <img src="${trip.imagem}" alt="${tituloDestino}" class="w-full h-48 object-cover">
+      <div class="absolute top-2 left-2 flex gap-2">
+        <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoViagemText}</span>
+        <span class="bg-Main-Primary bg-opacity-80 text-white text-xs px-2 py-1 rounded" title="Tipo de voo">${tipoVooText}</span>
       </div>
-    `;
-    
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = cardHTML;
-    const card = tempDiv.firstElementChild;
-    container.appendChild(card);
-    
-    /* Adicionar event listener ao ícone de favorito */
-    const heart = card.querySelector(".favorite-icon");
-    if (heart) {
-      /* Definir estado inicial baseado nos favoritos do utilizador */
-      let isFav = false;
-      if (User.isLogged()) {
-        const user = User.getUserLogged();
-        isFav = user.favoritos && user.favoritos.some((fav) => fav.numeroVoo === viagem.numeroVoo);
-      }
-      
-      heart.setAttribute("data-favorito", isFav ? "true" : "false");
-      heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
-      
-      heart.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!User.isLogged()) {
-          showToast("Faça login para adicionar aos favoritos");
-          window.location.href = "html/_login.html";
-          return;
-        }
-        
-        const user = User.getUserLogged();
-        const currentlyFav = heart.getAttribute("data-favorito") === "true";
-        
-        if (currentlyFav) {
-          User.removeFavorite(user, viagem);
-          heart.setAttribute("data-favorito", "false");
-          heart.style.fontVariationSettings = "'FILL' 0";
-          showToast("Removido dos favoritos");
-        } else {
-          User.addFavorite(user, viagem);
-          heart.setAttribute("data-favorito", "true");
-          heart.style.fontVariationSettings = "'FILL' 1";
-          showToast("Adicionado aos favoritos");
-        }
-        
-        heart.classList.add("scale-110");
-        setTimeout(() => heart.classList.remove("scale-110"), 150);
-      });
+      <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
+        ${turismoTags}
+      </div>
+      <span class="absolute top-2 right-2 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
+    </div>
+    <div class="p-4">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" title="${tituloDestino}">${tituloDestino}</h3>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
+        <span class="material-symbols-outlined text-sm">flight_takeoff</span>
+        <span>${origemDestinoText}</span>
+      </div>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
+        <span class="material-symbols-outlined text-sm">schedule</span>
+        <span>${datasText}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <div class="text-2xl font-bold text-Main-Primary dark:text-cyan-400">
+          €${custoDisplay}
+        </div>
+        <a href="html/flight_itinerary.html?id=${flightId}" 
+           class="bg-Main-Primary hover:bg-Main-Dark text-white px-4 py-2 rounded-lg transition-colors">
+          Ver detalhes
+        </a>
+      </div>
+    </div>
+  `;
+
+  /* Adicionar event listener ao ícone de favorito */
+  const heart = cardElement.querySelector(".favorite-icon");
+  if (heart) {
+    let isFav = false;
+    if (User.isLogged()) {
+      const user = User.getUserLogged();
+      isFav =
+        user.favoritos &&
+        user.favoritos.some((fav) => fav.numeroVoo === trip.numeroVoo);
     }
-  });
+
+    heart.setAttribute("data-favorito", isFav ? "true" : "false");
+    heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
+
+    heart.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (!User.isLogged()) {
+        showToast("Faça login para adicionar aos favoritos");
+        window.location.href = "html/_login.html";
+        return;
+      }
+
+      const user = User.getUserLogged();
+      const currentlyFav = heart.getAttribute("data-favorito") === "true";
+
+      if (currentlyFav) {
+        User.removeFavorite(user, trip);
+        heart.setAttribute("data-favorito", "false");
+        heart.style.fontVariationSettings = "'FILL' 0";
+        showToast("Removido dos favoritos");
+      } else {
+        User.addFavorite(user, trip);
+        heart.setAttribute("data-favorito", "true");
+        heart.style.fontVariationSettings = "'FILL' 1";
+        showToast("Adicionado aos favoritos");
+      }
+
+      heart.classList.add("scale-110");
+      setTimeout(() => heart.classList.remove("scale-110"), 150);
+    });
+  }
+
+  return cardElement;
+}
+
+/* Determinar ID correto para o link do itinerário - versão para index */
+function getFlightItineraryIdForIndex(trip) {
+  /* Para viagens ida e volta, usar os números de voo dos segmentos se existirem */
+  if (
+    trip.tripType === "ida-volta" &&
+    trip.segmentos &&
+    trip.segmentos.length >= 2
+  ) {
+    const vooIda = trip.segmentos[0].numeroVoo;
+    const vooVolta = trip.segmentos[1].numeroVoo;
+    return `${vooIda}-${vooVolta}`;
+  }
+
+  /* Para ida e volta sem segmentos definidos, gerar número de volta */
+  if (trip.dataVolta) {
+    const baseNumber = trip.numeroVoo || "AF151";
+    const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
+    if (match) {
+      const [, prefix, number] = match;
+      const nextNumber = parseInt(number) + 1;
+      return `${baseNumber}-${prefix}${nextNumber}`;
+    } else {
+      return `${baseNumber}-${baseNumber}R`;
+    }
+  }
+
+  /* Para outros tipos de viagem, usar o número de voo padrão */
+  return trip.numeroVoo;
 }
 /* Função para mostrar modal automaticamente no index */
 function initGamificationModal() {
