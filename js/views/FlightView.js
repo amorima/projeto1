@@ -1117,17 +1117,41 @@ function getFlightItineraryIdForIndex(trip) {
     return `${vooIda}-${vooVolta}`;
   }
 
-  /* Para ida e volta sem segmentos definidos, gerar número de volta */
+  /* Para ida e volta sem segmentos definidos, procurar voo de volta válido */
   if (trip.dataVolta) {
+    /* Buscar todas as viagens para encontrar um voo de volta válido */
+    const todasViagens = Flight.getAllTrips();
     const baseNumber = trip.numeroVoo || "AF151";
+
+    /* Procurar um voo de volta que existe nos dados */
+    const vooVolta = todasViagens.find(
+      (v) =>
+        v.origem === trip.destino &&
+        v.destino === trip.origem &&
+        v.numeroVoo !== trip.numeroVoo
+    );
+
+    if (vooVolta) {
+      return `${baseNumber}-${vooVolta.numeroVoo}`;
+    }
+
+    /* Se não encontrar voo específico, gerar baseado em padrão conhecido */
     const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
     if (match) {
       const [, prefix, number] = match;
-      const nextNumber = parseInt(number) + 1;
-      return `${baseNumber}-${prefix}${nextNumber}`;
-    } else {
-      return `${baseNumber}-${baseNumber}R`;
+      /* Tentar números próximos que possam existir */
+      for (let offset = 1; offset <= 10; offset++) {
+        const nextNumber = parseInt(number) + offset;
+        const candidateVoo = `${prefix}${nextNumber}`;
+        const exists = todasViagens.find((v) => v.numeroVoo === candidateVoo);
+        if (exists) {
+          return `${baseNumber}-${candidateVoo}`;
+        }
+      }
     }
+
+    /* Fallback: usar apenas o voo original se não conseguir criar ida e volta válida */
+    return trip.numeroVoo;
   }
 
   /* Para outros tipos de viagem, usar o número de voo padrão */

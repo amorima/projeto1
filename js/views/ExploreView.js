@@ -212,15 +212,40 @@ document.addEventListener("DOMContentLoaded", () => {
               const vooVolta = voo.segmentos[1].numeroVoo;
               flightId = `${vooIda}-${vooVolta}`;
             } else {
-              /* Para ida e volta sem segmentos definidos, gerar número de volta */
+              /* Para ida e volta sem segmentos definidos, procurar voo de volta válido */
+              const todasViagens = getVoosByDestino(
+                voo.destino.split(" - ")[1] || voo.destino
+              );
               const baseNumber = voo.numeroVoo || "AF151";
-              const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
-              if (match) {
-                const [, prefix, number] = match;
-                const nextNumber = parseInt(number) + 1;
-                flightId = `${baseNumber}-${prefix}${nextNumber}`;
+
+              /* Procurar um voo de volta que existe nos dados */
+              const vooVolta = todasViagens.find(
+                (v) =>
+                  v.origem === voo.destino &&
+                  v.destino === voo.origem &&
+                  v.numeroVoo !== voo.numeroVoo
+              );
+
+              if (vooVolta) {
+                flightId = `${baseNumber}-${vooVolta.numeroVoo}`;
               } else {
-                flightId = `${baseNumber}-${baseNumber}R`;
+                /* Se não encontrar voo específico, gerar baseado em padrão conhecido */
+                const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
+                if (match) {
+                  const [, prefix, number] = match;
+                  /* Tentar números próximos que possam existir */
+                  for (let offset = 1; offset <= 10; offset++) {
+                    const nextNumber = parseInt(number) + offset;
+                    const candidateVoo = `${prefix}${nextNumber}`;
+                    const exists = todasViagens.find(
+                      (v) => v.numeroVoo === candidateVoo
+                    );
+                    if (exists) {
+                      flightId = `${baseNumber}-${candidateVoo}`;
+                      break;
+                    }
+                  }
+                }
               }
             }
           }

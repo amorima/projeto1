@@ -2148,3 +2148,11 @@ export function testMultitrip() {
 
   return results;
 }
+
+/**
+ * Retorna todas as viagens disponíveis
+ * @returns {Array} - Array com todas as viagens
+ */
+export function getAllTrips() {
+  return [...viagens];
+}
