@@ -902,73 +902,83 @@ export function renderRandomOPOCards(containerClass, filtro = null) {
       : "all";
   }
 
-  const allTrips = Flight.getTripsFrom(filtro);
-
   const container = document.querySelector(`.${containerClass}`);
   if (!container) return;
   container.innerHTML = "";
 
-  allTrips.forEach((viagem) => {
-    /* Normalizar os dados da viagem para usar a mesma estrutura do FlightSearchView */
-    const hasValidReturnDate =
-      viagem.dataVolta &&
-      viagem.dataVolta !== null &&
-      viagem.dataVolta !== undefined &&
-      viagem.dataVolta !== "";
+  /* Aplicar exatamente a mesma lógica da pesquisa ida e volta */
+  const trips = buildIdaVoltaTripsForIndex(filtro);
 
-    const trip = {
-      ...viagem,
-      tripType:
-        viagem.tipoViagem || (hasValidReturnDate ? "ida-volta" : "so-ida"),
-      totalCost: viagem.custo,
-      origem: viagem.origem,
-      destino: viagem.destino,
-      partida: viagem.partida,
-      chegada: viagem.chegada,
-      dataVolta: hasValidReturnDate ? viagem.dataVolta : null,
-      numeroVoo: viagem.numeroVoo,
-      imagem: viagem.imagem,
-      turismo: viagem.turismo,
-      direto: viagem.direto,
-      segmentos: viagem.segmentos,
-    };
+  /* Limitar a 6 cards aleatórios */
+  const randomTrips = trips.sort(() => 0.5 - Math.random()).slice(0, 6);
 
-    /* Usar a mesma lógica do createFlightCard */
+  randomTrips.forEach((trip) => {
     const cardElement = createFlightCardForIndex(trip);
     container.appendChild(cardElement);
   });
 }
 
-/* Função adaptada do createFlightCard para o index */
+/* Aplicar a mesma lógica do FlightSearchView para criar viagens ida e volta */
+function buildIdaVoltaTripsForIndex(filtro) {
+  const allFlights = Flight.getAllTrips();
+  const trips = [];
+
+  /* Filtrar voos de ida baseado na origem */
+  let outboundFlights = allFlights;
+  if (filtro !== "all") {
+    outboundFlights = allFlights.filter((flight) => {
+      return (
+        flight.origem === filtro ||
+        flight.origem.includes(filtro.split(" - ")[0])
+      );
+    });
+  }
+
+  /* Para cada voo de ida, procurar voos de volta correspondentes */
+  outboundFlights.forEach((outbound) => {
+    /* Procurar voos de volta: destino→origem */
+    const returnFlights = allFlights.filter((flight) => {
+      return (
+        flight.origem === outbound.destino &&
+        flight.destino === outbound.origem &&
+        flight.numeroVoo !== outbound.numeroVoo
+      );
+    });
+
+    /* Combinar voo de ida com voos de volta (usar apenas o primeiro) */
+    if (returnFlights.length > 0) {
+      const returnFlight = returnFlights[0];
+      trips.push({
+        numeroVoo: `${outbound.numeroVoo}-${returnFlight.numeroVoo}`,
+        origem: outbound.origem,
+        destino: outbound.destino,
+        partida: outbound.partida,
+        chegada: returnFlight.chegada,
+        dataVolta: returnFlight.partida,
+        companhia: outbound.companhia,
+        imagem: outbound.imagem,
+        turismo: outbound.turismo,
+        tripType: "ida-volta",
+        segments: [outbound, returnFlight],
+        totalCost: outbound.custo + returnFlight.custo,
+        custo: outbound.custo + returnFlight.custo,
+        direto: outbound.direto && returnFlight.direto,
+        segmentos: [outbound, returnFlight],
+      });
+    }
+  });
+
+  return trips;
+}
+
+/* Função adaptada do createFlightCard do FlightSearchView para o index */
 function createFlightCardForIndex(trip) {
   const cardElement = document.createElement("div");
   cardElement.className =
     "bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow";
 
-  /* Determinar o tipo de viagem */
-  let tipoViagemText;
-  const hasValidReturnDate =
-    trip.dataVolta &&
-    trip.dataVolta !== null &&
-    trip.dataVolta !== undefined &&
-    trip.dataVolta !== "";
-
-  if (trip.tripType === "multitrip") {
-    tipoViagemText = "Multi-destino";
-  } else if (
-    trip.tripType === "so-ida" ||
-    trip.tipoViagem === "so-ida" ||
-    !hasValidReturnDate
-  ) {
-    tipoViagemText = "Só Ida";
-  } else if (
-    (trip.tripType === "ida-volta" || trip.tipoViagem === "ida-volta") &&
-    hasValidReturnDate
-  ) {
-    tipoViagemText = "Ida e Volta";
-  } else {
-    tipoViagemText = "Só Ida";
-  }
+  /* Determinar o tipo de viagem - sempre ida e volta neste contexto */
+  const tipoViagemText = "Ida e Volta";
 
   /* Determinar se é voo direto ou com escalas */
   const tipoVooText = trip.direto
@@ -991,65 +1001,34 @@ function createFlightCardForIndex(trip) {
           .join("")
       : "";
 
-  /* Formatação das datas baseada no tipo de viagem */
+  /* Formatação das datas para ida e volta */
   let datasText = "";
   let origemDestinoText = "";
   let tituloDestino = "";
 
-  const formatarData = (dataStr) => {
-    if (!dataStr) return "";
-    const [dia, mes, anoHora] = dataStr.split("/");
-    const [ano, hora] = anoHora.split(" ");
-    const meses = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
-  };
-
-  if (
-    hasValidReturnDate &&
-    (trip.tripType === "ida-volta" || trip.tipoViagem === "ida-volta")
-  ) {
-    /* Para ida e volta */
-    const dataPartida = formatarData(trip.partida);
-    const dataVolta = formatarData(trip.dataVolta);
-    datasText = `${dataPartida} - ${dataVolta}`;
+  if (trip.segments && trip.segments.length >= 2) {
+    const outbound = trip.segments[0];
+    const returnFlight = trip.segments[1];
+    datasText = `${outbound.partida} - ${returnFlight.partida}`;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
-    tituloDestino = trip.destino.includes(" - ")
-      ? trip.destino.split(" - ")[1]
-      : trip.destino;
+  } else if (trip.dataVolta) {
+    datasText = `${trip.partida} - ${trip.dataVolta}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
   } else {
-    /* Para voos só de ida */
-    const dataPartida = formatarData(trip.partida);
-    datasText = dataPartida;
+    datasText = trip.partida;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
-    tituloDestino = trip.destino.includes(" - ")
-      ? trip.destino.split(" - ")[1]
-      : trip.destino;
   }
+
+  /* Extrair apenas o nome da cidade para o título */
+  tituloDestino = trip.destino.includes(" - ")
+    ? trip.destino.split(" - ")[1]
+    : trip.destino;
 
   /* Usar custo total da viagem */
   const custoDisplay = trip.totalCost || trip.custo;
 
-  /* Gerar ID correto baseado no tipo de viagem */
+  /* Gerar ID exatamente como no FlightSearchView */
   let flightId = getFlightItineraryIdForIndex(trip);
-
-  /* Ajustar o tipo de viagem baseado no ID gerado */
-  if (!flightId.includes("-")) {
-    /* Se o ID não contém hífen, é só ida */
-    tipoViagemText = "Só Ida";
-  }
 
   cardElement.innerHTML = `
     <div class="relative">
@@ -1132,52 +1111,13 @@ function createFlightCardForIndex(trip) {
 
 /* Determinar ID correto para o link do itinerário -versão para index */
 function getFlightItineraryIdForIndex(trip) {
-  const hasValidReturnDate =
-    trip.dataVolta &&
-    trip.dataVolta !== null &&
-    trip.dataVolta !== undefined &&
-    trip.dataVolta !== "";
-
-  /* Se não há data de volta válida, é sempre só ida */
-  if (
-    !hasValidReturnDate ||
-    trip.tripType === "so-ida" ||
-    trip.tipoViagem === "so-ida"
-  ) {
-    return trip.numeroVoo;
+  /* Para viagens ida e volta com segmentos, usar os números de voo dos segmentos */
+  if (trip.segments && trip.segments.length > 0) {
+    const flightNumbers = trip.segments.map((segment) => segment.numeroVoo);
+    return flightNumbers.join("-");
   }
 
-  /* Para viagens ida e volta, usar os números de voo dos segmentos se existirem */
-  if (
-    trip.tripType === "ida-volta" &&
-    trip.segmentos &&
-    trip.segmentos.length >= 2
-  ) {
-    const vooIda = trip.segmentos[0].numeroVoo;
-    const vooVolta = trip.segmentos[1].numeroVoo;
-    return `${vooIda}-${vooVolta}`;
-  }
-
-  /* Para ida e volta sem segmentos definidos, procurar voo de volta válido */
-  if (hasValidReturnDate) {
-    /* Buscar todas as viagens para encontrar um voo de volta válido */
-    const todasViagens = Flight.getAllTrips();
-    const baseNumber = trip.numeroVoo || "AF151";
-
-    /* Procurar um voo de volta que existe nos dados */
-    const vooVolta = todasViagens.find(
-      (v) =>
-        v.origem === trip.destino &&
-        v.destino === trip.origem &&
-        v.numeroVoo !== trip.numeroVoo
-    );
-
-    if (vooVolta) {
-      return `${baseNumber}-${vooVolta.numeroVoo}`;
-    }
-  }
-
-  /* Fallback: se não conseguir criar ida e volta válida, é só ida */
+  /* Para outros tipos de viagem, usar o número de voo padrão */
   return trip.numeroVoo;
 }
 /* Função para mostrar modal automaticamente no index */
