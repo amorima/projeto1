@@ -368,15 +368,24 @@ function createFlightCard(trip) {
     const returnFlight = trip.segments[1];
     datasText = `${outbound.partida} - ${returnFlight.partida}`;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
-    tituloDestino = trip.destino;
+    /* Extrair apenas o nome da cidade para o título */
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
   } else if (trip.dataVolta) {
     datasText = `${trip.partida} - ${trip.dataVolta}`;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
-    tituloDestino = trip.destino;
+    /* Extrair apenas o nome da cidade para o título */
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
   } else {
     datasText = `${trip.partida} - ${trip.chegada}`;
     origemDestinoText = `${trip.origem} → ${trip.destino}`;
-    tituloDestino = trip.destino;
+    /* Extrair apenas o nome da cidade para o título */
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
   }
 
   /* Usar custo total da viagem */
