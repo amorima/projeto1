@@ -382,9 +382,14 @@ function createFlightCard(trip) {
   /* Usar custo total da viagem */
   const custoDisplay = trip.totalCost || trip.custo;
 
+  /* Texto do ícone de voo baseado no tipo */
+  const flightIconText = trip.tripType === "multitrip" ? "Multi Viagem" : "";
+
   cardElement.innerHTML = `
     <div class="relative">
-      <img src="${trip.imagem}" alt="${tituloDestino}" class="w-full h-48 object-cover">
+      <img src="${
+        trip.imagem
+      }" alt="${tituloDestino}" class="w-full h-48 object-cover">
       <div class="absolute top-2 left-2">
         <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoViagemText}</span>
       </div>
@@ -399,7 +404,11 @@ function createFlightCard(trip) {
       <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" title="${tituloDestino}">${tituloDestino}</h3>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
         <span class="material-symbols-outlined text-sm">flight_takeoff</span>
-        <span>${origemDestinoText}</span>
+        ${
+          flightIconText
+            ? `<span class="font-medium text-Main-Primary dark:text-cyan-400">${flightIconText}</span>`
+            : `<span>${origemDestinoText}</span>`
+        }
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
         <span class="material-symbols-outlined text-sm">schedule</span>
