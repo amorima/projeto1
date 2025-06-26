@@ -1168,7 +1168,7 @@ function criarCardVoo(voo, tipo) {
     ? voo.destino.split(" - ")[0]
     : voo.destino;
 
-  /* Formatação da data e hora */
+  // Formatação da data e hora
   const dataPartida = voo.partida || "";
   const dataChegada = voo.chegada || "";
 
@@ -1176,8 +1176,11 @@ function criarCardVoo(voo, tipo) {
   card.className =
     "flight-segment-card bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mt-6";
 
-  /* Obter logo da companhia */
+  // Obter logo da companhia
   const logo = getLogoCompanhia(voo.companhia);
+
+  // Fix for undefined cost - check if custo exists, otherwise use a default or hide the price
+  const custoPorPessoa = voo.custo !== undefined ? voo.custo : (vooShallow.custo ? Math.round(vooShallow.custo / (vooShallow.segments?.length || 1)) : 0);
 
   card.innerHTML = `
     <div class="flex items-center justify-between mb-6">
@@ -1241,10 +1244,12 @@ function criarCardVoo(voo, tipo) {
         </div>
       </div>
       <div class="text-right">
-        <div class="text-2xl font-black text-Main-Primary dark:text-cyan-400">€${
-          voo.custo
-        }</div>
+        ${custoPorPessoa > 0 ? `
+        <div class="text-2xl font-black text-Main-Primary dark:text-cyan-400">€${custoPorPessoa}</div>
         <div class="text-xs text-gray-500 dark:text-gray-400">por pessoa</div>
+        ` : `
+        <div class="text-sm text-gray-500 dark:text-gray-400">Incluído no total</div>
+        `}
       </div>
     </div>
   `;
