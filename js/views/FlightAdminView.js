@@ -67,6 +67,29 @@ function setupEventListeners() {
       }, 300);
     });
   }
+
+  /* Configurar tipo de viagem e data de regresso */
+  const tripTypeSelect = document.getElementById("trip-type");
+  const returnDateInput = document.getElementById("return-date");
+
+  if (tripTypeSelect && returnDateInput) {
+    tripTypeSelect.addEventListener("change", (e) => {
+      if (e.target.value === "ida-volta") {
+        returnDateInput.disabled = false;
+        returnDateInput.classList.remove(
+          "disabled:opacity-50",
+          "disabled:cursor-not-allowed"
+        );
+      } else {
+        returnDateInput.disabled = true;
+        returnDateInput.value = "";
+        returnDateInput.classList.add(
+          "disabled:opacity-50",
+          "disabled:cursor-not-allowed"
+        );
+      }
+    });
+  }
 }
 function setupTableSorting() {
   const tableHeaders = document.querySelectorAll("th[data-sort]");
@@ -249,6 +272,19 @@ function loadTable() {
                 <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">${escapeHtml(
                   flight.partida
                 )}</td>
+                <td class="px-6 py-4 text-sm">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      flight.dataVolta && flight.dataVolta !== ""
+                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                    }">
+                        ${
+                          flight.dataVolta && flight.dataVolta !== ""
+                            ? "Ida e Volta"
+                            : "Só Ida"
+                        }
+                    </span>
+                </td>
                 <td class="px-6 py-4 text-sm">
                     <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                       flight.direto === "S"
@@ -458,7 +494,10 @@ function createFlight() {
       direto: formData.get("direct") === "Sim",
       custo: parseFloat(formData.get("custo")) || 0,
       imagem: imagemUrl,
-      dataVolta: "", // Default empty
+      dataVolta:
+        formData.get("trip-type") === "ida-volta" && formData.get("return-date")
+          ? formatDateTime(formData.get("return-date"))
+          : "" /* Data de regresso só para voos ida e volta */,
       turismo: [], // Default vazio, pode ser configurado posteriormente
       segmentos: [
         {
@@ -472,6 +511,15 @@ function createFlight() {
       ],
       pointsAR: Math.floor(parseFloat(formData.get("custo")) / 10) || 0, // 1 ponto por cada 10€
     };
+
+    /* Debug: verificar se origem e destino estão preenchidos */
+    console.log("Dados do formulário:", {
+      origem: flightData.origem,
+      destino: flightData.destino,
+      numeroVoo: flightData.numeroVoo,
+      companhia: flightData.companhia,
+    });
+
     // Validation
     if (
       !flightData.numeroVoo ||
@@ -483,11 +531,37 @@ function createFlight() {
       showToast("Por favor, preencha todos os campos obrigatórios.", "error");
       return;
     }
+
+    /* Validar data de regresso para voos ida e volta */
+    if (
+      formData.get("trip-type") === "ida-volta" &&
+      !formData.get("return-date")
+    ) {
+      showToast(
+        "Para voos ida e volta, a data de regresso é obrigatória.",
+        "error"
+      );
+      return;
+    }
+
     if (flightData.custo < 0) {
       showToast("O custo não pode ser negativo.", "error");
       return;
     }
-    FlightModel.add(flightData);
+    FlightModel.add(
+      flightData.numeroVoo,
+      flightData.origem,
+      flightData.destino,
+      flightData.companhia,
+      flightData.partida,
+      flightData.chegada,
+      flightData.direto,
+      flightData.custo,
+      flightData.imagem,
+      flightData.dataVolta,
+      flightData.segmentos,
+      flightData.turismo
+    );
     closeModalFlight();
     loadTable();
     showToast("Voo criado com sucesso!", "success");
@@ -516,6 +590,30 @@ function editFlight(numeroVoo) {
     document.getElementById("custo").value = flight.custo || 0;
     document.getElementById("direct").value =
       flight.direto === "S" ? "Sim" : "Não";
+
+    /* Configurar tipo de viagem e data de regresso */
+    const tripType =
+      flight.dataVolta && flight.dataVolta !== "" ? "ida-volta" : "so-ida";
+    document.getElementById("trip-type").value = tripType;
+
+    const returnDateInput = document.getElementById("return-date");
+    if (tripType === "ida-volta") {
+      returnDateInput.disabled = false;
+      returnDateInput.classList.remove(
+        "disabled:opacity-50",
+        "disabled:cursor-not-allowed"
+      );
+      if (flight.dataVolta) {
+        returnDateInput.value = parseDateTime(flight.dataVolta);
+      }
+    } else {
+      returnDateInput.disabled = true;
+      returnDateInput.value = "";
+      returnDateInput.classList.add(
+        "disabled:opacity-50",
+        "disabled:cursor-not-allowed"
+      );
+    }
     // Update modal title and button
     const modalTitle = document.querySelector("#modal-adicionar h3");
     const createBtn = document.getElementById("create-flight-btn");
@@ -569,7 +667,10 @@ function updateFlight() {
       direto: formData.get("direct") === "Sim",
       custo: parseFloat(formData.get("custo")) || 0,
       imagem: imagemUrl,
-      dataVolta: "", // Keep existing or empty
+      dataVolta:
+        formData.get("trip-type") === "ida-volta" && formData.get("return-date")
+          ? formatDateTime(formData.get("return-date"))
+          : "" /* Data de regresso só para voos ida e volta */,
       turismo: [], // Preserve existing or default
       segmentos: [
         {
@@ -594,6 +695,19 @@ function updateFlight() {
       showToast("Por favor, preencha todos os campos obrigatórios.", "error");
       return;
     }
+
+    /* Validar data de regresso para voos ida e volta */
+    if (
+      formData.get("trip-type") === "ida-volta" &&
+      !formData.get("return-date")
+    ) {
+      showToast(
+        "Para voos ida e volta, a data de regresso é obrigatória.",
+        "error"
+      );
+      return;
+    }
+
     if (flightData.custo < 0) {
       showToast("O custo não pode ser negativo.", "error");
       return;
@@ -666,6 +780,18 @@ function resetForm() {
   const form = document.getElementById("add_flight_form");
   if (form) {
     form.reset();
+
+    /* Resetar campos específicos */
+    document.getElementById("trip-type").value = "so-ida";
+    const returnDateInput = document.getElementById("return-date");
+    if (returnDateInput) {
+      returnDateInput.disabled = true;
+      returnDateInput.value = "";
+      returnDateInput.classList.add(
+        "disabled:opacity-50",
+        "disabled:cursor-not-allowed"
+      );
+    }
   }
 }
 function closeModalFlight() {
