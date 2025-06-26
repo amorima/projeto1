@@ -2397,62 +2397,6 @@ function initdata() {
   if (!localStorage.viagens) {
     console.log("📊 Carregando dados de viagens...");
     const viagens = [
-      /* Cenários de teste para Porto → Londres */
-
-      /* CENÁRIO 1: SÓ IDA - Turismo Cultural + Acesso Sem Degraus */
-      {
-        numeroVoo: "BA2025",
-        origem: "OPO - Porto",
-        destino: "LHR - Londres",
-        companhia: "British Airways",
-        partida: "15/07/2025 09:30",
-        chegada: "15/07/2025 11:45",
-        direto: true,
-        custo: 185,
-        imagem: "/img/destinos/Londres/1.jpg",
-        turismo: ["Turismo Cultural"],
-        tipoViagem: "so-ida",
-        acessibilidade: ["Acesso Sem Degraus", "Elevadores Disponíveis"],
-        segmentos: [
-          {
-            numeroVoo: "BA2025",
-            origem: "OPO - Porto",
-            destino: "LHR - Londres",
-            companhia: "British Airways",
-            partida: "15/07/2025 09:30",
-            chegada: "15/07/2025 11:45",
-            tipo: "ida",
-          },
-        ],
-      },
-
-      /* CENÁRIO 2: SÓ IDA - Turismo Urbano + Transporte Acessível */
-      {
-        numeroVoo: "TP1205",
-        origem: "OPO - Porto",
-        destino: "LHR - Londres",
-        companhia: "TAP Air Portugal",
-        partida: "20/07/2025 14:15",
-        chegada: "20/07/2025 16:30",
-        direto: true,
-        custo: 165,
-        imagem: "/img/destinos/Londres/2.jpg",
-        turismo: ["Turismo Urbano"],
-        tipoViagem: "so-ida",
-        acessibilidade: ["Transporte Acessível", "Casas de Banho Adaptadas"],
-        segmentos: [
-          {
-            numeroVoo: "TP1205",
-            origem: "OPO - Porto",
-            destino: "LHR - Londres",
-            companhia: "TAP Air Portugal",
-            partida: "20/07/2025 14:15",
-            chegada: "20/07/2025 16:30",
-            tipo: "ida",
-          },
-        ],
-      },
-
       /* CENÁRIO 3: IDA E VOLTA - Turismo Cultural + Gastronómico */
       {
         numeroVoo: "EZY4080",
