@@ -1689,17 +1689,193 @@ export function buildTripCombinations(searchCriteria) {
       trips.length
     );
   } else if (searchCriteria.tripType === "multitrip") {
-    /* Para multi-destino: usar segmentos existentes se disponíveis */
+    console.log("🔀 Debug - Processing multitrip");
+    console.log(
+      "📋 Debug - multitripDestinations:",
+      searchCriteria.multitripDestinations
+    );
+
+    /* Para multitrip: usar os destinos dos pills */
     if (
-      searchCriteria.multitripSegments &&
-      searchCriteria.multitripSegments.length > 0
+      searchCriteria.multitripDestinations &&
+      searchCriteria.multitripDestinations.length >= 2
     ) {
-      /* Construir viagens multi-destino baseadas nos segmentos definidos */
-      const multiTripFlights = buildMultiTripFromSegments(
-        searchCriteria.multitripSegments,
-        allFlights
+      const destinations = searchCriteria.multitripDestinations;
+      console.log(
+        "🎯 Debug - Building multitrip with destinations:",
+        destinations
       );
-      trips.push(...multiTripFlights);
+
+      /* Se apenas 2 destinos, tratar como so-ida */
+      if (destinations.length === 2) {
+        console.log(
+          "🔄 Debug - 2 destinations only, treating as one-way flight"
+        );
+        const origem = destinations[0];
+        const destino = destinations[1];
+
+        console.log(
+          `🔍 Looking for direct flights: ${origem.codigo} → ${destino.codigo}`
+        );
+
+        const directFlights = allFlights.filter((flight) => {
+          const flightOrigin = extractCityFromLocation(flight.origem);
+          const flightDestination = extractCityFromLocation(flight.destino);
+
+          const originMatch =
+            flightOrigin.toLowerCase().includes(origem.nome.toLowerCase()) ||
+            flight.origem.includes(origem.codigo);
+          const destinationMatch =
+            flightDestination
+              .toLowerCase()
+              .includes(destino.nome.toLowerCase()) ||
+            flight.destino.includes(destino.codigo);
+
+          console.log(
+            `✈️ Checking flight ${flight.numeroVoo}: ${flight.origem} → ${flight.destino}`
+          );
+          console.log(
+            `🔍 Origin match: ${originMatch}, Destination match: ${destinationMatch}`
+          );
+
+          return originMatch && destinationMatch;
+        });
+
+        console.log(
+          `✅ Found ${directFlights.length} direct flights for multitrip with 2 destinations`
+        );
+
+        if (directFlights.length === 0) {
+          console.log("⚠️ No direct flights found for 2-destination multitrip");
+          /* Tentar procurar todos os voos de origem para destino sem filtros rigorosos */
+          const allPossibleFlights = allFlights.filter((flight) => {
+            const hasOriginCode = flight.origem.includes(origem.codigo);
+            const hasDestinationCode = flight.destino.includes(destino.codigo);
+            console.log(
+              `🔍 Broad search - Flight ${flight.numeroVoo}: ${flight.origem} → ${flight.destino}, originCode: ${hasOriginCode}, destCode: ${hasDestinationCode}`
+            );
+            return hasOriginCode && hasDestinationCode;
+          });
+
+          console.log(
+            `🔍 Broad search found ${allPossibleFlights.length} flights`
+          );
+
+          allPossibleFlights.forEach((flight) => {
+            trips.push({
+              ...flight,
+              tripType: "multitrip",
+              multitripDestinations: destinations,
+              segments: [flight],
+              isMultitripDirect: true,
+            });
+          });
+        } else {
+          directFlights.forEach((flight) => {
+            trips.push({
+              ...flight,
+              tripType: "multitrip",
+              multitripDestinations: destinations,
+              segments: [flight],
+              isMultitripDirect: true,
+            });
+          });
+        }
+
+        return trips;
+      }
+
+      /* Para mais de 2 destinos, construir segmentos */
+      const segments = [];
+      for (let i = 0; i < destinations.length - 1; i++) {
+        const origem = destinations[i];
+        const destino = destinations[i + 1];
+
+        console.log(
+          `🔍 Looking for flights: ${origem.codigo} → ${destino.codigo}`
+        );
+
+        /* Procurar voos para este segmento */
+        const segmentFlights = allFlights.filter((flight) => {
+          const flightOrigin = extractCityFromLocation(flight.origem);
+          const flightDestination = extractCityFromLocation(flight.destino);
+
+          const originMatch =
+            flightOrigin.toLowerCase().includes(origem.nome.toLowerCase()) ||
+            flight.origem.includes(origem.codigo);
+          const destinationMatch =
+            flightDestination
+              .toLowerCase()
+              .includes(destino.nome.toLowerCase()) ||
+            flight.destino.includes(destino.codigo);
+
+          return originMatch && destinationMatch;
+        });
+
+        console.log(
+          `✈️ Found ${segmentFlights.length} flights for ${origem.codigo} → ${destino.codigo}`
+        );
+
+        if (segmentFlights.length > 0) {
+          segments.push({
+            origem: origem,
+            destino: destino,
+            flights: segmentFlights,
+          });
+        }
+      }
+
+      /* Se temos todos os segmentos, criar as combinações */
+      if (segments.length === destinations.length - 1) {
+        console.log("🔗 Debug - All segments found, building combinations");
+
+        /* Para simplicificar, pegar o primeiro voo de cada segmento */
+        segments.forEach((segment) => {
+          if (segment.flights.length > 0) {
+            const flight = segment.flights[0];
+            trips.push({
+              ...flight,
+              tripType: "multitrip",
+              multitripDestinations: destinations,
+              segments: [flight],
+              isMultitripSegment: true,
+            });
+          }
+        });
+
+        /* Criar também viagens multitrip completas */
+        if (segments.every((s) => s.flights.length > 0)) {
+          const firstSegmentFlight = segments[0].flights[0];
+          const lastSegmentFlight = segments[segments.length - 1].flights[0];
+
+          const allSegmentFlights = segments.map((s) => s.flights[0]);
+          const totalCost = allSegmentFlights.reduce(
+            (sum, f) => sum + f.custo,
+            0
+          );
+
+          trips.push({
+            numeroVoo: `MULTI_${destinations.map((d) => d.codigo).join("_")}`,
+            origem: firstSegmentFlight.origem,
+            destino: lastSegmentFlight.destino,
+            partida: firstSegmentFlight.partida,
+            chegada: lastSegmentFlight.chegada,
+            companhia: "Multi-Airlines",
+            imagem: firstSegmentFlight.imagem,
+            turismo: firstSegmentFlight.turismo || [],
+            tripType: "multitrip",
+            multitripDestinations: destinations,
+            segments: allSegmentFlights,
+            totalCost: totalCost,
+            custo: totalCost,
+            direto: false,
+          });
+        }
+      }
+    } else {
+      console.log(
+        "⚠️ No multitrip destinations provided or less than 2 destinations"
+      );
     }
   }
 
