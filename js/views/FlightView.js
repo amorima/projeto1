@@ -76,7 +76,7 @@ function initView() {
   setupModalButtons();
   setupTripTypeButtons();
   /* Inicializar funcionalidade multitrip */
-  if (typeof initMultitrip === 'function') {
+  if (typeof initMultitrip === "function") {
     initMultitrip();
   }
   initGamificationModal();
@@ -757,13 +757,13 @@ function abrirModalTipoViagem() {
         if (tripType === "multitrip") {
           multitripContainer.classList.remove("hidden");
           /* Inicializar o sistema de pills se não estiver inicializado */
-          if (typeof initMultitrip === 'function') {
+          if (typeof initMultitrip === "function") {
             initMultitrip();
           }
         } else {
           multitripContainer.classList.add("hidden");
           /* Limpar destinos multitrip se mudar de tipo */
-          if (typeof clearMultitripDestinations === 'function') {
+          if (typeof clearMultitripDestinations === "function") {
             clearMultitripDestinations();
           }
         }

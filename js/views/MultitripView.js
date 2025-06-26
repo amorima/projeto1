@@ -6,14 +6,14 @@ let availableDestinations = [];
 /* Inicializar funcionalidade multitrip */
 function initMultitrip() {
   console.log("🚀 Inicializando sistema multitrip...");
-  
+
   loadAvailableDestinations();
   console.log("📍 Destinos carregados:", availableDestinations.length);
-  
+
   setupMultitripInput();
   setupDragAndDrop();
   setupTripTypeButtons();
-  
+
   console.log("✅ Sistema multitrip inicializado");
 }
 
@@ -21,13 +21,15 @@ function initMultitrip() {
 function loadAvailableDestinations() {
   const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
   const aeroportos = JSON.parse(localStorage.getItem("aeroportos") || "[]");
-  
+
   availableDestinations = destinos.map((dest) => {
     /* Encontrar o aeroporto correspondente */
-    const aeroporto = aeroportos.find(aero => aero.codigo === dest.aeroporto);
+    const aeroporto = aeroportos.find((aero) => aero.codigo === dest.aeroporto);
     return {
       nome: dest.cidade,
-      codigo: aeroporto ? aeroporto.codigo : dest.aeroporto || dest.cidade.substring(0, 3).toUpperCase(),
+      codigo: aeroporto
+        ? aeroporto.codigo
+        : dest.aeroporto || dest.cidade.substring(0, 3).toUpperCase(),
     };
   });
 }
@@ -118,7 +120,7 @@ function addDestination(nome, codigo) {
   multitripDestinations.push(newDestination);
   console.log("Destino adicionado:", newDestination);
   console.log("Lista atual:", multitripDestinations);
-  
+
   renderPills();
   updateOriginDestination();
 }
@@ -129,7 +131,7 @@ function removeDestination(index) {
     const removedDestination = multitripDestinations.splice(index, 1)[0];
     console.log("Destino removido:", removedDestination);
     console.log("Lista atual:", multitripDestinations);
-    
+
     renderPills();
     updateOriginDestination();
   }
@@ -194,7 +196,7 @@ function renderPills() {
       const index = parseInt(button.dataset.index);
       removeDestination(index);
     });
-    
+
     /* Prevenir drag quando clica no botão de remoção */
     button.addEventListener("mousedown", (e) => {
       e.stopPropagation();
@@ -244,10 +246,10 @@ function handleDragOver(e) {
 function handleDrop(e) {
   e.preventDefault();
   e.stopPropagation();
-  
+
   const targetPill = e.target.closest(".multitrip-pill");
   if (!targetPill) return;
-  
+
   const dropIndex = parseInt(targetPill.dataset.index);
 
   if (draggedIndex !== null && draggedIndex !== dropIndex) {
@@ -279,7 +281,7 @@ function updateOriginDestination() {
     /* Resetar botões se não há destinos */
     const origemBtn = document.querySelector("#btn-open p");
     const destinoBtn = document.querySelector("#btn-destino p");
-    
+
     if (origemBtn) {
       origemBtn.textContent = "Origem";
     }
@@ -371,7 +373,7 @@ function testMultitrip() {
   console.log("🧪 Testando sistema multitrip...");
   console.log("Destinos disponíveis:", availableDestinations);
   console.log("Destinos selecionados:", multitripDestinations);
-  
+
   /* Testar adição de destino */
   if (availableDestinations.length > 0) {
     const testDest = availableDestinations[0];
