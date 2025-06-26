@@ -91,15 +91,15 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 - **Origem:** Porto (OPO)
 - **Destino:** Londres (LHR)
 - **Tipo:** Só ida
-- **Data de Partida:** 15/07/2025
+- **Data de Partida:** 05/07/2025
 - **Tipo de Turismo:** Turismo Cultural
 - **Acessibilidade:** Acesso Sem Degraus
 
 ### **Resultado Esperado:**
-- ✈️ **Voo:** BA2025 - British Airways
-- 🕘 **Partida:** 15/07/2025 às 09:30
-- 🕐 **Chegada:** 15/07/2025 às 11:45
-- 💰 **Preço:** €185
+- ✈️ **Voo:** BA1001 - British Airways
+- 🕘 **Partida:** 05/07/2025 às 06:30
+- 🕐 **Chegada:** 05/07/2025 às 08:30
+- 💰 **Preço:** €200
 - ♿ **Acessibilidade:** Acesso Sem Degraus, Elevadores Disponíveis
 
 ---
@@ -110,58 +110,55 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 - **Origem:** Porto (OPO)
 - **Destino:** Londres (LHR)
 - **Tipo:** Só ida
-- **Data de Partida:** 20/07/2025
+- **Data de Partida:** 21/10/2025
 - **Tipo de Turismo:** Turismo Urbano
 - **Acessibilidade:** Transporte Acessível
 
 ### **Resultado Esperado:**
-- ✈️ **Voo:** TP1205 - TAP Air Portugal
-- 🕐 **Partida:** 20/07/2025 às 14:15
-- 🕔 **Chegada:** 20/07/2025 às 16:30
-- 💰 **Preço:** €165
+- ✈️ **Voo:** EZ9101 - easyJet
+- 🕐 **Partida:** 21/10/2025 às 08:30
+- 🕔 **Chegada:** 21/10/2025 às 11:00
+- 💰 **Preço:** €120
 - ♿ **Acessibilidade:** Transporte Acessível, Casas de Banho Adaptadas
 
 ---
 
-## 🎯 **CENÁRIO 3: IDA E VOLTA - Turismo Cultural + Gastronómico**
+## 🎯 **CENÁRIO 3: IDA E VOLTA - Turismo de Negócios**
 
 ### **Pesquisa:**
 - **Origem:** Porto (OPO)
 - **Destino:** Londres (LHR)
 - **Tipo:** Ida e volta
-- **Data de Partida:** 25/07/2025
-- **Data de Regresso:** 30/07/2025
-- **Tipo de Turismo:** Turismo Cultural, Turismo Gastronómico
+- **Data de Partida:** 05/07/2025
+- **Data de Regresso:** 07/07/2025
+- **Tipo de Turismo:** Turismo de Negócios
 - **Acessibilidade:** Elevadores Disponíveis
 
 ### **Resultado Esperado:**
-- ✈️ **Voo de Ida:** EZY4080 - easyJet
-- 🕘 **Partida:** 25/07/2025 às 07:45
-- 🕙 **Chegada:** 25/07/2025 às 10:00
-- ✈️ **Voo de Volta:** EZY4081 - easyJet
-- 🕕 **Partida:** 30/07/2025 às 18:20
-- 🕗 **Chegada:** 30/07/2025 às 20:35
-- 💰 **Preço Total:** €280 (€140 + €140)
+- ✈️ **Voo de Ida:** BA1001 - British Airways
+- 🕘 **Partida:** 05/07/2025 às 06:30
+- 🕙 **Chegada:** 05/07/2025 às 08:30
+- ✈️ **Voo de Volta:** BA1002 - British Airways
+- 🕕 **Partida:** 07/07/2025 às 14:00
+- 🕗 **Chegada:** 07/07/2025 às 16:00
+- 💰 **Preço Total:** €410 (€200 + €210)
 - ♿ **Acessibilidade:** Elevadores Disponíveis, Aluguer de Equipamento de Mobilidade
 
 ---
 
-## 🎯 **CENÁRIO 4: SÓ IDA - Compras (Preço Baixo)**
+## 🎯 **CENÁRIO 4: SÓ IDA - Preço Baixo**
 
 ### **Pesquisa:**
 - **Origem:** Porto (OPO)
-- **Destino:** Londres (LHR)
 - **Tipo:** Só ida
-- **Data de Partida:** 18/07/2025
-- **Tipo de Turismo:** Compras
 - **Acessibilidade:** Acesso Sem Degraus
-- **Filtro de Preço:** Máximo €100
+- **Filtro de Preço:** Máximo €80
 
 ### **Resultado Esperado:**
-- ✈️ **Voo:** RY3456 - Ryanair
-- 🕕 **Partida:** 18/07/2025 às 06:30
-- 🕗 **Chegada:** 18/07/2025 às 08:45
-- 💰 **Preço:** €89
+- ✈️ **Voo:** TP2456 - TAP
+- 🕕 **Partida:** 01/07/2025 às 08:15
+- 🕗 **Chegada:** 01/07/2025 às 09:10
+- 💰 **Preço:** €75
 - ♿ **Acessibilidade:** Acesso Sem Degraus
 
 ---
@@ -172,19 +169,56 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 - **Origem:** Porto (OPO)
 - **Destino Final:** Paris (CDG)
 - **Tipo:** Multiviagem
-- **Data:** 05/08/2025
 - **Escala:** Londres (LHR)
-- **Tipo de Turismo:** Turismo Cultural, Turismo Urbano
+- **Tipo de Turismo:** Turismo Cultural
 - **Acessibilidade:** Transporte Acessível
 
 ### **Resultado Esperado:**
-- ✈️ **Segmento 1:** VS8901 - Virgin Atlantic (Porto → Londres)
-- 🕘 **Partida:** 05/08/2025 às 08:00
-- 🕙 **Chegada:** 05/08/2025 às 10:15
-- ✈️ **Segmento 2:** AF1234 - Air France (Londres → Paris)
-- 🕓 **Partida:** 05/08/2025 às 16:00
-- 🕕 **Chegada:** 05/08/2025 às 18:30
+- ✈️ **Segmento 1:** BA1001 - British Airways (Porto → Londres)
+- 🕘 **Partida:** 05/07/2025 às 06:30
+- 🕙 **Chegada:** 05/07/2025 às 08:30
+- ✈️ **Segmento 2:** FR305 - Ryanair (Londres → Paris)
+- 🕓 **Partida:** 02/08/2025 às 14:00
+- 🕕 **Chegada:** 02/08/2025 às 18:00
 - 💰 **Preço Total:** €295
+- ♿ **Acessibilidade:** Transporte Acessível, Elevadores Disponíveis
+
+---
+
+## 🎯 **CENÁRIO 6: MULTIVIAGEM - Porto → Londres → Paris → Roma**
+
+### **Pesquisa no Sistema:**
+- **Origem:** Porto (OPO)
+- **Escala 1:** Londres (LHR) 
+- **Escala 2:** Paris (CDG)
+- **Destino Final:** Roma (FCO)
+- **Tipo:** Multiviagem
+- **Tipo de Turismo:** Turismo Cultural, Turismo Urbano
+
+### **Voos Individuais que Compõem a Viagem:**
+1. **BA2025** - Porto (OPO) → Londres (LHR)
+   - 🕘 **Partida:** 05/07/2025 às 06:30
+   - 🕙 **Chegada:** 05/07/2025 às 08:30
+   - ✈️ **Companhia:** British Airways
+   - 💰 **Preço:** €200
+
+2. **AF1234** - Londres (LHR) → Paris (CDG)
+   - 🕓 **Partida:** 02/08/2025 às 14:00
+   - 🕕 **Chegada:** 02/08/2025 às 18:00
+   - ✈️ **Companhia:** Ryanair
+   - 💰 **Preço:** €95
+
+3. **LH567** - Paris (CDG) → Roma (FCO)
+   - 🕗 **Partida:** 27/09/2025 às 10:30
+   - 🕘 **Chegada:** 27/09/2025 às 12:00
+   - ✈️ **Companhia:** EasyJet
+   - 💰 **Preço:** €125
+
+### **Resultado Esperado:**
+- 🆔 **ID da Viagem:** BA1001-FR305-OP1012
+- 🗺️ **Rota Completa:** Porto → Londres → Paris → Roma
+- 💰 **Preço Total:** €420
+- 🎯 **Tipo:** Multi-destino
 - ♿ **Acessibilidade:** Transporte Acessível, Elevadores Disponíveis
 
 ---
@@ -224,45 +258,6 @@ location.reload();
 - **Sem datas:** Todos os voos da rota aparecem
 
 ---
-
----
-
-## 🎯 **CENÁRIO 6: MULTIVIAGEM - Porto → Londres → Paris → Roma**
-
-### **Pesquisa no Sistema:**
-- **Origem:** Porto (OPO)
-- **Escala 1:** Londres (LHR) 
-- **Escala 2:** Paris (CDG)
-- **Destino Final:** Roma (FCO)
-- **Tipo:** Multiviagem
-- **Data:** 05/08/2025
-- **Tipo de Turismo:** Turismo Cultural, Turismo Urbano
-
-### **Voos Individuais que Compõem a Viagem:**
-1. **BA2025** - Porto (OPO) → Londres (LHR)
-   - 🕘 **Partida:** 05/08/2025 às 09:30
-   - 🕙 **Chegada:** 05/08/2025 às 11:45
-   - ✈️ **Companhia:** British Airways
-   - 💰 **Preço:** €185
-
-2. **AF1234** - Londres (LHR) → Paris (CDG)
-   - 🕓 **Partida:** 05/08/2025 às 16:00
-   - 🕕 **Chegada:** 05/08/2025 às 18:30
-   - ✈️ **Companhia:** Air France
-   - 💰 **Preço:** €150
-
-3. **LH567** - Paris (CDG) → Roma (FCO)
-   - 🕗 **Partida:** 05/08/2025 às 20:00
-   - 🕘 **Chegada:** 05/08/2025 às 22:30
-   - ✈️ **Companhia:** Lufthansa
-   - 💰 **Preço:** €180
-
-### **Resultado Esperado:**
-- 🆔 **ID da Viagem:** BA2025-AF1234-LH567
-- 🗺️ **Rota Completa:** Porto → Londres → Paris → Roma
-- 💰 **Preço Total:** €515
-- 🎯 **Tipo:** Multi-destino
-- ♿ **Acessibilidade:** Transporte Acessível, Elevadores Disponíveis
 
 ### **Como Testar:**
 
