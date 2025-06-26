@@ -191,7 +191,12 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       /* Filtrar apenas voos de ida e volta */
       const voosIdaVolta = voos.filter(
-        (voo) => voo.dataVolta && voo.tipoViagem !== "so-ida"
+        (voo) =>
+          voo.dataVolta &&
+          voo.dataVolta !== null &&
+          voo.dataVolta !== undefined &&
+          voo.dataVolta !== "" &&
+          voo.tipoViagem !== "so-ida"
       );
 
       if (voosIdaVolta.length === 0) {
@@ -203,50 +208,28 @@ document.addEventListener("DOMContentLoaded", () => {
           const companhia = getCompanhiaAereaByNome(voo.companhia);
           const logoUrl = companhia?.logo || "../img/icons/ca_tap.jpg"; // Imagem padrão caso não encontre
 
-          /* Gerar ID correto para ida e volta */
+          /* Gerar ID para ida e volta */
           let flightId = voo.numeroVoo;
-          if (voo.dataVolta) {
-            if (voo.segmentos && voo.segmentos.length >= 2) {
-              /* Para ida e volta com segmentos definidos, usar ambos os números de voo */
-              const vooIda = voo.segmentos[0].numeroVoo;
-              const vooVolta = voo.segmentos[1].numeroVoo;
-              flightId = `${vooIda}-${vooVolta}`;
-            } else {
-              /* Para ida e volta sem segmentos definidos, procurar voo de volta válido */
-              const todasViagens = getVoosByDestino(
-                voo.destino.split(" - ")[1] || voo.destino
-              );
-              const baseNumber = voo.numeroVoo || "AF151";
 
-              /* Procurar um voo de volta que existe nos dados */
-              const vooVolta = todasViagens.find(
-                (v) =>
-                  v.origem === voo.destino &&
-                  v.destino === voo.origem &&
-                  v.numeroVoo !== voo.numeroVoo
-              );
+          if (voo.segmentos && voo.segmentos.length >= 2) {
+            /* Para ida e volta com segmentos definidos */
+            const vooIda = voo.segmentos[0].numeroVoo;
+            const vooVolta = voo.segmentos[1].numeroVoo;
+            flightId = `${vooIda}-${vooVolta}`;
+          } else {
+            /* Procurar voo de volta válido nos dados */
+            const todasViagens = getVoosByDestino(
+              voo.destino.split(" - ")[1] || voo.destino
+            );
+            const vooVolta = todasViagens.find(
+              (v) =>
+                v.origem === voo.destino &&
+                v.destino === voo.origem &&
+                v.numeroVoo !== voo.numeroVoo
+            );
 
-              if (vooVolta) {
-                flightId = `${baseNumber}-${vooVolta.numeroVoo}`;
-              } else {
-                /* Se não encontrar voo específico, gerar baseado em padrão conhecido */
-                const match = baseNumber.match(/^([A-Z]+)(\d+)$/);
-                if (match) {
-                  const [, prefix, number] = match;
-                  /* Tentar números próximos que possam existir */
-                  for (let offset = 1; offset <= 10; offset++) {
-                    const nextNumber = parseInt(number) + offset;
-                    const candidateVoo = `${prefix}${nextNumber}`;
-                    const exists = todasViagens.find(
-                      (v) => v.numeroVoo === candidateVoo
-                    );
-                    if (exists) {
-                      flightId = `${baseNumber}-${candidateVoo}`;
-                      break;
-                    }
-                  }
-                }
-              }
+            if (vooVolta) {
+              flightId = `${voo.numeroVoo}-${vooVolta.numeroVoo}`;
             }
           }
 
