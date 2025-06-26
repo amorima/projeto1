@@ -1553,6 +1553,26 @@ export function buildTripCombinations(searchCriteria) {
   console.log("✈️ Debug - Total flights available:", allFlights.length);
   console.log("📋 Debug - First 3 flights:", allFlights.slice(0, 3));
 
+  /* Debug específico para multitrip */
+  if (searchCriteria && searchCriteria.tripType === "multitrip") {
+    console.log(
+      "🔥 MULTITRIP DEBUG - Full search criteria:",
+      JSON.stringify(searchCriteria, null, 2)
+    );
+    if (searchCriteria.multitripDestinations) {
+      console.log(
+        "🎯 MULTITRIP DEBUG - Destinations:",
+        searchCriteria.multitripDestinations
+      );
+      console.log(
+        "🎯 MULTITRIP DEBUG - Number of destinations:",
+        searchCriteria.multitripDestinations.length
+      );
+    } else {
+      console.log("⚠️ MULTITRIP DEBUG - No multitripDestinations found!");
+    }
+  }
+
   if (!searchCriteria) {
     console.log("⚠️ No search criteria provided, returning all flights");
     return allFlights;
@@ -1762,26 +1782,41 @@ export function buildTripCombinations(searchCriteria) {
           );
 
           allPossibleFlights.forEach((flight) => {
+            const roteiro = `${extractCityName(origem)} → ${extractCityName(
+              destino
+            )}`;
+            console.log(`🛤️ Creating 2-destination multitrip: ${roteiro}`);
             trips.push({
               ...flight,
               tripType: "multitrip",
               multitripDestinations: destinations,
               segments: [flight],
+              totalCost: flight.custo,
               isMultitripDirect: true,
+              roteiro: roteiro,
             });
           });
         } else {
           directFlights.forEach((flight) => {
+            const roteiro = `${extractCityName(origem)} → ${extractCityName(
+              destino
+            )}`;
+            console.log(`🛤️ Creating 2-destination multitrip: ${roteiro}`);
             trips.push({
               ...flight,
               tripType: "multitrip",
               multitripDestinations: destinations,
               segments: [flight],
+              totalCost: flight.custo,
               isMultitripDirect: true,
+              roteiro: roteiro,
             });
           });
         }
 
+        console.log(
+          `✅ Created ${trips.length} multitrip results for 2 destinations`
+        );
         return trips;
       }
 
@@ -1829,22 +1864,10 @@ export function buildTripCombinations(searchCriteria) {
       if (segments.length === destinations.length - 1) {
         console.log("🔗 Debug - All segments found, building combinations");
 
-        /* Para simplicificar, pegar o primeiro voo de cada segmento */
-        segments.forEach((segment) => {
-          if (segment.flights.length > 0) {
-            const flight = segment.flights[0];
-            trips.push({
-              ...flight,
-              tripType: "multitrip",
-              multitripDestinations: destinations,
-              segments: [flight],
-              isMultitripSegment: true,
-            });
-          }
-        });
-
-        /* Criar também viagens multitrip completas */
+        /* Criar viagens multitrip completas */
         if (segments.every((s) => s.flights.length > 0)) {
+          console.log("🔗 Creating complete multitrip with all segments");
+
           const firstSegmentFlight = segments[0].flights[0];
           const lastSegmentFlight = segments[segments.length - 1].flights[0];
 
@@ -1854,13 +1877,21 @@ export function buildTripCombinations(searchCriteria) {
             0
           );
 
+          /* Criar roteiro com nomes das cidades */
+          const roteiro = destinations
+            .map((d) => extractCityName(d))
+            .join(" → ");
+
+          console.log(`🛤️ Complete multitrip route: ${roteiro}`);
+          console.log(`💰 Total cost: €${totalCost}`);
+
           trips.push({
             numeroVoo: `MULTI_${destinations.map((d) => d.codigo).join("_")}`,
             origem: firstSegmentFlight.origem,
             destino: lastSegmentFlight.destino,
             partida: firstSegmentFlight.partida,
             chegada: lastSegmentFlight.chegada,
-            companhia: "Multi-Airlines",
+            companhia: "Viagem Multi-Destino",
             imagem: firstSegmentFlight.imagem,
             turismo: firstSegmentFlight.turismo || [],
             tripType: "multitrip",
@@ -1869,7 +1900,13 @@ export function buildTripCombinations(searchCriteria) {
             totalCost: totalCost,
             custo: totalCost,
             direto: false,
+            roteiro: roteiro,
+            isMultitripComplete: true,
           });
+
+          console.log("✅ Complete multitrip created successfully");
+        } else {
+          console.log("⚠️ Cannot create complete multitrip - missing segments");
         }
       }
     } else {
@@ -1968,6 +2005,23 @@ function extractCityFromLocation(location) {
   return parts.length > 1 ? parts[1] : location;
 }
 
+/* Função auxiliar para extrair nome da cidade de forma mais robusta */
+function extractCityName(destination) {
+  if (!destination) return "";
+
+  if (typeof destination === "object") {
+    return destination.nome || destination.cidade || destination.codigo || "";
+  }
+
+  if (typeof destination === "string") {
+    /* Formato: "CODE - Cidade" */
+    const parts = destination.split(" - ");
+    return parts.length > 1 ? parts[1] : destination;
+  }
+
+  return destination.toString();
+}
+
 /* Função auxiliar para construir viagens multi-destino */
 function buildMultiTripFromSegments(segments, allFlights) {
   const trips = [];
@@ -2042,4 +2096,37 @@ export function debugFlightData() {
   console.log("  - selectedOrigin:", selectedOrigin);
   console.log("  - selectedDestination:", selectedDestination);
   console.log("  - datesTravelers:", datesTravelers);
+}
+
+/* Teste simples de multitrip para verificar funcionamento */
+export function testMultitrip() {
+  console.log("🧪 TESTE MULTITRIP - Iniciando teste...");
+
+  const testDestinations = [
+    { nome: "Porto", codigo: "OPO" },
+    { nome: "Londres", codigo: "LHR" },
+    { nome: "Paris", codigo: "CDG" },
+  ];
+
+  const testSearchCriteria = {
+    tripType: "multitrip",
+    multitripDestinations: testDestinations,
+    dataPartida: "2025-08-05",
+  };
+
+  console.log("🧪 TESTE - Critérios de pesquisa:", testSearchCriteria);
+
+  const results = buildTripCombinations(testSearchCriteria);
+
+  console.log("🧪 TESTE - Resultados encontrados:", results.length);
+
+  if (results.length > 0) {
+    console.log("🧪 TESTE - Primeiro resultado:", results[0]);
+    console.log(
+      "🧪 TESTE - Roteiro do primeiro resultado:",
+      results[0].roteiro
+    );
+  }
+
+  return results;
 }

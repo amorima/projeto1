@@ -301,7 +301,65 @@ function createFlightCard(trip) {
 
   /* Formatação das datas baseada no tipo de viagem */
   let datasText = "";
-  if (
+  let origemDestinoText = "";
+  let tituloDestino = "";
+
+  if (trip.tripType === "multitrip") {
+    /* Para multitrip, mostrar o roteiro completo */
+    if (trip.roteiro) {
+      origemDestinoText = trip.roteiro;
+      tituloDestino = trip.roteiro;
+    } else if (
+      trip.multitripDestinations &&
+      trip.multitripDestinations.length >= 2
+    ) {
+      const destinos = trip.multitripDestinations
+        .map((d) => {
+          if (typeof d === "object") {
+            return d.nome || d.cidade || d.codigo || "";
+          }
+          return d.toString();
+        })
+        .join(" → ");
+      origemDestinoText = destinos;
+      tituloDestino = destinos;
+    } else {
+      /* Fallback para formato "CODE - Cidade" */
+      const origemCidade = trip.origem.includes(" - ")
+        ? trip.origem.split(" - ")[1]
+        : trip.origem;
+      const destinoCidade = trip.destino.includes(" - ")
+        ? trip.destino.split(" - ")[1]
+        : trip.destino;
+      origemDestinoText = `${origemCidade} → ${destinoCidade}`;
+      tituloDestino = destinoCidade;
+    }
+
+    /* Para multitrip, mostrar data de início e fim */
+    if (trip.segments && trip.segments.length > 1) {
+      const primeiroVoo = trip.segments[0];
+      const ultimoVoo = trip.segments[trip.segments.length - 1];
+      /* Extrair apenas a data (dd/mm/yyyy) removendo a hora se existir */
+      const dataInicio = primeiroVoo.partida.includes(" ")
+        ? primeiroVoo.partida.split(" ")[0]
+        : primeiroVoo.partida;
+      const dataFim = ultimoVoo.chegada.includes(" ")
+        ? ultimoVoo.chegada.split(" ")[0]
+        : ultimoVoo.chegada;
+      datasText = `${dataInicio} - ${dataFim}`;
+    } else if (trip.partida && trip.chegada) {
+      /* Para voos únicos multitrip */
+      const dataInicio = trip.partida.includes(" ")
+        ? trip.partida.split(" ")[0]
+        : trip.partida;
+      const dataFim = trip.chegada.includes(" ")
+        ? trip.chegada.split(" ")[0]
+        : trip.chegada;
+      datasText = `${dataInicio} - ${dataFim}`;
+    } else {
+      datasText = `${trip.partida || "N/A"} - ${trip.chegada || "N/A"}`;
+    }
+  } else if (
     trip.tripType === "ida-volta" &&
     trip.segments &&
     trip.segments.length >= 2
@@ -309,10 +367,16 @@ function createFlightCard(trip) {
     const outbound = trip.segments[0];
     const returnFlight = trip.segments[1];
     datasText = `${outbound.partida} - ${returnFlight.partida}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    tituloDestino = trip.destino;
   } else if (trip.dataVolta) {
     datasText = `${trip.partida} - ${trip.dataVolta}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    tituloDestino = trip.destino;
   } else {
     datasText = `${trip.partida} - ${trip.chegada}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    tituloDestino = trip.destino;
   }
 
   /* Usar custo total da viagem */
@@ -320,7 +384,7 @@ function createFlightCard(trip) {
 
   cardElement.innerHTML = `
     <div class="relative">
-      <img src="${trip.imagem}" alt="${trip.destino}" class="w-full h-48 object-cover">
+      <img src="${trip.imagem}" alt="${tituloDestino}" class="w-full h-48 object-cover">
       <div class="absolute top-2 left-2">
         <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoViagemText}</span>
       </div>
@@ -332,10 +396,10 @@ function createFlightCard(trip) {
       </div>
     </div>
     <div class="p-4">
-      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">${trip.destino}</h3>
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" title="${tituloDestino}">${tituloDestino}</h3>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
         <span class="material-symbols-outlined text-sm">flight_takeoff</span>
-        <span>${trip.origem} → ${trip.destino}</span>
+        <span>${origemDestinoText}</span>
       </div>
       <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
         <span class="material-symbols-outlined text-sm">schedule</span>
