@@ -160,8 +160,10 @@ function carregarHoteis(destino) {
     let hoteis = [];
     if (destino) {
       // Extract city name if in "XXX - City" format
-      const cidadeNome = destino.includes(" - ") ? destino.split(" - ").pop() : destino;
-      
+      const cidadeNome = destino.includes(" - ")
+        ? destino.split(" - ").pop()
+        : destino;
+
       hoteis = HotelModel.getHoteisByCidade(cidadeNome);
       // fallback: tentar por destinoId se não encontrar por cidade
       if (!hoteis.length) {
@@ -265,18 +267,20 @@ function carregarActividades(destino) {
     let atividadesDestino = [];
     if (destino) {
       // Extract city name if in "XXX - City" format
-      const cidadeNome = destino.includes(" - ") ? destino.split(" - ").pop() : destino;
-      
+      const cidadeNome = destino.includes(" - ")
+        ? destino.split(" - ").pop()
+        : destino;
+
       // Get the destination object to find its ID
       const destinos = JSON.parse(localStorage.getItem("destinos") || "[]");
       const destinoObj = destinos.find(
         (d) => d.cidade && d.cidade.toLowerCase() === cidadeNome.toLowerCase()
       );
-      
+
       if (destinoObj) {
         // Filter activities by destinoId
-        atividadesDestino = todasAtividades.filter((a) => 
-          a.destinoId === destinoObj.id
+        atividadesDestino = todasAtividades.filter(
+          (a) => a.destinoId === destinoObj.id
         );
       } else {
         // Fallback: try to match by string comparison for older data
@@ -555,13 +559,33 @@ function atualizarSidebarVoo(voo) {
   }
   const pontosAcumular = Math.round(precoComDesconto * pointsMultiplier);
   vooShallow.pointsAR = pontosAcumular;
-  const tipoVoo = voo.tipo
-    ? voo.tipo === "ida"
-      ? "Só ida"
-      : voo.tipo === "ida e volta"
-      ? "Ida e volta"
-      : "Multitryp"
-    : "Só ida";
+
+  /* Determinar tipo de viagem baseado na nova propriedade tipoViagem */
+  let tipoVoo = "Ida e volta"; /* Valor padrão */
+  if (voo.tipoViagem) {
+    switch (voo.tipoViagem) {
+      case "ida":
+        tipoVoo = "Só ida";
+        break;
+      case "ida-volta":
+        tipoVoo = "Ida e volta";
+        break;
+      case "multitrip":
+        tipoVoo = "Multidestino";
+        break;
+      default:
+        tipoVoo = "Ida e volta";
+    }
+  } else {
+    /* Se não tiver tipoViagem, verificar o tipo de pesquisa para determinar */
+    const searchData = sessionStorage.getItem("planit_search");
+    if (searchData) {
+      const parsedData = JSON.parse(searchData);
+      if (parsedData.tripType === "so-ida") {
+        tipoVoo = "Só ida";
+      }
+    }
+  }
   const dataFormatada = formatDatesForDisplayPt(
     voo.partida,
     voo.dataVolta || voo.chegada
@@ -696,21 +720,118 @@ document.addEventListener("DOMContentLoaded", () => {
   User.init();
   const params = new URLSearchParams(window.location.search);
   const numeroVoo = params.get("id");
-  let destinoVoo = null;  let voo = null;
+  let destinoVoo = null;
+  let voo = null;
+  let isRoundTrip = false;
+
   if (numeroVoo) {
     FlightModel.init();
-    voo = FlightModel.getByNumeroVoo(numeroVoo);
+
+    /* Verificar se é uma viagem com múltiplos segmentos (formato: VOO1-VOO2 ou VOO1-VOO2-VOO3-...) */
+    if (numeroVoo.includes("-")) {
+      const vooIds = numeroVoo.split("-");
+
+      if (vooIds.length === 2) {
+        /* Viagem ida-volta */
+        isRoundTrip = true;
+        const [vooIda, vooVolta] = vooIds;
+
+        const flightIda = FlightModel.getByNumeroVoo(vooIda);
+        const flightVolta = FlightModel.getByNumeroVoo(vooVolta);
+
+        if (flightIda && flightVolta) {
+          voo = {
+            numeroVoo: numeroVoo,
+            origem: flightIda.origem,
+            destino: flightIda.destino,
+            partida: flightIda.partida,
+            chegada: flightVolta.chegada,
+            dataVolta: flightVolta.partida,
+            companhia: flightIda.companhia,
+            imagem: flightIda.imagem,
+            turismo: flightIda.turismo,
+            tripType: "ida-volta",
+            tipoViagem: "ida-volta",
+            custo: flightIda.custo + flightVolta.custo,
+            segments: [flightIda, flightVolta],
+            segmentos: [
+              {
+                ...flightIda,
+                tipo: "ida",
+              },
+              {
+                ...flightVolta,
+                tipo: "volta",
+              },
+            ],
+          };
+
+          console.log("🔄 Viagem ida-volta criada:", voo);
+        }
+      } else if (vooIds.length > 2) {
+        /* Viagem multitrip */
+        const flights = [];
+        let custoTotal = 0;
+        let todasEncotradas = true;
+
+        /* Obter todos os voos individuais */
+        for (const vooId of vooIds) {
+          const flight = FlightModel.getByNumeroVoo(vooId);
+          if (flight) {
+            flights.push(flight);
+            custoTotal += flight.custo || 0;
+          } else {
+            todasEncotradas = false;
+            break;
+          }
+        }
+
+        if (todasEncotradas && flights.length > 0) {
+          const primeiroVoo = flights[0];
+          const ultimoVoo = flights[flights.length - 1];
+
+          voo = {
+            numeroVoo: numeroVoo,
+            origem: primeiroVoo.origem,
+            destino: ultimoVoo.destino,
+            partida: primeiroVoo.partida,
+            chegada: ultimoVoo.chegada,
+            companhia: "Multi-companhias",
+            imagem: ultimoVoo.imagem || primeiroVoo.imagem,
+            turismo: primeiroVoo.turismo,
+            tripType: "multitrip",
+            tipoViagem: "multitrip",
+            custo: custoTotal,
+            segments: flights,
+            segmentos: flights.map((flight, index) => ({
+              ...flight,
+              tipo: `segmento-${index + 1}`,
+            })),
+          };
+
+          console.log("🗺️ Viagem multitrip criada:", voo);
+        }
+      }
+    } else {
+      /* Voo individual */
+      voo = FlightModel.getByNumeroVoo(numeroVoo);
+    }
+
     if (voo) {
       vooShallow = { ...voo };
-      // Extract city name from "XXX - City" format for loading activities and hotels
-      destinoVoo = voo.destino?.includes(" - ") ? voo.destino.split(" - ").pop() : voo.destino;
+      /* Extrair nome da cidade do destino */
+      destinoVoo = voo.destino?.includes(" - ")
+        ? voo.destino.split(" - ").pop()
+        : voo.destino;
+
       atualizarHeroVoo(voo);
       atualizarItinerarioVoo(voo);
       atualizarSidebarVoo(voo);
-      // Atualiza o estado do favorito usando vooShallow se possível, senão voo
       updateFavItineraryState(
         vooShallow && vooShallow.numeroVoo ? vooShallow : voo
       );
+    } else {
+      console.error("❌ Voo não encontrado:", numeroVoo);
     }
   }
   carregarHoteis(destinoVoo);
@@ -760,12 +881,12 @@ function formatDatesForDisplayPt(dataPartida, dataRegresso) {
   return `${dataPartidaFormatada} - ${dataRegressoFormatada}`;
 }
 function atualizarHeroVoo(voo) {
-  // Hero: cidade destino, datas, imagem
+  /* Hero: cidade destino, datas, imagem */
   const heroCidade = document.querySelector(
     ".flex.items-center.gap-2 > div > .text-2xl.font-bold"
   );
 
-  // Extrair a cidade do destino (remove o código do aeroporto se presente)
+  /* Extrair a cidade do destino (remove o código do aeroporto se presente) */
   const cidadeDestino = voo.destino?.split(" - ").pop() || voo.destino;
   if (heroCidade) heroCidade.textContent = cidadeDestino;
 
@@ -773,40 +894,48 @@ function atualizarHeroVoo(voo) {
     ".flex.items-center.gap-2 > div > .inline-flex .text-base"
   );
   if (heroDatas) {
-    heroDatas.textContent = formatDatesForDisplayPt(
-      voo.partida,
-      voo.dataVolta || voo.chegada
-    );
+    /* Melhorar formatação de datas baseada no tipo de viagem */
+    let datasTexto = "";
+
+    if (voo.tripType === "ida-volta" || voo.segments?.length >= 2) {
+      /* Ida e volta: mostrar data de ida e volta */
+      const dataIda = voo.partida || voo.segments[0]?.partida;
+      const dataVolta = voo.dataVolta || voo.segments[1]?.partida;
+      datasTexto = formatDatesForDisplayPt(dataIda, dataVolta);
+    } else {
+      /* Só ida: mostrar data de partida e chegada */
+      datasTexto = formatDatesForDisplayPt(voo.partida, voo.chegada);
+    }
+
+    heroDatas.textContent = datasTexto;
   }
 
   const heroImg = document.querySelector(".w-full.h-full.object-cover");
   const itineraryImg = document.getElementById("itinerary-card-img");
+
   if (heroImg) {
-    // Extract clean city name from "XXX - City" format
-    const cleanCityName = voo.destino?.includes(" - ") 
-      ? voo.destino.split(" - ").pop() 
+    /* Extrair nome limpo da cidade */
+    const cleanCityName = voo.destino?.includes(" - ")
+      ? voo.destino.split(" - ").pop()
       : voo.destino;
-    
-    // Prioriza a imagem do destino carregada pelo admin.
+
+    /* Priorizar imagem do destino carregada pelo admin */
     const destinoEncontrado = getDestinationByCity(cleanCityName);
 
     let imgSrc = "";
     if (destinoEncontrado && destinoEncontrado.imagem) {
-      // Admin-created destination with custom image (including base64)
       imgSrc = destinoEncontrado.imagem;
     } else if (voo.imagem) {
-      // Fallback para a imagem do voo
       imgSrc = voo.imagem;
     } else {
-      // Fallback para imagem de diretório
-      imgSrc = `img/destinos/${cleanCityName}/1.jpg`;
+      imgSrc = `../img/destinos/${cleanCityName}/1.jpg`;
     }
 
     heroImg.src = imgSrc;
-    // Fallback final para placeholder se a imagem falhar
+    /* Fallback para placeholder se a imagem falhar */
     heroImg.onerror = () => {
       heroImg.src = "https://placehold.co/1920x480";
-      heroImg.onerror = null; // Evita loop infinito se o placeholder também falhar
+      heroImg.onerror = null;
     };
 
     if (itineraryImg) {
@@ -831,49 +960,303 @@ function getLogoCompanhia(nome) {
   }
 }
 function atualizarItinerarioVoo(voo) {
-  // Itinerário principal
-  const itinerarioDiv = document.querySelector(
+  /* Atualizar card principal com informações gerais */
+  const mainCard = document.querySelector(
     ".bg-white.dark\\:bg-gray-900.rounded-xl.shadow-md.outline"
   );
-  if (!itinerarioDiv) return;
-  const img = itinerarioDiv.querySelector("img");
+  if (!mainCard) return;
+
+  /* Atualizar imagem do card principal */
+  const img = mainCard.querySelector("img");
   if (img && voo.imagem) img.src = voo.imagem;
-  // Conteúdo à esquerda
-  const conteudo = itinerarioDiv.querySelector(
+
+  /* Conteúdo à esquerda do card principal */
+  const conteudo = mainCard.querySelector(
     ".flex.flex-col.gap-2.text-left.flex-1"
-  );  if (conteudo) {
-    // Extract city names for display
-    const origemCidade = voo.origem?.includes(" - ") ? voo.origem.split(" - ").pop() : voo.origem;
-    const destinoCidade = voo.destino?.includes(" - ") ? voo.destino.split(" - ").pop() : voo.destino;
-    
+  );
+  if (conteudo) {
+    const origemCidade = voo.origem?.includes(" - ")
+      ? voo.origem.split(" - ").pop()
+      : voo.origem;
+    const destinoCidade = voo.destino?.includes(" - ")
+      ? voo.destino.split(" - ").pop()
+      : voo.destino;
+
+    /* Determinar o tipo de viagem para exibição */
+    let tipoViagemTexto = "Ida";
+    if (
+      voo.tripType === "ida-volta" ||
+      voo.tipoViagem === "ida-volta" ||
+      voo.segments?.length >= 2
+    ) {
+      tipoViagemTexto = "Ida e Volta";
+    } else if (voo.tripType === "multitrip" || voo.tipoViagem === "multitrip") {
+      tipoViagemTexto = "Multi-destino";
+    }
+
     conteudo.innerHTML = `
-      <span class='font-bold text-lg'>${origemCidade} → ${destinoCidade}</span>
-      <span class='text-gray-500'>${formatDatesForDisplayPt(
+      <span class='text-3xl font-bold font-["Space_Mono"] text-Main-Primary dark:text-cyan-400'>${destinoCidade}</span>
+      <span class='text-sm font-semibold text-Main-Secondary dark:text-cyan-200'>${formatDatesForDisplayPt(
         voo.partida,
         voo.dataVolta || voo.chegada
       )}</span>
-      <span class='text-gray-700 dark:text-gray-300'>Companhia: <b>${
-        voo.companhia
-      }</b></span>
-      <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${
-        voo.numeroVoo
-      }</b></span>
-      <span class='text-gray-700 dark:text-gray-300'>${
-        voo.direto === "S" ? "Direto" : "Com escalas"
-      }</span>
+      <span class='text-base font-light text-Main-Secondary dark:text-cyan-100'>Tipo: ${tipoViagemTexto}</span>
     `;
   }
-  // Imagem da companhia aérea à direita
-  const companhiaDiv = itinerarioDiv.querySelector(
-    ".pl-4.flex-shrink-0.flex.items-center"
+
+  /* Imagem da companhia aérea à direita - removida conforme solicitado */
+
+  /* Limpar cards de segmentos existentes */
+  const itinerarioContainer = mainCard.parentElement;
+  const cardsSegmentos = itinerarioContainer.querySelectorAll(
+    ".flight-segment-card"
   );
-  if (companhiaDiv) {
-    const logo = getLogoCompanhia(voo.companhia);
-    companhiaDiv.innerHTML = logo
-      ? `<img src="${logo}" alt="${voo.companhia}" class="w-16 h-16 object-contain rounded-full bg-white">`
-      : `<span class='font-semibold'>${voo.companhia}</span>`;
+  cardsSegmentos.forEach((card) => card.remove());
+
+  /* Renderizar cards de segmentos baseado no tipo de viagem */
+  if (voo.segments && voo.segments.length >= 2) {
+    if (voo.tripType === "multitrip" || voo.tipoViagem === "multitrip") {
+      /* Viagem multitrip */
+      voo.segments.forEach((segmento, index) => {
+        const origemCidade = segmento.origem?.includes(" - ")
+          ? segmento.origem.split(" - ").pop()
+          : segmento.origem;
+        const destinoCidade = segmento.destino?.includes(" - ")
+          ? segmento.destino.split(" - ").pop()
+          : segmento.destino;
+
+        const tipoSegmento = `${origemCidade} → ${destinoCidade}`;
+        const cardSegmento = criarCardVoo(segmento, tipoSegmento);
+        itinerarioContainer.appendChild(cardSegmento);
+      });
+    } else {
+      /* Viagem ida-volta */
+      const vooIda = voo.segments[0];
+      const vooVolta = voo.segments[1];
+
+      const cardIda = criarCardVoo(vooIda, "Ida");
+      itinerarioContainer.appendChild(cardIda);
+
+      const cardVolta = criarCardVoo(vooVolta, "Volta");
+      itinerarioContainer.appendChild(cardVolta);
+    }
+  } else if (voo.segmentos && voo.segmentos.length > 0) {
+    /* Usar estrutura de segmentos se disponível */
+    voo.segmentos.forEach((segmento, index) => {
+      const tipoSegmento = segmento.tipo || (index === 0 ? "Ida" : "Volta");
+      const cardSegmento = criarCardVoo(segmento, tipoSegmento);
+      itinerarioContainer.appendChild(cardSegmento);
+    });
+  } else {
+    /* Voo único */
+    const cardVoo = criarCardVoo(voo, "Ida");
+    itinerarioContainer.appendChild(cardVoo);
   }
 }
+
+/* Função para renderizar segmentos individuais */
+function renderizarSegmentos(segmentos, container, tipoViagem) {
+  const segmentosIda = segmentos.filter((s) => s.tipo === "ida");
+  const segmentosVolta = segmentos.filter((s) => s.tipo === "volta");
+
+  /* Renderizar segmentos de ida */
+  if (segmentosIda.length > 0) {
+    const cardIda = criarCardSegmento(segmentosIda, "Ida", "ida");
+    container.appendChild(cardIda);
+  }
+
+  /* Renderizar segmentos de volta se existirem */
+  if (segmentosVolta.length > 0 && tipoViagem !== "ida") {
+    const cardVolta = criarCardSegmento(segmentosVolta, "Volta", "volta");
+    container.appendChild(cardVolta);
+  }
+}
+
+/* Função para criar um card de segmento */
+function criarCardSegmento(segmentos, titulo, tipo) {
+  const primeiroSegmento = segmentos[0];
+  const ultimoSegmento = segmentos[segmentos.length - 1];
+
+  const origemCidade = primeiroSegmento.origem?.includes(" - ")
+    ? primeiroSegmento.origem.split(" - ").pop()
+    : primeiroSegmento.origem;
+  const destinoCidade = ultimoSegmento.destino?.includes(" - ")
+    ? ultimoSegmento.destino.split(" - ").pop()
+    : ultimoSegmento.destino;
+
+  const temEscalas = segmentos.length > 1;
+  const tipoVoo = temEscalas
+    ? `Com ${segmentos.length - 1} escala${segmentos.length > 2 ? "s" : ""}`
+    : "Direto";
+
+  const cardElement = document.createElement("div");
+  cardElement.className =
+    "bg-white dark:bg-gray-900 rounded-xl shadow-md outline outline-1 outline-gray-200 dark:outline-gray-700 p-4 mt-4";
+
+  cardElement.innerHTML = `
+    <div class="flex gap-4">
+      <div class="flex-shrink-0">
+        <div class="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center">
+          <span class="material-symbols-outlined text-cyan-600 dark:text-cyan-400">
+            ${tipo === "ida" ? "flight_takeoff" : "flight_land"}
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 text-left flex-1">
+        <span class='font-bold text-lg'>${titulo}: ${origemCidade} → ${destinoCidade}</span>
+        <span class='text-gray-500'>${primeiroSegmento.partida} - ${
+    ultimoSegmento.chegada
+  }</span>
+        <span class='text-gray-700 dark:text-gray-300'>Companhia: <b>${
+          primeiroSegmento.companhia
+        }</b></span>
+        <span class='text-gray-700 dark:text-gray-300'>Nº Voo: <b>${segmentos
+          .map((s) => s.numeroVoo)
+          .join(", ")}</b></span>
+        <span class='text-gray-700 dark:text-gray-300'>${tipoVoo}</span>
+        ${temEscalas ? renderizarEscalas(segmentos) : ""}
+      </div>
+      <div class="pl-4 flex-shrink-0 flex items-center">
+        ${
+          getLogoCompanhia(primeiroSegmento.companhia)
+            ? `<img src="${getLogoCompanhia(
+                primeiroSegmento.companhia
+              )}" alt="${
+                primeiroSegmento.companhia
+              }" class="w-16 h-16 object-contain rounded-full bg-white">`
+            : `<span class='font-semibold'>${primeiroSegmento.companhia}</span>`
+        }
+      </div>
+    </div>
+  `;
+
+  return cardElement;
+}
+
+/* Função para renderizar informações de escalas */
+function renderizarEscalas(segmentos) {
+  if (segmentos.length <= 1) return "";
+
+  let escalasHtml =
+    '<div class="mt-2 text-sm text-gray-600 dark:text-gray-400">';
+  escalasHtml += '<span class="font-medium">Escalas:</span><br>';
+
+  for (let i = 0; i < segmentos.length - 1; i++) {
+    const chegada = segmentos[i].chegada;
+    const proximaPartida = segmentos[i + 1].partida;
+    const aeroportoEscala = segmentos[i].destino;
+
+    escalasHtml += `• ${aeroportoEscala} (${chegada} - ${proximaPartida})<br>`;
+  }
+
+  escalasHtml += "</div>";
+  return escalasHtml;
+}
+
+/* Função para criar card individual de voo */
+function criarCardVoo(voo, tipo) {
+  const origemCidade = voo.origem?.includes(" - ")
+    ? voo.origem.split(" - ")[1]
+    : voo.origem;
+  const destinoCidade = voo.destino?.includes(" - ")
+    ? voo.destino.split(" - ")[1]
+    : voo.destino;
+  const origemCodigo = voo.origem?.includes(" - ")
+    ? voo.origem.split(" - ")[0]
+    : voo.origem;
+  const destinoCodigo = voo.destino?.includes(" - ")
+    ? voo.destino.split(" - ")[0]
+    : voo.destino;
+
+  // Formatação da data e hora
+  const dataPartida = voo.partida || "";
+  const dataChegada = voo.chegada || "";
+
+  const card = document.createElement("div");
+  card.className =
+    "flight-segment-card bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 mt-6";
+
+  // Obter logo da companhia
+  const logo = getLogoCompanhia(voo.companhia);
+
+  // Fix for undefined cost - check if custo exists, otherwise use a default or hide the price
+  const custoPorPessoa = voo.custo !== undefined ? voo.custo : (vooShallow.custo ? Math.round(vooShallow.custo / (vooShallow.segments?.length || 1)) : 0);
+
+  card.innerHTML = `
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-gradient-to-br from-Main-Primary to-Main-Secondary dark:from-cyan-400 dark:to-cyan-600 rounded-full">
+          <span class="material-symbols-outlined text-white text-lg">flight_takeoff</span>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">${tipo}</h3>
+      </div>
+      <div class="text-right">
+        <span class="text-sm text-gray-500 dark:text-gray-400 font-medium block">${
+          voo.numeroVoo
+        }</span>
+        <span class="text-xs text-gray-400 dark:text-gray-500">${
+          voo.companhia
+        }</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center justify-between mb-6">
+      <div class="text-center flex-1">
+        <div class="text-3xl font-black text-Main-Primary dark:text-cyan-400 mb-1">${origemCodigo}</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400 font-medium">${origemCidade}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-500 mt-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full inline-block">${dataPartida}</div>
+      </div>
+      
+      <div class="flex-1 flex flex-col items-center mx-8">
+        <div class="w-full flex items-center mb-2">
+          <div class="h-1 bg-gradient-to-r from-Main-Primary to-Main-Secondary dark:from-cyan-400 dark:to-cyan-600 flex-1 rounded-full"></div>
+          <div class="p-2 bg-white dark:bg-gray-900 border-4 border-Main-Primary dark:border-cyan-400 rounded-full mx-3">
+            <span class="material-symbols-outlined text-Main-Primary dark:text-cyan-400 text-lg">flight</span>
+          </div>
+          <div class="h-1 bg-gradient-to-r from-Main-Secondary to-Main-Primary dark:from-cyan-600 dark:to-cyan-400 flex-1 rounded-full"></div>
+        </div>
+        <div class="text-xs text-gray-500 dark:text-gray-400 font-medium px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full">
+          ${voo.direto ? "Voo Direto" : "Com Escalas"}
+        </div>
+      </div>
+      
+      <div class="text-center flex-1">
+        <div class="text-3xl font-black text-Main-Primary dark:text-cyan-400 mb-1">${destinoCodigo}</div>
+        <div class="text-sm text-gray-600 dark:text-gray-400 font-medium">${destinoCidade}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-500 mt-2 bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded-full inline-block">${dataChegada}</div>
+      </div>
+    </div>
+    
+    <div class="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-gray-700">
+      <div class="flex items-center gap-3">
+        ${
+          logo
+            ? `<div class="p-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
+          <img src="${logo}" alt="${voo.companhia}" class="w-8 h-8 object-contain">
+        </div>`
+            : ""
+        }
+        <div class="flex flex-col">
+          <span class="text-sm font-bold text-gray-800 dark:text-gray-200">${
+            voo.companhia
+          }</span>
+          <span class="text-xs text-gray-500 dark:text-gray-400">Companhia Aérea</span>
+        </div>
+      </div>
+      <div class="text-right">
+        ${custoPorPessoa > 0 ? `
+        <div class="text-2xl font-black text-Main-Primary dark:text-cyan-400">€${custoPorPessoa}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">por pessoa</div>
+        ` : `
+        <div class="text-sm text-gray-500 dark:text-gray-400">Incluído no total</div>
+        `}
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
 // Disable automatic header loading since we handle it manually
 window.skipAutoHeaderLoad = true;
 window.onload = function () {

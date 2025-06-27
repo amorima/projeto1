@@ -17,6 +17,7 @@ let filters = {
   maxPrice: Infinity,
   sortDate: "",
   sortPrice: "",
+  tripType: "so-ida", // Default to one-way
 };
 // Preenche os campos do topo da página de pesquisa com os dados vindos do sessionStorage
 function preencherCamposPesquisa() {
@@ -81,8 +82,11 @@ function preencherCamposPesquisa() {
       }`;
 
     /* Atualizar filtros globais */
+    filters.tripType = dados.tripType || "so-ida";
     filters.dataPartida = dados.dataPartida || "";
-    filters.dataRegresso = dados.dataRegresso || "";
+    /* Para "só ida", não passar data de regresso mesmo que preenchida */
+    filters.dataRegresso =
+      dados.tripType === "so-ida" ? "" : dados.dataRegresso || "";
     filters.adultos = dados.adultos || 1;
     filters.criancas = dados.criancas || 0;
     filters.bebes = dados.bebes || 0;
@@ -116,9 +120,15 @@ function preencherCamposPesquisa() {
   // Show/hide multitrip container based on trip type
   const multitripContainer = document.getElementById("multitrip-container");
   if (multitripContainer) {
-    if (dados.tripType === "multitrip" && dados.multitripSegments) {
+    if (dados.tripType === "multitrip") {
       multitripContainer.classList.remove("hidden");
-      renderMultitripSegments();
+      /* Carregar destinos multitrip se disponível */
+      if (
+        dados.multitripDestinations &&
+        typeof setMultitripDestinations === "function"
+      ) {
+        setMultitripDestinations(dados.multitripDestinations);
+      }
     } else {
       multitripContainer.classList.add("hidden");
     }
@@ -126,453 +136,605 @@ function preencherCamposPesquisa() {
   return dados;
 }
 /**
- * Renderiza cards de voos.
- * @param {Array} filteredFlights - Lista de voos filtrados (opcional).
- * @param {Object} planitFilter - Filtros vindos do formulário PlanIt (opcional, pode ser null).
+ * Renderiza cards de voos usando a nova arquitetura de filtros separados.
  * @param {number} maxCards - Número máximo de cards a renderizar (default: 18).
  */
 function renderFlightCards(maxCards = 18) {
-  // Get search data from sessionStorage if available
-  const searchData = sessionStorage.getItem("planit_search");
-  let flights = Flight.getAll();
+  console.log("🚀 renderFlightCards called with maxCards:", maxCards);
 
-  // Apply search filters from PlanIt form if available
+  /* Chamar função de debug para verificar dados */
+  Flight.debugFlightData();
+
+  /* Obter dados de pesquisa do sessionStorage se disponível */
+  const searchData = sessionStorage.getItem("planit_search");
+  let trips = [];
+
+  console.log("🔍 Debug - SearchData from sessionStorage:", searchData);
+
+  /* Aplicar filtros de pesquisa do formulário PlanIt se disponível */
   if (searchData) {
     const parsedSearchData = JSON.parse(searchData);
-    flights = Flight.filterFlights(parsedSearchData);
-  } // Apply additional UI filters
-  flights = flights.filter((flight) => {
-    let match = true; /* Filtragem por origem (da interface) */
+    console.log("📋 Debug - Parsed SearchData:", parsedSearchData);
+    /* Usar a nova função de construção de viagens inteligentes */
+    trips = Flight.buildTripCombinations(parsedSearchData);
+    console.log("✈️ Debug - Trips after buildTripCombinations:", trips.length);
+  } else {
+    console.log(
+      "⚠️ No search data found, showing all flights as individual trips"
+    );
+    /* Se não há critérios de pesquisa, mostrar voos individuais como viagens de ida */
+    const allFlights = Flight.getAll();
+    console.log("📊 Debug - All flights:", allFlights.length);
+    trips = allFlights.map((flight) => ({
+      ...flight,
+      tripType: "so-ida",
+      segments: [flight],
+      totalCost: flight.custo,
+    }));
+    console.log("🎫 Debug - Trips from all flights:", trips.length);
+  }
+
+  /* Aplicar filtros da interface (UI) - preço, ordenação, etc */
+  const uiFilters = {
+    minPrice: filters.minPrice !== 0 ? filters.minPrice : undefined,
+    maxPrice: filters.maxPrice !== Infinity ? filters.maxPrice : undefined,
+    sortDate: filters.sortDate || undefined,
+    sortPrice: filters.sortPrice || undefined,
+  };
+
+  console.log("🔧 Debug - UI Filters:", uiFilters);
+  console.log("🔧 Debug - Additional filters:", {
+    origem: filters.origem,
+    destino: filters.destino,
+    tipoTurismo: filters.tipoTurismo,
+    acessibilidade: filters.acessibilidade,
+  });
+
+  trips = Flight.applyUIFilters(trips, uiFilters);
+  console.log("🔧 Debug - Trips after applyUIFilters:", trips.length);
+
+  /* Aplicar filtros adicionais específicos da interface */
+  trips = trips.filter((trip) => {
+    let match = true;
+
+    /* Para viagens multitrip, ignorar filtros de origem/destino específicos */
+    if (trip.tripType === "multitrip") {
+      console.log("🎯 Multitrip detected, skipping origin/destination filters");
+      return match; /* Para multitrip, só aplicar outros filtros se necessário */
+    }
+
+    /* Filtro por origem específica da interface */
     if (
       filters.origem &&
       filters.origem !== "Qualquer" &&
       filters.origem !== "Nenhum" &&
       filters.origem !== "Origem" &&
-      flight.origem
+      trip.origem
     ) {
       const filtroOrigem = filters.origem.trim().toLowerCase();
-      const origemVoo = flight.origem.trim().toLowerCase();
-
-      /* Tentar correspondência exata primeiro */
-      let origemMatch = origemVoo === filtroOrigem;
-
-      /* Se não funcionar, tentar por código de aeroporto */
-      if (!origemMatch && filtroOrigem.includes(" - ")) {
-        const codigoFiltro = filtroOrigem.split(" - ")[0];
-        origemMatch = origemVoo.startsWith(codigoFiltro + " -");
-      }
-
-      /* Se ainda não funcionar, tentar por cidade */
-      if (!origemMatch) {
-        const cidadeFiltro = filtroOrigem.includes(" - ")
-          ? filtroOrigem.split(" - ")[1]
-          : filtroOrigem;
-        origemMatch = origemVoo.includes(cidadeFiltro);
-      }
-
-      match = match && origemMatch;
+      const origemTrip = trip.origem.trim().toLowerCase();
+      match = match && origemTrip.includes(filtroOrigem);
+      console.log(
+        `🔍 Origin filter: "${filtroOrigem}" vs "${origemTrip}" = ${match}`
+      );
     }
 
-    /* Filtragem por destino (da interface) */
+    /* Filtro por destino específico da interface */
     if (
       filters.destino &&
       filters.destino !== "Qualquer" &&
       filters.destino !== "Nenhum" &&
       filters.destino !== "Destino" &&
-      flight.destino
+      trip.destino
     ) {
       const filtroDestino = filters.destino.trim().toLowerCase();
-      const destinoVoo = flight.destino.trim().toLowerCase();
-
-      /* Tentar correspondência exata primeiro */
-      let destinoMatch = destinoVoo === filtroDestino;
-
-      /* Se não funcionar, tentar por código de aeroporto */
-      if (!destinoMatch && filtroDestino.includes(" - ")) {
-        const codigoFiltro = filtroDestino.split(" - ")[0];
-        destinoMatch = destinoVoo.startsWith(codigoFiltro + " -");
-      }
-
-      /* Se ainda não funcionar, tentar por cidade */
-      if (!destinoMatch) {
-        const cidadeFiltro = filtroDestino.includes(" - ")
-          ? filtroDestino.split(" - ")[1]
-          : filtroDestino;
-        destinoMatch = destinoVoo.includes(cidadeFiltro);
-      }
-
-      match = match && destinoMatch;
-    } // Date filters (from UI)
-    if (filters.dataPartida && flight.partida) {
-      const filtroData = new Date(filters.dataPartida);
-      const dataVoo = new Date(
-        flight.partida.split(" ")[0].split("/").reverse().join("-")
+      /* Usar a função utilitária para verificar se passa pela cidade */
+      match = match && Flight.flightPassesPorCidade(trip, filtroDestino);
+      console.log(
+        `🔍 Destination filter: "${filtroDestino}" vs trip destination = ${match}`
       );
-      if (dataVoo < filtroData) match = false;
-    }
-    if (filters.dataRegresso && flight.dataVolta) {
-      const filtroData = new Date(filters.dataRegresso);
-      const dataVoo = new Date(
-        flight.dataVolta.split(" ")[0].split("/").reverse().join("-")
-      );
-      if (dataVoo > filtroData) match = false;
     }
 
-    // Tourism type filter (from UI)
-    if (
-      filters.tipoTurismo &&
-      filters.tipoTurismo.trim() !== "" &&
-      filters.tipoTurismo !== "Nenhum"
-    ) {
-      if (flight.turismo && Array.isArray(flight.turismo)) {
-        const filterTourism = filters.tipoTurismo.toLowerCase();
-        const hasTourismMatch = flight.turismo.some((turismo) =>
-          turismo.toLowerCase().includes(filterTourism)
-        );
-        if (!hasTourismMatch) match = false;
-      } else {
-        // If flight has no tourism type info and we're filtering for tourism type, exclude it
-        match = false;
-      }
-    }
-
-    // Accessibility filter (from UI) - match against destination accessibility
-    if (
-      filters.acessibilidade &&
-      ((typeof filters.acessibilidade === "string" &&
-        filters.acessibilidade.trim() !== "" &&
-        filters.acessibilidade !== "Nenhum") ||
-        (Array.isArray(filters.acessibilidade) &&
-          filters.acessibilidade.length > 0))
-    ) {
-      // Get destination data to check accessibility
-      const destinos = JSON.parse(localStorage.getItem("destinos")) || [];
-
-      // Extract city name from flight destination (e.g., "LIS - Lisboa" -> "Lisboa")
-      const destinoCity = flight.destino ? flight.destino.split(" - ")[1] : "";
-
-      if (destinoCity) {
-        // Find the destination data
-        const destinoData = destinos.find(
-          (dest) =>
-            dest.cidade &&
-            dest.cidade.toLowerCase() === destinoCity.toLowerCase()
-        );
-
-        if (destinoData && destinoData.acessibilidade) {
-          // Handle both string and array cases for filters.acessibilidade
-          let filterAccessibilities = [];
-          if (typeof filters.acessibilidade === "string") {
-            filterAccessibilities = filters.acessibilidade
-              .split(",")
-              .map((acc) => acc.trim().toLowerCase());
-          } else if (Array.isArray(filters.acessibilidade)) {
-            filterAccessibilities = filters.acessibilidade.map((acc) =>
-              acc.toString().toLowerCase()
-            );
-          }
-
-          const destinoAccessibilities = Array.isArray(
-            destinoData.acessibilidade
-          )
-            ? destinoData.acessibilidade
-            : [destinoData.acessibilidade];
-
-          const hasMatchingAccessibility = filterAccessibilities.some(
-            (filterAcc) =>
-              destinoAccessibilities.some((destAcc) =>
-                destAcc.toLowerCase().includes(filterAcc)
-              )
-          );
-
-          if (!hasMatchingAccessibility) match = false;
-        } else {
-          // If destination has no accessibility info and we're filtering for accessibility, exclude it
-          match = false;
-        }
-      } else {
-        // If we can't extract destination city, exclude the flight
-        match = false;
-      }
-    }
-
-    // Price filter (from UI)
-    const preco = parseFloat(flight.custo) || 0;
-    if (
-      preco < (filters.minPrice || 0) ||
-      preco > (filters.maxPrice || Infinity)
-    )
-      match = false;
     return match;
   });
-  // Ordenação
-  if (filters.sortDate === "recent") {
-    flights.sort((a, b) => new Date(b.partida) - new Date(a.partida));
-  } else if (filters.sortDate === "oldest") {
-    flights.sort((a, b) => new Date(a.partida) - new Date(b.partida));
-  }
-  if (filters.sortPrice === "price-asc") {
-    flights.sort((a, b) => Number(a.custo) - Number(b.custo));
-  } else if (filters.sortPrice === "price-desc") {
-    flights.sort((a, b) => Number(b.custo) - Number(a.custo));
-  } // Limitar o número de cards
-  flights = flights.slice(0, maxCards);
+
+  console.log("🔧 Debug - Trips after additional filters:", trips.length);
+
+  /* Limitar número de resultados */
+  trips = trips.slice(0, maxCards);
+
+  /* Renderizar os cards */
+  renderCards(trips);
+}
+
+function renderCards(trips) {
+  console.log("🎨 renderCards called with", trips.length, "trips");
   const container = document.querySelector(".card-viagens");
   if (!container) {
+    console.log("⚠️ Container .card-viagens not found!");
     return;
   }
+
   container.innerHTML = "";
-  if (!flights.length) {
-    container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">Nenhuma viagem encontrada.</div>`;
-    return;
-  }
-  // Função para formatar datas no estilo homepage
-  const formatarData = (dataStr) => {
-    if (!dataStr) return "";
-    const [dia, mes, anoHora] = dataStr.split("/");
-    if (!anoHora) return dataStr;
-    const [ano, hora] = anoHora.split(" ");
-    const meses = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    return `${dia} ${meses[parseInt(mes, 10) - 1]}`;
-  };
-  flights.forEach((flight) => {
-    const {
-      numeroVoo,
-      origem,
-      destino,
-      companhia,
-      partida,
-      chegada,
-      direto,
-      custo,
-      imagem,
-      dataVolta,
-    } = flight; // Extrair a cidade do destino (remove o código do aeroporto se presente)
-    const cidadeDestino = destino?.split(" - ").pop() || destino;
-    const cidade = cidadeDestino || "Destino";
-    const dataPartida = formatarData(partida);
-    const dataRegresso = formatarData(dataVolta);
-    const datas =
-      dataPartida && dataRegresso
-        ? `${dataPartida} - ${dataRegresso}`
-        : dataPartida;
-    const preco = custo || "-";
-    const nVoo = numeroVoo || "AF151";
 
-    // Prioriza a imagem do destino carregada pelo admin.
-    let imgSrc = "";
-    const destinoEncontrado = getDestinationByCity(cidadeDestino);
-
-    if (destinoEncontrado && destinoEncontrado.imagem) {
-      imgSrc = destinoEncontrado.imagem;
-    } else if (imagem) {
-      // Fallback para a imagem do voo (se existir)
-      imgSrc = imagem;
-    } else {
-      // Fallback para uma imagem de diretório padrão
-      imgSrc = `/img/destinos/${cidadeDestino}/1.jpg`;
-    }
-
-    const card = document.createElement("div");
-    card.className =
-      "bg-white dark:bg-gray-800 w-full relative rounded-lg shadow-[0px_2px_4px_0px_rgba(0,0,0,0.08)] border border-gray-200 dark:border-gray-700 overflow-hidden";
-    card.innerHTML = `
-      <img class="w-full h-80 object-cover" src="${imgSrc}" alt="Imagem do destino" onerror="this.onerror=null;this.src='https://placehold.co/413x327';">
-      <div class="p-4">
-        <p class="text-Text-Body dark:text-gray-100 text-2xl font-bold font-['Space_Mono'] mb-2">${cidade}</p>
-        <div class="inline-flex">
-          <span class="material-symbols-outlined text-Text-Subtitles dark:text-gray-300">calendar_month</span>
-          <p class="text-Text-Subtitles dark:text-gray-300 align-bottom font-normal font-['IBM_Plex_Sans'] mb-4">${datas}</p>
-        </div>
-        <p class="text-Button-Main dark:text-cyan-400 text-3xl font-bold font-['IBM_Plex_Sans']">${preco} €</p>
-        <p class="justify-start text-Text-Subtitles dark:text-gray-300 text-xs font-light font-['IBM_Plex_Sans'] leading-none">Transporte para 1 pessoa</p>
-        <a href="flight_itinerary.html?id=${nVoo}" class="ver-oferta absolute bottom-4 right-4 h-8 px-2.5 py-3.5 bg-Main-Secondary dark:bg-cyan-800 rounded-lg  inline-flex justify-center items-center gap-2.5 text-white text-base font-bold font-['Space_Mono'] hover:bg-Main-Primary dark:hover:bg-cyan-600 transition duration-300 ease-in-out">Ver oferta</a>
-        <span class="absolute top-4 right-6 material-symbols-outlined text-red-500 cursor-pointer transition-all duration-300 ease-in-out favorite-icon" data-favorito="false">favorite</span>
+  if (trips.length === 0) {
+    console.log("📭 No trips to render, showing empty state");
+    container.innerHTML = `
+      <div class="col-span-full text-center py-12">
+        <p class="text-gray-500 dark:text-gray-400 text-lg">Nenhuma viagem encontrada para os critérios selecionados.</p>
+        <button onclick="clearAllFilters()" class="mt-4 px-6 py-2 bg-Main-Primary text-white rounded-lg hover:bg-Main-Dark transition-colors">
+          Limpar filtros
+        </button>
       </div>
     `;
+    return;
+  }
+
+  console.log("🎯 Rendering", trips.length, "trip cards");
+  trips.forEach((trip, index) => {
+    console.log(`🃏 Creating card ${index + 1} for trip:`, trip.numeroVoo);
+    const card = createFlightCard(trip);
     container.appendChild(card);
-    // Now add the event listener to the heart icon inside this card
-    const heart = card.querySelector(".favorite-icon");
-    if (heart) {
-      // Set initial fill state based on whether this trip is a favorite
-      let isFav = false;
-      if (User.isLogged()) {
-        const user = User.getUserLogged();
-        isFav =
-          user.favoritos &&
-          user.favoritos.some(
-            (fav) =>
-              (fav.numeroVoo && fav.numeroVoo === flight.numeroVoo) ||
-              (fav.nVoo && fav.nVoo === flight.numeroVoo) ||
-              (fav.numeroVoo && fav.numeroVoo === flight.nVoo) ||
-              (fav.nVoo && fav.nVoo === flight.nVoo)
-          );
+  });
+  console.log("✅ All cards rendered successfully");
+}
+
+function createFlightCard(trip) {
+  const cardElement = document.createElement("div");
+  cardElement.className =
+    "bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow";
+
+  /* Determinar o tipo de viagem */
+  let tipoViagemText;
+  if (trip.tripType === "so-ida") {
+    tipoViagemText = "Ida";
+  } else if (trip.tripType === "ida-volta") {
+    tipoViagemText = "Ida e Volta";
+  } else if (trip.tripType === "multitrip") {
+    tipoViagemText = "Multi-destino";
+  } else {
+    /* Fallback baseado na pesquisa */
+    const searchData = sessionStorage.getItem("planit_search");
+    if (searchData) {
+      const parsedData = JSON.parse(searchData);
+      if (parsedData.tripType === "so-ida") {
+        tipoViagemText = "Ida";
+      } else if (parsedData.tripType === "multitrip") {
+        tipoViagemText = "Multi-destino";
+      } else {
+        tipoViagemText = "Ida e Volta";
       }
-      heart.setAttribute("data-favorito", isFav ? "true" : "false");
-      heart.style.fontVariationSettings = isFav ? "'FILL' 1" : "'FILL' 0";
-      heart.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!User.isLogged()) {
-          showToast("Faça login para adicionar aos favoritos", "error");
-          window.location.href = "_login.html";
-          return;
+    } else {
+      tipoViagemText = "Ida";
+    }
+  }
+
+  /* Determinar se é voo direto ou com escalas */
+  const tipoVooText = trip.direto
+    ? "Direto"
+    : `${
+        trip.segmentos && trip.segmentos.length ? trip.segmentos.length - 1 : 0
+      } escala${trip.segmentos && trip.segmentos.length > 2 ? "s" : ""}`;
+
+  /* Formatação de tipos de turismo */
+  const turismoTags =
+    Array.isArray(trip.turismo) && trip.turismo.length > 0
+      ? trip.turismo
+          .filter((tipo) => tipo && typeof tipo === "string")
+          .map(
+            (tipo) =>
+              `<span class="bg-Main-Secondary text-white text-xs px-2 py-1 rounded-full">${traduzirTipoTurismo(
+                tipo.trim()
+              )}</span>`
+          )
+          .join("")
+      : "";
+
+  /* Formatação das datas baseada no tipo de viagem */
+  let datasText = "";
+  let origemDestinoText = "";
+  let tituloDestino = "";
+
+  if (trip.tripType === "multitrip") {
+    /* Para multitrip, mostrar o roteiro completo */
+    if (trip.roteiro) {
+      origemDestinoText = trip.roteiro;
+      tituloDestino = trip.roteiro;
+    } else if (
+      trip.multitripDestinations &&
+      trip.multitripDestinations.length >= 2
+    ) {
+      const destinos = trip.multitripDestinations
+        .map((d) => {
+          if (typeof d === "object") {
+            return d.nome || d.cidade || d.codigo || "";
+          }
+          return d.toString();
+        })
+        .join(" → ");
+      origemDestinoText = destinos;
+      tituloDestino = destinos;
+    } else {
+      /* Fallback para formato "CODE - Cidade" */
+      const origemCidade = trip.origem.includes(" - ")
+        ? trip.origem.split(" - ")[1]
+        : trip.origem;
+      const destinoCidade = trip.destino.includes(" - ")
+        ? trip.destino.split(" - ")[1]
+        : trip.destino;
+      origemDestinoText = `${origemCidade} → ${destinoCidade}`;
+      tituloDestino = destinoCidade;
+    }
+
+    /* Para multitrip, mostrar data de início e fim */
+    if (trip.segments && trip.segments.length > 1) {
+      const primeiroVoo = trip.segments[0];
+      const ultimoVoo = trip.segments[trip.segments.length - 1];
+      /* Extrair apenas a data (dd/mm/yyyy) removendo a hora se existir */
+      const dataInicio = primeiroVoo.partida.includes(" ")
+        ? primeiroVoo.partida.split(" ")[0]
+        : primeiroVoo.partida;
+      const dataFim = ultimoVoo.chegada.includes(" ")
+        ? ultimoVoo.chegada.split(" ")[0]
+        : ultimoVoo.chegada;
+      datasText = `${dataInicio} - ${dataFim}`;
+    } else if (trip.partida && trip.chegada) {
+      /* Para voos únicos multitrip */
+      const dataInicio = trip.partida.includes(" ")
+        ? trip.partida.split(" ")[0]
+        : trip.partida;
+      const dataFim = trip.chegada.includes(" ")
+        ? trip.chegada.split(" ")[0]
+        : trip.chegada;
+      datasText = `${dataInicio} - ${dataFim}`;
+    } else {
+      datasText = `${trip.partida || "N/A"} - ${trip.chegada || "N/A"}`;
+    }
+  } else if (
+    trip.tripType === "ida-volta" &&
+    trip.segments &&
+    trip.segments.length >= 2
+  ) {
+    const outbound = trip.segments[0];
+    const returnFlight = trip.segments[1];
+    datasText = `${outbound.partida} - ${returnFlight.partida}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    /* Extrair apenas o nome da cidade para o título */
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
+  } else if (trip.dataVolta) {
+    datasText = `${trip.partida} - ${trip.dataVolta}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    /* Extrair apenas o nome da cidade para o título */
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
+  } else {
+    datasText = `${trip.partida} - ${trip.chegada}`;
+    origemDestinoText = `${trip.origem} → ${trip.destino}`;
+    /* Extrair apenas o nome da cidade para o título */
+    tituloDestino = trip.destino.includes(" - ")
+      ? trip.destino.split(" - ")[1]
+      : trip.destino;
+  }
+
+  /* Usar custo total da viagem */
+  const custoDisplay = trip.totalCost || trip.custo;
+
+  /* Texto do ícone de voo baseado no tipo */
+  const flightIconText = trip.tripType === "multitrip" ? "Multi Viagem" : "";
+
+  cardElement.innerHTML = `
+    <div class="relative">
+      <img src="${
+        trip.imagem
+      }" alt="${tituloDestino}" class="w-full h-48 object-cover">
+      <div class="absolute top-2 left-2">
+        <span class="bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">${tipoViagemText}</span>
+      </div>
+      <div class="absolute top-2 right-2">
+        <span class="bg-Main-Primary bg-opacity-80 text-white text-xs px-2 py-1 rounded" title="Tipo de voo">${tipoVooText}</span>
+      </div>
+      <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
+        ${turismoTags}
+      </div>
+    </div>
+    <div class="p-4">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2" title="${tituloDestino}">${tituloDestino}</h3>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
+        <span class="material-symbols-outlined text-sm">flight_takeoff</span>
+        ${
+          flightIconText
+            ? `<span class="font-medium text-Main-Primary dark:text-cyan-400">${flightIconText}</span>`
+            : `<span>${origemDestinoText}</span>`
         }
-        const user = User.getUserLogged();
-        const currentlyFav = heart.getAttribute("data-favorito") === "true";
-        if (currentlyFav) {
-          User.removeFavorite(user, flight);
-          heart.setAttribute("data-favorito", "false");
-          heart.style.fontVariationSettings = "'FILL' 0";
-          showToast("Removido dos favoritos", "success");
-        } else {
-          User.addFavorite(user, flight);
-          heart.setAttribute("data-favorito", "true");
-          heart.style.fontVariationSettings = "'FILL' 1";
-          showToast("Adicionado aos favoritos", "success");
-        }
-        heart.classList.add("scale-110");
-        setTimeout(() => heart.classList.remove("scale-110"), 150);
+      </div>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
+        <span class="material-symbols-outlined text-sm">schedule</span>
+        <span>${datasText}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <div class="text-2xl font-bold text-Main-Primary dark:text-cyan-400">
+          €${custoDisplay}
+        </div>
+        <a href="flight_itinerary.html?id=${getFlightItineraryId(trip)}" 
+           class="bg-Main-Primary hover:bg-Main-Dark text-white px-4 py-2 rounded-lg transition-colors">
+          Ver detalhes
+        </a>
+      </div>
+    </div>
+  `;
+
+  return cardElement;
+}
+
+/* Determinar ID correto para o link do itinerário */
+function getFlightItineraryId(trip) {
+  /* Para viagens multitrip, usar os números de voo dos segmentos */
+  if (
+    trip.tripType === "multitrip" &&
+    trip.segments &&
+    trip.segments.length > 0
+  ) {
+    const flightNumbers = trip.segments.map((segment) => segment.numeroVoo);
+    console.log("🔗 Creating multitrip ID from segments:", flightNumbers);
+    return flightNumbers.join("-");
+  }
+
+  /* Para outros tipos de viagem, usar o número de voo padrão */
+  return trip.numeroVoo;
+}
+
+/* Função para limpar todos os filtros */
+function clearAllFilters() {
+  console.log("🧹 clearAllFilters called - starting filter cleanup");
+  console.log("🧹 Current filters before clearing:", filters);
+
+  /* Limpar sessionStorage e localStorage */
+  sessionStorage.removeItem("planit_search");
+  localStorage.removeItem("origemSelecionada");
+  localStorage.removeItem("destinoSelecionado");
+  localStorage.removeItem("datasViajantes");
+  localStorage.removeItem("acessibilidadesSelecionadas");
+  localStorage.removeItem("tipoTurismoSelecionado");
+  console.log("🧹 Cleared sessionStorage and localStorage form data");
+
+  /* Reset dos filtros */
+  filters = {
+    origem: "",
+    destino: "",
+    tipoTurismo: "",
+    acessibilidade: "",
+    dataPartida: "",
+    dataRegresso: "",
+    adultos: 1,
+    criancas: 0,
+    bebes: 0,
+    minPrice: 0,
+    maxPrice: Infinity,
+    sortDate: "",
+    sortPrice: "",
+    tripType: "so-ida",
+  };
+
+  console.log("🧹 Filters reset to:", filters);
+
+  /* Limpar campos principais do formulário */
+  const origemBtn = document.querySelector("#btn-open p");
+  if (origemBtn) {
+    origemBtn.textContent = "Origem";
+    console.log("🧹 Cleared origem button");
+  }
+
+  const destinoBtn = document.querySelector("#btn-destino p");
+  if (destinoBtn) {
+    destinoBtn.textContent = "Destino";
+    console.log("🧹 Cleared destino button");
+  }
+
+  /* Limpar datas e viajantes */
+  const btnDatas = document.getElementById("btn-datas");
+  if (btnDatas) {
+    const datasP = btnDatas.querySelector("div:first-child p");
+    if (datasP) {
+      datasP.textContent = "Datas";
+      console.log("🧹 Cleared dates text");
+    }
+
+    const viajantesP = btnDatas.querySelector("div:nth-child(2) p");
+    if (viajantesP) {
+      viajantesP.textContent = "1 Viajante";
+      console.log("🧹 Cleared travelers text");
+    }
+  }
+
+  /* Limpar tipo de turismo */
+  const tipoTurismoP = document.getElementById("texto-tipo-turismo");
+  if (tipoTurismoP) {
+    tipoTurismoP.textContent = "Tipo de Turismo";
+    console.log("🧹 Cleared tourism type text");
+  }
+
+  /* Limpar acessibilidade */
+  const acessibilidadeP = document.getElementById("texto-acessibilidade");
+  if (acessibilidadeP) {
+    acessibilidadeP.textContent = "Acessibilidade";
+    console.log("🧹 Cleared accessibility text");
+  }
+
+  /* Limpar campos de filtros de preço e ordenação */
+  const minPriceInput = document.getElementById("min-price");
+  const maxPriceInput = document.getElementById("max-price");
+  const sortDateSelect = document.getElementById("sort-date");
+  const sortPriceSelect = document.getElementById("sort-price");
+
+  if (minPriceInput) {
+    minPriceInput.value = "";
+    console.log("🧹 Cleared min price input");
+  }
+  if (maxPriceInput) {
+    maxPriceInput.value = "";
+    console.log("🧹 Cleared max price input");
+  }
+  if (sortDateSelect) {
+    sortDateSelect.value = "";
+    console.log("🧹 Cleared sort date select");
+  }
+  if (sortPriceSelect) {
+    sortPriceSelect.value = "";
+    console.log("🧹 Cleared sort price select");
+  }
+
+  /* Limpar destinos multitrip */
+  if (typeof clearMultitripDestinations === "function") {
+    clearMultitripDestinations();
+    console.log("🧹 Cleared multitrip destinations");
+  }
+
+  /* Re-renderizar com todos os voos */
+  console.log("🧹 Calling renderFlightCards to refresh display");
+  renderFlightCards();
+}
+
+/* Configurar event listeners para filtros da interface */
+function setupFilterEventListeners() {
+  /* Event listeners para filtros de preço */
+  const minPriceInput = document.getElementById("min-price");
+  const maxPriceInput = document.getElementById("max-price");
+
+  if (minPriceInput) {
+    minPriceInput.addEventListener("input", (e) => {
+      filters.minPrice = e.target.value ? parseFloat(e.target.value) : 0;
+      renderFlightCards();
+    });
+  }
+
+  if (maxPriceInput) {
+    maxPriceInput.addEventListener("input", (e) => {
+      filters.maxPrice = e.target.value ? parseFloat(e.target.value) : Infinity;
+      renderFlightCards();
+    });
+  }
+
+  /* Event listeners para ordenação */
+  const sortDateSelect = document.getElementById("sort-date");
+  const sortPriceSelect = document.getElementById("sort-price");
+
+  if (sortDateSelect) {
+    sortDateSelect.addEventListener("change", (e) => {
+      filters.sortDate = e.target.value;
+      renderFlightCards();
+    });
+  }
+
+  if (sortPriceSelect) {
+    sortPriceSelect.addEventListener("change", (e) => {
+      filters.sortPrice = e.target.value;
+      renderFlightCards();
+    });
+  }
+
+  /* Event listener para limpar filtros */
+  const clearFiltersBtn = document.getElementById("clear-filters");
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", clearAllFilters);
+  }
+}
+
+/* Funcionalidade para refinar pesquisa */
+function setupSearchRefinement() {
+  const form = document.querySelector("section form");
+  const btnOrigem = document.getElementById("btn-open");
+  const btnDestino = document.getElementById("btn-destino");
+  const btnDatas = document.getElementById("btn-datas");
+
+  /* Event listeners para os botões do formulário */
+  if (btnOrigem) {
+    btnOrigem.addEventListener("click", (e) => {
+      e.preventDefault();
+      showToast(
+        "Para refinar a pesquisa, use o botão 'Limpar filtros' e faça uma nova pesquisa na página inicial.",
+        "info"
+      );
+    });
+  }
+
+  if (btnDestino) {
+    btnDestino.addEventListener("click", (e) => {
+      e.preventDefault();
+      showToast(
+        "Para refinar a pesquisa, use o botão 'Limpar filtros' e faça uma nova pesquisa na página inicial.",
+        "info"
+      );
+    });
+  }
+
+  if (btnDatas) {
+    btnDatas.addEventListener("click", (e) => {
+      e.preventDefault();
+      showToast(
+        "Para refinar a pesquisa, use o botão 'Limpar filtros' e faça uma nova pesquisa na página inicial.",
+        "info"
+      );
+    });
+  }
+
+  /* Capturar todos os botões PlanIt pela estrutura do HTML */
+  const planItButtons = document.querySelectorAll("button");
+  planItButtons.forEach((button) => {
+    const spans = button.querySelectorAll("span");
+    let hasFirstSpan = false;
+    let hasSecondSpan = false;
+
+    spans.forEach((span) => {
+      if (
+        span.textContent.includes("Plan") ||
+        span.textContent.includes("Pronto")
+      ) {
+        hasFirstSpan = true;
+      }
+      if (span.textContent.includes("It")) {
+        hasSecondSpan = true;
+      }
+    });
+
+    if (hasFirstSpan && hasSecondSpan) {
+      button.addEventListener("click", (e) => {
+        e.preventDefault();
+        /* Redirecionar para a página inicial */
+        window.location.href = "../index.html";
       });
     }
   });
 }
-// --- Filtros de pesquisa de voos ---
-function setupFlightFilters() {
-  const sortDate = document.getElementById("sort-date");
-  const sortPrice = document.getElementById("sort-price");
-  const minPrice = document.getElementById("min-price");
-  const maxPrice = document.getElementById("max-price");
-  const clearFiltersBtn = document.getElementById("clear-filters-btn");
-  function updateAndRender() {
-    filters.minPrice = parseFloat(minPrice?.value) || 0;
-    filters.maxPrice = parseFloat(maxPrice?.value) || Infinity;
-    filters.sortDate = sortDate?.value || "";
-    filters.sortPrice = sortPrice?.value || "";
-    renderFlightCards();
+
+/* Inicialização da página de pesquisa de voos */
+document.addEventListener("DOMContentLoaded", function () {
+  Flight.init();
+  User.init();
+
+  /* Inicializar funcionalidade multitrip */
+  if (typeof initMultitrip === "function") {
+    initMultitrip();
   }
-  if (sortDate) sortDate.addEventListener("change", updateAndRender);
-  if (sortPrice) sortPrice.addEventListener("change", updateAndRender);
-  if (minPrice) minPrice.addEventListener("input", updateAndRender);
-  if (maxPrice) maxPrice.addEventListener("input", updateAndRender);
-  // Clear filters functionality
-  if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener("click", () => {
-      // Reset all filter values
-      if (sortDate) sortDate.value = "";
-      if (sortPrice) sortPrice.value = "";
-      if (minPrice) minPrice.value = "";
-      if (maxPrice) maxPrice.value = "";
-      // Reset filter object
-      filters.minPrice = 0;
-      filters.maxPrice = Infinity;
-      filters.sortDate = "";
-      filters.sortPrice = "";
-      // Reset search form buttons to default values
-      const origemBtn = document.querySelector("#btn-open p");
-      const destinoBtn = document.querySelector("#btn-destino p");
-      const tipoTurismoText = document.getElementById("texto-tipo-turismo");
-      const acessibilidadeText = document.getElementById(
-        "texto-acessibilidade"
-      );
-      const tipoViagemText = document.getElementById("texto-tipo-viagem");
-      if (origemBtn) origemBtn.textContent = "Origem";
-      if (destinoBtn) destinoBtn.textContent = "Destino";
-      if (tipoTurismoText) tipoTurismoText.textContent = "Nenhum";
-      if (acessibilidadeText) acessibilidadeText.textContent = "Nenhum";
-      if (tipoViagemText) tipoViagemText.textContent = "Ida e Volta";
-      // Reset dates and travelers button
-      const btnDatas = document.getElementById("btn-datas");
-      if (btnDatas) {
-        const datasP = btnDatas.querySelector("div:nth-child(1) p");
-        const viajantesP = btnDatas.querySelector("div:nth-child(2) p");
-        if (datasP) datasP.textContent = "Datas";
-        if (viajantesP) viajantesP.textContent = "Viajantes";
-      }
-      // Reset filters object
-      filters.origem = "";
-      filters.destino = "";
-      filters.tipoTurismo = "";
-      filters.acessibilidade = "";
-      filters.dataPartida = "";
-      filters.dataRegresso = "";
-      filters.adultos = 1;
-      filters.criancas = 0;
-      filters.bebes = 0;
-      // Hide multitrip container
-      const multitripContainer = document.getElementById("multitrip-container");
-      if (multitripContainer) {
-        multitripContainer.classList.add("hidden");
-      }
-      // Clear sessionStorage
-      sessionStorage.removeItem("planit_search");
-      // Reset Flight model state
-      if (Flight.resetState) {
-        Flight.resetState();
-      }
-      // Re-render with all flights
-      renderFlightCards();
-      showToast("Filtros limpos!", "info");
-    });
-  }
-  updateAndRender();
-}
-function setupModalButtons() {
-  const btnOrigem = document.getElementById("btn-open");
-  if (btnOrigem) {
-    btnOrigem.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirModalOrigem();
-    });
-  }
-  const btnDestino = document.getElementById("btn-destino");
-  if (btnDestino) {
-    btnDestino.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirModalDestino();
-    });
-  }
-  const btnDatas = document.getElementById("btn-datas");
-  if (btnDatas) {
-    btnDatas.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirModalDatas();
-    });
-  }
-  const btnAcessibilidade = document.getElementById("btn-acessibilidade");
-  if (btnAcessibilidade) {
-    btnAcessibilidade.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirModalAcessibilidade();
-    });
-  }
-  const btnTipoTurismo = document.getElementById("btn-tipo-turismo");
-  if (btnTipoTurismo) {
-    btnTipoTurismo.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirModalTipoTurismo();
-    });
-  }
-  const btnTipoViagem = document.getElementById("btn-tipo-viagem");
-  if (btnTipoViagem) {
-    btnTipoViagem.addEventListener("click", (e) => {
-      e.preventDefault();
-      abrirModalTipoViagem();
-    });
-  }
-}
+
+  /* Preencher campos com dados da pesquisa */
+  preencherCamposPesquisa();
+
+  /* Configurar event listeners */
+  setupFilterEventListeners();
+  setupSearchRefinement(); /* Adicionar esta linha */
+
+  /* Renderizar cards iniciais */
+  renderFlightCards();
+});
+
+/* Export para outras partes da aplicação, se necessário */
+export { renderFlightCards, clearAllFilters };
+
+/* Tornar clearAllFilters disponível globalmente para onclick */
+window.clearAllFilters = clearAllFilters;
 // --- Inicialização principal ---
 function pararScroll() {
   document.body.classList.add("modal-aberto");
@@ -643,7 +805,9 @@ document.addEventListener("DOMContentLoaded", () => {
       filters.acessibilidade = "";
     }
     filters.dataPartida = planitFilter.dataPartida || "";
-    filters.dataRegresso = planitFilter.dataRegresso || "";
+    /* Para "só ida", não usar data de regresso mesmo que esteja no filtro */
+    filters.dataRegresso =
+      planitFilter.tripType === "so-ida" ? "" : planitFilter.dataRegresso || "";
     filters.adultos = planitFilter.adultos || 1;
     filters.criancas = planitFilter.criancas || 0;
     filters.bebes = planitFilter.bebes || 0;
@@ -677,7 +841,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (typeof Flight !== "undefined" && Flight.getDatesTravelers) {
       const dt = Flight.getDatesTravelers();
       filters.dataPartida = dt.dataPartida;
-      filters.dataRegresso = dt.dataRegresso;
+      /* Para "só ida", não usar data de regresso */
+      filters.dataRegresso = dt.tripType === "so-ida" ? "" : dt.dataRegresso;
       filters.adultos = dt.adultos;
       filters.criancas = dt.criancas;
       filters.bebes = dt.bebes;
@@ -688,14 +853,36 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render initial flight cards with any available filters
   renderFlightCards();
   // Setup filters and modal buttons
-  setupFlightFilters();
-  setupModalButtons();
+  setupFilterEventListeners();
+  /* setupModalButtons(); - Event listeners dos modais já estão configurados individualmente */
   setupTripTypeButtons(); // Setup multitrip functionality
+
+  /* Inicializar sistema multitrip */
+  if (typeof initMultitrip === "function") {
+    initMultitrip();
+    console.log("✅ Sistema multitrip inicializado");
+  } else {
+    console.log("⚠️ Função initMultitrip não disponível");
+  }
   // Prevent default form submission to avoid page reload
   const form = document.querySelector("form");
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
+
+      /* Coletar dados do formulário atual e salvar no sessionStorage */
+      const currentSearchData = collectCurrentSearchData();
+      if (currentSearchData) {
+        sessionStorage.setItem(
+          "planit_search",
+          JSON.stringify(currentSearchData)
+        );
+        console.log(
+          "💾 Search data saved to sessionStorage:",
+          currentSearchData
+        );
+      }
+
       // Re-render cards when form is submitted
       renderFlightCards();
     });
@@ -1045,17 +1232,38 @@ function abrirModalDatas() {
   document.getElementById("confirmar-datas").addEventListener("click", () => {
     const dataPartida = inputDataPartida.value;
     const dataRegresso = inputDataRegresso.value;
-    if (dataPartida && dataRegresso) {
+    const tripType = filters.tripType || "so-ida"; // Default to one-way if not set
+
+    console.log("🎯 Debug - Modal confirmar datas:", {
+      dataPartida,
+      dataRegresso,
+      tripType,
+    });
+
+    /* Para "só ida", só precisa de data de partida. Para "ida e volta", precisa de ambas */
+    const requiredFieldsFilled =
+      tripType === "so-ida" ? dataPartida : dataPartida && dataRegresso;
+
+    if (requiredFieldsFilled) {
+      /* Para "só ida", limpar data de regresso */
+      const finalDataRegresso = tripType === "so-ida" ? "" : dataRegresso;
+
       Flight.setDatesTravelers(
         dataPartida,
-        dataRegresso,
+        finalDataRegresso,
         adultos,
         criancas,
         bebes
       );
-      updateDatesButton(dataPartida, dataRegresso, adultos, criancas, bebes);
+      updateDatesButton(
+        dataPartida,
+        finalDataRegresso,
+        adultos,
+        criancas,
+        bebes
+      );
       filters.dataPartida = dataPartida;
-      filters.dataRegresso = dataRegresso;
+      filters.dataRegresso = finalDataRegresso;
       filters.adultos = adultos;
       filters.criancas = criancas;
       filters.bebes = bebes;
@@ -1297,4 +1505,97 @@ function fecharModalTipoTurismo() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
   pesquisaInput.value = "";
+}
+/* Função para traduzir tipos de turismo */
+function traduzirTipoTurismo(tipo) {
+  const traducoes = {
+    "Turismo Cultural": "Turismo Cultural",
+    "Turismo Gastronómico": "Turismo Gastronómico",
+    "Turismo Urbano": "Turismo Urbano",
+    "Turismo de Aventura": "Turismo de Aventura",
+    "Turismo Rural": "Turismo Rural",
+    "Turismo de Praia": "Turismo de Praia",
+    "Turismo de Montanha": "Turismo de Montanha",
+    "Turismo de Bem-estar": "Turismo de Bem-estar",
+    "Turismo Ecológico": "Turismo Ecológico",
+    "Turismo Religioso": "Turismo Religioso",
+    "Turismo de Negócios": "Turismo de Negócios",
+    TurismoCultural: "Turismo Cultural",
+    TurismoGastronomico: "Turismo Gastronómico",
+    TurismoUrbano: "Turismo Urbano",
+    TurismoAventura: "Turismo de Aventura",
+    TurismoRural: "Turismo Rural",
+    TurismoPraia: "Turismo de Praia",
+    TurismoMontanha: "Turismo de Montanha",
+    "TurismoBem-estar": "Turismo de Bem-estar",
+    TurismoEcologico: "Turismo Ecológico",
+    TurismoReligioso: "Turismo Religioso",
+    Turismodenegocios: "Turismo de Negócios",
+  };
+  return traducoes[tipo] || tipo;
+}
+
+/* Coletar dados do formulário atual para pesquisa */
+function collectCurrentSearchData() {
+  console.log("📋 Coletando dados do formulário atual...");
+
+  /* Obter dados básicos do formulário */
+  const origem = Flight.getSelectedOrigin();
+  const destino = Flight.getSelectedDestination();
+  const datesTravelers = Flight.getDatesTravelers();
+  const tripType = Flight.getTripType();
+
+  console.log("🔍 Dados básicos coletados:", {
+    origem,
+    destino,
+    datesTravelers,
+    tripType,
+  });
+
+  /* Para multitrip, limpar filtros de origem/destino que podem interferir */
+  if (tripType === "multitrip") {
+    const multitripDestinations = getMultitripDestinations
+      ? getMultitripDestinations()
+      : [];
+    console.log("🎯 Destinos multitrip coletados:", multitripDestinations);
+
+    /* Limpar filtros que podem interferir com multitrip */
+    filters.origem = "";
+    filters.destino = "";
+    console.log("🧹 Filtros de origem/destino limpos para multitrip");
+
+    if (multitripDestinations && multitripDestinations.length >= 2) {
+      return {
+        tripType: "multitrip",
+        multitripDestinations: multitripDestinations,
+        dataPartida: datesTravelers.dataPartida,
+        adultos: datesTravelers.adultos,
+        criancas: datesTravelers.criancas,
+        bebes: datesTravelers.bebes,
+      };
+    } else {
+      console.log(
+        "⚠️ Destinos multitrip insuficientes:",
+        multitripDestinations?.length || 0
+      );
+      return null;
+    }
+  }
+
+  /* Para outros tipos de viagem */
+  if (!origem || !destino) {
+    console.log("⚠️ Origem ou destino não selecionados");
+    return null;
+  }
+
+  return {
+    tripType: tripType,
+    origem: origem,
+    destino: destino,
+    dataPartida: datesTravelers.dataPartida,
+    dataRegresso: datesTravelers.dataRegresso,
+    adultos: datesTravelers.adultos,
+    criancas: datesTravelers.criancas,
+    bebes: datesTravelers.bebes,
+  };
 }

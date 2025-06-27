@@ -1,5 +1,6 @@
 initdata();
-function initdata() {  // Utilizador inicial
+function initdata() {
+  // Utilizador inicial
   if (!localStorage.user) {
     const user = [
       {
@@ -12,26 +13,96 @@ function initdata() {  // Utilizador inicial
         isPrivate: false,
         admin: false,
         preferences: {
-          newsletter: true
-        },        reservas: [
+          newsletter: true,
+        },
+        reservas: [
           {
             numeroVoo: "TAP101",
             origem: "OPO - Porto",
             destino: "LIS - Lisboa",
-            companhia: "TAP",
+            companhia: "TAP Air Portugal",
             partida: "15/07/2025 10:00",
             chegada: "15/07/2025 11:00",
-            direto: "S",
+            direto: true,
             custo: 150,
             imagem: "/img/destinos/Lisboa/5.jpg",
             dataVolta: "20/07/2025 18:00",
             turismo: ["Turismo Cultural"],
+            segmentos: [
+              {
+                numeroVoo: "TAP101",
+                origem: "OPO - Porto",
+                destino: "LIS - Lisboa",
+                companhia: "TAP Air Portugal",
+                partida: "15/07/2025 10:00",
+                chegada: "15/07/2025 11:00",
+              },
+            ],
             pointsAR: 150,
             car: {},
             hotel: {},
             seguro: false,
-            nPessoas: 1
-          }
+            nPessoas: 1,
+          },
+          {
+            numeroVoo: "RYR205",
+            origem: "OPO - Porto",
+            destino: "MAD - Madrid",
+            companhia: "Ryanair",
+            partida: "22/07/2025 14:30",
+            chegada: "22/07/2025 16:45",
+            direto: true,
+            custo: 89,
+            imagem: "/img/destinos/Madrid/3.jpg",
+            turismo: ["Turismo Cultural"],
+            car: {},
+            hotel: {},
+            seguro: false,
+            nPessoas: 1,
+          },
+          {
+            numeroVoo: "BA2025-AF1234-LH567",
+            origem: "OPO - Porto",
+            destino: "FCO - Roma",
+            companhia: "Multi-companhias",
+            partida: "25/07/2025 08:00",
+            chegada: "25/07/2025 20:30",
+            direto: false,
+            custo: 320,
+            imagem: "/img/destinos/Roma/1.jpg",
+            turismo: ["Turismo Cultural"],
+            segments: [
+              {
+                numeroVoo: "BA2025",
+                origem: "OPO - Porto",
+                destino: "LHR - Londres",
+                companhia: "British Airways",
+                partida: "25/07/2025 08:00",
+                chegada: "25/07/2025 10:00",
+              },
+              {
+                numeroVoo: "AF1234",
+                origem: "LHR - Londres",
+                destino: "CDG - Paris",
+                companhia: "Air France",
+                partida: "25/07/2025 12:30",
+                chegada: "25/07/2025 15:00",
+              },
+              {
+                numeroVoo: "LH567",
+                origem: "CDG - Paris",
+                destino: "FCO - Roma",
+                companhia: "Lufthansa",
+                partida: "25/07/2025 17:00",
+                chegada: "25/07/2025 20:30",
+              },
+            ],
+            pointsAR: 320,
+            car: {},
+            hotel: {},
+            seguro: false,
+            nPessoas: 1,
+          },
         ],
         favoritos: [
           {
@@ -41,13 +112,23 @@ function initdata() {  // Utilizador inicial
             companhia: "British Airways",
             partida: "01/08/2025 14:00",
             chegada: "01/08/2025 16:00",
-            direto: "S",
+            direto: true,
             custo: 200,
             imagem: "/img/destinos/Londres/1.jpg",
             dataVolta: "08/08/2025 10:00",
-            turismo: ["Turismo Cultural", "Turismo Urbano"]
-          }
-        ]
+            turismo: ["Turismo Cultural", "Turismo Urbano"],
+            segmentos: [
+              {
+                numeroVoo: "TP300",
+                origem: "OPO - Porto",
+                destino: "LHR - Londres",
+                companhia: "British Airways",
+                partida: "01/08/2025 14:00",
+                chegada: "01/08/2025 16:00",
+              },
+            ],
+          },
+        ],
       },
       {
         id: 2,
@@ -59,27 +140,35 @@ function initdata() {  // Utilizador inicial
         isPrivate: false,
         admin: true,
         preferences: {
-          newsletter: true
+          newsletter: true,
         },
         reservas: [
           {
-            numeroVoo: "BA1002",            origem: "LHR - Londres",
+            numeroVoo: "BA1002",
+            origem: "LHR - Londres",
             destino: "OPO - Porto",
             companhia: "British Airways",
             partida: "07/07/2025 14:00",
             chegada: "07/07/2025 16:00",
-            direto: "S",
+            direto: true,
             custo: 210,
             imagem: "https://placehold.co/413x327",
             dataVolta: "12/07/2025 14:00",
-            turismo: [
-              "Turismo Cultural",
-              "Turismo Gastronómico"
+            turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+            segmentos: [
+              {
+                numeroVoo: "BA1002",
+                origem: "LHR - Londres",
+                destino: "OPO - Porto",
+                companhia: "British Airways",
+                partida: "07/07/2025 14:00",
+                chegada: "07/07/2025 16:00",
+              },
             ],
             pointsAR: 1265,
             car: {
               nome: "Ford Fiesta",
-              preco: 24
+              preco: 24,
             },
             hotel: {
               id: 4,
@@ -93,25 +182,21 @@ function initdata() {  // Utilizador inicial
                   capacidade: 2,
                   precoNoite: 150,
                   foto: "https://placehold.co/300x200/F4A460/000000?text=Quarto+Standard",
-                  acessibilidade: [
-                    "Quartos Adaptados"
-                  ],
+                  acessibilidade: ["Quartos Adaptados"],
                   dataCheckin: "2025-07-10",
                   numeroNoites: 5,
                   pequenoAlmocoIncluido: true,
-                  comodidades: [
-                    "Restaurante",
-                    "Bar"
-                  ],
+                  comodidades: ["Restaurante", "Bar"],
                   wifiGratis: true,
-                  descricao: "Quarto confortável no centro histórico do Porto."
-                }
-              ]
+                  descricao: "Quarto confortável no centro histórico do Porto.",
+                },
+              ],
             },
             seguro: true,
-            nPessoas: 2
-          }
-        ],        favoritos: [
+            nPessoas: 2,
+          },
+        ],
+        favoritos: [
           {
             numeroVoo: "EI9101",
             origem: "OPO - Porto",
@@ -126,8 +211,8 @@ function initdata() {  // Utilizador inicial
             turismo: [
               "Turismo Cultural",
               "Turismo Urbano",
-              "Turismo Gastronómico"
-            ]
+              "Turismo Gastronómico",
+            ],
           },
           {
             numeroVoo: "AF205",
@@ -140,11 +225,9 @@ function initdata() {  // Utilizador inicial
             custo: 180,
             imagem: "https://placehold.co/413x327",
             dataVolta: "22/12/2025 15:00",
-            turismo: [
-              "Turismo Cultural",
-              "Turismo Gastronómico"
-            ]          }
-        ]
+            turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+          },
+        ],
       },
       {
         id: 3,
@@ -156,20 +239,22 @@ function initdata() {  // Utilizador inicial
         isPrivate: false,
         admin: false,
         preferences: {
-          newsletter: false
+          newsletter: false,
         },
         reservas: [],
         favoritos: [
           {
-            numeroVoo: "TAP301",            origem: "LIS - Lisboa",
+            numeroVoo: "TAP301",
+            origem: "LIS - Lisboa",
             destino: "LHR - Londres",
             companhia: "TAP",
             partida: "10/08/2025 16:00",
             chegada: "10/08/2025 19:00",
             direto: "S",
             custo: 220,
-            turismo: ["Turismo Cultural"]
-          },          {
+            turismo: ["Turismo Cultural"],
+          },
+          {
             numeroVoo: "FR502",
             origem: "OPO - Porto",
             destino: "MAD - Madrid",
@@ -178,9 +263,9 @@ function initdata() {  // Utilizador inicial
             chegada: "05/09/2025 14:00",
             direto: "S",
             custo: 89,
-            turismo: ["Turismo Urbano"]
-          }
-        ]
+            turismo: ["Turismo Urbano"],
+          },
+        ],
       },
       {
         id: 4,
@@ -192,9 +277,10 @@ function initdata() {  // Utilizador inicial
         isPrivate: false,
         admin: false,
         preferences: {
-          newsletter: true
+          newsletter: true,
         },
-        reservas: [],        favoritos: [
+        reservas: [],
+        favoritos: [
           {
             numeroVoo: "LH401",
             origem: "OPO - Porto",
@@ -204,7 +290,7 @@ function initdata() {  // Utilizador inicial
             chegada: "20/10/2025 13:00",
             direto: "S",
             custo: 190,
-            turismo: ["Turismo Cultural", "Turismo Gastronómico"]
+            turismo: ["Turismo Cultural", "Turismo Gastronómico"],
           },
           {
             numeroVoo: "KL601",
@@ -215,14 +301,14 @@ function initdata() {  // Utilizador inicial
             chegada: "15/11/2025 17:00",
             direto: "S",
             custo: 165,
-            turismo: ["Turismo Cultural"]
-          }
-        ]
+            turismo: ["Turismo Cultural"],
+          },
+        ],
       },
     ];
     localStorage.setItem("user", JSON.stringify(user));
   }
-    // Aeroportos
+  // Aeroportos
   if (!localStorage.aeroportos) {
     const aeroportos = [
       {
@@ -659,7 +745,7 @@ function initdata() {  // Utilizador inicial
         id: 5,
         cidade: "Porto",
         nome: "Torel Avantgarde",
-       foto: "/img/hoteis/Porto/Torel_Avantgarde/1.jpg",
+        foto: "/img/hoteis/Porto/Torel_Avantgarde/1.jpg",
         foto: "/img/hoteis/Porto/Torel_Avantgarde/2.jpg",
         foto: "/img/hoteis/Porto/Torel_Avantgarde/3.jpg",
         foto: "/img/hoteis/Porto/Torel_Avantgarde/4.jpg",
@@ -1240,7 +1326,7 @@ function initdata() {  // Utilizador inicial
         id: 21,
         cidade: "Amesterdão",
         nome: "Conservatorium Hotel",
-       foto: "/img/hoteis/Amsterdao/Conservatorium_Hotel/1.jpg",
+        foto: "/img/hoteis/Amsterdao/Conservatorium_Hotel/1.jpg",
         foto: "/img/hoteis/Amsterdao/Conservatorium_Hotel/2.jpg",
         foto: "/img/hoteis/Amsterdao/Conservatorium_Hotel/3.jpg",
         foto: "/img/hoteis/Amsterdao/Conservatorium_Hotel/4.jpg",
@@ -2305,9 +2391,180 @@ function initdata() {  // Utilizador inicial
       "Casas de Banho Neutras em Género",
     ];
     localStorage.setItem("acessibilidade", JSON.stringify(acessibilidade));
-  }  // Viagens
+  } // Viagens
   if (!localStorage.viagens) {
     const viagens = [
+      /* CENÁRIO 3: IDA E VOLTA - Turismo Cultural + Gastronómico */
+      {
+        numeroVoo: "EZY4080",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "easyJet",
+        partida: "25/07/2025 07:45",
+        chegada: "25/07/2025 10:00",
+        direto: true,
+        custo: 140,
+        imagem: "/img/destinos/Londres/3.jpg",
+        dataVolta: "30/07/2025 18:20",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+        tipoViagem: "ida-volta",
+        acessibilidade: [
+          "Elevadores Disponíveis",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+        segmentos: [
+          {
+            numeroVoo: "EZY4080",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "easyJet",
+            partida: "25/07/2025 07:45",
+            chegada: "25/07/2025 10:00",
+            tipo: "ida",
+          },
+          {
+            numeroVoo: "EZY4081",
+            origem: "LHR - Londres",
+            destino: "OPO - Porto",
+            companhia: "easyJet",
+            partida: "30/07/2025 18:20",
+            chegada: "30/07/2025 20:35",
+            tipo: "volta",
+          },
+        ],
+      },
+
+      /* Voos de regresso individuais para ida e volta */
+      {
+        numeroVoo: "EZY4081",
+        origem: "LHR - Londres",
+        destino: "OPO - Porto",
+        companhia: "easyJet",
+        partida: "30/07/2025 18:20",
+        chegada: "30/07/2025 20:35",
+        direto: true,
+        custo: 140,
+        imagem: "/img/destinos/Porto/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+        tipoViagem: "volta",
+        acessibilidade: [
+          "Elevadores Disponíveis",
+          "Aluguer de Equipamento de Mobilidade",
+        ],
+        segmentos: [
+          {
+            numeroVoo: "EZY4081",
+            origem: "LHR - Londres",
+            destino: "OPO - Porto",
+            companhia: "easyJet",
+            partida: "30/07/2025 18:20",
+            chegada: "30/07/2025 20:35",
+            tipo: "volta",
+          },
+        ],
+      },
+
+      /* VOOS INDIVIDUAIS CONVERTIDOS DO MULTITRIP ANTERIOR */
+      {
+        numeroVoo: "VS8901",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "Virgin Atlantic",
+        partida: "05/08/2025 08:00",
+        chegada: "05/08/2025 10:15",
+        direto: true,
+        custo: 145,
+        imagem: "/img/destinos/Londres/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Transporte Acessível", "Elevadores Disponíveis"],
+        segmentos: [
+          {
+            numeroVoo: "VS8901",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "Virgin Atlantic",
+            partida: "05/08/2025 08:00",
+            chegada: "05/08/2025 10:15",
+          },
+        ],
+      },
+      {
+        numeroVoo: "AF1234",
+        origem: "LHR - Londres",
+        destino: "CDG - Paris",
+        companhia: "Air France",
+        partida: "05/08/2025 16:00",
+        chegada: "05/08/2025 18:30",
+        direto: true,
+        custo: 150,
+        imagem: "/img/destinos/Paris/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Transporte Acessível", "Elevadores Disponíveis"],
+        segmentos: [
+          {
+            numeroVoo: "AF1234",
+            origem: "LHR - Londres",
+            destino: "CDG - Paris",
+            companhia: "Air France",
+            partida: "05/08/2025 16:00",
+            chegada: "05/08/2025 18:30",
+          },
+        ],
+      },
+      {
+        numeroVoo: "LH567",
+        origem: "CDG - Paris",
+        destino: "FCO - Roma",
+        companhia: "Lufthansa",
+        partida: "05/08/2025 20:00",
+        chegada: "05/08/2025 22:30",
+        direto: true,
+        custo: 180,
+        imagem: "/img/destinos/Roma/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Transporte Acessível", "Elevadores Disponíveis"],
+        segmentos: [
+          {
+            numeroVoo: "LH567",
+            origem: "CDG - Paris",
+            destino: "FCO - Roma",
+            companhia: "Lufthansa",
+            partida: "05/08/2025 20:00",
+            chegada: "05/08/2025 22:30",
+          },
+        ],
+      },
+
+      /* Voos adicionais para outras combinações de teste */
+      {
+        numeroVoo: "RY3456",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "Ryanair",
+        partida: "18/07/2025 06:30",
+        chegada: "18/07/2025 08:45",
+        direto: true,
+        custo: 89,
+        imagem: "/img/destinos/Londres/4.jpg",
+        turismo: ["Compras"],
+        tipoViagem: "so-ida",
+        acessibilidade: ["Acesso Sem Degraus"],
+        segmentos: [
+          {
+            numeroVoo: "RY3456",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "Ryanair",
+            partida: "18/07/2025 06:30",
+            chegada: "18/07/2025 08:45",
+            tipo: "ida",
+          },
+        ],
+      },
+
       {
         numeroVoo: "TP2456",
         origem: "OPO - Porto",
@@ -2315,32 +2572,32 @@ function initdata() {  // Utilizador inicial
         companhia: "TAP",
         partida: "01/07/2025 08:15",
         chegada: "01/07/2025 09:10",
-        direto: "S",
+        direto: true,
         custo: 75,
         imagem: "/img/destinos/Lisboa/1.jpg",
-        imagem: "/img/destinos/Lisboa/2.jpg",
-        imagem: "/img/destinos/Lisboa/3.jpg",
-        imagem: "/img/destinos/Lisboa/4.jpg",
-        imagem: "/img/destinos/Lisboa/5.jpg",
-        dataVolta: "05/07/2025 08:15",
-        turismo: ["Turismocultural", "Turismogastronomico", "TurismoUrbano"],
-      },
-      {
-        numeroVoo: "TP2457",
-        origem: "LIS - Lisboa",
-        destino: "OPO - Porto",
-        companhia: "TAP",
-        partida: "03/07/2025 10:00",
-        chegada: "03/07/2025 10:55",
-        direto: "S",
-        custo: 80,
-        imagem: "/img/destinos/Porto/1.jpg",
-        imagem: "/img/destinos/Porto/2.jpg",
-        imagem: "/img/destinos/Porto/3.jpg",
-        imagem: "/img/destinos/Porto/4.jpg",
-        imagem: "/img/destinos/Porto/5.jpg",
-        dataVolta: "08/07/2025 10:00",
-        turismo: ["Turismocultural", "Turismoreligioso", "TurismoUrbano"],
+        dataVolta: "05/07/2025 18:15",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico", "Turismo Urbano"],
+        tipoViagem: "ida-volta",
+        segmentos: [
+          {
+            numeroVoo: "TP2456",
+            origem: "OPO - Porto",
+            destino: "LIS - Lisboa",
+            companhia: "TAP",
+            partida: "01/07/2025 08:15",
+            chegada: "01/07/2025 09:10",
+            tipo: "ida",
+          },
+          {
+            numeroVoo: "TP2457",
+            origem: "LIS - Lisboa",
+            destino: "OPO - Porto",
+            companhia: "TAP",
+            partida: "05/07/2025 18:15",
+            chegada: "05/07/2025 19:10",
+            tipo: "volta",
+          },
+        ],
       },
       {
         numeroVoo: "BA1001",
@@ -2349,31 +2606,32 @@ function initdata() {  // Utilizador inicial
         companhia: "British Airways",
         partida: "05/07/2025 06:30",
         chegada: "05/07/2025 08:30",
-        direto: "S",
+        direto: true,
         custo: 200,
         imagem: "/img/destinos/Londres/1.jpg",
-        imagem: "/img/destinos/Londres/2.jpg",
-        imagem: "/img/destinos/Londres/3.jpg",
-        imagem: "/img/destinos/Londres/4.jpg",
-        imagem: "/img/destinos/Londres/5.jpg",
-        dataVolta: "10/07/2025 06:30",
-        turismo: ["TurismoUrbano", "Turismocultural", "Turismodenegocios"],
-      },      {
-        numeroVoo: "BA1002",
-        origem: "LHR - Londres",
-        destino: "OPO - Porto",
-        companhia: "British Airways",
-        partida: "07/07/2025 14:00",
-        chegada: "07/07/2025 16:00",
-        direto: "S",
-        custo: 210,
-        imagem: "/img/destinos/Porto/1.jpg",
-        imagem: "/img/destinos/Porto/2.jpg",
-        imagem: "/img/destinos/Porto/3.jpg",
-        imagem: "/img/destinos/Porto/4.jpg",
-        imagem: "/img/destinos/Porto/5.jpg",
-        dataVolta: "12/07/2025 14:00",
-        turismo: ["Turismocultural", "Turismogastronomico"],
+        dataVolta: "10/07/2025 16:30",
+        turismo: ["Turismo Urbano", "Turismo Cultural", "Turismo de Negócios"],
+        tipoViagem: "ida-volta",
+        segmentos: [
+          {
+            numeroVoo: "BA1001",
+            origem: "OPO - Porto",
+            destino: "LHR - Londres",
+            companhia: "British Airways",
+            partida: "05/07/2025 06:30",
+            chegada: "05/07/2025 08:30",
+            tipo: "ida",
+          },
+          {
+            numeroVoo: "BA1002",
+            origem: "LHR - Londres",
+            destino: "OPO - Porto",
+            companhia: "British Airways",
+            partida: "10/07/2025 16:30",
+            chegada: "10/07/2025 18:30",
+            tipo: "volta",
+          },
+        ],
       },
       {
         numeroVoo: "AF150",
@@ -2442,7 +2700,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Roma/5.jpg",
         dataVolta: "20/07/2025 12:00",
         turismo: ["Turismoreligioso", "Turismogastronomico"],
-      },      {
+      },
+      {
         numeroVoo: "FR300",
         origem: "STN - Londres",
         destino: "LIS - Lisboa",
@@ -2506,7 +2765,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Londres/2.jpg",
         imagem: "/img/destinos/Londres/3.jpg",
         imagem: "/img/destinos/Londres/4.jpg",
-        imagem: "/img/destinos/Londres/5.jpg",        dataVolta: "28/07/2025 12:00",
+        imagem: "/img/destinos/Londres/5.jpg",
+        dataVolta: "28/07/2025 12:00",
         turismo: ["Turismodenegocios", "TurismoUrbano"],
       },
       {
@@ -2576,7 +2836,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Paris/5.jpg",
         dataVolta: "07/08/2025 14:00",
         turismo: ["TurismoUrbano", "Turismogastronomico"],
-      },      {
+      },
+      {
         numeroVoo: "AF2010",
         origem: "CDG - Paris",
         destino: "LHR - Londres",
@@ -2609,7 +2870,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Londres/5.jpg",
         dataVolta: "11/08/2025 12:00",
         turismo: ["TurismoUrbano", "Turismodenegocios"],
-      },      {
+      },
+      {
         numeroVoo: "KL115",
         origem: "LIS - Lisboa",
         destino: "AMS - Amesterdão",
@@ -2676,7 +2938,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Roma/5.jpg",
         dataVolta: "19/08/2025 17:00",
         turismo: ["Turismoreligioso", "Turismocultural"],
-      },      {
+      },
+      {
         numeroVoo: "BA550",
         origem: "LGW - Londres",
         destino: "CDG - Paris",
@@ -2709,7 +2972,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Amsterdao/5.jpg",
         dataVolta: "23/08/2025 12:30",
         turismo: ["Turismocultural", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "TP300",
         origem: "LHR - Londres",
         destino: "LIS - Lisboa",
@@ -2780,7 +3044,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Londres/5.jpg",
         dataVolta: "31/08/2025 12:00",
         turismo: ["Turismodenegocios", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "SN100",
         origem: "BVA - Paris",
         destino: "AMS - Amesterdão",
@@ -2864,7 +3129,7 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Londres/5.jpg",
         dataVolta: "14/09/2025 07:15",
         turismo: ["TurismoUrbano", "Turismodenegocios"],
-      },      
+      },
       {
         numeroVoo: "OP1004",
         origem: "FCO - Roma",
@@ -2883,7 +3148,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "Turismodenegocios"],
       },
       {
-        numeroVoo: "OP1005",        
+        numeroVoo: "OP1005",
         origem: "CIA - Roma",
         destino: "CDG - Paris",
         companhia: "Air France",
@@ -2900,7 +3165,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "Turismogastronomico"],
       },
       {
-        numeroVoo: "OP1006",        
+        numeroVoo: "OP1006",
         origem: "LCY - Londres",
         destino: "CDG - Paris",
         companhia: "KLM",
@@ -2917,7 +3182,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["TurismoUrbano", "Turismodenegocios"],
       },
       {
-        numeroVoo: "OP1007",        
+        numeroVoo: "OP1007",
         origem: "BVA - Paris",
         destino: "LHR - Londres",
         companhia: "Brussels Airlines",
@@ -2934,7 +3199,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "TurismoUrbano"],
       },
       {
-        numeroVoo: "OP1008",        
+        numeroVoo: "OP1008",
         origem: "CDG - Paris",
         destino: "AMS - Amesterdão",
         companhia: "Ryanair",
@@ -2951,7 +3216,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "TurismoUrbano"],
       },
       {
-        numeroVoo: "OP1009",        
+        numeroVoo: "OP1009",
         origem: "AMS - Amesterdão",
         destino: "MAD - Madrid",
         companhia: "TAP",
@@ -2968,7 +3233,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "Turismogastronomico"],
       },
       {
-        numeroVoo: "OP1010",        
+        numeroVoo: "OP1010",
         origem: "MAD - Madrid",
         destino: "FCO - Roma",
         companhia: "Alitalia",
@@ -2985,7 +3250,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismoreligioso", "Turismocultural"],
       },
       {
-        numeroVoo: "OP1011",        
+        numeroVoo: "OP1011",
         origem: "LGW - Londres",
         destino: "FCO - Roma",
         companhia: "British Airways",
@@ -3002,7 +3267,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismoreligioso", "Turismocultural", "Turismogastronomico"],
       },
       {
-        numeroVoo: "OP1012",        
+        numeroVoo: "OP1012",
         origem: "CDG - Paris",
         destino: "FCO - Roma",
         companhia: "EasyJet",
@@ -3019,7 +3284,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismoreligioso", "Turismogastronomico"],
       },
       {
-        numeroVoo: "OP1013",        
+        numeroVoo: "OP1013",
         origem: "LHR - Londres",
         destino: "CDG - Paris",
         companhia: "TAP",
@@ -3036,7 +3301,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "TurismoUrbano", "Turismodenegocios"],
       },
       {
-        numeroVoo: "OP1014",        
+        numeroVoo: "OP1014",
         origem: "FCO - Roma",
         destino: "LHR - Londres",
         companhia: "Ryanair",
@@ -3053,7 +3318,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["TurismoUrbano", "Turismodenegocios"],
       },
       {
-        numeroVoo: "OP1015",        origem: "CIA - Roma",
+        numeroVoo: "OP1015",
+        origem: "CIA - Roma",
         destino: "LHR - Londres",
         companhia: "KLM",
         partida: "05/10/2025 07:45",
@@ -3069,7 +3335,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["TurismoUrbano", "Turismocultural"],
       },
       {
-        numeroVoo: "OP1016",        origem: "AMS - Amesterdão",
+        numeroVoo: "OP1016",
+        origem: "AMS - Amesterdão",
         destino: "LHR - Londres",
         companhia: "TAP",
         partida: "07/10/2025 13:00",
@@ -3084,7 +3351,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "12/10/2025 13:00",
         turismo: ["Turismodenegocios", "TurismoUrbano"],
       },
-      {        numeroVoo: "OP1017",
+      {
+        numeroVoo: "OP1017",
         origem: "OPO - Porto",
         destino: "LHR - Londres",
         companhia: "Air France",
@@ -3100,7 +3368,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "14/10/2025 06:30",
         turismo: ["Turismocultural", "Turismodenegocios"],
       },
-      {        numeroVoo: "OP1018",
+      {
+        numeroVoo: "OP1018",
         origem: "OPO - Porto",
         destino: "CDG - Paris",
         companhia: "Brussels Airlines",
@@ -3116,7 +3385,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "16/10/2025 11:15",
         turismo: ["TurismoUrbano", "Turismogastronomico"],
       },
-      {        numeroVoo: "OP1019",
+      {
+        numeroVoo: "OP1019",
         origem: "OPO - Porto",
         destino: "CDG - Paris",
         companhia: "EasyJet",
@@ -3132,7 +3402,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "18/10/2025 07:00",
         turismo: ["Turismocultural", "Turismodenegocios"],
       },
-      {        numeroVoo: "OP1020",
+      {
+        numeroVoo: "OP1020",
         origem: "OPO - Porto",
         destino: "CDG - Paris",
         companhia: "Ryanair",
@@ -3149,7 +3420,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "TurismoUrbano"],
       },
       {
-        numeroVoo: "TP1234",        origem: "OPO - Porto",
+        numeroVoo: "TP1234",
+        origem: "OPO - Porto",
         destino: "MAD - Madrid",
         companhia: "TAP Air Portugal",
         partida: "17/10/2025 10:00",
@@ -3164,7 +3436,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "22/10/2025 14:00",
         turismo: ["Turismocultural", "Turismogastronomico"],
       },
-      {        numeroVoo: "FR5678",
+      {
+        numeroVoo: "FR5678",
         origem: "OPO - Porto",
         destino: "CDG - Paris",
         companhia: "Ryanair",
@@ -3180,7 +3453,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "24/10/2025 12:00",
         turismo: ["Turismocultural", "TurismoUrbano"],
       },
-      {        numeroVoo: "EZY9101",
+      {
+        numeroVoo: "EZY9101",
         origem: "OPO - Porto",
         destino: "LHR - Londres",
         companhia: "easyJet",
@@ -3196,7 +3470,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "26/10/2025 16:00",
         turismo: ["Turismodenegocios", "TurismoUrbano"],
       },
-      {        numeroVoo: "BA2345",
+      {
+        numeroVoo: "BA2345",
         origem: "OPO - Porto",
         destino: "DUB - Dublin",
         companhia: "British Airways",
@@ -3212,7 +3487,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "28/10/2025 10:00",
         turismo: ["Turismocultural", "TurismoUrbano"],
       },
-      {        numeroVoo: "LH6789",
+      {
+        numeroVoo: "LH6789",
         origem: "OPO - Porto",
         destino: "TXL - Berlim",
         companhia: "Lufthansa",
@@ -3228,7 +3504,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "30/10/2025 15:00",
         turismo: ["Turismocultural", "TurismoUrbano", "Turismodenegocios"],
       },
-      {        numeroVoo: "IB3456",
+      {
+        numeroVoo: "IB3456",
         origem: "OPO - Porto",
         destino: "BCN - Barcelona",
         companhia: "Iberia",
@@ -3248,7 +3525,8 @@ function initdata() {  // Utilizador inicial
           "Turismogastronomico",
         ],
       },
-      {        numeroVoo: "KL7890",
+      {
+        numeroVoo: "KL7890",
         origem: "OPO - Porto",
         destino: "AMS - Amsterdão",
         companhia: "KLM",
@@ -3265,7 +3543,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "TurismoUrbano"],
       },
       {
-        numeroVoo: "SK1234",        origem: "OPO - Porto",
+        numeroVoo: "SK1234",
+        origem: "OPO - Porto",
         destino: "CPH - Copenhaga",
         companhia: "SAS",
         partida: "04/11/2025 07:00",
@@ -3281,7 +3560,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "Ecoturismo"],
       },
       {
-        numeroVoo: "AF5678",        origem: "OPO - Porto",
+        numeroVoo: "AF5678",
+        origem: "OPO - Porto",
         destino: "FCO - Roma",
         companhia: "Air France",
         partida: "06/11/2025 10:00",
@@ -3296,7 +3576,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "11/11/2025 17:00",
         turismo: ["Turismoreligioso", "Turismocultural", "Turismogastronomico"],
       },
-      {        numeroVoo: "VY9101",
+      {
+        numeroVoo: "VY9101",
         origem: "OPO - Porto",
         destino: "MXP - Milão",
         companhia: "Vueling",
@@ -3312,7 +3593,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "13/11/2025 19:00",
         turismo: ["Turismodenegocios", "Turismocultural", "TurismoUrbano"],
       },
-      {        numeroVoo: "TK2345",
+      {
+        numeroVoo: "TK2345",
         origem: "OPO - Porto",
         destino: "IST - Istambul",
         companhia: "Turkish Airlines",
@@ -3327,7 +3609,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Istambul/5.jpg",
         dataVolta: "15/11/2025 14:00",
         turismo: ["Turismoreligioso", "Turismocultural", "Turismodenegocios"],
-      },      {
+      },
+      {
         numeroVoo: "LX6789",
         origem: "OPO - Porto",
         destino: "ZUR - Zurique",
@@ -3343,7 +3626,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Zurique/5.jpg",
         dataVolta: "17/11/2025 10:00",
         turismo: ["Turismodenegocios", "Ecoturismo", "SaudeeBemEstar"],
-      },      {
+      },
+      {
         numeroVoo: "AUA1234",
         origem: "OPO - Porto",
         destino: "VIE - Viena",
@@ -3361,7 +3645,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "SaudeeBemEstar", "TurismoUrbano"],
       },
       {
-        numeroVoo: "DY5678",        origem: "OPO - Porto",
+        numeroVoo: "DY5678",
+        origem: "OPO - Porto",
         destino: "OSL - Oslo",
         companhia: "Norwegian Air Shuttle",
         partida: "16/11/2025 16:00",
@@ -3376,7 +3661,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "21/11/2025 08:00",
         turismo: ["Ecoturismo", "Turismocultural"],
       },
-      {        numeroVoo: "EI9101",
+      {
+        numeroVoo: "EI9101",
         origem: "OPO - Porto",
         destino: "DUB - Dublin",
         companhia: "Aer Lingus",
@@ -3391,7 +3677,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Dublin/5.jpg",
         dataVolta: "23/11/2025 16:00",
         turismo: ["Turismocultural", "TurismoUrbano", "Turismogastronomico"],
-      },      {
+      },
+      {
         numeroVoo: "AZ2345",
         origem: "OPO - Porto",
         destino: "FLR - Florença",
@@ -3407,7 +3694,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Florença/5.jpg",
         dataVolta: "25/11/2025 10:00",
         turismo: ["Turismocultural", "Turismorural", "Turismogastronomico"],
-      },      {
+      },
+      {
         numeroVoo: "SN6789",
         origem: "OPO - Porto",
         destino: "BRU - Bruxelas",
@@ -3423,7 +3711,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Bruxelas/5.jpg",
         dataVolta: "27/11/2025 15:00",
         turismo: ["Turismodenegocios", "Turismogastronomico", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "LO1234",
         origem: "OPO - Porto",
         destino: "WAW - Varsóvia",
@@ -3439,7 +3728,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Varsovia/5.jpg",
         dataVolta: "29/11/2025 09:00",
         turismo: ["Turismocultural", "Turismoreligioso", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "RO5678",
         origem: "OPO - Porto",
         destino: "OTP - Bucareste",
@@ -3455,7 +3745,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Bucareste/5.jpg",
         dataVolta: "01/12/2025 11:00",
         turismo: ["Turismocultural", "Turismodenegocios", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "H69101",
         origem: "OPO - Porto",
         destino: "BUD - Budapeste",
@@ -3471,7 +3762,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Budapeste/5.jpg",
         dataVolta: "03/12/2025 14:00",
         turismo: ["Turismocultural", "SaudeeBemEstar", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "AY2345",
         origem: "OPO - Porto",
         destino: "HEL - Helsínquia",
@@ -3488,7 +3780,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "06/12/2025 10:00",
         turismo: ["Ecoturismo", "Turismocultural", "TurismoUrbano"],
       },
-      {        numeroVoo: "LX6789",
+      {
+        numeroVoo: "LX6789",
         origem: "OPO - Porto",
         destino: "GVA - Genebra",
         companhia: "SWISS",
@@ -3508,7 +3801,8 @@ function initdata() {  // Utilizador inicial
           "TurismoUrbano",
           "SaudeeBemEstar",
         ],
-      },      {
+      },
+      {
         numeroVoo: "FR1020",
         origem: "OPO - Porto",
         destino: "FRA - Frankfurt",
@@ -3524,7 +3818,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Frankfurt/5.jpg",
         dataVolta: "10/12/2025 12:00",
         turismo: ["Turismodenegocios", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "TP3040",
         origem: "OPO - Porto",
         destino: "MUC - Munique",
@@ -3544,7 +3839,8 @@ function initdata() {  // Utilizador inicial
           "Turismogastronomico",
           "Turismodenegocios",
         ],
-      },      {
+      },
+      {
         numeroVoo: "EZY5060",
         origem: "OPO - Porto",
         destino: "MAN - Manchester",
@@ -3560,7 +3856,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Manchester/5.jpg",
         dataVolta: "14/12/2025 14:00",
         turismo: ["Turismocultural", "Turismodenegocios", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "BA7080",
         origem: "OPO - Porto",
         destino: "EDI - Edimburgo",
@@ -3578,7 +3875,7 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "Turismoreligioso", "TurismoUrbano"],
       },
       {
-        numeroVoo: "LH9010",        
+        numeroVoo: "LH9010",
         origem: "OPO - Porto",
         destino: "HAM - Hamburgo",
         companhia: "Lufthansa",
@@ -3593,7 +3890,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Hamburgo/5.jpg",
         dataVolta: "18/12/2025 15:00",
         turismo: ["Turismodenegocios", "Turismocultural", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "IB2030",
         origem: "OPO - Porto",
         destino: "VLC - Valência",
@@ -3613,7 +3911,8 @@ function initdata() {  // Utilizador inicial
           "Turismogastronomico",
           "Turismocultural",
         ],
-      },      {
+      },
+      {
         numeroVoo: "KL4050",
         origem: "OPO - Porto",
         destino: "RTM - Roterdão",
@@ -3629,7 +3928,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Roterdao/5.jpg",
         dataVolta: "22/12/2025 11:00",
         turismo: ["TurismoUrbano", "Turismodenegocios", "Turismocultural"],
-      },      {
+      },
+      {
         numeroVoo: "SK6070",
         origem: "OPO - Porto",
         destino: "ARN - Estocolmo",
@@ -3647,7 +3947,8 @@ function initdata() {  // Utilizador inicial
         turismo: ["Turismocultural", "Ecoturismo", "TurismoUrbano"],
       },
       {
-        numeroVoo: "AF8090",        origem: "OPO - Porto",
+        numeroVoo: "AF8090",
+        origem: "OPO - Porto",
         destino: "MRS - Marselha",
         companhia: "Air France",
         partida: "21/12/2025 11:00",
@@ -3667,7 +3968,8 @@ function initdata() {  // Utilizador inicial
         ],
       },
       {
-        numeroVoo: "VY1020",        origem: "OPO - Porto",
+        numeroVoo: "VY1020",
+        origem: "OPO - Porto",
         destino: "SVQ - Sevilha",
         companhia: "Vueling",
         partida: "23/12/2025 16:00",
@@ -3681,7 +3983,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Sevilha/5.jpg",
         dataVolta: "28/12/2025 19:00",
         turismo: ["Turismocultural", "Turismoreligioso", "Turismogastronomico"],
-      },      {
+      },
+      {
         numeroVoo: "TK3040",
         origem: "OPO - Porto",
         destino: "ESB - Ancara",
@@ -3697,7 +4000,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Ancara/5.jpg",
         dataVolta: "30/12/2025 14:00",
         turismo: ["Turismocultural", "Turismodenegocios", "TurismoUrbano"],
-      },      {
+      },
+      {
         numeroVoo: "LX5060",
         origem: "OPO - Porto",
         destino: "BSL - Basileia",
@@ -3714,7 +4018,8 @@ function initdata() {  // Utilizador inicial
         dataVolta: "29/12/2025 10:00",
         turismo: ["Turismodenegocios", "Turismocultural", "SaudeeBemEstar"],
       },
-      {        numeroVoo: "AUA7080",
+      {
+        numeroVoo: "AUA7080",
         origem: "OPO - Porto",
         destino: "SZG - Salzburgo",
         companhia: "Austrian Airlines",
@@ -3729,7 +4034,8 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Salzburgo/5.jpg",
         dataVolta: "31/12/2025 13:00",
         turismo: ["Turismocultural", "Turismorural", "Ecoturismo"],
-      },      {
+      },
+      {
         numeroVoo: "DY9010",
         origem: "OPO - Porto",
         destino: "BGO - Bergen",
@@ -3745,6 +4051,85 @@ function initdata() {  // Utilizador inicial
         imagem: "/img/destinos/Bergen/5.jpg",
         dataVolta: "02/01/2026 08:00",
         turismo: ["Ecoturismo", "Turismocultural"],
+      },
+
+      /* Voos individuais para criar viagens multitrip dinâmicas */
+      /* Rota Porto → Londres → Paris */
+      {
+        numeroVoo: "TP441",
+        origem: "OPO - Porto",
+        destino: "LHR - Londres",
+        companhia: "TAP Air Portugal",
+        partida: "15/08/2025 09:00",
+        chegada: "15/08/2025 11:15",
+        direto: true,
+        custo: 180,
+        imagem: "/img/destinos/Londres/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+      },
+      {
+        numeroVoo: "BA334",
+        origem: "LHR - Londres",
+        destino: "CDG - Paris",
+        companhia: "British Airways",
+        partida: "15/08/2025 16:45",
+        chegada: "15/08/2025 20:30",
+        direto: true,
+        custo: 240,
+        imagem: "/img/destinos/Paris/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      },
+
+      /* Rota Lisboa → Madrid → Roma */
+      {
+        numeroVoo: "TP1013",
+        origem: "LIS - Lisboa",
+        destino: "MAD - Madrid",
+        companhia: "TAP Air Portugal",
+        partida: "22/08/2025 08:30",
+        chegada: "22/08/2025 10:45",
+        direto: true,
+        custo: 160,
+        imagem: "/img/destinos/Madrid/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
+      },
+      {
+        numeroVoo: "IB3246",
+        origem: "MAD - Madrid",
+        destino: "FCO - Roma",
+        companhia: "Iberia",
+        partida: "22/08/2025 15:20",
+        chegada: "22/08/2025 19:45",
+        direto: true,
+        custo: 220,
+        imagem: "/img/destinos/Roma/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Histórico"],
+      },
+
+      /* Mais voos para outras combinações multitrip */
+      {
+        numeroVoo: "AF1234",
+        origem: "CDG - Paris",
+        destino: "AMS - Amesterdão",
+        companhia: "Air France",
+        partida: "10/09/2025 14:20",
+        chegada: "10/09/2025 16:00",
+        direto: true,
+        custo: 190,
+        imagem: "/img/destinos/Amsterdao/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Urbano"],
+      },
+      {
+        numeroVoo: "KL889",
+        origem: "AMS - Amesterdão",
+        destino: "OPO - Porto",
+        companhia: "KLM",
+        partida: "10/09/2025 18:30",
+        chegada: "10/09/2025 20:15",
+        direto: true,
+        custo: 210,
+        imagem: "/img/destinos/Porto/1.jpg",
+        turismo: ["Turismo Cultural", "Turismo Gastronómico"],
       },
     ];
     localStorage.setItem("viagens", JSON.stringify(viagens));
@@ -4619,24 +5004,24 @@ function initdata() {  // Utilizador inicial
     const newsletter = [
       {
         username: "António Amorim",
-        email: "40240119@esmad.ipp.pt"
+        email: "40240119@esmad.ipp.pt",
       },
       {
-        email: "unregistered1@example.com"
+        email: "unregistered1@example.com",
       },
       {
-        email: "unregistered2@example.com"
+        email: "unregistered2@example.com",
       },
       {
-        email: "unregistered3@example.com"
+        email: "unregistered3@example.com",
       },
       {
         username: "Gabriel Paiva",
-        email: "40240137@esmad.ipp.pt"
+        email: "40240137@esmad.ipp.pt",
       },
       {
-        email: "newsletter.subscriber@example.com"
-      }
+        email: "newsletter.subscriber@example.com",
+      },
     ];
     localStorage.setItem("newsletter", JSON.stringify(newsletter));
   }
