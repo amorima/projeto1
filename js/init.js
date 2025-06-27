@@ -1,7 +1,5 @@
-console.log("🚀 Iniciando carregamento de dados...");
 initdata();
 function initdata() {
-  console.log("📊 Executando initdata()...");
   // Utilizador inicial
   if (!localStorage.user) {
     const user = [
@@ -2395,7 +2393,6 @@ function initdata() {
     localStorage.setItem("acessibilidade", JSON.stringify(acessibilidade));
   } // Viagens
   if (!localStorage.viagens) {
-    console.log("📊 Carregando dados de viagens...");
     const viagens = [
       /* CENÁRIO 3: IDA E VOLTA - Turismo Cultural + Gastronómico */
       {
@@ -4136,13 +4133,6 @@ function initdata() {
       },
     ];
     localStorage.setItem("viagens", JSON.stringify(viagens));
-    console.log("✅ Dados de viagens carregados:", viagens.length, "voos");
-  } else {
-    console.log(
-      "📊 Dados de viagens já existem no localStorage:",
-      JSON.parse(localStorage.viagens).length,
-      "voos"
-    );
   }
   // Companhias Aéreas
   if (!localStorage.companhiasAereas) {
@@ -5035,20 +5025,4 @@ function initdata() {
     ];
     localStorage.setItem("newsletter", JSON.stringify(newsletter));
   }
-
-  /* Debug - verificar dados carregados */
-  console.log("✅ Dados inicializados:");
-  console.log(
-    "  - Utilizadores:",
-    localStorage.user ? JSON.parse(localStorage.user).length : 0
-  );
-  console.log(
-    "  - Viagens:",
-    localStorage.viagens ? JSON.parse(localStorage.viagens).length : 0
-  );
-  console.log(
-    "  - Destinos:",
-    localStorage.destinos ? JSON.parse(localStorage.destinos).length : 0
-  );
-  console.log("🎉 initdata() concluída com sucesso");
 }

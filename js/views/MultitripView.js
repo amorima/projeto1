@@ -5,16 +5,13 @@ let availableDestinations = [];
 
 /* Inicializar funcionalidade multitrip */
 function initMultitrip() {
-  console.log("🚀 Inicializando sistema multitrip...");
 
   loadAvailableDestinations();
-  console.log("📍 Destinos carregados:", availableDestinations.length);
 
   setupMultitripInput();
   setupDragAndDrop();
   setupTripTypeButtons();
 
-  console.log("✅ Sistema multitrip inicializado");
 }
 
 /* Carregar destinos disponíveis do localStorage */
@@ -112,14 +109,12 @@ function handleInputKeydown(e) {
 function addDestination(nome, codigo) {
   /* Verificar se já existe */
   if (multitripDestinations.some((dest) => dest.nome === nome)) {
-    console.log("Destino já existe:", nome);
     return;
   }
 
   const newDestination = { nome, codigo };
   multitripDestinations.push(newDestination);
-  console.log("Destino adicionado:", newDestination);
-  console.log("Lista atual:", multitripDestinations);
+
 
   renderPills();
   updateOriginDestination();
@@ -134,8 +129,7 @@ function addDestination(nome, codigo) {
 function removeDestination(index) {
   if (index >= 0 && index < multitripDestinations.length) {
     const removedDestination = multitripDestinations.splice(index, 1)[0];
-    console.log("Destino removido:", removedDestination);
-    console.log("Lista atual:", multitripDestinations);
+
 
     renderPills();
     updateOriginDestination();
@@ -155,7 +149,6 @@ function renderPills() {
     return;
   }
 
-  console.log("🔄 Renderizando pills:", multitripDestinations.length);
 
   if (multitripDestinations.length === 0) {
     if (placeholder) placeholder.classList.remove("hidden");
@@ -378,35 +371,28 @@ function setupTripTypeButtons() {
 
 /* Atualizar pesquisa quando destinos multitrip mudam */
 function updateSearch() {
-  console.log("🔄 Atualizando pesquisa multitrip...");
 
   /* Verificar se a função de coleta de dados está disponível */
   if (typeof collectCurrentSearchData === "function") {
     const searchData = collectCurrentSearchData();
     if (searchData) {
       sessionStorage.setItem("planit_search", JSON.stringify(searchData));
-      console.log("💾 Dados de pesquisa atualizados:", searchData);
 
       /* Atualizar cards se a função estiver disponível */
       if (typeof renderFlightCards === "function") {
         renderFlightCards();
       }
     }
-  } else {
-    console.log("⚠️ Função collectCurrentSearchData não disponível");
-  }
+  } 
 }
 
 /* Função de teste para debugging */
 function testMultitrip() {
-  console.log("🧪 Testando sistema multitrip...");
-  console.log("Destinos disponíveis:", availableDestinations);
-  console.log("Destinos selecionados:", multitripDestinations);
+
 
   /* Testar adição de destino */
   if (availableDestinations.length > 0) {
     const testDest = availableDestinations[0];
-    console.log("Adicionando destino de teste:", testDest);
     addDestination(testDest.nome, testDest.codigo);
   }
 }
