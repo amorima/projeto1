@@ -91,14 +91,14 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 - **Origem:** Porto (OPO)
 - **Destino:** Londres (LHR)
 - **Tipo:** Só ida
-- **Data de Partida:** 05/07/2025
+- **Data de Partida:** 05/07/2026
 - **Tipo de Turismo:** Turismo Cultural
 - **Acessibilidade:** Acesso Sem Degraus
 
 ### **Resultado Esperado:**
 - ✈️ **Voo:** BA1001 - British Airways
-- 🕘 **Partida:** 05/07/2025 às 06:30
-- 🕐 **Chegada:** 05/07/2025 às 08:30
+- 🕘 **Partida:** 05/07/2026 às 06:30
+- 🕐 **Chegada:** 05/07/2026 às 08:30
 - 💰 **Preço:** €200
 - ♿ **Acessibilidade:** Acesso Sem Degraus, Elevadores Disponíveis
 
@@ -110,14 +110,14 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 - **Origem:** Porto (OPO)
 - **Destino:** Londres (LHR)
 - **Tipo:** Só ida
-- **Data de Partida:** 21/10/2025
+- **Data de Partida:** 21/10/2026
 - **Tipo de Turismo:** Turismo Urbano
 - **Acessibilidade:** Transporte Acessível
 
 ### **Resultado Esperado:**
 - ✈️ **Voo:** EZ9101 - easyJet
-- 🕐 **Partida:** 21/10/2025 às 08:30
-- 🕔 **Chegada:** 21/10/2025 às 11:00
+- 🕐 **Partida:** 21/10/2026 às 08:30
+- 🕔 **Chegada:** 21/10/2026 às 11:00
 - 💰 **Preço:** €120
 - ♿ **Acessibilidade:** Transporte Acessível, Casas de Banho Adaptadas
 
@@ -129,18 +129,18 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 - **Origem:** Porto (OPO)
 - **Destino:** Londres (LHR)
 - **Tipo:** Ida e volta
-- **Data de Partida:** 05/07/2025
-- **Data de Regresso:** 07/07/2025
+- **Data de Partida:** 05/07/2026
+- **Data de Regresso:** 07/07/2026
 - **Tipo de Turismo:** Turismo de Negócios
 - **Acessibilidade:** Elevadores Disponíveis
 
 ### **Resultado Esperado:**
 - ✈️ **Voo de Ida:** BA1001 - British Airways
-- 🕘 **Partida:** 05/07/2025 às 06:30
-- 🕙 **Chegada:** 05/07/2025 às 08:30
+- 🕘 **Partida:** 05/07/2026 às 06:30
+- 🕙 **Chegada:** 05/07/2026 às 08:30
 - ✈️ **Voo de Volta:** BA1002 - British Airways
-- 🕕 **Partida:** 07/07/2025 às 14:00
-- 🕗 **Chegada:** 07/07/2025 às 16:00
+- 🕕 **Partida:** 07/07/2026 às 14:00
+- 🕗 **Chegada:** 07/07/2026 às 16:00
 - 💰 **Preço Total:** €410 (€200 + €210)
 - ♿ **Acessibilidade:** Elevadores Disponíveis, Aluguer de Equipamento de Mobilidade
 
@@ -156,8 +156,8 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 
 ### **Resultado Esperado:**
 - ✈️ **Voo:** TP2456 - TAP
-- 🕕 **Partida:** 01/07/2025 às 08:15
-- 🕗 **Chegada:** 01/07/2025 às 09:10
+- 🕕 **Partida:** 01/07/2026 às 08:15
+- 🕗 **Chegada:** 01/07/2026 às 09:10
 - 💰 **Preço:** €75
 - ♿ **Acessibilidade:** Acesso Sem Degraus
 
@@ -175,11 +175,11 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 
 ### **Resultado Esperado:**
 - ✈️ **Segmento 1:** BA1001 - British Airways (Porto → Londres)
-- 🕘 **Partida:** 05/07/2025 às 06:30
-- 🕙 **Chegada:** 05/07/2025 às 08:30
+- 🕘 **Partida:** 05/07/2026 às 06:30
+- 🕙 **Chegada:** 05/07/2026 às 08:30
 - ✈️ **Segmento 2:** FR305 - Ryanair (Londres → Paris)
-- 🕓 **Partida:** 02/08/2025 às 14:00
-- 🕕 **Chegada:** 02/08/2025 às 18:00
+- 🕓 **Partida:** 02/08/2026 às 14:00
+- 🕕 **Chegada:** 02/08/2026 às 18:00
 - 💰 **Preço Total:** €295
 - ♿ **Acessibilidade:** Transporte Acessível, Elevadores Disponíveis
 
@@ -197,20 +197,20 @@ Foram adicionados voos específicos para testar todos os tipos de viagem entre P
 
 ### **Voos Individuais que Compõem a Viagem:**
 1. **BA2025** - Porto (OPO) → Londres (LHR)
-   - 🕘 **Partida:** 05/07/2025 às 06:30
-   - 🕙 **Chegada:** 05/07/2025 às 08:30
+   - 🕘 **Partida:** 05/07/2026 às 06:30
+   - 🕙 **Chegada:** 05/07/2026 às 08:30
    - ✈️ **Companhia:** British Airways
    - 💰 **Preço:** €200
 
 2. **AF1234** - Londres (LHR) → Paris (CDG)
-   - 🕓 **Partida:** 02/08/2025 às 14:00
-   - 🕕 **Chegada:** 02/08/2025 às 18:00
+   - 🕓 **Partida:** 02/08/2026 às 14:00
+   - 🕕 **Chegada:** 02/08/2026 às 18:00
    - ✈️ **Companhia:** Ryanair
    - 💰 **Preço:** €95
 
 3. **LH567** - Paris (CDG) → Roma (FCO)
-   - 🕗 **Partida:** 27/09/2025 às 10:30
-   - 🕘 **Chegada:** 27/09/2025 às 12:00
+   - 🕗 **Partida:** 27/09/2026 às 10:30
+   - 🕘 **Chegada:** 27/09/2026 às 12:00
    - ✈️ **Companhia:** EasyJet
    - 💰 **Preço:** €125
 
